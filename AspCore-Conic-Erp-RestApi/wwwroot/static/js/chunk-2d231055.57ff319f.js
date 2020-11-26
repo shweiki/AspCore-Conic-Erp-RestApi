@@ -1,0 +1,1 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d231055"],{ef86:function(e,n,t){"use strict";t.r(n);var a=function(){var e=this,n=e.$createElement,t=e._self._c||n;return t("detail",{attrs:{"is-edit":!1}})},c=[],i=t("3da3"),l={name:"CreateInvoice",components:{Detail:i["a"]}},s=l,o=t("2877"),r=Object(o["a"])(s,a,c,!1,null,null,null);n["default"]=r.exports}}]);
