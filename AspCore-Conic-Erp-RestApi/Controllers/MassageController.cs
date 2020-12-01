@@ -23,10 +23,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetMassageObjID(string TableName , long ObjID )
         {
 
-            var Massage = (from x in DB.Massages.ToList()
-                        where (x.TableName == TableName && x.Fktable == ObjID)
-                        select new
-                        { x.Id, x.SendDate, x.Type , x.Body }).ToList(); 
+            var Massage = DB.Massages.Where(i => i.TableName == TableName && i.Fktable == ObjID).Select(x => new {
+                x.Id,
+                x.SendDate,
+                x.Type,
+                x.Body
+            }).ToList();
+              
           if(Massage != null)
             return Ok(Massage);
 

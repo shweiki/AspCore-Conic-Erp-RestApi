@@ -31,15 +31,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Role/GetRoles")]
         public  IActionResult GetRoles()
         {
-            var Roles = (from x in DB.Roles.ToList()
-                         select new
-                         {
-                             x.Id,
-                             x.Name,
-                             x.NormalizedName,
-                             x.ConcurrencyStamp,
-
-                         }).ToList();
+            var Roles = DB.Roles.Select(x => new
+            {
+                x.Id,
+                x.Name,
+                x.NormalizedName,
+                x.ConcurrencyStamp,
+            }).ToList();
+                     
             return Ok(DB.Roles.ToList());
         }
 

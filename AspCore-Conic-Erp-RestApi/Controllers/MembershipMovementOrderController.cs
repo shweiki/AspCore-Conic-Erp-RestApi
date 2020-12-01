@@ -16,20 +16,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMembershipMovementOrderByMemberShipID(long? MemberShipID)
         {
-            var MembershipMovementOrder = (from x in DB.MembershipMovementOrders.ToList()
-                            where (x.MemberShipMovementId == MemberShipID)
-                            let p = new
-                            {
-                                x.Id,
-                                x.EditorName,
-                                x.Type,
-                                x.StartDate,
-                                x.EndDate,
-                                x.Status,
-                                x.MemberShipMovementId,
-                                x.Description
-                            }
-                            select p);
+            var MembershipMovementOrder = DB.MembershipMovementOrders.Where(i => i.MemberShipMovementId == MemberShipID).Select(x => new
+            {
+                x.Id,
+                x.EditorName,
+                x.Type,
+                x.StartDate,
+                x.EndDate,
+                x.Status,
+                x.MemberShipMovementId,
+                x.Description
+            }).ToList();
 
             return Ok(MembershipMovementOrder);
         }
@@ -38,25 +35,22 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMembershipMovementOrderByStatus(int? Status)
         {
-            var MembershipMovementOrders = (from x in DB.MembershipMovementOrders.ToList()
-                            where (x.Status == Status)
-                            let p = new
-                            {
-                                x.Id,
-                                x.Type,
-                                x.StartDate,
-                                x.EndDate,
-                                x.Status,
-                                x.EditorName,
-                                x.MemberShipMovementId,
-                                x.Description,
-                                MembershipMovementType =DB.MembershipMovements.Where(m=>m.Id == x.MemberShipMovementId).SingleOrDefault().Type,
-                                MemberId = DB.MembershipMovements.Where(m=>m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId,
-                                Name = DB.Members.Where(m=>m.Id == DB.MembershipMovements.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId).SingleOrDefault().Name,
-                          
-                            }
-                            select p);
-
+            var MembershipMovementOrders = DB.MembershipMovementOrders.Where(i => i.Status == Status).Select(x => new
+            {
+                x.Id,
+                x.Type,
+                x.StartDate,
+                x.EndDate,
+                x.Status,
+                x.EditorName,
+                x.MemberShipMovementId,
+                x.Description,
+                MembershipMovementType = DB.MembershipMovements.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().Type,
+                MemberId = DB.MembershipMovements.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId,
+                Name = DB.Members.Where(m => m.Id == DB.MembershipMovements.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId).SingleOrDefault().Name,
+            }).ToList();
+                      
+                           
             return Ok(MembershipMovementOrders);
         }
 
@@ -71,13 +65,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                     DB.MembershipMovementOrders.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "MembershipMovementOrder").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
-                    else return Ok(false);
+                    return Ok(true);
+
                 }
                 catch
                 {

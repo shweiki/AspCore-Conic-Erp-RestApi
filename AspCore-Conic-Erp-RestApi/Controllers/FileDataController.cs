@@ -21,10 +21,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetFileByObjID(string TableName , long ObjID )
         {
 
-            var file = (from x in DB.FileData.ToList()
-                        where (x.TableName == TableName && x.Fktable == ObjID)
-                        select new
-                        { x.Id, x.File, x.FileType }).LastOrDefault(); 
+            var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjID).Select(x => new {
+                x.Id,
+                x.File,
+                x.FileType
+
+            }).LastOrDefault();
+    
           if(file != null)
             return Ok(file);
 

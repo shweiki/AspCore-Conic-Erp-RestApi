@@ -15,19 +15,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetDiscount()
         {
-            var Discounts = (from x in DB.Discounts.ToList()
-                             select new
-                             {
-                                 x.Id,
-                                 x.Name,
-                                 x.Type,
-                                 x.Value,
-                                 x.ValueOfDays,
-                                 x.IsPrime,
-                                 x.Status,
-                                 x.Description,
+            var Discounts = DB.Discounts.Select(x => new {
+                x.Id,
+                x.Name,
+                x.Type,
+                x.Value,
+                x.ValueOfDays,
+                x.IsPrime,
+                x.Status,
+                x.Description,
+            }).ToList();
                            
-                             });
+
+                           
+                            
             return Ok(Discounts);
         }
         [Route("Discount/GetActiveDiscount")]
@@ -46,15 +47,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
-                    collection.Status = 0;
                     DB.Discounts.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "Discount").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
                 }
                 catch
                 {

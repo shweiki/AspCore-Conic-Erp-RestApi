@@ -23,13 +23,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                     DB.MembershipMovements.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "MembershipMovement").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(collection.Id);
-                    }
-                    else return Ok("False Op");
+                    return Ok(collection.Id);
+
                 }
                 catch
                 {
@@ -61,13 +56,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     MemberShipMovement.EditorName = collection.EditorName;
 
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == MemberShipMovement.Status && d.TableName == "MembershipMovement").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(collection.Id);
-                    }
-                    else return Ok("False Op");
+                    return Ok(collection.Id);
+
                 }
                 catch
                 {
@@ -170,62 +160,40 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMembershipMovementByMemberId(long? MemberId)
         {
-            var MembershipMovements = (from MS in DB.MembershipMovements?.Where(z => z.MemberId == MemberId)?.ToList()
-                                       let p = new
-                                       {
-                                           MS.Id,
-                                           MS.Membership.Name,
-                                           MS.Membership.MinFreezeLimitDays,
-                                           MS.Membership.MaxFreezeLimitDays,
-                                           MS.VisitsUsed,
-                                           MS.Type,
-                                           MS.TotalAmmount,
-                                           MS.MemberId,
-                                           MS.MembershipId,
-                                           MS.DiscountDescription,
-                                           MS.Description,
-                                           MS.StartDate,
-                                           MS.EndDate,
-                                           MS.Discount,
-                                           MS.EditorName,
-                                           MembershipMovementOrders = (from MSO in DB.MembershipMovementOrders.Where(f => f.MemberShipMovementId == MS.Id).ToList()
-                                                                       select new
-                                                                       {
-                                                                           MSO.Id,
-                                                                           MSO.Type,
-                                                                           MSO.StartDate,
-                                                                           MSO.EndDate,
-                                                                           MSO.Description,
-                                                                           Status = (from a in DB.Oprationsys.ToList()
-                                                                                     where (a.Status == MSO.Status) && (a.TableName == "MembershipMovementOrder")
-                                                                                     select new
-                                                                                     {
-                                                                                         a.Id,
-                                                                                         a.OprationName,
-                                                                                         a.Status,
-                                                                                         a.OprationDescription,
-                                                                                         a.ArabicOprationDescription,
-                                                                                         a.IconClass,
-                                                                                         a.ClassName
-                                                                                     }).FirstOrDefault(),
-                                                                       }).ToList(),
+            var MembershipMovements = DB.MembershipMovements.Where(z => z.MemberId == MemberId).Select(MS => new
+            {
+                MS.Id,
+                MS.Membership.Name,
+                MS.Membership.MinFreezeLimitDays,
+                MS.Membership.MaxFreezeLimitDays,
+                MS.VisitsUsed,
+                MS.Type,
+                MS.TotalAmmount,
+                MS.MemberId,
+                MS.MembershipId,
+                MS.DiscountDescription,
+                MS.Description,
+                MS.StartDate,
+                MS.EndDate,
+                MS.Discount,
+                MS.EditorName,
+                MS.Status,
+                MS.Tax,
+                MembershipMovementOrders = DB.MembershipMovementOrders.Where(f => f.MemberShipMovementId == MS.Id).Select(MSO => new
+                {
+                    MSO.Id,
+                    MSO.Type,
+                    MSO.StartDate,
+                    MSO.EndDate,
+                    MSO.Description,
+                }).ToList(),
 
-                                           MS.Tax,
-                                           Status = (from a in DB.Oprationsys.ToList()
-                                                     where (a.Status == MS.Status) && (a.TableName == "MembershipMovement")
-                                                     select new
-                                                     {
-                                                         a.Id,
-                                                         a.OprationName,
-                                                         a.Status,
-                                                         a.OprationDescription,
-                                                         a.ArabicOprationDescription,
-                                                         a.IconClass,
-                                                         a.ClassName
-                                                     }).FirstOrDefault(),
-                                  
-                                       }
-                                       select p);
+
+
+            }).ToList();
+                                    
+                                         
+                                 
 
             return Ok(MembershipMovements);
         }
@@ -233,26 +201,23 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMembershipMovementByID(long? ID)
         {
-            var MembershipMovements = (from MS in DB.MembershipMovements?.Where(z => z.Id == ID)?.ToList()
-                                       let p = new
-                                       {
-                                           MS.Id,
-                                           MS.VisitsUsed,
-                                           MS.Type,
-                                           MS.TotalAmmount,
-                                           MS.MemberId,
-                                           MS.MembershipId,
-                                           MS.DiscountDescription,
-                                           MS.Description,
-                                           MS.StartDate,
-                                           MS.EndDate,
-                                           MS.Discount,
-                                           MS.Tax,
-                                           MS.Status,                                   
-                                           MS.EditorName,                                   
+            var MembershipMovements = DB.MembershipMovements.Where(z => z.Id == ID).Select(x => new {
+                x.Id,
+                x.VisitsUsed,
+                x.Type,
+                x.TotalAmmount,
+                x.MemberId,
+                x.MembershipId,
+                x.DiscountDescription,
+                x.Description,
+                x.StartDate,
+                x.EndDate,
+                x.Discount,
+                x.Tax,
+                x.Status,
+                x.EditorName,
+            }).SingleOrDefault();
 
-                                       }
-                                       select p).SingleOrDefault();
 
             return Ok(MembershipMovements);
         }
@@ -260,28 +225,26 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMembershipMovementByStatus(int? Status)
         {
-            var MembershipMovements = (from x in DB.MembershipMovements?.Where(z=> z.Status == Status)?.ToList()
-                            let p = new
-                            {
-                                x.Id,
-                                x.TotalAmmount,
-                                x.Tax,
-                                x.StartDate,
-                                x.EndDate,
-                                x.Type,
-                                x.VisitsUsed,
-                                x.Discount,
-                                x.DiscountDescription,
-                                x.Description,
-                                x.Status,
-                                x.EditorName,
-                                x.MemberId,
-                                x.Member.AccountId,
-                                MemberName= DB.Members.Where(m=>m.Id == x.MemberId).SingleOrDefault().Name,
-                                MembershipName= DB.Memberships.Where(m=>m.Id == x.MembershipId).SingleOrDefault().Name,
-                            }
-                            select p);
-
+            var MembershipMovements = DB.MembershipMovements.Where(z => z.Status == Status).Select(x => new {
+                x.Id,
+                x.TotalAmmount,
+                x.Tax,
+                x.StartDate,
+                x.EndDate,
+                x.Type,
+                x.VisitsUsed,
+                x.Discount,
+                x.DiscountDescription,
+                x.Description,
+                x.Status,
+                x.EditorName,
+                x.MemberId,
+                x.Member.AccountId,
+                MemberName = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
+                MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
+            }).ToList();
+                         
+                              
             return Ok(MembershipMovements);
         }
     }

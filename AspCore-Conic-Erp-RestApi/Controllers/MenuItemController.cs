@@ -15,15 +15,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMenuItem()
         {
-            var MenuItems = (from x in DB.MenuItems.ToList()
-                              select new
-                              {
-                                  x.Id,
-                                  x.Name,
-                                  x.Description,
-                                  x.IsPrime,
-                        
-                              });
+            var MenuItems = DB.MenuItems.Select(x => new
+            {
+                x.Id,
+                x.Name,
+                x.Description,
+                x.IsPrime,
+            }).ToList();
 
             return Ok(MenuItems);
         }
@@ -45,15 +43,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
-                    collection.Status = 0;
                     DB.MenuItems.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "MenuItem").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
+                    return Ok(true);
+
                 }
                 catch
                 {

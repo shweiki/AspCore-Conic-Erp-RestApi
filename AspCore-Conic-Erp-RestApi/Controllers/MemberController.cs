@@ -39,22 +39,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetPayablesMember()
         {
-            var Members = from x in DB.Members.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) < 0).ToList()
-                          select new
-                          {
-                              x.Id,
-                              x.Name,
-                              x.Ssn,
-                              x.PhoneNumber1,
-                              x.PhoneNumber2,
-                              x.Status,
-                              x.Type,
-                              x.AccountId,
-                              x.Tag,
-                              TotalDebit = (from D in DB.EntryMovements.Where(l => l.AccountId == x.AccountId).ToList() select D.Debit).Sum(),
-                              TotalCredit = (from C in DB.EntryMovements.Where(l => l.AccountId == x.AccountId).ToList() select C.Credit).Sum(),
-                          };
-
+            var Members = DB.Members.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) < 0).Select(x => new {
+                x.Id,
+                x.Name,
+                x.Ssn,
+                x.PhoneNumber1,
+                x.PhoneNumber2,
+                x.Status,
+                x.Type,
+                x.AccountId,
+                x.Tag,
+                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
+                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum()
+            }).ToList();
+                   
             return Ok(Members);
         }
         [Route("Member/GetMember")]
@@ -72,29 +70,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             var membershiplist = DB.ActionLogs.Where(l => l.MembershipMovementId != null && l.PostingDateTime >= DateTime.Today).Select(x => x.MembershipMovementId).ToList();
             var memberships = DB.MembershipMovements.Where(x => membershiplist.Contains(x.Id)).ToList();
-            var Members = (from x in memberships.ToList()
-                           select new
-                           {
-                               x.Member.Id,
-                               x.Member.Name,
-                               x.Member.Ssn,
-                               x.Member.PhoneNumber1,
-                               x.Member.PhoneNumber2,
-                               x.Status,
-                               x.Member.Tag,
-                               x.Member.AccountId,
-                               ActiveMemberShip = new
-                               {
-                                   x.Id,
-                                   x.Membership.Name,
-                                   x.VisitsUsed,
-                                   x.Type,
-                                   x.StartDate,
-                                   x.EndDate,
-                                   x.TotalAmmount,
-                                   x.Description,
-                               }
-                           }).ToList();
+            var Members = memberships.Select(x => new {
+                x.Member.Id,
+                x.Member.Name,
+                x.Member.Ssn,
+                x.Member.PhoneNumber1,
+                x.Member.PhoneNumber2,
+                x.Status,
+                x.Member.Tag,
+                x.Member.AccountId,
+                ActiveMemberShip = new
+                {
+                    x.Id,
+                    x.Membership.Name,
+                    x.VisitsUsed,
+                    x.Type,
+                    x.StartDate,
+                    x.EndDate,
+                    x.TotalAmmount,
+                    x.Description,
+                }
+            }).ToList();
+                      
 
             return Ok(Members);
        
@@ -106,22 +103,21 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMemberByStatus(int Status)
         {
-            var Members = from x in DB.Members.Where(f => f.Status == Status).ToList()
-                          select new
-                          {
-                              x.Id,
-                              x.Name,
-                              x.Ssn,
-                              x.PhoneNumber1,
-                              x.PhoneNumber2,
-                              x.Status,
-                              x.Type,
-                              x.AccountId,
-                              x.Tag,
-                              TotalDebit = (from D in DB.EntryMovements.Where(l => l.AccountId == x.AccountId).ToList() select D.Debit).Sum(),
-                              TotalCredit = (from C in DB.EntryMovements.Where(l => l.AccountId == x.AccountId).ToList() select C.Credit).Sum(),
-                              // Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg").ToString(),
-                          };
+            var Members = DB.Members.Where(f => f.Status == Status).Select(x => new {
+                x.Id,
+                x.Name,
+                x.Ssn,
+                x.PhoneNumber1,
+                x.PhoneNumber2,
+                x.Status,
+                x.Type,
+                x.AccountId,
+                x.Tag,
+                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
+                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum()
+                // Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg").ToString(),
+            }).ToList();
+                        
             return Ok(Members);
         }
         
@@ -146,14 +142,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     collection.AccountId = NewAccount.Id;
                     DB.Members.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "Member").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        DB.SaveChanges();
-                        return Ok(collection.Id);
-                    }
-                    else return Ok(false);
+                    return Ok(collection.Id);
                 }
                 catch
                 {
@@ -198,9 +187,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMemberByID(long? ID)
         {
-            var Members = (from x in DB.Members.ToList()
-                           where x.Id == ID
-                           select new
+            var Members = DB.Members.Where(m=>m.Id ==  ID).Select(
+                x=> new
                            {
                                x.Id,
                                x.Name,
@@ -213,58 +201,51 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                x.Status,
                                x.Type,
                                x.Tag,
-                               HaveFaceOnDevice = x.MemberFaces.Count() > 0 ? true : false, 
+                              HaveFaceOnDevice = x.MemberFaces.Count() > 0 ? true : false, 
                                Avatar = "", //Url.Content("~/Images/Member/" + x.Id + ".jpeg"),
                                x.AccountId,
-                               lastLog =x.MemberLogs.LastOrDefault()?.DateTime,
-                               ActiveMemberShip = (from MS in DB.MembershipMovements.Where(f => f.MemberId == x.Id && f.Status > 0).ToList()
-                                                   select new
-                                                   {
-                                                       MS.Id,
-                                                       MS.Membership.Name,
-                                                       MS.VisitsUsed,
-                                                       MS.Type,
-                                                       MS.StartDate,
-                                                       MS.EndDate,
-                                                       MS.Description,
-                                                   }
-                                                   ).FirstOrDefault(),
-                       
-                               ServiceInvoices = (from SI in DB.SalesInvoices.Where(f => f.MemberId == x.Id && f.IsPrime == true).ToList()
-                                                  let e = new
-                                                  {
-                                                      SI.Id,
-                                                      SI.Name,
-                                                      SI.Status,
-                                                      SI.Description,
-                                                      InventoryMovements = (from m in SI.InventoryMovements.ToList()
-                                                                            select new
-                                                                            {
-                                                                                m.Id,
-                                                                                m.Status,
-                                                                                m.Items.Name,
-                                                                                m.Qty,
-                                                                                m.SellingPrice,
-                                                                                m.Description
-                                                                            })
-                                                  }
-                                                  select e),
-                               TotalDebit = (from D in DB.EntryMovements.Where(l => l.AccountId == x.AccountId).ToList() select D.Debit).Sum(),
-                               TotalCredit = (from D in DB.EntryMovements.Where(l => l.AccountId == x.AccountId).ToList() select D.Credit).Sum(),
-                               Opration = (from a in DB.Oprationsys.ToList()
-                                           where (a.Status == x.Status) && (a.TableName == "Member")
-                                           select new
-                                           {
-                                               a.Id,
-                                               a.OprationName,
-                                               a.Status,
-                                               a.OprationDescription,
-                                               a.ArabicOprationDescription,
-                                               a.IconClass,
-                                               a.ClassName
-                                           }).FirstOrDefault(),
-                              
-                           }).SingleOrDefault();
+                              // lastLog =x.MemberLogs.LastOrDefault().DateTime,
+                               ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == x.Id && f.Status > 0).Select(MS=>new {
+                                   MS.Id,
+                                   MS.Membership.Name,
+                                   MS.VisitsUsed,
+                                   MS.Type,
+                                   MS.StartDate,
+                                   MS.EndDate,
+                                   MS.Description,
+                               }).FirstOrDefault(),
+
+                    ServiceInvoices =  DB.SalesInvoices.Where(f => f.MemberId == x.Id && f.IsPrime == true).Select(SI=>new
+                    {
+                        SI.Id,
+                        SI.Name,
+                        SI.Status,
+                        SI.Description,
+                        InventoryMovements = SI.InventoryMovements.Select(m=>new {
+                            m.Id,
+                            m.Status,
+                            m.Items.Name,
+                            m.Qty,
+                            m.SellingPrice,
+                            m.Description
+                        }).ToList(),
+                                                                
+                    }).ToList(),
+
+                    TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
+                    TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
+                    Opration =  DB.Oprationsys.Where(a=> a.Status == x.Status && a.TableName == "Member").Select(a=> new{
+                        a.Id,
+                        a.OprationName,
+                        a.Status,
+                        a.OprationDescription,
+                        a.ArabicOprationDescription,
+                        a.IconClass,
+                        a.ClassName
+                    }).FirstOrDefault()
+        
+
+                }).SingleOrDefault();
             return Ok(Members);
         }
 

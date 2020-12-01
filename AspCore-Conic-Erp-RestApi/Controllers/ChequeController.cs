@@ -18,24 +18,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetCheque()
         {
-            var Cheques = (from x in DB.Cheques.ToList()
-                           select new
-                           {
-                               x.Id,
-                               x.BankAddress,
-                               x.BankName,
-                               x.ChequeAmount,
-                               x.FakeDate,
-                               x.Payee,
-                               x.PaymentType,
-                               x.Status,
-                               x.ChequeNumber,
-                               x.Currency,
-                               x.Description,
-                               x.VendorId,
-                               x.Vendor.Name,
+            var Cheques = DB.Cheques.Select(x=>new {
+                x.Id,
+                x.BankAddress,
+                x.BankName,
+                x.ChequeAmount,
+                x.FakeDate,
+                x.Payee,
+                x.PaymentType,
+                x.Status,
+                x.ChequeNumber,
+                x.Currency,
+                x.Description,
+                x.VendorId,
+                x.Vendor.Name,
+            }).ToList();
+                          
+
                          
-                           });
             return Ok(Cheques);
         }
 
@@ -50,12 +50,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     collection.Status = 0;
                     DB.Cheques.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "Cheque").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
+
                 }
                 catch
                 {

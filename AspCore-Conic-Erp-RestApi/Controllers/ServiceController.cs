@@ -15,40 +15,40 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetService()
         {
-            var Services = (from x in DB.Services.ToList()
-                             select new
-                             {
-                                 x.Id,
-                                 x.Name,
-                                 x.Qty,
-                                 x.SellingPrice,
-                                 x.ItemId,
-                                 ItemName  = DB.Items.Where(i=>i.Id == x.ItemId).SingleOrDefault().Name,
-                                 x.Type,
-                                 x.Status,
-                                 x.Description,
-                               
-                             });
+            var Services = DB.Services.Select(x => new
+            {
+                x.Id,
+                x.Name,
+                x.Qty,
+                x.SellingPrice,
+                x.ItemId,
+                ItemName = DB.Items.Where(i => i.Id == x.ItemId).SingleOrDefault().Name,
+                x.Type,
+                x.Status,
+                x.Description,
+            }).ToList();
+
             return Ok(Services);
         }
         [Route("Service/GetActiveService")]
         [HttpGet]
         public IActionResult GetActiveService()
         {
-            var Services = (from x in DB.Services.ToList()
-                            select new
-                            {
-                                x.Id,
-                                x.Name,
-                                x.Qty,
-                                x.SellingPrice,
-                                x.ItemId,
-                                ItemName = DB.Items.Where(i => i.Id == x.ItemId).SingleOrDefault().Name,
-                                x.Type,
-                                x.Status,
-                                x.Description,
+            var Services = DB.Services.Where(i=>i.Status == 0).Select(x => new
+            {
 
-                            });
+                x.Id,
+                x.Name,
+                x.Qty,
+                x.SellingPrice,
+                x.ItemId,
+                ItemName = DB.Items.Where(i => i.Id == x.ItemId).SingleOrDefault().Name,
+                x.Type,
+                x.Status,
+                x.Description,
+            }).ToList();
+   
+
             return Ok(Services);
         }
         [Route("Service/Create")]
@@ -61,12 +61,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     DB.Services.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "Service").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
+                    return Ok(true);
+
                 }
                 catch
                 {

@@ -16,29 +16,22 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetOrderInventory(DateTime DateFrom, DateTime DateTo)
         {
-            var Orders = (from x in DB.OrderInventories.ToList()
-                            where (x.FakeDate >= DateFrom) && (x.FakeDate <= DateTo)
-                            let p = new
-                            {
-                                x.Id,
-                                FakeDate = x.FakeDate.Value.ToString("dd/MM/yyyy"),
-                                x.OrderType,
-                                x.Status,
-                                x.Description,
-                                InventoryMovements = (from m in DB.InventoryMovements.ToList()
-                                                      where (m.OrderInventoryId == x.Id)
-                                                      select new
-                                                      {
-                                                          m.Id,
-                                                          m.Items.Name,
-                                                          m.Qty,
-                                                          InventoryName=  m.InventoryItem.Name,
-                                                          m.Description
-                                                      }),
-                   
-                            }
-                            select p);
-
+            var Orders = DB.OrderInventories.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new {
+                x.Id,
+                FakeDate = x.FakeDate.Value.ToString("dd/MM/yyyy"),
+                x.OrderType,
+                x.Status,
+                x.Description,
+                InventoryMovements = DB.InventoryMovements.Where(i => i.OrderInventoryId == x.Id).Select(m => new
+                {
+                    m.Id,
+                    m.Items.Name,
+                    m.Qty,
+                    InventoryName = m.InventoryItem.Name,
+                    m.Description
+                }).ToList()
+            }).ToList(); 
+                        
             return Ok(Orders);
         }
 
@@ -55,13 +48,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     // TODO: Add insert logic here
                     DB.OrderInventories.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "OrderInventory").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
-                    else return Ok(false);
+                    return Ok(true);
+
                 }
                 catch
                 {
@@ -104,34 +92,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetOrderInventoryByID(long? ID)
         {
-            var Orders = (from x in DB.OrderInventories.ToList()
-                          where (x.Id == ID)
-                          let p = new
-                          {
-                              x.Id,
-                              x.FakeDate,
-                              x.OrderType,
-                              x.Status,
-                              x.Description,
-                              InventoryMovements = (from m in DB.InventoryMovements.ToList()
-                                                    where (m.OrderInventoryId == x.Id)
-                                                    select new
-                                                    {
-                                                        m.Id,
-                                                        m.Qty,
-                                                        m.ItemsId,
-                                                        m.TypeMove,
-                                                        Itemx = new
-                                                        {
-                                                            m.Items.Name
-                                                        },
-                                                        m.InventoryItemId,
-                                                        InventoryName = m.InventoryItem.Name,
-                                                        m.Description
-                                                    }),
-                    
-                          }
-                          select p).SingleOrDefault();
+            var Orders = DB.OrderInventories.Where(i => i.Id == ID).Select(x => new {
+
+                x.Id,
+                x.FakeDate,
+                x.OrderType,
+                x.Status,
+                x.Description,
+                InventoryMovements = DB.InventoryMovements.Where(i => i.OrderInventoryId == x.Id).Select(m => new {
+                    m.Id,
+                    m.Qty,
+                    m.ItemsId,
+                    m.TypeMove,
+                    Itemx = new
+                    {
+                        m.Items.Name
+                    },
+                    m.InventoryItemId,
+                    InventoryName = m.InventoryItem.Name,
+                    m.Description
+                }).ToList()
+            }).SingleOrDefault();
+                      
 
             return Ok(Orders);
         }

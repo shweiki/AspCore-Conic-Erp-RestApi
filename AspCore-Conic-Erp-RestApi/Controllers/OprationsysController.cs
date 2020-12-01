@@ -5,34 +5,48 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Entities;
+using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
+
     [Authorize]
 
     public class OprationsysController : Controller
     {
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly ILogger<UserController> _logger;
         private ConicErpContext DB = new ConicErpContext();
+        public OprationsysController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _logger = logger;
 
+        }
         [Route("Oprationsys/GetOpration")]
         [HttpGet]
         public IActionResult GetOpration()
         {
-            var Oprations = from x in DB.Oprationsys.ToList()
-                            select new
-                            {
-                                x.Id,
-                                x.OprationName,
-                                x.TableName,
-                                x.ControllerName,
-                                x.RoleName,
-                                x.OprationDescription,
-                                x.ArabicOprationDescription,
-                                x.Status,
-                                x.ReferenceStatus,
-                                x.IconClass,
-                                x.ClassName,
-                            };
+
+            var Oprations = DB.Oprationsys.Select(x => new
+            {
+                x.Id,
+                x.OprationName,
+                x.TableName,
+                x.ControllerName,
+                x.RoleName,
+                x.OprationDescription,
+                x.ArabicOprationDescription,
+                x.Status,
+                x.ReferenceStatus,
+                x.IconClass,
+                x.ClassName,
+            }).ToList();
+                 
+                          
             return Ok(Oprations);
 
         }
@@ -145,15 +159,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(false);
 
         }
+
         [Route("Oprationsys/ChangeStatus")]
         [HttpPost]
         public Boolean ChangeStatus(long? ObjID, long? OprationID, string Description)
         {
             Oprationsy Oprationsys = DB.Oprationsys.Where(x => x.Id == OprationID).SingleOrDefault();
             ActionLog log = new ActionLog();
+            // var claimsIdentity = (ClaimsIdentity)HttpContext.User.Identity;
+            //  var claim = claimsIdentity.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            var userId = _userManager.GetUserId(User); // Get user id:
             log.PostingDateTime = DateTime.Now;
             log.OprationId = Oprationsys.Id;
-            log.UserId = User.Identity.Name;
+            log.UserId = userId;
             log.Description = Description;
 
             switch (Oprationsys.TableName)
@@ -264,6 +282,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return false;
 
         }
+
 
     }
 }

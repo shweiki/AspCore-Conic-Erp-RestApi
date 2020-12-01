@@ -14,26 +14,25 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetVendor()
         {
-            var Vendors = from x in DB.Vendors.ToList()
-                                      select new
-                                      {
-                                          x.Id,
-                                          x.Name,
-                                          x.Address,
-                                          x.Email,
-                                          x.PhoneNumber1,
-                                          x.PhoneNumber2,
-                                          x.Fax,
-                                          x.Description,
-                                          x.CreditLimit,
-                                          x.IsPrime,
-                                          x.Type,
-                                          x.AccountId,
-                                          x.Status,
-                                          TotalDebit = (from D in DB.EntryMovements.Where(l => l.AccountId == x.AccountId).ToList() select D.Debit).Sum(),
-                                          TotalCredit = (from C in DB.EntryMovements.Where(l => l.AccountId == x.AccountId).ToList() select C.Credit).Sum(),
-                                
-                                      };
+            var Vendors = DB.Vendors.Select(x => new
+            {
+                x.Id,
+                x.Name,
+                x.Address,
+                x.Email,
+                x.PhoneNumber1,
+                x.PhoneNumber2,
+                x.Fax,
+                x.Description,
+                x.CreditLimit,
+                x.IsPrime,
+                x.Type,
+                x.AccountId,
+                x.Status,
+                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
+                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
+            }).ToList();
+
             return Ok(Vendors);
         }
         [Route("Vendor/GetActiveVendor")]
@@ -64,13 +63,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     collection.AccountId = NewAccount.Id;
                     DB.Vendors.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "Vendor").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
-                    else return Ok(false);
+                    return Ok(true);
+
                 }
                 catch
                 {

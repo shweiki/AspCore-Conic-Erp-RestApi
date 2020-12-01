@@ -27,32 +27,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMemberLogByStatus(int Status)
         {
-            var MemberLogs = (from x in DB.MemberLogs.Where(x => x.Status == Status).ToList()
-                              select new
-                              {
-                                  x.Id,
-                                  x.MemberId,
-                                  x.Member.Name,
-                                  DateTime = x.DateTime.ToString("hh:mm tt"),
-                                  x.Description,
-                                  DeviceName = x.Device.Name,
-                                  x.Member.Status,
-                                  TotalDebit = (from D in DB.EntryMovements.Where(l => l.AccountId == x.Member.AccountId).ToList() select D.Debit).Sum(),
-                                  TotalCredit = (from D in DB.EntryMovements.Where(l => l.AccountId == x.Member.AccountId).ToList() select D.Credit).Sum(),
-                                  ActiveMemberShip =x.Member.MembershipMovements.Where(f => f.MemberId == x.MemberId && f.Status == 1).Select(ms => new { ms.Id , ms.Type}).FirstOrDefault(),
-                                  Opration = (from a in DB.Oprationsys.ToList()
-                                              where (a.Status == x.Member.Status) && (a.TableName == "Member")
-                                              select new
-                                              {
-                                                  a.Id,
-                                                  a.OprationName,
-                                                  a.Status,
-                                                  a.OprationDescription,
-                                                  a.ArabicOprationDescription,
-                                                  a.IconClass,
-                                                  a.ClassName
-                                              }).FirstOrDefault(),
-                              }).ToList();
+            var MemberLogs = DB.MemberLogs.Where(x => x.Status == Status).Select(x => new {
+                x.Id,
+                x.MemberId,
+                x.Member.Name,
+                DateTime = x.DateTime.ToString("hh:mm tt"),
+                x.Description,
+                DeviceName = x.Device.Name,
+                x.Member.Status,
+                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Member.AccountId).Select(d => d.Debit).Sum(),
+                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Member.AccountId).Select(c => c.Credit).Sum(),
+                ActiveMemberShip = x.Member.MembershipMovements.Where(f => f.MemberId == x.MemberId && f.Status == 1).Select(ms => new { ms.Id, ms.Type }).FirstOrDefault(),
+            }).ToList();
+                          
                              
 
              MemberLogs = MemberLogs.GroupBy(a => a.MemberId)
@@ -101,18 +88,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMemberLogByID(long? ID)
         {
-            var MemberLogs = (from x in DB.MemberLogs.ToList()
-                              where x.MemberId == ID
-                              select new
-                              {
-                                  x.Status,
-                                  x.Type,
-                                  x.DateTime,
-                                  x.Device?.Name,
-                                  x.DeviceId,
-                                  x.Description,
-                                  x.Id
-                              }).ToList();
+            var MemberLogs = DB.MemberLogs.Where(i => i.MemberId == ID).Select(x => new {
+                x.Status,
+                x.Type,
+                x.DateTime,
+                x.Device.Name,
+                x.DeviceId,
+                x.Description,
+                x.Id
+            }).ToList();
+                          
             return Ok(MemberLogs);
         }
         public Boolean RegisterMemberLog(long? ID , DateTime datetime)

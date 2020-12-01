@@ -28,6 +28,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
 
 
+
         // POST User/Login
         [AllowAnonymous]
         [HttpPost]
@@ -151,6 +152,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             await _userManager.AddToRoleAsync(user, RoleName);
 
             return Ok(true);
+        }
+        public  string  GetUserId()
+        {
+            var id = _userManager.GetUserId(User); // Get user id:
+
+            return id;
         }
         public class Userlogin
         {

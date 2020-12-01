@@ -41,18 +41,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetEntryMovementsByAccountID(long? AccountID)
         {
-            var EntryMovements = (from D in DB.EntryMovements.Where(l => l.AccountId == AccountID).ToList()
-                                  let e = new
-                                  {
-                                      D.Id,
-                                      D.Credit,
-                                      D.Debit,
-                                      D.EntryId,
-                                      D.Entry.Type,
-                                      D.Entry.FakeDate,
-                                      D.Description,
-                                  }
-                                  select e);
+            var EntryMovements = DB.EntryMovements.Where(l => l.AccountId == AccountID).Select(x => new {
+
+                x.Id,
+                x.Credit,
+                x.Debit,
+                x.EntryId,
+                x.Entry.Type,
+                x.Entry.FakeDate,
+                x.Description,
+            }).ToList();
+ 
      
 
             return Ok(EntryMovements);

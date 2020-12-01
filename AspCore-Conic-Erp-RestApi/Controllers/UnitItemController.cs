@@ -15,21 +15,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetUnitItem()
         {
-            var UnitItems = (from x in DB.UnitItems.ToList()
-                             select new
-                             {
-                                 x.Id,
-                                 x.Name,
-                                 x.Description,
-                              
-                             });
+            var UnitItems = DB.UnitItems.Select(x => new
+            {
+                x.Id,
+                x.Name,
+                x.Description,
+            }).ToList();
+
             return Ok(UnitItems);
         }
         [Route("UnitItem/GetActiveUnitItem")]
         [HttpGet]
         public IActionResult GetActiveUnitItem()
         {
-            var UnitItems = DB.UnitItems.Select(x => new { value = x.Id, label = x.Name }).ToList();
+            var UnitItems = DB.UnitItems.Where(i=>i.Status==0).Select(x => new { value = x.Id, label = x.Name }).ToList();
 
             return Ok(UnitItems);
         }
@@ -41,15 +40,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
-                    collection.Status = 0;
                     DB.UnitItems.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "UnitItem").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
+                    return Ok(true);
+
                 }
                 catch
                 {

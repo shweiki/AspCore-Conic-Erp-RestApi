@@ -14,23 +14,22 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMembership()
         {
-            var Memberships = (from x in DB.Memberships.ToList()
-                         select new
-                         {
-                             x.Id,
-                             x.Name,
-                             x.NumberDays,
-                             x.FullDayPrice,
-                             x.MorningPrice,
-                             x.Tax,
-                             x.Rate,
-                             x.MinFreezeLimitDays,
-                             x.MaxFreezeLimitDays,
-                             x.Description,
-                             x.Status,
-                             TotalMembers = (from D in DB.MembershipMovements.Where(l => l.MembershipId == x.Id && l.Status > 0).ToList() select D.MemberId).Count(),
-                   
-                         });
+            var Memberships = DB.Memberships.Select(x => new
+            {
+                x.Id,
+                x.Name,
+                x.NumberDays,
+                x.FullDayPrice,
+                x.MorningPrice,
+                x.Tax,
+                x.Rate,
+                x.MinFreezeLimitDays,
+                x.MaxFreezeLimitDays,
+                x.Description,
+                x.Status,
+                TotalMembers = DB.MembershipMovements.Where(l => l.MembershipId == x.Id && l.Status > 0).Count(),
+            }).ToList();
+
             return Ok(Memberships);
         }
 
@@ -64,12 +63,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     DB.Memberships.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "Membership").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
+                    return Ok(true);
+
                 }
                 catch
                 {

@@ -20,15 +20,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
-                    collection.Status = 0;
                     DB.InventoryItems.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "InventoryItem").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
+                    return Ok(true);
+
                 }
                 catch
                 {
@@ -66,29 +61,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetInventoryItem()
         {
-            var InventoryItems = (from x in DB.InventoryItems.ToList()
-                             select new
-                             {
-                                 x.Id,
-                                 x.Name,
-                                 x.Description,
-                                 Items =(from i in DB.InventoryMovements.Where(o => o.InventoryItemId == x.Id && o.Status == 0).ToList()
-                                         group i by i.ItemsId into g
-                                         select new
-                                         {
-                                             Item = (from a in DB.Items.ToList()
-                                                     where (a.Id == g.Key) 
-                                                     select new
-                                                     {
-                                                         a.Id,
-                                                       a.Name,
-                                                       a.Barcode
-                                                     }).FirstOrDefault(),
-                                             QtyIn = g.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty),
-                                             QtyOut = g.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty)
-                                         }).ToList(),
-                          
-                             });
+            var InventoryItems = DB.InventoryItems.Select(x => new {
+                x.Id,
+                x.Name,
+                x.Description,
+            }).ToList();
+
             return Ok(InventoryItems);
         }
 

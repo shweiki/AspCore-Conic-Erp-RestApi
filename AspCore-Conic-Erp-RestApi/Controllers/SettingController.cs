@@ -14,17 +14,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetSetting()
         {
-            var Settings = (from x in DB.Settings.ToList()
-                             select new
-                             {
-                                 x.Id,
-                                 x.Name,
-                                 x.Value,
-                                 x.Type,
-                                 x.Status,
-                                 x.Description,
-                               
-                             });
+            var Settings = DB.Settings.Select(x => new {
+                x.Id,
+                x.Name,
+                x.Value,
+                x.Type,
+                x.Status,
+                x.Description,
+            }).ToList();
+
+
             return Ok(Settings);
         }
         [Authorize]
@@ -32,17 +31,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetActiveSetting()
         {
-            var Settings = (from x in DB.Settings.ToList()
-                            select new
-                            {
-                                x.Id,
-                                x.Name,
-                                x.Value,
-                                x.Type,
-                                x.Status,
-                                x.Description,
-
-                            });
+            var Settings = DB.Settings.Where(i=>i.Status==0).Select(x => new {
+                x.Id,
+                x.Name,
+                x.Value,
+                x.Type,
+                x.Status,
+                x.Description,
+            }).ToList();
             return Ok(Settings);
         }
         [Route("Setting/Create")]
@@ -55,12 +51,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     DB.Settings.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "Setting").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
+                    return Ok(true);
+
                 }
                 catch
                 {

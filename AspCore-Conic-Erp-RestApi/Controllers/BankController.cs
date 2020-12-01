@@ -16,20 +16,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetBanks()
         {
-            var Banks = (from x in DB.Banks.ToList()
-                         select new
-                         {
-                             x.Id,
-                             x.Iban,
-                             x.AccountId,
-                             x.Name,
-                             x.Description,
-                             x.AccountNumber,
-                             x.AccountType,
-                             x.BranchName,
-                             x.Currency
-                         
-                         });
+            var Banks = DB.Banks.Select(x => new {
+                x.Id,
+                x.Iban,
+                x.AccountId,
+                x.Name,
+                x.Description,
+                x.AccountNumber,
+                x.AccountType,
+                x.BranchName,
+                x.Currency
+            }).ToList();
+
             return Ok(Banks);
         }
 
@@ -44,15 +42,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 try
                 {
                     // TODO: Add insert logic here
-                    collection.Status = 0;
                     DB.Banks.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "Bank").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
+
                 }
                 catch
                 {

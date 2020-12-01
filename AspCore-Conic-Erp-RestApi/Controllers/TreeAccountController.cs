@@ -17,20 +17,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             var Accounts = new
             {
-                Accounts = (from x in DB.Accounts.ToList()
-                            where (x.Status == 0 )
-                            select new
-                            {
-                                x.Id,
-                                x.Description,
-                                x.Status,
-                                x.Code,
-                                x.Name,
-                                TotalDebit = (from D in DB.EntryMovements.Where(l => l.AccountId == x.Id).ToList() select D.Debit).Sum(),
-                                TotalCredit = (from D in DB.EntryMovements.Where(l => l.AccountId == x.Id).ToList() select D.Credit).Sum(),
-                                x.Type ,
-                     
-                            }).ToList()
+                Accounts =  DB.Accounts.Where(i=>i.Status == 0).Select(x=>new
+                {
+                    x.Id,
+                    x.Description,
+                    x.Status,
+                    x.Code,
+                    x.Name,
+                    TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
+                    TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
+                    x.Type,
+                }).ToList()
+
             };
             return Ok(Accounts);
 
@@ -51,13 +49,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetInComeAccounts()
         {
-            var InComeAccounts = (from x in DB.Accounts.ToList()
-                                  where (x.Status == 0 && x.Type == "InCome")
-                                  select new
-                                  {
-                                      value = x.Id,
-                                      label = x.Name
-                                  }).ToList();
+            var InComeAccounts = DB.Accounts.Where(i => i.Status == 0 && i.Type == "InCome").Select(x => new
+            {
+                value = x.Id,
+                label = x.Name
+            }).ToList();
+                                 
             return Ok(InComeAccounts);
         }
         [Route("Account/Create")]
@@ -71,12 +68,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     // TODO: Add insert logic here
                     DB.Accounts.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "Account").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
+
                     return Ok(true);
                 }
                 catch

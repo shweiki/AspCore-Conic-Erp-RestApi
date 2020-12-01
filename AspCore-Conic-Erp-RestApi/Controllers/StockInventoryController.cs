@@ -16,30 +16,27 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetStockInventory(DateTime DateFrom, DateTime DateTo)
         {
-            var Orders = (from x in DB.StocktakingInventories.ToList()
-                            where (x.FakeDate >= DateFrom) && (x.FakeDate <= DateTo)
-                            let p = new
-                            {
-                                x.Id,
-                                FakeDate = x.FakeDate.ToString("dd/MM/yyyy"),
-                                x.Status,
-                                x.Description,
-                                StockMovements = (from m in DB.StockMovements.ToList()
-                                                      where (m.StocktakingInventoryId == x.Id)
-                                                      select new
-                                                      {
-                                                          m.Id,
-                                                          m.ItemsId,
-                                                          m.Items.Name,
-                                                          m.Items.Barcode,
-                                                          m.Qty,
-                                                          m.InventoryItemId,
-                                                          InventoryName =  m.InventoryItem.Name,
-                                                          m.Description
-                                                      }),
-                            
-                            }
-                            select p);
+            var Orders = DB.StocktakingInventories.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new
+            {
+                x.Id,
+                FakeDate = x.FakeDate.ToString("dd/MM/yyyy"),
+                x.Status,
+                x.Description,
+                StockMovements = DB.StockMovements.Where(i => i.StocktakingInventoryId == x.Id).Select(m => new
+                {
+                    m.Id,
+                    m.ItemsId,
+                    m.Items.Name,
+                    m.Items.Barcode,
+                    m.Qty,
+                    m.InventoryItemId,
+                    InventoryName = m.InventoryItem.Name,
+                    m.Description
+                }).ToList()
+
+
+            }).ToList();
+
 
             return Ok(Orders);
         }
@@ -57,13 +54,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     // TODO: Add insert logic here
                     DB.StocktakingInventories.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "StocktakingInventory").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
-                    else return Ok(false);
+
+                     return Ok(true);
                 }
                 catch
                 {

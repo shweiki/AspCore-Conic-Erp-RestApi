@@ -17,22 +17,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public ActionResult GetPayment(DateTime DateFrom, DateTime DateTo , int Status)
         {
-            var Payments = (from x in DB.Payments.ToList()
-                            where (x.FakeDate >= DateFrom) && (x.FakeDate <= DateTo) && (x.Status == Status)
-                            let p = new 
-                         {
-                                x.Id,
-                                x.TotalAmmount,
-                                x.Type,
-                                x.EditorName,
-                                Name = x.Vendor?.Name + " " + x.Member?.Name + " - " + x.Name,
-                                x.FakeDate,
-                                x.PaymentMethod,
-                                x.Status,
-                                x.Description,
-                                AccountID = (x.Vendor?.AccountId != null) ? x.Vendor?.AccountId :   x.MemberId
-                         }
-                            select p);
+            var Payments = DB.Payments.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo && i.Status == Status).Select(x => new
+            {
+                x.Id,
+                x.TotalAmmount,
+                x.Type,
+                x.EditorName,
+                Name = x.Vendor.Name + " " + x.Member.Name + " - " + x.Name,
+                x.FakeDate,
+                x.PaymentMethod,
+                x.Status,
+                x.Description,
+                AccountID = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
+            }).ToList();
+     
             
             return Ok(Payments.ToList());
     }
@@ -40,34 +38,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetPaymentsByMemberId(long? MemberId)
         {
-            var Payments = (from PS in DB.Payments?.Where(z => z.MemberId == MemberId)?.ToList()
-                            let p = new
-                            {
-                                PS.Id,
-                                PS.TotalAmmount,
-                                PS.Type,
-                                PS.EditorName,
-                                Name = PS.Vendor?.Name + " " + PS.Member?.Name + " - " + PS.Name,
-                                PS.FakeDate,
-                                PS.PaymentMethod,
-                                ObjectID = PS.VendorId == null ? PS.MemberId : PS.VendorId,
-                                PS.Description,
-                                AccountID = (PS.Vendor == null) ? PS.Member.AccountId : PS.Vendor.AccountId,
-                                Status = (from a in DB.Oprationsys.ToList()
-                                          where (a.Status == PS.Status) && (a.TableName == "Payment")
-                                          select new
-                                          {
-                                              a.Id,
-                                              a.OprationName,
-                                              a.Status,
-                                              a.OprationDescription,
-                                              a.ArabicOprationDescription,
-                                              a.IconClass,
-                                              a.ClassName
-                                          }).FirstOrDefault(),
-
-                            }
-                            select p);
+            var Payments = DB.Payments.Where(i => i.MemberId == MemberId).Select(x => new {
+                x.Id,
+                x.TotalAmmount,
+                x.Type,
+                x.EditorName,
+                Name = x.Vendor.Name + " " + x.Member.Name + " - " + x.Name,
+                x.FakeDate,
+                x.PaymentMethod,
+                ObjectID = x.VendorId == null ? x.MemberId : x.VendorId,
+                x.Description,
+                AccountID = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
+               x.Status
+            }).ToList();
 
             return Ok(Payments);
         }
@@ -75,24 +58,21 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetPaymentByStatus(int? Status)
         {
-            var Payments = (from x in DB.Payments.ToList()
-                            where (x.Status == Status)
-                            let p = new
-                            {
-                                x.Id,
-                                x.TotalAmmount,
-                                x.Type,
-                                x.EditorName,
-                                Name = x.Vendor?.Name + " " + x.Member?.Name + " - " + x.Name,
-                                x.FakeDate ,
-                                x.PaymentMethod,
-                                ObjectID = x.VendorId == null ? x.MemberId : x.VendorId,
-                                x.Status,
-                                x.Description,
-                                AccountID = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
-                          
-                            }
-                            select p); ;
+            var Payments = DB.Payments.Where(i => i.Status == Status).Select(x => new
+            {
+                x.Id,
+                x.TotalAmmount,
+                x.Type,
+                x.EditorName,
+                Name = x.Vendor.Name + " " + x.Member.Name + " - " + x.Name,
+                x.FakeDate,
+                x.PaymentMethod,
+                ObjectID = x.VendorId == null ? x.MemberId : x.VendorId,
+                x.Status,
+                x.Description,
+                AccountID = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
+            }).ToList();
+                
 
             return Ok(Payments);
         }
@@ -106,13 +86,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     // TODO: Add insert logic here
                     DB.Payments.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "Payment").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(collection.Id);
-                    }
-                    else return Ok(false);
+                    return Ok(collection.Id);
+
                 }
                 catch
                 {

@@ -15,14 +15,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetOriginItem()
         {
-            var OriginItems = (from x in DB.OriginItems.ToList()
-                               select new
-                               {
-                                   x.Id,
-                                   x.Name,
-                                   x.Description,
-                       
-                               });
+            var OriginItems = DB.OriginItems.Select(x => new
+            {
+                x.Id,
+                x.Name,
+                x.Description,
+            }).ToList();
+
             return Ok(OriginItems);
         }
         [Route("OriginItem/GetActiveOriginItem")]
@@ -41,15 +40,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
-                    collection.Status = 0;
                     DB.OriginItems.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "OriginItem").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
+                    return Ok(true);
+
                 }
                 catch
                 {

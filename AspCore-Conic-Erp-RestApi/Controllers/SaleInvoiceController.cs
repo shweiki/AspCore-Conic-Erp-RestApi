@@ -17,55 +17,50 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetSaleInvoice(DateTime DateFrom, DateTime DateTo)
         {
-            var Invoices = (from x in DB.SalesInvoices.ToList()
-                            where (x.FakeDate >= DateFrom) && (x.FakeDate <= DateTo)
-                            let p = new 
-                         {
-                                x.Id,
-                                x.Discount,
-                                x.Tax,
-                                Name = x.Vendor?.Name + " " + x.Member?.Name + " - " + x.Name,
-                                FakeDate = x.FakeDate.ToString("dd/MM/yyyy"),
-                                x.PaymentMethod,
-                                x.Status,
-                                x.Description,
-                                AccountID = (x.Vendor?.AccountId != null) ? x.Vendor?.AccountId :   x.Member?.AccountId,
-                                InventoryMovements = (from m in DB.InventoryMovements.ToList()
-                                                     where (m.SalesInvoiceId == x.Id) && (m.TypeMove == "Out")
-                                                     select new
-                                                     {
-                                                         m.Id,
-                                                        Name = DB.Items.Where(x => x.Id == m.ItemsId).SingleOrDefault().Name,
-                                                         m.Qty,
-                                                         InventoryName = DB.InventoryItems.Where(x=>x.Id == m.InventoryItemId).SingleOrDefault().Name,
-                                                         m.SellingPrice,
-                                                         m.Description
-                                                     })
-                         }
-                            select p);
-            
+            var Invoices = DB.SalesInvoices.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new {
+
+                x.Id,
+                x.Discount,
+                x.Tax,
+                Name = x.Vendor.Name + " " + x.Member.Name + " - " + x.Name,
+                FakeDate = x.FakeDate.ToString("dd/MM/yyyy"),
+                x.PaymentMethod,
+                x.Status,
+                x.Description,
+                AccountID = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
+                InventoryMovements = DB.InventoryMovements.Where(i => i.SalesInvoiceId == x.Id && i.TypeMove == "Out").Select(m => new {
+                    m.Id,
+                    Name = DB.Items.Where(x => x.Id == m.ItemsId).SingleOrDefault().Name,
+                    m.Qty,
+                    InventoryName = DB.InventoryItems.Where(x => x.Id == m.InventoryItemId).SingleOrDefault().Name,
+                    m.SellingPrice,
+                    m.Description
+
+                }).ToList()
+
+            }).ToList();
+
             return Ok(Invoices);
     }
         [Route("SaleInvoice/GetSaleItem")]
         [HttpGet]
         public IActionResult GetSaleItem(long ItemID, DateTime DateFrom, DateTime DateTo )
         {
-            var Invoices = (from x in DB.InventoryMovements.Where(i=>i.SalesInvoiceId !=null).ToList()
-                            where (x.ItemsId== ItemID) &&(DB.SalesInvoices.Where(s=>s.Id == x.SalesInvoiceId).Single().FakeDate >= DateFrom) && (DB.SalesInvoices.Where(s => s.Id == x.SalesInvoiceId).Single().FakeDate  <= DateTo) 
-                            let p = new
-                            {
-                                x.Id,
-                                x.SellingPrice,
-                                x.Qty,
-                                x.Status,
-                                x.Tax,
-                                Name = x.SalesInvoice?.Vendor?.Name + " " + x.SalesInvoice?.Member?.Name + " - " + x.SalesInvoice.Name,
-                                FakeDate = x.SalesInvoice.FakeDate.ToString("dd/MM/yyyy"),
-                                x.Description,
-                      
-                            
-                            }
-                            select p);
+            var Invoices =  DB.InventoryMovements.Where(i => i.SalesInvoiceId != null && i.ItemsId == ItemID && i.SalesInvoice.FakeDate >= DateFrom && i.SalesInvoice.FakeDate <= DateTo).Select(x => new
+            {
+                x.Id,
+                x.SellingPrice,
+                x.Qty,
+                x.Status,
+                x.Tax,
+                x.TypeMove,
+                x.SalesInvoice.Vendor.Name,
+                FakeDate = x.SalesInvoice.FakeDate.ToString("dd/MM/yyyy"),
+                x.Description,
+                x.SalesInvoiceId,
+                x.ItemsId,
+                Type = "مبيعات"
+            }).ToList();
 
             return Ok(Invoices);
         }
@@ -73,32 +68,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetSaleInvoiceByStatus(int? Status)
         {
-            var Invoices = (from x in DB.SalesInvoices.ToList()
-                            where (x.Status == Status)
-                            let p = new
-                            {
-                                x.Id,
-                                x.Discount,
-                                x.Tax,
-                                Name = x.Vendor?.Name + " " + x.Member?.Name + " - " + x.Name,
-                                FakeDate = x.FakeDate.ToString("dd/MM/yyyy"),
-                                x.PaymentMethod,
-                                x.Status,
-                                x.Description,
-                                AccountID = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
-                                InventoryMovements = (from m in DB.InventoryMovements.ToList()
-                                                      where (m.SalesInvoiceId == x.Id) && (m.TypeMove == "Out")
-                                                      select new
-                                                      {
-                                                          m.Id,
-                                                          m.Items.Name,
-                                                          m.Qty,
-                                                          m.SellingPrice,
-                                                          m.Description
-                                                      }),
-                          
-                            }
-                            select p);
+            var Invoices = DB.SalesInvoices.Where(s => s.Status == Status).Select(x => new
+            {
+                x.Id,
+                x.Discount,
+                x.Tax,
+                Name =DB.Vendors.Where(v=>v.Id == x.VendorId).SingleOrDefault().Name+ DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+                FakeDate = x.FakeDate.ToString("dd/MM/yyyy"),
+                x.PaymentMethod,
+                x.Status,
+                x.Description,
+              //  AccountID = ' ' + DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId,
+                InventoryMovements =  DB.InventoryMovements.Where(im =>im.SalesInvoiceId == x.Id &&im.TypeMove == "Out").Select(imx => new {
+                    imx.Id,
+                   imx.ItemsId,
+                   imx.InventoryItemId,
+                    imx.Qty,
+                    imx.SellingPrice,
+                    imx.Description
+                }).ToList(),
+
+            }).ToList();
+
 
             return Ok(Invoices);
         }
@@ -112,13 +103,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     // TODO: Add insert logic here
                     DB.SalesInvoices.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "SalesInvoice").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(collection.Id);
-                    }
-                    else return Ok(false);
+                    return Ok(collection.Id);
+
                 }
                 catch
                 {

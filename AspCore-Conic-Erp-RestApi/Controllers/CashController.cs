@@ -16,16 +16,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetCashes()
         {
-            var Cashes = (from x in DB.Cashes.ToList()
-                          select new
-                          {
-                              x.Id,
-                              x.AccountId,
-                              x.Pcip,
-                              x.Description,
-                              x.Name,
-                       
-                          });
+            var Cashes = DB.Cashes.Select(x=> new {
+                x.Id,
+                x.AccountId,
+                x.Pcip,
+                x.Description,
+                x.Name,
+            }).ToList();
+                
+       
+                  
             return Ok(Cashes);
         }
         [Route("Cash/GetActiveCash")]
@@ -85,12 +85,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     collection.AccountId = NewAccount.Id;
                     DB.Cashes.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "Cash").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
                 }
                 catch
                 {

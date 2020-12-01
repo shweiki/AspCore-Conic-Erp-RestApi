@@ -16,32 +16,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetPurchaseInvoice(DateTime DateFrom, DateTime DateTo)
         {
-            var Invoices = (from x in DB.PurchaseInvoices.ToList()
-                            where (x.FakeDate >= DateFrom) && (x.FakeDate <= DateTo)
-                            let p = new
-                            {
-                                x.Id,
-                                Name = x.Vendor?.Name + " - " + x.Name,
-                                x.Discount,
-                                x.Tax,
-                                FakeDate = x.FakeDate.Value.ToString("dd/MM/yyyy"),
-                                x.PaymentMethod,
-                                x.Status,
-                                x.Description,
-                                InventoryMovements = (from m in DB.InventoryMovements.ToList()
-                                                      where (m.PurchaseInvoiceId == x.Id) && (m.TypeMove == "In")
-                                                      select new
-                                                      {
-                                                          m.Id,
-                                                          m.Items.Name,
-                                                          InventoryName = m.InventoryItem.Name,
-                                                          m.Qty,
-                                                          m.SellingPrice,
-                                                          m.Description
-                                                      }),
-                 
-                            }
-                            select p);
+            var Invoices = DB.PurchaseInvoices.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new
+            {
+
+                x.Id,
+                Name = x.Vendor.Name + " - " + x.Name,
+                x.Discount,
+                x.Tax,
+                FakeDate = x.FakeDate.Value.ToString("dd/MM/yyyy"),
+                x.PaymentMethod,
+                x.Status,
+                x.Description,
+                InventoryMovements = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId == x.Id && i.TypeMove == "In").Select(m => new
+                {
+                    m.Id,
+                    m.Items.Name,
+                    InventoryName = m.InventoryItem.Name,
+                    m.Qty,
+                    m.SellingPrice,
+                    m.Description
+                }).ToList()
+            }).ToList();
+                            
 
             return Ok(Invoices);
         }
@@ -49,20 +45,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetPurchaseItem(long? ItemID, DateTime DateFrom, DateTime DateTo)
         {
-            var Invoices = (from x in DB.InventoryMovements.Where(i => i.PurchaseInvoiceId != null).ToList()
-                            where (x.ItemsId == ItemID) && (x.PurchaseInvoice.FakeDate >= DateFrom) && (x.PurchaseInvoice.FakeDate <= DateTo)
-                            let p = new
-                            {
-                                x.Id,
-                                x.SellingPrice,
-                                x.Qty,
-                                x.Status,
-                                x.Tax,
-                                FakeDate = x.PurchaseInvoice.FakeDate.Value.ToString("dd/MM/yyyy"),
-                                x.Description,
-                
-                            }
-                            select p);
+            var Invoices = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId != null && i.ItemsId == ItemID && i.PurchaseInvoice.FakeDate >= DateFrom && i.PurchaseInvoice.FakeDate <= DateTo).Select(x => new
+            {
+                x.Id,
+                x.SellingPrice,
+                x.Qty,
+                x.Status,
+                x.Tax,
+                FakeDate = x.PurchaseInvoice.FakeDate.Value.ToString("dd/MM/yyyy"),
+                x.Description,
+
+            }).ToList();
 
             return Ok(Invoices);
         }
@@ -77,13 +70,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     // TODO: Add insert logic here
                     DB.PurchaseInvoices.Add(collection);
                     DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "PurchaseInvoice").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(collection.Id);
-                    }
-                    else return Ok(false);
+                    return Ok(collection.Id);
+
                 }
                 catch
                 {
@@ -131,42 +119,37 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetPurchaseInvoiceByID(long? ID)
         {
-            var Invoices = (from x in DB.PurchaseInvoices.ToList()
-                            where (x.Id == ID)
-                            let p = new
-                            {
-                                x.Id,
-                                Name = x.Vendor?.Name + " - " + x.Name,
-                                x.VendorId,
-                                x.Discount,
-                                x.Tax,
-                                x.FakeDate,
-                                x.InvoicePurchaseDate,
-                                x.PaymentMethod,
-                                x.Status,
-                                x.Description,
-                                InventoryMovements = (from m in DB.InventoryMovements.ToList()
-                                                      where (m.PurchaseInvoiceId == x.Id) && (m.TypeMove == "In")
-                                                      select new
-                                                      {
-                                                          m.Id,
-                                                          m.ItemsId,
-                                                          m.TypeMove,
-                                                          m.Status,
-                                                          m.Qty,
-                                                          Itemx = new
-                                                          {
-                                                              m.SellingPrice,
-                                                              m.Items.Name
-                                                          },
-                                                          m.PurchaseInvoiceId,
-                                                          m.InventoryItemId,
-                                                          m.SellingPrice,
-                                                          m.Description
-                                                      }),
-                    
-                            }
-                            select p).SingleOrDefault();
+            var Invoices = DB.PurchaseInvoices.Where(i => i.Id == ID).Select(x => new {
+                x.Id,
+                Name = x.Vendor.Name + " - " + x.Name,
+                x.VendorId,
+                x.Discount,
+                x.Tax,
+                x.FakeDate,
+                x.InvoicePurchaseDate,
+                x.PaymentMethod,
+                x.Status,
+                x.Description,
+                InventoryMovements = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId == x.Id && i.TypeMove == "In").Select(m => new {
+                    m.Id,
+                    m.ItemsId,
+                    m.TypeMove,
+                    m.Status,
+                    m.Qty,
+                    Itemx = new
+                    {
+                        m.SellingPrice,
+                        m.Items.Name
+                    },
+                    m.PurchaseInvoiceId,
+                    m.InventoryItemId,
+                    m.SellingPrice,
+                    m.Description
+                }).ToList()
+                                
+            }).SingleOrDefault();
+                       
+                        
 
             return Ok(Invoices);
         }

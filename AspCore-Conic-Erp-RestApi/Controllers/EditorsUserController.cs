@@ -16,12 +16,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetEditorsUser()
         {
-            var EditorsUsers = (from x in DB.EditorsUsers.ToList()
-                             select new
-                             {
-                                 x.Id,
-                                 x.Name
-                             });
+            var EditorsUsers = DB.EditorsUsers.Select(x => new
+            {
+                x.Id,
+                x.Name
+            }).ToList();
+                         
+                            
             return Ok(EditorsUsers);
 
         }

@@ -16,7 +16,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetItem()
         {
-            var Items = DB.Items.Select(x => new { x.Id, x.Name, x.Barcode, x.SellingPrice, x.OtherPrice }).ToList();
+            var Items = DB.Items.Select(x => new { x.Id, x.Name, x.Barcode, x.SellingPrice, x.OtherPrice ,x.CostPrice }).ToList();
 
             return Ok(Items);
         }
@@ -24,107 +24,96 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetIsPrimeItem()
         {
-            var Items = (from x in DB.Items.ToList()
-                         where (x.IsPrime == true)
-                         select new
-                         {
-                             x.Id,
-                             x.Name,
-                             x.CostPrice,
-                             x.SellingPrice,
-                             x.OtherPrice,
-                             x.LowOrder,
-                             x.Tax,
-                             x.IsPrime,
-                             x.Rate,
-                             x.Barcode,
-                             x.Description,
-                             InventoryQty = CalculateInventoryItemQty(x.Id),
-
-                         });
+            var Items = DB.Items.Where(i => i.IsPrime == true).Select(x => new {
+                x.Id,
+                x.Name,
+                x.CostPrice,
+                x.SellingPrice,
+                x.OtherPrice,
+                x.LowOrder,
+                x.Tax,
+                x.IsPrime,
+                x.Rate,
+                x.Barcode,
+                x.Description,
+             //   InventoryQty = CalculateInventoryItemQty(x.Id),
+            }).ToList();
+                         
+          
             return Ok(Items);
         }
         [Route("Item/GetActiveItem")]
         [HttpGet]
         public IActionResult GetActiveItem()
         {
-            var Items = (from x in DB.Items.ToList()
-                         where (x.Status == 0)
-                         select new
-                         {
-                             x.Id,
-                             x.Name,
-                             x.CostPrice,
-                             x.SellingPrice,
-                             x.OtherPrice,
-                             x.LowOrder,
-                             x.Tax,
-                             x.IsPrime,
-                             x.Rate,
-                             x.Barcode,
-                             x.Description,
-                             InventoryQty = CalculateInventoryItemQty(x.Id),
+            var Items = DB.Items.Where(i => i.Status == 0).Select(x => new {
+                x.Id,
+                x.Name,
+                x.CostPrice,
+                x.SellingPrice,
+                x.OtherPrice,
+                x.LowOrder,
+                x.Tax,
+                x.IsPrime,
+                x.Rate,
+                x.Barcode,
+                x.Description,
+               // InventoryQty = CalculateInventoryItemQty(x.Id),
+            }).ToList();
 
-                         });
             return Ok(Items);
         }
         [Route("Item/GetItemMove")]
         [HttpGet]
         public IActionResult GetItemMove(long ItemID, DateTime DateFrom, DateTime DateTo)
         {
-            var SalesInvoiceMove = (from x in DB.InventoryMovements.Where(i => i.SalesInvoiceId != null).ToList()
-                                    where (x.ItemsId == ItemID)  && (x.SalesInvoice.FakeDate >= DateFrom) && (x.SalesInvoice.FakeDate <= DateTo)
-                         let p = new
-                         { 
-                             x.Id,
-                             x.SellingPrice,
-                             x.Qty,
-                             x.Status,
-                             x.Tax,
-                             x.TypeMove,
-                             Name = x.SalesInvoice?.Vendor?.Name + " " + x.SalesInvoice?.Member?.Name ,
-                             FakeDate = x.SalesInvoice.FakeDate.ToString("dd/MM/yyyy") ,
-                             x.Description,
-                             x.SalesInvoiceId,
-                             Type = "مبيعات"
-                         }
-                         select p);
-            var PurchaseInvoiceMove = (from x in DB.InventoryMovements.Where(i => i.PurchaseInvoiceId != null).ToList()
-                                       where (x.ItemsId == ItemID) &&  (x.PurchaseInvoice.FakeDate >= DateFrom) && (x.PurchaseInvoice.FakeDate <= DateTo)
-                                    let p = new
-                                    {
-                                        x.Id,
-                                        x.SellingPrice,
-                                        x.Qty,
-                                        x.Status,
-                                        x.Tax,
-                                        x.TypeMove,
-                                        Name = x.PurchaseInvoice?.Vendor?.Name,
-                                        FakeDate = x.PurchaseInvoice.FakeDate.Value.ToString("dd/MM/yyyy"),
-                                        x.Description,
-                                        x.PurchaseInvoiceId,
-                                        Type = "مشتريات"
+            var SalesInvoiceMove = DB.InventoryMovements.Where(i => i.SalesInvoiceId != null && i.ItemsId == ItemID && i.SalesInvoice.FakeDate >= DateFrom && i.SalesInvoice.FakeDate <= DateTo).Select(x => new
+            {
+                x.Id,
+                x.SellingPrice,
+                x.Qty,
+                x.Status,
+                x.Tax,
+                x.TypeMove,
+                Name = DB.SalesInvoices.Where(S=>S.VendorId == x.SalesInvoice.VendorId).SingleOrDefault().Name + " " + DB.SalesInvoices.Where(S => S.MemberId == x.SalesInvoice.MemberId).SingleOrDefault().Name,
+                FakeDate = x.SalesInvoice.FakeDate.ToString("dd/MM/yyyy"),
+                x.Description,
+                x.SalesInvoiceId,
+                x.ItemsId,
+                Type = "مبيعات"
+            }).ToList();
 
-                                    }
-                                       select p);
-            var OrderInventoryMove = (from x in DB.InventoryMovements.Where(i => i.OrderInventoryId != null).ToList()
-                                       where (x.ItemsId == ItemID) && (x.OrderInventory.FakeDate >= DateFrom) && (x.OrderInventory.FakeDate <= DateTo)
-                                       let p = new
-                                       {
-                                           x.Id,
-                                           x.SellingPrice,
-                                           x.Qty,
-                                           x.Status,
-                                           x.Tax,
-                                           x.TypeMove,
-                                           Name = x.OrderInventory?.OrderType,
-                                           FakeDate = x.OrderInventory.FakeDate.Value.ToString("dd/MM/yyyy"),
-                                           x.Description,
-                                           x.OrderInventoryId,
-                                           Type = "سند مخزون"
+            var PurchaseInvoiceMove = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId != null && i.ItemsId == ItemID && i.PurchaseInvoice.FakeDate >= DateFrom && i.PurchaseInvoice.FakeDate <= DateTo).Select(x => new
+            {
+                x.Id,
+                x.SellingPrice,
+                x.Qty,
+                x.Status,
+                x.Tax,
+                x.TypeMove,
+                Name = DB.PurchaseInvoices.Where(S => S.VendorId == x.PurchaseInvoice.VendorId).SingleOrDefault().Name + " ",
+                FakeDate = x.PurchaseInvoice.FakeDate.Value.ToString("dd/MM/yyyy"),
+                x.Description,
+                x.PurchaseInvoiceId,
+                Type = "مشتريات",
+                                x.ItemsId
+            }).ToList();
 
-                                       }
-                                      select p);
+            var OrderInventoryMove = DB.InventoryMovements.Where(i => i.OrderInventoryId != null && i.ItemsId == ItemID && i.OrderInventory.FakeDate >= DateFrom && i.OrderInventory.FakeDate <= DateTo).Select(x => new {
+                x.Id,
+                x.SellingPrice,
+                x.Qty,
+                x.Status,
+                x.Tax,
+                x.TypeMove,
+                Name =  "سند " +x.OrderInventory.OrderType,
+                FakeDate = x.OrderInventory.FakeDate.Value.ToString("dd/MM/yyyy"),
+                x.Description,
+                x.OrderInventoryId,
+                Type = "سند مخزون",
+                                x.ItemsId
+            }).ToList();
+
             return Ok(new { OrderInventoryMove, PurchaseInvoiceMove, SalesInvoiceMove });
         }
         [Route("Item/Create")]
@@ -136,13 +125,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 try
                 {
                     DB.Items.Add(collection);
-                    DB.SaveChanges();
-                    Oprationsy Opx = DB.Oprationsys.Where(d => d.Status == collection.Status && d.TableName == "Item").SingleOrDefault();
-                    OprationsysController Op = new OprationsysController();
-                    if (Op.ChangeStatus(collection.Id, Opx.Id, "<!" + collection.Id + "!>"))
-                    {
-                        return Ok(true);
-                    }
+                    DB.SaveChanges();               
                 }
                 catch
                 {
