@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.IO;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -57,22 +58,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult Restore(int backUpId)
         {
-            // var Backup = DB.BackUps.Where(x => x.Id == backUpId).SingleOrDefault();
-            // Server server = new Server(serverConnection);
-            // var dat = server.Databases.ToString();
-            //// server.ConnectionContext.Connect();
-            // //"ALTER DATABASE [database name] SET OFFLINE WITH ROLLBACK IMMEDIATE;"
-            // Restore Restorex = new Restore();
-            // Restorex.Action = RestoreActionType.Database;
-            // Restorex.Database = database;
-            // BackupDeviceItem source = new BackupDeviceItem(Backup.Name, DeviceType.File);
-            // Restorex.Devices.Add(source);
-            // Restorex.ReplaceDatabase = true;
-            // Restorex.NoRecovery = false;
 
-            // Restorex.SqlRestore(server);
-
-            // return Ok(true);
             var Backup = DB.BackUps.Where(x => x.Id == backUpId).SingleOrDefault();
                 ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "\\SQLEXPRESS");
                 Server dbServer = new Server(serverConnection);
@@ -84,20 +70,27 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     ReplaceDatabase = true,
                     NoRecovery = false
                 };
-                 BackupDeviceItem source = new BackupDeviceItem(Backup.Name, DeviceType.File);
-
+            if (Directory.Exists(Backup.Name))
+            {
+                BackupDeviceItem source = new BackupDeviceItem(Backup.Name, DeviceType.File);
                 _Restore.Devices.Add(source);
-            CloseAllConnection("USE master alter database " + DatabaseName + " set offline with rollback immediate");
+                CloseAllConnection("USE master alter database " + DatabaseName + " set offline with rollback immediate");
 
-            //   _Restore.PercentComplete += DB_Restore_PersentComplete;
-            //      _Restore.Complete += DB_Restore_Complete;
-            _Restore.SqlRestore(dbServer);
-            CloseAllConnection("USE master alter database " + DatabaseName + " set online");
+                //   _Restore.PercentComplete += DB_Restore_PersentComplete;
+                //      _Restore.Complete += DB_Restore_Complete;
+                _Restore.SqlRestore(dbServer);
+                CloseAllConnection("USE master alter database " + DatabaseName + " set online");
 
-            return Ok(true);
+                return Ok(true);
+            }
+            else
+            {
+                return Ok("File is not Exsit");
+            }
 
 
-       
+
+
         }
 
 

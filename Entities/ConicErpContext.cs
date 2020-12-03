@@ -585,7 +585,7 @@ namespace Entities
                     .IsUnicode(false);
 
 
-                entity.Property(e => e.BusinessDescription).HasColumnType("text");
+                entity.Property(e => e.BusinessDescription).HasColumnType("nvarchar(max)");
 
 
                 entity.Property(e => e.Email)
@@ -596,7 +596,7 @@ namespace Entities
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Logo).HasColumnType("text");
+                entity.Property(e => e.Logo).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(50)
@@ -692,13 +692,13 @@ namespace Entities
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.FakeDate).HasColumnType("date");
 
                 entity.Property(e => e.Type)
                     .IsRequired()
-                    .HasColumnType("text");
+                    .HasColumnType("nvarchar(max)");
             });
 
             modelBuilder.Entity<EntryMovement>(entity =>
@@ -713,7 +713,7 @@ namespace Entities
 
                 entity.Property(e => e.AccountId).HasColumnName("AccountID");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.EntryId).HasColumnName("EntryID");
 
@@ -738,7 +738,7 @@ namespace Entities
 
                 entity.Property(e => e.File)
                     .IsRequired()
-                    .HasColumnType("text");
+                    .HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.FileType)
                     .IsRequired()
@@ -759,7 +759,7 @@ namespace Entities
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -905,7 +905,7 @@ namespace Entities
 
                 entity.Property(e => e.Body)
                     .IsRequired()
-                    .HasColumnType("text");
+                    .HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.Fktable).HasColumnName("FKTable");
 
@@ -938,7 +938,7 @@ namespace Entities
 
                 entity.Property(e => e.DateofBirth).HasColumnType("date");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.Email)
                     .HasMaxLength(255)
@@ -968,7 +968,7 @@ namespace Entities
 
                 entity.Property(e => e.Type)
                     .IsRequired()
-                    .HasColumnType("text");
+                    .HasColumnType("nvarchar(max)");
 
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.Members)
@@ -1008,7 +1008,7 @@ namespace Entities
 
                 entity.Property(e => e.DateTime).HasColumnType("datetime");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.DeviceId).HasColumnName("DeviceID");
 
@@ -1016,7 +1016,7 @@ namespace Entities
 
                 entity.Property(e => e.Type)
                     .IsRequired()
-                    .HasColumnType("text");
+                    .HasColumnType("nvarchar(max)");
 
                 entity.HasOne(d => d.Device)
                     .WithMany(p => p.MemberLogs)
@@ -1057,7 +1057,7 @@ namespace Entities
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.DiscountDescription)
                     .HasMaxLength(50)
@@ -1075,7 +1075,7 @@ namespace Entities
 
                 entity.Property(e => e.Type)
                     .IsRequired()
-                    .HasColumnType("text");
+                    .HasColumnType("nvarchar(max)");
 
                 entity.HasOne(d => d.Member)
                     .WithMany(p => p.MembershipMovements)
@@ -1098,7 +1098,7 @@ namespace Entities
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.EditorName).IsUnicode(false);
 
@@ -1125,7 +1125,7 @@ namespace Entities
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -1177,7 +1177,7 @@ namespace Entities
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.FakeDate).HasColumnType("date");
 
@@ -1193,7 +1193,7 @@ namespace Entities
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -1211,7 +1211,7 @@ namespace Entities
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.EditorName).IsUnicode(false);
 
@@ -1226,7 +1226,7 @@ namespace Entities
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Type).HasColumnType("text");
+                entity.Property(e => e.Type).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.VendorId).HasColumnName("VendorID");
 
@@ -1251,7 +1251,7 @@ namespace Entities
 
                 entity.Property(e => e.AccountInvoiceNumber).HasMaxLength(50);
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.FakeDate).HasColumnType("date");
 
@@ -1285,7 +1285,7 @@ namespace Entities
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.FakeDate).HasColumnType("date");
 
@@ -1298,7 +1298,7 @@ namespace Entities
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Type).HasColumnType("text");
+                entity.Property(e => e.Type).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.VendorId).HasColumnName("VendorID");
 
@@ -1390,7 +1390,7 @@ namespace Entities
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.FakeDate).HasColumnType("date");
             });
@@ -1401,7 +1401,7 @@ namespace Entities
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -1419,9 +1419,9 @@ namespace Entities
 
                 entity.Property(e => e.AccountId).HasColumnName("AccountID");
 
-                entity.Property(e => e.Address).HasColumnType("text");
+                entity.Property(e => e.Address).HasColumnType("nvarchar(max)");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.Email)
                     .HasMaxLength(255)

@@ -34,7 +34,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsPrime")
                         .HasColumnType("bit");
@@ -49,7 +49,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -410,10 +410,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(255)");
 
-
                     b.Property<string>("BusinessDescription")
-                        .HasColumnType("text");
-
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(255)
@@ -431,10 +429,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("HeaderReport")
                         .HasColumnType("nvarchar(max)");
 
-
-
                     b.Property<string>("Logo")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
@@ -460,7 +456,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasMaxLength(255)
                         .IsUnicode(false)
                         .HasColumnType("varchar(255)");
-
 
                     b.Property<string>("TaxNumber")
                         .HasMaxLength(100)
@@ -590,7 +585,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("FakeDate")
                         .HasColumnType("date");
@@ -600,7 +595,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -626,7 +621,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("EntryId")
                         .HasColumnType("bigint")
@@ -651,7 +646,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<string>("File")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FileType")
                         .IsRequired()
@@ -686,7 +681,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsPrime")
                         .HasColumnType("bit");
@@ -876,7 +871,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<string>("Body")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("Fktable")
                         .HasColumnType("bigint")
@@ -926,7 +921,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(255)
@@ -965,7 +960,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1012,7 +1007,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("DeviceId")
                         .HasColumnType("bigint")
@@ -1027,7 +1022,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1095,7 +1090,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Discount")
                         .HasColumnType("float");
@@ -1134,7 +1129,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("VisitsUsed")
                         .HasColumnType("int");
@@ -1157,7 +1152,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EditorName")
                         .IsUnicode(false)
@@ -1197,7 +1192,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsPrime")
                         .HasColumnType("bit");
@@ -1284,7 +1279,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("FakeDate")
                         .HasColumnType("date");
@@ -1312,7 +1307,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsPrime")
                         .HasColumnType("bit");
@@ -1340,7 +1335,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EditorName")
                         .IsUnicode(false)
@@ -1373,7 +1368,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("Type")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("VendorId")
                         .HasColumnType("bigint")
@@ -1401,7 +1396,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Discount")
                         .HasColumnType("float");
@@ -1449,7 +1444,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Discount")
                         .HasColumnType("float");
@@ -1481,7 +1476,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("Type")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("VendorId")
                         .HasColumnType("bigint")
@@ -1622,7 +1617,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("FakeDate")
                         .HasColumnType("date");
@@ -1644,7 +1639,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsPrime")
                         .HasColumnType("bit");
@@ -1694,13 +1689,13 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnName("AccountID");
 
                     b.Property<string>("Address")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double?>("CreditLimit")
                         .HasColumnType("float");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(255)

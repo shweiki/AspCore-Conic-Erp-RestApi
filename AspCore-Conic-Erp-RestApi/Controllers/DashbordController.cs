@@ -25,7 +25,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             WebRequest request = WebRequest.Create(
               "http://josmsservice.com/smsonline/GetBalance.cfm?AccName=highfit&AccPass=D7!cT5!SgU0");
      
-            if(request.Timeout <= 50000) { 
+            if(request.Timeout <= 500000) { 
                 request.Credentials = CredentialCache.DefaultCredentials;
                 WebResponse response = request.GetResponse();
                 string responseFromServer;

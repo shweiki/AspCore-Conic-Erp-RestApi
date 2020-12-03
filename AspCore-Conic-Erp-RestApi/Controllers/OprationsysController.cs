@@ -72,6 +72,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Oprations);
 
         }
+        [Route("Oprationsys/GetOprationByStatusTable")]
+        [HttpGet]
+        public IActionResult GetOprationByStatusTable(string TableName , int Status)
+        {
+            var Oprations = DB.Oprationsys.Where(i => i.Status == Status &&i.TableName == TableName ).Select(x => new
+            {
+                x.Id,
+                x.OprationName,
+                x.TableName,
+                x.ControllerName,
+                x.RoleName,
+                x.OprationDescription,
+                x.ArabicOprationDescription,
+                x.Status,
+                x.ReferenceStatus,
+                x.IconClass,
+                x.ClassName
+            }).SingleOrDefault();
+
+            return Ok(Oprations);
+
+        }
         [Route("Oprationsys/ChangeObjStatusByTableName")]
         [HttpPost]
         public IActionResult ChangeObjStatusByTableName(long ObjID, string TableName, int Status, string Description)

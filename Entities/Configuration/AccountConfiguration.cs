@@ -17,7 +17,7 @@ namespace Entities.Configuration
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-                builder.Property(e => e.Description).HasColumnType("text");
+                builder.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
                 builder.Property(e => e.Name)
                     .HasMaxLength(255)
@@ -25,7 +25,7 @@ namespace Entities.Configuration
 
                 builder.Property(e => e.Type)
                     .IsRequired()
-                    .HasColumnType("text");
+                    .HasColumnType("nvarchar(max)");
 
 
             builder.HasData

@@ -125,7 +125,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 try
                 {
                     DB.Items.Add(collection);
-                    DB.SaveChanges();               
+                    DB.SaveChanges();
+                    return Ok(true);
+
                 }
                 catch
                 {

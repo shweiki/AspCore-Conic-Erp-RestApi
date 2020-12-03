@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
-    public partial class Firstinitl : Migration
+    public partial class FirstIntail : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,10 +13,10 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                 {
                     ID = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Code = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
-                    Type = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsPrime = table.Column<bool>(type: "bit", nullable: false),
                     Name = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true)
                 },
@@ -90,8 +90,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     Name = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true),
                     NickName = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true),
                     TaxNumber = table.Column<string>(type: "varchar(100)", unicode: false, maxLength: 100, nullable: true),
-                    Logo = table.Column<string>(type: "text", nullable: true),
-                    BusinessDescription = table.Column<string>(type: "text", nullable: true),
+                    Logo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BusinessDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RateNumber = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
                     Address = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
                     PhoneNumber1 = table.Column<string>(type: "varchar(25)", unicode: false, maxLength: 25, nullable: true),
@@ -100,8 +100,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     Email = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
                     Website = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
                     HeaderReport = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FooterReport = table.Column<string>(type: "nvarchar(max)", nullable: true),
-
+                    FooterReport = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -165,10 +164,10 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                 {
                     ID = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FakeDate = table.Column<DateTime>(type: "date", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    Type = table.Column<string>(type: "text", nullable: false)
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -182,7 +181,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     ID = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FileType = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
-                    File = table.Column<string>(type: "text", nullable: false),
+                    File = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     TableName = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
                     FKTable = table.Column<long>(type: "bigint", nullable: false)
@@ -200,7 +199,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsPrime = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -238,7 +237,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     ID = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Type = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
-                    Body = table.Column<string>(type: "text", nullable: false),
+                    Body = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SendDate = table.Column<DateTime>(type: "datetime", nullable: false),
                     PhoneNumber = table.Column<string>(type: "varchar(13)", unicode: false, maxLength: 13, nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
@@ -280,7 +279,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsPrime = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -319,7 +318,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     FakeDate = table.Column<DateTime>(type: "date", nullable: true),
                     OrderType = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -334,7 +333,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsPrime = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -367,7 +366,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FakeDate = table.Column<DateTime>(type: "date", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -382,7 +381,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsPrime = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -468,9 +467,9 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     Email = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
                     PhoneNumber1 = table.Column<string>(type: "varchar(13)", unicode: false, maxLength: 13, nullable: true),
                     PhoneNumber2 = table.Column<string>(type: "varchar(13)", unicode: false, maxLength: 13, nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    Type = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AccountID = table.Column<long>(type: "bigint", nullable: false),
                     SSN = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false),
                     Tag = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true)
@@ -493,12 +492,12 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     ID = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
-                    Address = table.Column<string>(type: "text", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
                     PhoneNumber1 = table.Column<string>(type: "varchar(13)", unicode: false, maxLength: 13, nullable: true),
                     PhoneNumber2 = table.Column<string>(type: "varchar(13)", unicode: false, maxLength: 13, nullable: true),
                     Fax = table.Column<string>(type: "varchar(13)", unicode: false, maxLength: 13, nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreditLimit = table.Column<double>(type: "float", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     IsPrime = table.Column<bool>(type: "bit", nullable: false),
@@ -629,7 +628,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     ID = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AccountID = table.Column<long>(type: "bigint", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Debit = table.Column<double>(type: "float", nullable: false),
                     Credit = table.Column<double>(type: "float", nullable: false),
                     EntryID = table.Column<long>(type: "bigint", nullable: false)
@@ -827,9 +826,9 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                 {
                     ID = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Type = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateTime = table.Column<DateTime>(type: "datetime", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     MemberID = table.Column<long>(type: "bigint", nullable: false),
                     DeviceID = table.Column<long>(type: "bigint", nullable: false)
@@ -861,10 +860,10 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     Tax = table.Column<double>(type: "float", nullable: true),
                     StartDate = table.Column<DateTime>(type: "date", nullable: false),
                     EndDate = table.Column<DateTime>(type: "date", nullable: false),
-                    Type = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VisitsUsed = table.Column<int>(type: "int", nullable: false),
                     Discount = table.Column<double>(type: "float", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     MemberID = table.Column<long>(type: "bigint", nullable: false),
                     MembershipID = table.Column<int>(type: "int", nullable: false),
@@ -928,12 +927,12 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     FakeDate = table.Column<DateTime>(type: "date", nullable: false),
                     PaymentMethod = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
                     TotalAmmount = table.Column<double>(type: "float", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     VendorID = table.Column<long>(type: "bigint", nullable: true),
                     IsPrime = table.Column<bool>(type: "bit", nullable: false),
                     MemberID = table.Column<long>(type: "bigint", nullable: true),
-                    Type = table.Column<string>(type: "text", nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EditorName = table.Column<string>(type: "varchar(max)", unicode: false, nullable: true)
                 },
                 constraints: table =>
@@ -966,7 +965,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     PaymentMethod = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
                     Discount = table.Column<double>(type: "float", nullable: false),
                     InvoicePurchaseDate = table.Column<DateTime>(type: "date", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     VendorID = table.Column<long>(type: "bigint", nullable: false)
                 },
@@ -992,12 +991,12 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     FakeDate = table.Column<DateTime>(type: "date", nullable: false),
                     PaymentMethod = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
                     Discount = table.Column<double>(type: "float", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     VendorID = table.Column<long>(type: "bigint", nullable: true),
                     IsPrime = table.Column<bool>(type: "bit", nullable: false),
                     MemberID = table.Column<long>(type: "bigint", nullable: true),
-                    Type = table.Column<string>(type: "text", nullable: true)
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1026,7 +1025,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     StartDate = table.Column<DateTime>(type: "date", nullable: false),
                     EndDate = table.Column<DateTime>(type: "date", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EditorName = table.Column<string>(type: "varchar(max)", unicode: false, nullable: true),
                     MemberShipMovementID = table.Column<long>(type: "bigint", nullable: false)
                 },
