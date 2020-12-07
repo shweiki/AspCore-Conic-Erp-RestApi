@@ -20,6 +20,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.AccountId,
                 x.Pcip,
+                x.Btcash,
                 x.Description,
                 x.Name,
             }).ToList();
@@ -45,6 +46,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 Cash cash = DB.Cashes.Where(x => x.Id == collection.Id).SingleOrDefault();
                 cash.Pcip = collection.Pcip;
+                cash.Btcash = collection.Btcash;
                 cash.Description = collection.Description;
                 cash.Name = collection.Name;
                 try
