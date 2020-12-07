@@ -71,6 +71,7 @@ namespace Entities
             modelBuilder.UseCollation("Arabic_CI_AI");
 
             modelBuilder.ApplyConfiguration(new AccountConfiguration());
+      //      modelBuilder.ApplyConfiguration(new MicrosoftAspNetCoreIdentityConfiguration());
 
             modelBuilder
     .HasAnnotation("ProductVersion", "3.0.0")
