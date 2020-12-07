@@ -116,6 +116,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(new { OrderInventoryMove, PurchaseInvoiceMove, SalesInvoiceMove });
         }
+
+        [Route("Item/GetItemByID")]
+        [HttpGet]
+        public IActionResult GetItemByID(long? ID)
+        {
+       
+            return Ok(DB.Items.Where(x => x.Id == ID).SingleOrDefault());
+        }
         [Route("Item/Create")]
         [HttpPost]
         public IActionResult Create(Item collection)

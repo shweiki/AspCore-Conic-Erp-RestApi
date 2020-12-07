@@ -109,7 +109,13 @@ namespace Entities
                     ConcurrencyStamp = "f9fd5fb8-1ea9-4afd-8029-b8a027ee943f",
                     Name = "Developer",
                     NormalizedName = "DEVELOPER"
-                });
+                },new {
+                    Id = "f4c8a1a5-0530-41a3-9ae1-99d51857de42", //  Guid.NewGuid(),
+                    ConcurrencyStamp = "4a1971c9-71fd-41d8-8cad-35176671d26a",
+                    Name = "Admin",
+                    NormalizedName = "ADMIN"
+             
+            });
             });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -285,6 +291,9 @@ namespace Entities
                     UserId = "2c4f9fbb-cefc-4217-909d-dad1b6afd726",
                     RoleId = "2890efde-5d28-406d-ae5e-72576f74870f"
 
+                }, new {
+                    UserId = "2c4f9fbb-cefc-4217-909d-dad1b6afd726",
+                    RoleId = "f4c8a1a5-0530-41a3-9ae1-99d51857de42"
                 });
             });
 

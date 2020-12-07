@@ -39,11 +39,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 // TODO: Add update logic here
                 DB.SaveChanges();
               
-                return Json(true);
+                return Ok(true);
             }
             else
             {
-                return Json(false);
+                return Ok(false);
             }
         }
 

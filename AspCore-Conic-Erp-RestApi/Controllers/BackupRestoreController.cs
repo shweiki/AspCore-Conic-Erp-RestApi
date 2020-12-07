@@ -41,6 +41,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             backup.BackupSetDescription = "AdventureWorks - full backup";
             backup.BackupSetName = "AdventureWorks backup";
             backup.Database = DatabaseName;
+            if (!Directory.Exists(BackUpPath))
+            {
+                Directory.CreateDirectory(BackUpPath);
+            }
             string name = BackUpPath + DatabaseName + "-" + DateTime.ToString("dd-MM-yyyy hh-mm-tt") + ".bak";
             BackupDeviceItem deviceItem = new BackupDeviceItem(name, DeviceType.File);
             backup.Devices.Add(deviceItem);
