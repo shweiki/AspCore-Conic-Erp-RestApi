@@ -39,6 +39,46 @@ namespace Entities.Configuration
                     Code = "",
                     Type = "InCome",
                     IsPrime = false
+                },
+                new Account
+                {
+                    Id = 3,
+                    Name = "اشتراكات",
+                    Description = "",
+                    Status = 0,
+                    Code = "",
+                    Type = "InCome",
+                    IsPrime = false
+                },
+                new Account
+                {
+                    Id = 4,
+                    Name = "مقبوضات",
+                    Description = "",
+                    Status = 0,
+                    Code = "",
+                    Type = "InCome",
+                    IsPrime = false
+                },
+                new Account
+                {
+                    Id = 5,
+                    Name = "خزينة 1",
+                    Description = "",
+                    Status = 0,
+                    Code = "",
+                    Type = "Cash",
+                    IsPrime = false
+                },
+                new Account
+                {
+                    Id = 6,
+                    Name = "زبون نقدي",
+                    Description = "",
+                    Status = 0,
+                    Code = "",
+                    Type = "Vendor",
+                    IsPrime = false
                 }
             );
         }

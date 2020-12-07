@@ -71,7 +71,9 @@ namespace Entities
             modelBuilder.UseCollation("Arabic_CI_AI");
 
             modelBuilder.ApplyConfiguration(new AccountConfiguration());
-      //      modelBuilder.ApplyConfiguration(new MicrosoftAspNetCoreIdentityConfiguration());
+            modelBuilder.ApplyConfiguration(new CashConfiguration());
+            modelBuilder.ApplyConfiguration(new VendorConfiguration());
+            modelBuilder.ApplyConfiguration(new InventoryItemConfiguration());
 
             modelBuilder
     .HasAnnotation("ProductVersion", "3.0.0")
@@ -516,34 +518,7 @@ namespace Entities
                     .HasConstraintName("FK_Bank_Account");
             });
 
-            modelBuilder.Entity<Cash>(entity =>
-            {
-                entity.ToTable("Cash");
 
-                entity.HasIndex(e => e.AccountId, "IX_Cash_AccountID");
-
-                entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.AccountId).HasColumnName("AccountID");
-
-                entity.Property(e => e.Btcash).HasColumnName("BTCash");
-
-                entity.Property(e => e.Description)
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Pcip).HasColumnName("PCIP");
-
-                entity.HasOne(d => d.Account)
-                    .WithMany(p => p.Cashes)
-                    .HasForeignKey(d => d.AccountId)
-                    .HasConstraintName("FK_Cash_Account");
-            });
 
             modelBuilder.Entity<Cheque>(entity =>
             {
@@ -763,19 +738,7 @@ namespace Entities
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<InventoryItem>(entity =>
-            {
-                entity.ToTable("InventoryItem");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-            });
 
             modelBuilder.Entity<InventoryMovement>(entity =>
             {
@@ -1419,52 +1382,7 @@ namespace Entities
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<Vendor>(entity =>
-            {
-                entity.ToTable("Vendor");
-
-                entity.HasIndex(e => e.AccountId, "IX_Vendor_AccountID");
-
-                entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.AccountId).HasColumnName("AccountID");
-
-                entity.Property(e => e.Address).HasColumnType("nvarchar(max)");
-
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
-
-                entity.Property(e => e.Email)
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Fax)
-                    .HasMaxLength(13)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.PhoneNumber1)
-                    .HasMaxLength(13)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.PhoneNumber2)
-                    .HasMaxLength(13)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Type)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.HasOne(d => d.Account)
-                    .WithMany(p => p.Vendors)
-                    .HasForeignKey(d => d.AccountId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Vendor_Account");
-            });
+   
 
             OnModelCreatingPartial(modelBuilder);
         }
