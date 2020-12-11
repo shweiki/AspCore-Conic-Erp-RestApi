@@ -25,7 +25,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             WebRequest request = WebRequest.Create(
               "http://josmsservice.com/smsonline/GetBalance.cfm?AccName=highfit&AccPass=D7!cT5!SgU0");
      
-            if(request.Timeout <= 500000) { 
+            if(request.ContentLength > 0) { 
                 request.Credentials = CredentialCache.DefaultCredentials;
                 WebResponse response = request.GetResponse();
                 string responseFromServer;
@@ -41,7 +41,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     Purchases = DB.PurchaseInvoices.Count(),
                     Sales = DB.SalesInvoices.Count(),
-                    Clients = DB.Vendors.Where(x => x.Type == "Client").Count(),
+                    Clients = DB.Vendors.Where(x => x.Type == "Customer").Count(),
                     Suppliers = DB.Vendors.Where(x => x.Type == "Supplier").Count(),
                     Members = DB.Members.Count(),
                     MembersActive = DB.Members.Where(x => x.Status == 0).Count(),
