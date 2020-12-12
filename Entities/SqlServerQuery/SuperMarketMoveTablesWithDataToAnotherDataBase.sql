@@ -27,17 +27,18 @@
 		DROP TABLE [Conic_Erp].[dbo].Discount 
 		DROP TABLE [Conic_Erp].[dbo].EntryMovement 
 		DROP TABLE [Conic_Erp].[dbo].EntryAccounting 
-		/*DROP TABLE [Conic_Erp].[dbo].Payment */
+		DROP TABLE [Conic_Erp].[dbo].Payment 
+		DROP TABLE [Conic_Erp].[dbo].ActionLog 
+
 		DROP TABLE [Conic_Erp].[dbo].Vendor 
 		DROP TABLE [Conic_Erp].[dbo].[Member] 
 		DROP TABLE [Conic_Erp].[dbo].Account 
 
 
-		DROP TABLE [Conic_Erp].[dbo].ActionLog 
 		DROP TABLE [Conic_Erp].[dbo].[BackUp] 
 		DROP TABLE [Conic_Erp].[dbo].[CompanyInfo] 
-	/*	DROP TABLE [Conic_Erp].[dbo].[Device] */
-		DROP TABLE [Conic_Erp].[dbo].[EditorsUser] 
+	/*	DROP TABLE [Conic_Erp].[dbo].[Device]
+		DROP TABLE [Conic_Erp].[dbo].[EditorsUser]  */
 		DROP TABLE [Conic_Erp].[dbo].[FileData] 
 		DROP TABLE [Conic_Erp].[dbo].[Oprationsys]
 
@@ -55,20 +56,20 @@
 
 
 		select * into [Conic_Erp].[dbo].ActionLog from [SuperMarket].Config.ActionLog
-		select * into [Conic_Erp].[dbo].[BackUp] from [SuperMarket].[dbo].[BackUp]
+		/*select * into [Conic_Erp].[dbo].[BackUp] from [SuperMarket].[dbo].[BackUp]*/
 		select * into [Conic_Erp].[dbo].[CompanyInfo] from [SuperMarket].Config.[CompanyInfo]
-	/*	select * into [Conic_Erp].[dbo].[Device]  from [SuperMarket].Config.[Device] */
+	/*	select * into [Conic_Erp].[dbo].[Device]  from [SuperMarket].Config.[Device] 
 		select * into [Conic_Erp].[dbo].[EditorsUser] from [SuperMarket].[dbo].[EditorsUser]
-		select * into [Conic_Erp].[dbo].[FileData] from [SuperMarket].Config.[FileData]
+		select * into [Conic_Erp].[dbo].[FileData] from [SuperMarket].Config.[FileData]*/
 		select * into [Conic_Erp].[dbo].[Oprationsys] from [SuperMarket].Config.[Oprationsys]
 
-		select * into [Conic_Erp].[dbo].[Member] from [SuperMarket].[Gym].[Member]
-	    select * into [Conic_Erp].[dbo].[MemberFace] from [SuperMarket].[dbo].[MemberFace]
+		/*select * into [Conic_Erp].[dbo].[Member] from [SuperMarket].[Gym].[Member]
+	   select * into [Conic_Erp].[dbo].[MemberFace] from [SuperMarket].[dbo].[MemberFace]
 		select * into [Conic_Erp].[dbo].[MemberLog] from [SuperMarket].[dbo].[MemberLog]
 	    select * into [Conic_Erp].[dbo].[Membership] from [SuperMarket].[dbo].[Membership]
 	    select * into [Conic_Erp].[dbo].[MembershipMovement] from [SuperMarket].[dbo].[MembershipMovement]
 	    select * into [Conic_Erp].[dbo].[MembershipMovementOrder] from [SuperMarket].[dbo].[MembershipMovementOrder]
-	    select * into [Conic_Erp].[dbo].[Service] from [SuperMarket].[dbo].[Service]
+	    select * into [Conic_Erp].[dbo].[Service] from [SuperMarket].[dbo].[Service]*/
 
 
 	    select * into [Conic_Erp].[dbo].[InventoryItem] from [SuperMarket].[Inventory].[InventoryItem]

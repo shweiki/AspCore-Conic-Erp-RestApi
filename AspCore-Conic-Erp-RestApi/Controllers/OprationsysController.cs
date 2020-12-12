@@ -190,10 +190,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             ActionLog log = new ActionLog();
             // var claimsIdentity = (ClaimsIdentity)HttpContext.User.Identity;
             //  var claim = claimsIdentity.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-            var userId = _userManager.GetUserId(User); // Get user id:
             log.PostingDateTime = DateTime.Now;
             log.OprationId = Oprationsys.Id;
-            log.UserId = userId;
+            log.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             log.Description = Description;
 
             switch (Oprationsys.TableName)

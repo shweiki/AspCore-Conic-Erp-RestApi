@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.IO;
+using System.Security.Claims;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -51,7 +52,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             backup.Incremental = false;
             backup.LogTruncation = BackupTruncateLogType.Truncate;
             backup.SqlBackup(server);
-            BackUp backup1 = new BackUp { Name = name, BackUpPath = BackUpPath, DateTime = DateTime, UserId = User.Identity.Name, DataBaseName = DatabaseName };
+            BackUp backup1 = new BackUp { Name = name, BackUpPath = BackUpPath, DateTime = DateTime, UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value , DataBaseName = DatabaseName };
             DB.BackUps.Add(backup1);
             DB.SaveChanges();
             return Ok(true);
@@ -74,7 +75,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     ReplaceDatabase = true,
                     NoRecovery = false
                 };
-            if (Directory.Exists(Backup.Name))
+            if (!Directory.Exists(Backup.Name))
+            {
+                                return Ok("File is not Exsit");
+
+            }
+            else
             {
                 BackupDeviceItem source = new BackupDeviceItem(Backup.Name, DeviceType.File);
                 _Restore.Devices.Add(source);
@@ -86,10 +92,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 CloseAllConnection("USE master alter database " + DatabaseName + " set online");
 
                 return Ok(true);
-            }
-            else
-            {
-                return Ok("File is not Exsit");
             }
 
 
