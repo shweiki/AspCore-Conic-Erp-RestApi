@@ -97,14 +97,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(false);
         }
 
-        [Route("Cash/OpenCashDrawer")]
-        [HttpGet]
-        public IActionResult OpenCashDrawer()
-        {
-            var Device = DB.Devices.ToList();
-
-            return Ok(Device);
-        }
+     
     }
 }
 

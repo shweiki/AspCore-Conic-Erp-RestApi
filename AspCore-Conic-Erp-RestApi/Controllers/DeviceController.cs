@@ -16,6 +16,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private ZkemClient objZkeeper;
 
         private ConicErpContext DB = new ConicErpContext();
+        [Route("Device/OpenCashDrawer")]
+        [HttpGet]
+        public IActionResult OpenCashDrawer(string Com)
+        {
+
+            return Ok(Com);
+        }
+
+
         [Route("Device/GetDevice")]
         [HttpGet]
         public IActionResult GetDevice()
