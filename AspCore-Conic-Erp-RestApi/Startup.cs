@@ -61,10 +61,8 @@ namespace AspCore_Conic_Erp_RestApi
             {
                 app.UseDeveloperExceptionPage();
                 app.UseMigrationsEndPoint();
+
             }
-
-
-
 
             app.UseHttpsRedirection();
 
@@ -90,6 +88,7 @@ namespace AspCore_Conic_Erp_RestApi
                 endpoints.MapDefaultControllerRoute();
 
             });
+
         }
     }
 }
