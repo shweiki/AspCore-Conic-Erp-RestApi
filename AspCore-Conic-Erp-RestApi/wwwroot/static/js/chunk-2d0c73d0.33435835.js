@@ -1,1 +1,0 @@
-(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d0c73d0"],{5087:function(e,t,n){"use strict";n.r(t);var a=function(){var e=this,t=e.$createElement,n=e._self._c||t;return n("detail",{attrs:{"is-edit":!1}})},r=[],c=n("3ef2"),l={name:"CreateOrder",components:{Detail:c["a"]}},s=l,i=n("2877"),u=Object(i["a"])(s,a,r,!1,null,null,null);t["default"]=u.exports}}]);

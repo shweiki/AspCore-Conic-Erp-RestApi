@@ -202,8 +202,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                x.Type,
                                x.Tag,
                               HaveFaceOnDevice = x.MemberFaces.Count() > 0 ? true : false, 
-                               Avatar = "", //Url.Content("~/Images/Member/" + x.Id + ".jpeg"),
-                               x.AccountId,
+                               Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg"),
+                    TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
+                    TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
+                    x.AccountId,
                               // lastLog =x.MemberLogs.LastOrDefault().DateTime,
                                ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == x.Id && f.Status > 0).Select(MS=>new {
                                    MS.Id,
@@ -232,18 +234,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                                                 
                     }).ToList(),
 
-                    TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
-                    TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
-                    Opration =  DB.Oprationsys.Where(a=> a.Status == x.Status && a.TableName == "Member").Select(a=> new{
-                        a.Id,
-                        a.OprationName,
-                        a.Status,
-                        a.OprationDescription,
-                        a.ArabicOprationDescription,
-                        a.IconClass,
-                        a.ClassName
-                    }).FirstOrDefault()
-        
 
                 }).SingleOrDefault();
             return Ok(Members);

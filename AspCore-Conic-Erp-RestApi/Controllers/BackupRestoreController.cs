@@ -75,9 +75,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     ReplaceDatabase = true,
                     NoRecovery = false
                 };
-            if (!Directory.Exists(Backup.Name))
+            if (!System.IO.File.Exists(Backup.Name))
             {
-                                return Ok("File is not Exsit");
+             return Ok("File is not Exsit");
 
             }
             else
