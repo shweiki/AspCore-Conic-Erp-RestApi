@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Authorization;
-using Entities; 
+using Entities;
+using System.IO.Ports;
+using System.Text;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -20,7 +22,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult OpenCashDrawer(string Com)
         {
+            Encoding enc = Encoding.Unicode;
+            SerialPort sp = new SerialPort();
+            sp.PortName = Com;
 
+            sp.Encoding = enc;
+            sp.BaudRate = 38400;
+            sp.Parity = Parity.None;
+            sp.DataBits = 8;
+            sp.StopBits = StopBits.One;
+            sp.DtrEnable = true;
+            sp.Open();
+            sp.Write(char.ConvertFromUtf32(28699) + char.ConvertFromUtf32(9472) + char.ConvertFromUtf32(3365));
+            sp.Close();
             return Ok(Com);
         }
 
