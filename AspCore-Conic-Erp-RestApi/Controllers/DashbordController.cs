@@ -39,6 +39,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             var Data = new
                 {
+                    Items = DB.Items.Count(),
                     Purchases = DB.PurchaseInvoices.Count(),
                     Sales = DB.SalesInvoices.Count(),
                     Clients = DB.Vendors.Where(x => x.Type == "Customer").Count(),
