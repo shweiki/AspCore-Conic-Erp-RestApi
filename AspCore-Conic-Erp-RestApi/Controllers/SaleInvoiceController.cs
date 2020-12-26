@@ -114,6 +114,77 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
+        [Route("SaleInvoice/Edit")]
+        [HttpPost]
+        public IActionResult Edit(SalesInvoice collection)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    SalesInvoice Invoice = DB.SalesInvoices.Where(x => x.Id == collection.Id).SingleOrDefault();
+
+                    Invoice.Type = collection.Type;
+                    Invoice.Tax = collection.Tax;
+                    Invoice.Discount = collection.Discount;
+                    Invoice.Description = collection.Description;
+                    Invoice.Status = collection.Status;
+                    Invoice.VendorId = collection.VendorId;
+                    Invoice.FakeDate = collection.FakeDate;
+                    Invoice.PaymentMethod = collection.PaymentMethod;
+                    Invoice.Name = collection.Name;
+                    Invoice.MemberId = collection.MemberId;
+                    Invoice.IsPrime = collection.IsPrime;
+                    DB.InventoryMovements.RemoveRange(Invoice.InventoryMovements);
+                    Invoice.InventoryMovements = collection.InventoryMovements;
+                    DB.SaveChanges();
+
+                    return Ok(true);
+
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            else return Ok(false);
+        }
+        [Route("SaleInvoice/GetSaleInvoiceByID")]
+        [HttpGet]
+        public IActionResult GetSaleInvoiceByID(long? ID)
+        {
+            var Invoices = DB.SalesInvoices.Where(x => x.Id == ID).Select(x => new {
+                x.Id,
+                x.VendorId,
+                x.Name,
+                x.Discount,
+                x.Tax,
+                x.FakeDate,
+                x.PaymentMethod,
+                x.Status,
+                x.Description,
+                InventoryMovements = DB.InventoryMovements.Where(Im => Im.SalesInvoiceId == x.Id).Select(m => new {
+                    m.Id,
+                    m.ItemsId,
+                    m.TypeMove,
+                    m.Status,
+                    m.Qty,
+                    Itemx = new
+                    {
+                        m.SellingPrice,
+                        m.Items.Name
+                    },
+                    m.SalesInvoiceId,
+                    m.InventoryItemId,
+                    m.SellingPrice,
+                    m.Description
+
+                }).ToList()
+            }).SingleOrDefault();
+
+            return Ok(Invoices);
+        }
 
     }
 }

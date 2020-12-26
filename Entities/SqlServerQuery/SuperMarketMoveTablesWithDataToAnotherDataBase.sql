@@ -24,7 +24,7 @@
 		DROP TABLE [Conic_Erp].[dbo].Bank 
 		DROP TABLE [Conic_Erp].[dbo].Cash 
 		DROP TABLE [Conic_Erp].[dbo].Cheque 
-		DROP TABLE [Conic_Erp].[dbo].Discount 
+	/*	DROP TABLE [Conic_Erp].[dbo].Discount  */
 		DROP TABLE [Conic_Erp].[dbo].EntryMovement 
 		DROP TABLE [Conic_Erp].[dbo].EntryAccounting 
 		DROP TABLE [Conic_Erp].[dbo].Payment 
@@ -33,6 +33,7 @@
 		DROP TABLE [Conic_Erp].[dbo].Vendor 
 		DROP TABLE [Conic_Erp].[dbo].[Member] 
 		DROP TABLE [Conic_Erp].[dbo].Account 
+		DROP TABLE [Conic_Erp].[dbo].[CompanyInfo]
 
 	/*	DROP TABLE [Conic_Erp].[dbo].[Device]
 		DROP TABLE [Conic_Erp].[dbo].[EditorsUser]  
@@ -45,7 +46,7 @@
 		select * into [Conic_Erp].[dbo].Bank from [SuperMarket].Accounting.Bank
 		select * into [Conic_Erp].[dbo].Cash from [SuperMarket].Accounting.Cash
 		select * into [Conic_Erp].[dbo].Cheque from [SuperMarket].Accounting.Cheque
-		select * into [Conic_Erp].[dbo].Discount from [SuperMarket].Accounting.Discount
+	/*	select * into [Conic_Erp].[dbo].Discount from [SuperMarket].Accounting.Discount */
 		select * into [Conic_Erp].[dbo].EntryAccounting from [SuperMarket].Accounting.EntryAccounting
 		select * into [Conic_Erp].[dbo].EntryMovement from [SuperMarket].Accounting.EntryMovement
 	/*	select * into [Conic_Erp].[dbo].Payment from [SuperMarket].Accounting.Payment */
@@ -53,8 +54,8 @@
 
 
 		select * into [Conic_Erp].[dbo].ActionLog from [SuperMarket].Config.ActionLog
+				select * into [Conic_Erp].[dbo].[CompanyInfo] from [SuperMarket].Config.[CompanyInfo]
 		/*select * into [Conic_Erp].[dbo].[BackUp] from [SuperMarket].[dbo].[BackUp]
-		select * into [Conic_Erp].[dbo].[CompanyInfo] from [SuperMarket].Config.[CompanyInfo]
 		select * into [Conic_Erp].[dbo].[Device]  from [SuperMarket].Config.[Device] 
 		select * into [Conic_Erp].[dbo].[EditorsUser] from [SuperMarket].[dbo].[EditorsUser]
 		select * into [Conic_Erp].[dbo].[FileData] from [SuperMarket].Config.[FileData]*/
@@ -89,6 +90,8 @@
 		ALTER TABLE [Conic_Erp].[dbo].Account ALTER COLUMN Type nvarchar(MAX)
 		ALTER TABLE [Conic_Erp].[dbo].Vendor ALTER COLUMN Description nvarchar(MAX)  
 		ALTER TABLE [Conic_Erp].[dbo].Vendor ALTER COLUMN Address nvarchar(MAX)  
+
+
 
 use Conic_Erp
 CREATE TABLE [dbo].[Member](
