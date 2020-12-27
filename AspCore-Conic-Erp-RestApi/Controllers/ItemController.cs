@@ -176,10 +176,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(false);
         }
 
-     
-        public dynamic CalculateInventoryItemQty(long? ItemID)
+        [Route("Item/CalculateInventoryItemQty")]
+        [HttpPost]
+        public ActionResult CalculateInventoryItemQty(long? ItemID)
         {
-            return from x in DB.InventoryMovements.Where(i => i.ItemsId == ItemID && i.Status == 0).ToList()
+            return Ok(from x in DB.InventoryMovements.Where(i => i.ItemsId == ItemID && i.Status == 0).ToList()
                    group x by x.InventoryItemId into g
                    select new
                    {
@@ -187,7 +188,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                        InventoryName = DB.InventoryItems.Where(a => a.Id == g.Key).Select(c => c.Name).FirstOrDefault(),
                        QtyIn = g.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty),
                        QtyOut = g.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty)
-                   };
+                   });
         }
 
     }
