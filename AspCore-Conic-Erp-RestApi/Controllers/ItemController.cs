@@ -119,10 +119,25 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("Item/GetItemByID")]
         [HttpGet]
-        public IActionResult GetItemByID(long? ID)
+        public IActionResult GetItemByID(long ID)
         {
-       
-            return Ok(DB.Items.Where(x => x.Id == ID).SingleOrDefault());
+            var Item = DB.Items.Where(x=>x.Id == ID).Select(x=> new 
+                        {
+                            x.Id,
+                            x.Name,
+                            x.CostPrice,
+                            x.SellingPrice,
+                            x.OtherPrice,
+                            x.LowOrder,
+                            x.Tax,
+                            x.Rate,
+                            x.Barcode,
+                            x.Description,
+                            x.IsPrime,
+                            x.Status,
+                          //  InventoryQty = CalculateInventoryItemQty(x.Id)
+                        }).SingleOrDefault();
+            return Ok(Item);
         }
         [Route("Item/Create")]
         [HttpPost]
@@ -178,9 +193,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("Item/CalculateInventoryItemQty")]
         [HttpPost]
-        public ActionResult CalculateInventoryItemQty(long? ItemID)
+        public IActionResult CalculateInventoryItemQty(long ID)
         {
-            return Ok(from x in DB.InventoryMovements.Where(i => i.ItemsId == ItemID && i.Status == 0).ToList()
+            return Ok(from x in DB.InventoryMovements.Where(i => i.ItemsId == ID && i.Status == 0).ToList()
                    group x by x.InventoryItemId into g
                    select new
                    {
