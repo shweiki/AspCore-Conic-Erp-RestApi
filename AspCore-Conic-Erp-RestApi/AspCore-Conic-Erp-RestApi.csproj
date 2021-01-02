@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -16,6 +16,86 @@
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>false</Isolated>
     </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\static\fonts\fa-brands-400.f075c50f.woff2" />
+    <None Include="wwwroot\static\fonts\fa-regular-400.4a74738e.woff2" />
+    <None Include="wwwroot\static\fonts\fa-solid-900.8e1ed89b.woff2" />
+    <None Include="wwwroot\static\img\fa-brands-400.2f122423.svg" />
+    <None Include="wwwroot\static\img\fa-regular-400.3602b7e8.svg" />
+    <None Include="wwwroot\static\img\fa-solid-900.664de393.svg" />
+    <None Include="wwwroot\static\js\app.c1d77f0e.js" />
+    <None Include="wwwroot\static\js\chunk-00b90cd4.c6a28a96.js" />
+    <None Include="wwwroot\static\js\chunk-01643c62.2deb29a0.js" />
+    <None Include="wwwroot\static\js\chunk-02ad4a1e.b2bb1db8.js" />
+    <None Include="wwwroot\static\js\chunk-05f9a750.6c754ea5.js" />
+    <None Include="wwwroot\static\js\chunk-0c1c0e6b.63b7f6cf.js" />
+    <None Include="wwwroot\static\js\chunk-0e4b08a7.40deee24.js" />
+    <None Include="wwwroot\static\js\chunk-0fee1061.ccf3e0b4.js" />
+    <None Include="wwwroot\static\js\chunk-100bc33e.d7a9c1e8.js" />
+    <None Include="wwwroot\static\js\chunk-1b54a460.2f9bca44.js" />
+    <None Include="wwwroot\static\js\chunk-1be010d8.4eb66695.js" />
+    <None Include="wwwroot\static\js\chunk-1e041410.37f1312f.js" />
+    <None Include="wwwroot\static\js\chunk-208f7099.a679b1bf.js" />
+    <None Include="wwwroot\static\js\chunk-23d263b0.17d45ab9.js" />
+    <None Include="wwwroot\static\js\chunk-26a2124e.2be64a74.js" />
+    <None Include="wwwroot\static\js\chunk-27aaa9e4.13b39d59.js" />
+    <None Include="wwwroot\static\js\chunk-27bdc7f3.b049bb61.js" />
+    <None Include="wwwroot\static\js\chunk-2d0a4400.02b99d18.js" />
+    <None Include="wwwroot\static\js\chunk-2d0a461b.698a4804.js" />
+    <None Include="wwwroot\static\js\chunk-2d0ac1ee.4ef9c378.js" />
+    <None Include="wwwroot\static\js\chunk-2d0af42d.feea11b0.js" />
+    <None Include="wwwroot\static\js\chunk-2d0b1c32.0fdd6677.js" />
+    <None Include="wwwroot\static\js\chunk-2d0b39cf.e97dcbea.js" />
+    <None Include="wwwroot\static\js\chunk-2d0bd90b.83d4934e.js" />
+    <None Include="wwwroot\static\js\chunk-2d2105d3.b54ad484.js" />
+    <None Include="wwwroot\static\js\chunk-2d213caa.7e7bf860.js" />
+    <None Include="wwwroot\static\js\chunk-2d21e3e9.d2292aec.js" />
+    <None Include="wwwroot\static\js\chunk-2d21e993.288d1e05.js" />
+    <None Include="wwwroot\static\js\chunk-2d225786.7b30476d.js" />
+    <None Include="wwwroot\static\js\chunk-2d230fe7.19def69d.js" />
+    <None Include="wwwroot\static\js\chunk-2f3f2c17.b9d6b978.js" />
+    <None Include="wwwroot\static\js\chunk-357966ec.60b6fd30.js" />
+    <None Include="wwwroot\static\js\chunk-37c30122.a2eb04f3.js" />
+    <None Include="wwwroot\static\js\chunk-396d9d4f.316fb7e8.js" />
+    <None Include="wwwroot\static\js\chunk-45e3171a.d1d9ef2a.js" />
+    <None Include="wwwroot\static\js\chunk-4927cb87.add16d2b.js" />
+    <None Include="wwwroot\static\js\chunk-4d90b186.7e53a00e.js" />
+    <None Include="wwwroot\static\js\chunk-4e008538.f276fb08.js" />
+    <None Include="wwwroot\static\js\chunk-51218a64.dafd0b9f.js" />
+    <None Include="wwwroot\static\js\chunk-5164a781.3edd439b.js" />
+    <None Include="wwwroot\static\js\chunk-542d9f86.e372e0b1.js" />
+    <None Include="wwwroot\static\js\chunk-547c4cc3.a3797ca2.js" />
+    <None Include="wwwroot\static\js\chunk-556562e8.82288351.js" />
+    <None Include="wwwroot\static\js\chunk-59cd30ad.42e2045a.js" />
+    <None Include="wwwroot\static\js\chunk-5a424569.e4ab6610.js" />
+    <None Include="wwwroot\static\js\chunk-5bdd67a2.6bdb88d0.js" />
+    <None Include="wwwroot\static\js\chunk-5d4670a0.31b60fa2.js" />
+    <None Include="wwwroot\static\js\chunk-61507df0.ef276259.js" />
+    <None Include="wwwroot\static\js\chunk-62c2c264.61b816ef.js" />
+    <None Include="wwwroot\static\js\chunk-6493876a.5c242138.js" />
+    <None Include="wwwroot\static\js\chunk-6558e106.bc9d42c3.js" />
+    <None Include="wwwroot\static\js\chunk-6883c91c.77eda2b3.js" />
+    <None Include="wwwroot\static\js\chunk-69a0151e.db067e16.js" />
+    <None Include="wwwroot\static\js\chunk-6b9c9f26.3e89b47f.js" />
+    <None Include="wwwroot\static\js\chunk-7348d640.d3c97e49.js" />
+    <None Include="wwwroot\static\js\chunk-74a63d34.9bc313c1.js" />
+    <None Include="wwwroot\static\js\chunk-777c0a2e.2f93ed2a.js" />
+    <None Include="wwwroot\static\js\chunk-78b46cc5.578a0f65.js" />
+    <None Include="wwwroot\static\js\chunk-7aa41444.b93bc6c4.js" />
+    <None Include="wwwroot\static\js\chunk-98341df2.ec54e2a4.js" />
+    <None Include="wwwroot\static\js\chunk-a4d046f4.fc3eb550.js" />
+    <None Include="wwwroot\static\js\chunk-c357c656.85874cae.js" />
+    <None Include="wwwroot\static\js\chunk-ce9d6162.709f507d.js" />
+    <None Include="wwwroot\static\js\chunk-commons.42f27db5.js" />
+    <None Include="wwwroot\static\js\chunk-d21d9fa6.ecae172b.js" />
+    <None Include="wwwroot\static\js\chunk-dcdd3d18.87397db9.js" />
+    <None Include="wwwroot\static\js\chunk-e1febfe2.e0accccb.js" />
+    <None Include="wwwroot\static\js\chunk-e6d92972.98779d00.js" />
+    <None Include="wwwroot\static\js\chunk-elementUI.14e5d494.js" />
+    <None Include="wwwroot\static\js\chunk-fadcc026.5143b478.js" />
+    <None Include="wwwroot\static\js\chunk-libs.8a1b79bb.js" />
   </ItemGroup>
 
   <ItemGroup>
