@@ -63,12 +63,21 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
         }
-        [Route("Setting/CheckSetting")]
-        [HttpPost]
-        public IActionResult CheckSetting(Setting dynamicRequest)
+
+        [Route("Setting/CheckUpdate")]
+        [HttpGet]
+        public IActionResult CheckUpdate()
         {
-     
-            return Ok(dynamicRequest);
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = "/C copy /b Image1.jpg + Archive.rar Image2.jpg";
+            startInfo.Verb = "runas";
+            process.StartInfo = startInfo;
+            process.Start();
+            var version = "Ok";
+            return Ok(version);
         }
 
         [Route("Setting/Edit")]
