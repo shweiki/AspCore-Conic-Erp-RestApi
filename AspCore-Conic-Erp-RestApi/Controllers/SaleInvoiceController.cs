@@ -30,9 +30,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 AccountID = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
                 InventoryMovements = DB.InventoryMovements.Where(i => i.SalesInvoiceId == x.Id && i.TypeMove == "Out").Select(m => new {
                     m.Id,
-                    Name = DB.Items.Where(x => x.Id == m.ItemsId).SingleOrDefault().Name,
+                    m.Items.Name ,//= DB.Items.Where(x => x.Id == m.ItemsId).SingleOrDefault().Name,
                     m.Qty,
-                    InventoryName = DB.InventoryItems.Where(x => x.Id == m.InventoryItemId).SingleOrDefault().Name,
+                    InventoryName = m.InventoryItem.Name,//DB.InventoryItems.Where(x => x.Id == m.InventoryItemId).SingleOrDefault().Name,
                     m.SellingPrice,
                     m.Description
 
@@ -82,6 +82,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 InventoryMovements =  DB.InventoryMovements.Where(im =>im.SalesInvoiceId == x.Id &&im.TypeMove == "Out").Select(imx => new {
                     imx.Id,
                    imx.ItemsId,
+                   imx.Items.Name,
                    imx.InventoryItemId,
                     imx.Qty,
                     imx.SellingPrice,
