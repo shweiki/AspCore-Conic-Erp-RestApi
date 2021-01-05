@@ -79,6 +79,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             UserResponse response = new UserResponse();
             IdentityUser user = await _userManager.FindByIdAsync(id);
             var roles = await _userManager.GetRolesAsync(user);
+            roles.Add("Gest");
             response.name = User.Identity.Name;
             response.introduction = "I am a super hero";
             response.avatar = Url.Content("~/Images/User/" + id + ".jpeg");
@@ -107,7 +108,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = new IdentityUser() { UserName = model.UserName, Email = model.Email, PhoneNumber = model.PhoneNumber };
+            var user = new IdentityUser() { UserName = model.UserName, Email = model.Email, PhoneNumber = model.PhoneNumber ,PhoneNumberConfirmed = true , EmailConfirmed= true };
 
             IdentityResult result = await _userManager.CreateAsync(user, model.Password);
 
