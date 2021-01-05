@@ -25,7 +25,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             Encoding enc = Encoding.Unicode;
             SerialPort sp = new SerialPort();
             sp.PortName = Com;
-
             sp.Encoding = enc;
             sp.BaudRate = 38400;
             sp.Parity = Parity.None;
