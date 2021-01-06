@@ -122,7 +122,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [HttpPost]
         [Route("User/GetUsers")]
-
         public IActionResult GetUsers()
         {
             var Users = (from x in DB.Users.ToList()
@@ -144,6 +143,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                          }).ToList();
             return Ok(Users);
         }
+
         [HttpPost]
         [Route("User/AddRoleForUser")]
         public async Task<IActionResult> AddRoleForUser(string UserName, string RoleName)
@@ -153,6 +153,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             await _userManager.AddToRoleAsync(user, RoleName);
 
             return Ok(true);
+        }
+        [HttpPost]
+        [Route("User/DeleteRoleForUser")]
+        public async Task<IActionResult> DeleteRoleForUser(string UserName, string RoleName)
+        {
+            IdentityUser user = await _userManager.FindByNameAsync(UserName);
+            await _userManager.RemoveFromRoleAsync(user, RoleName);
+            return Ok(true);
+          
         }
         public  string  GetUserId()
         {
