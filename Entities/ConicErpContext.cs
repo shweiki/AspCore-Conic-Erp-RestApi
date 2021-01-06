@@ -1231,7 +1231,6 @@ namespace Entities
                 entity.Property(e => e.InvoicePurchaseDate).HasColumnType("date");
 
                 entity.Property(e => e.Name)
-                    .IsRequired()
                     .IsUnicode(false);
 
                 entity.Property(e => e.PaymentMethod)

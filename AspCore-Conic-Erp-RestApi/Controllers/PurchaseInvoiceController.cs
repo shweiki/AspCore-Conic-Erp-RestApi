@@ -68,6 +68,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 try
                 {
                     // TODO: Add insert logic here
+                    collection.InventoryMovements.ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
                     DB.PurchaseInvoices.Add(collection);
                     DB.SaveChanges();
                     return Ok(collection.Id);
