@@ -80,9 +80,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             IdentityUser user = await _userManager.FindByIdAsync(id);
             var roles = await _userManager.GetRolesAsync(user);
             roles.Add("Gest");
+            response.Id = id;
             response.name = User.Identity.Name;
+            response.phone = long.Parse(user.PhoneNumber);
             response.introduction = "I am a super hero";
-            response.avatar = Url.Content("~/Images/User/" + id + ".jpeg");
+            response.avatar = DB.FileData.Where(x => x.TableName == "User" && x.Fktable == long.Parse(user.PhoneNumber))?.ToList()?.LastOrDefault()?.File;
+            // Url.Content("~/Images/User/" + long.Parse() + ".jpeg");
             response.userrouter = DB.UserRouter.Where(x=>x.UserId == id)?.SingleOrDefault()?.Router;
             response.roles = roles.ToArray();
             return Ok(response);
@@ -186,8 +189,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         public class UserResponse
         {
+            public string Id { get; set; }
             public string name { get; set; }
-
+            public long phone { get; set; }
             public string[] roles { get; set; }
             public string avatar { get; set; }
             public string userrouter { get; set; }
