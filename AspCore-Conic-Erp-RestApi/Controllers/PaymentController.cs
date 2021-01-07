@@ -15,7 +15,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("Payment/GetPayment")]
         [HttpGet]
-        public ActionResult GetPayment(DateTime DateFrom, DateTime DateTo , int Status)
+        public ActionResult GetPayment(DateTimeOffset DateFrom, DateTimeOffset DateTo , int Status)
         {
             var Payments = DB.Payments.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo && i.Status == Status).Select(x => new
             {

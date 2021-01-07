@@ -65,7 +65,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("Item/GetItemMove")]
         [HttpGet]
-        public IActionResult GetItemMove(long ItemID, DateTime DateFrom, DateTime DateTo)
+        public IActionResult GetItemMove(long ItemID, DateTimeOffset DateFrom, DateTimeOffset DateTo)
         {
             var SalesInvoiceMove = DB.InventoryMovements.Where(i => i.SalesInvoiceId != null && i.ItemsId == ItemID && i.SalesInvoice.FakeDate >= DateFrom && i.SalesInvoice.FakeDate <= DateTo).Select(x => new
             {
@@ -149,7 +149,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     DB.Items.Add(collection);
                     DB.SaveChanges();
-                    return Ok(true);
+                    return Ok(collection);
 
                 }
                 catch

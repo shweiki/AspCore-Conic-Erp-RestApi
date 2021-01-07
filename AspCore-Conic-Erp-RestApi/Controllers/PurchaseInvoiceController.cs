@@ -14,7 +14,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("PurchaseInvoice/GetPurchaseInvoice")]
         [HttpGet]
-        public IActionResult GetPurchaseInvoice(DateTime DateFrom, DateTime DateTo)
+        public IActionResult GetPurchaseInvoice(DateTimeOffset DateFrom, DateTimeOffset DateTo)
         {
             var Invoices = DB.PurchaseInvoices.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new
             {
@@ -26,6 +26,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 FakeDate = x.FakeDate.Value.ToString("dd/MM/yyyy"),
                 x.PaymentMethod,
                 x.Status,
+                x.InvoicePurchaseDate,
+                x.AccountInvoiceNumber,
                 x.Description,
                 InventoryMovements = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId == x.Id && i.TypeMove == "In").Select(m => new
                 {
@@ -43,7 +45,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("PurchaseInvoice/GetPurchaseItem")]
         [HttpGet]
-        public IActionResult GetPurchaseItem(long? ItemID, DateTime DateFrom, DateTime DateTo)
+        public IActionResult GetPurchaseItem(long? ItemID, DateTimeOffset DateFrom, DateTimeOffset DateTo)
         {
             var Invoices = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId != null && i.ItemsId == ItemID && i.PurchaseInvoice.FakeDate >= DateFrom && i.PurchaseInvoice.FakeDate <= DateTo).Select(x => new
             {

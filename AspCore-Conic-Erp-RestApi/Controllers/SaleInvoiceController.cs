@@ -15,7 +15,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("SaleInvoice/GetSaleInvoice")]
         [HttpGet]
-        public IActionResult GetSaleInvoice(DateTime DateFrom, DateTime DateTo)
+        public IActionResult GetSaleInvoice(DateTimeOffset DateFrom, DateTimeOffset DateTo)
         {
             var Invoices = DB.SalesInvoices.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new {
 
@@ -44,7 +44,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     }
         [Route("SaleInvoice/GetSaleItem")]
         [HttpGet]
-        public IActionResult GetSaleItem(long ItemID, DateTime DateFrom, DateTime DateTo )
+        public IActionResult GetSaleItem(long ItemID, DateTimeOffset DateFrom, DateTimeOffset DateTo )
         {
             var Invoices =  DB.InventoryMovements.Where(i => i.SalesInvoiceId != null && i.ItemsId == ItemID && i.SalesInvoice.FakeDate >= DateFrom && i.SalesInvoice.FakeDate <= DateTo).Select(x => new
             {
