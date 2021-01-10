@@ -57,6 +57,7 @@ namespace Entities
         public virtual DbSet<StocktakingInventory> StocktakingInventories { get; set; }
         public virtual DbSet<UnitItem> UnitItems { get; set; }
         public virtual DbSet<Vendor> Vendors { get; set; }
+        public virtual DbSet<Report> Reports { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

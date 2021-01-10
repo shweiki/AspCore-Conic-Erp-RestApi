@@ -31,16 +31,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             sp.DataBits = 8;
             sp.StopBits = StopBits.One;
             sp.DtrEnable = true;
-            sp.Open();
-            if (sp.IsOpen)
+            try
             {
+                sp.Open();
                 sp.Write(char.ConvertFromUtf32(28699) + char.ConvertFromUtf32(9472) + char.ConvertFromUtf32(3365));
                 sp.Close();
                 return Ok(Com);
+            }
+            catch
+            {
+                return Ok("this Com Is Not Find");
+            }
 
-            }else
-
-            return Ok("this Com Is Not Find");
         }
 
 

@@ -78,17 +78,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PaymentMethod,
                 x.Status,
                 x.Description,
-              //  AccountID = ' ' + DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId,
-                InventoryMovements =  DB.InventoryMovements.Where(im =>im.SalesInvoiceId == x.Id &&im.TypeMove == "Out").Select(imx => new {
+                //  AccountID = ' ' + DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId,
+                InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == x.Id && im.TypeMove == "Out").Select(imx => new {
                     imx.Id,
-                   imx.ItemsId,
-                   imx.Items.Name,
-                   imx.InventoryItemId,
+                    imx.ItemsId,
+                    imx.Items.Name,
+                    imx.InventoryItemId,
                     imx.Qty,
                     imx.SellingPrice,
                     imx.Description
                 }).ToList(),
-
             }).ToList();
 
 

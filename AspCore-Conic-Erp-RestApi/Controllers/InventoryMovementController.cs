@@ -35,6 +35,25 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 return false;
             }
         }
+        [Route("InventoryMovement/GetInventoryMovementsBySalesInvoiceId")]
+        [HttpGet]
+        public IActionResult GetInventoryMovementsBySalesInvoiceId(long? SalesInvoiceId)
+        {
+            var InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == SalesInvoiceId).Select(imx => new
+            {
+                imx.Id,
+                imx.ItemsId,
+                imx.Items.Name,
+                imx.InventoryItemId,
+                imx.Qty,
+                imx.SellingPrice,
+                imx.Description
+            }).ToList();
+
+
+            return Ok(InventoryMovements);
+        }
+  
       
     }
 }
