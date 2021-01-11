@@ -64,6 +64,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 else {
                     IsExsit.UserId = UserRouter.UserId;
                     IsExsit.Router = UserRouter.Router;
+                    IsExsit.DefulateRedirect = UserRouter.DefulateRedirect;
                 }
                 DB.SaveChanges();
                 return Ok(UserRouter);
