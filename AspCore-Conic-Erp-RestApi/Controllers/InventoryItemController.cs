@@ -65,6 +65,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.Name,
                 x.Description,
+              /*  Items = DB.InventoryMovements.Where(o => o.InventoryItemId == x.Id && o.Status == 0).GroupBy(s => s.ItemsId).ToList()
+                .Select(a=> new{
+                    Item = DB.Items.Where(i=>i.Id == a.Key).Select(ii=>new {
+                        ii.Id,
+                        ii.CostPrice,
+                        ii.Name,
+                       ii.Barcode
+                    }).FirstOrDefault(), 
+                    QtyIn = a.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty),
+                    QtyOut = a.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty)
+                }).ToList()*/
             }).ToList();
 
             return Ok(InventoryItems);
