@@ -65,7 +65,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.Name,
                 x.Description,
-              /*  Items = DB.InventoryMovements.Where(o => o.InventoryItemId == x.Id && o.Status == 0).GroupBy(s => s.ItemsId).ToList()
+                Items = DB.InventoryMovements.Where(o => o.InventoryItemId == x.Id).GroupBy(s => s.ItemsId).ToList()
+                /*
                 .Select(a=> new{
                     Item = DB.Items.Where(i=>i.Id == a.Key).Select(ii=>new {
                         ii.Id,

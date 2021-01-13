@@ -54,7 +54,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.Tax,
                 x.TypeMove,
-                x.SalesInvoice.Vendor.Name,
+                Name = x.SalesInvoice.Vendor.Name + x.SalesInvoice.Member.Name,
                 FakeDate = x.SalesInvoice.FakeDate.ToString("dd/MM/yyyy"),
                 x.Description,
                 x.SalesInvoiceId,
@@ -78,11 +78,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PaymentMethod,
                 x.Status,
                 x.Description,
-                //  AccountID = ' ' + DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId,
-                InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == x.Id && im.TypeMove == "Out").Select(imx => new {
+                AccountId =  DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
+                InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == x.Id).Select(imx => new {
                     imx.Id,
                     imx.ItemsId,
                     imx.Items.Name,
+                    imx.TypeMove,
                     imx.InventoryItemId,
                     imx.Qty,
                     imx.SellingPrice,

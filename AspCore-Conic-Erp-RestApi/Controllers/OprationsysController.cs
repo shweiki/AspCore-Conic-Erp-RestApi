@@ -123,7 +123,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             Oprationsy Op = DB.Oprationsys.Where(x => x.TableName == TableName && x.Status == Status).SingleOrDefault();
             if (ChangeStatus(ObjID, Op.Id, Description))
             {
-                return Ok();
+                return Ok(true);
             }
             else return NotFound();
         }
@@ -133,7 +133,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (ChangeStatus(ObjID, OprationID, Description)){
                 return Ok();
-            } else return NotFound();
+            } else return NotFound(true);
         }
 
         [Route("Oprationsys/ChangeArrObjStatus")]
