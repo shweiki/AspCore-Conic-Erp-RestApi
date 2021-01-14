@@ -65,18 +65,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.Name,
                 x.Description,
-                Items = DB.InventoryMovements.Where(o => o.InventoryItemId == x.Id).GroupBy(s => s.ItemsId).ToList()
-                /*
-                .Select(a=> new{
-                    Item = DB.Items.Where(i=>i.Id == a.Key).Select(ii=>new {
-                        ii.Id,
-                        ii.CostPrice,
-                        ii.Name,
-                       ii.Barcode
-                    }).FirstOrDefault(), 
-                    QtyIn = a.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty),
-                    QtyOut = a.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty)
-                }).ToList()*/
+             
             }).ToList();
 
             return Ok(InventoryItems);
@@ -91,5 +80,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         }
 
+        [Route("InventoryItem/InventoryQty")]
+        [HttpPost]
+        public IActionResult InventoryQty(long ID)
+        {
+            var InventoryQty = (from i in DB.InventoryMovements.Where(o => o.InventoryItemId == ID).ToList()
+                                group i by i.ItemsId into g
+                                select new
+                                {
+                                    Item = (from a in DB.Items.ToList()
+                                            where (a.Id == g.Key)
+                                            select new
+                                            {
+                                                a.Id,
+                                                a.CostPrice,
+                                                a.Name,
+                                                a.Barcode
+                                            }).FirstOrDefault(),
+                                    QtyIn = g.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty),
+                                    QtyOut = g.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty)
+                                }).ToList();
+
+            return Ok(InventoryQty);
+        }
     }
 }
