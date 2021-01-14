@@ -195,15 +195,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpPost]
         public IActionResult CalculateInventoryItemQty(long ID)
         {
-            return Ok(from x in DB.InventoryMovements.Where(i => i.ItemsId == ID && i.Status == 0).ToList()
-                   group x by x.InventoryItemId into g
-                   select new
-                   {
-                       InventoryItemID = g.Key,
-                       InventoryName = DB.InventoryItems.Where(a => a.Id == g.Key).Select(c => c.Name).FirstOrDefault(),
-                       QtyIn = g.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty),
-                       QtyOut = g.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty)
-                   });
+            var InventoryItemsQty = from x in DB.InventoryMovements.Where(i => i.ItemsId == ID && i.Status == 0).ToList()
+                                    group x by x.InventoryItemId into g
+                                    select new
+                                    {
+                                        InventoryItemID = g.Key,
+                                        InventoryName = DB.InventoryItems.Where(a => a.Id == g.Key).Select(c => c.Name).FirstOrDefault(),
+                                        QtyIn = g.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty),
+                                        QtyOut = g.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty)
+                                    };
+
+            return Ok(InventoryItemsQty);
         }
 
     }
