@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -68,16 +69,21 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult CheckUpdate()
         {
-            System.Diagnostics.Process process = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = "/C copy /b Image1.jpg + Archive.rar Image2.jpg";
-            startInfo.Verb = "runas";
-            process.StartInfo = startInfo;
-            process.Start();
-            var version = "Ok";
-            return Ok(version);
+            ProcessStartInfo info = new ProcessStartInfo("C:\\ConicErpDeploy-main\\Update.bat");
+            info.UseShellExecute = true;
+            info.Verb = "runas";
+            Process.Start(info);
+            return Ok("Run");
+            /* System.Diagnostics.Process process = new System.Diagnostics.Process();
+             System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+             startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+             startInfo.FileName = "cmd.exe";
+             startInfo.Arguments = "iisreset /stop echo 'IIS Is Stop' cd.. cd.. cd ConicErpDeploy-main mkdir Test  git remote add origin 'https://github.com/shweiki/ConicErpDeploy.git' echo'add origin' git fetch origin echo 'add origin' iisreset / start echo 'IIS Is Start' ";
+             startInfo.Verb = "runas";
+             process.StartInfo = startInfo;
+             process.Start();
+             var version = "Ok";
+             return Ok(version); */
         }
 
         [Route("Setting/Edit")]

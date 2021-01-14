@@ -16,7 +16,7 @@ namespace AspCore_Conic_Erp_RestApi
             psi.FileName = "chrome.exe";
             psi.Arguments = "--app=https://localhost/";
 
-            System.Diagnostics.Process.Start(psi );
+            System.Diagnostics.Process.Start(psi);
             CreateHostBuilder(args).Build().MigrateDatabase().Run();
 
         }
