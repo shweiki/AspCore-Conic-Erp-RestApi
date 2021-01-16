@@ -22,25 +22,30 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult OpenCashDrawer(string Com)
         {
-            Encoding enc = Encoding.Unicode;
-            SerialPort sp = new SerialPort();
-            sp.PortName = Com;
-            sp.Encoding = enc;
-            sp.BaudRate = 38400;
-            sp.Parity = Parity.None;
-            sp.DataBits = 8;
-            sp.StopBits = StopBits.One;
-            sp.DtrEnable = true;
-            sp.Open();
-            if (sp.IsOpen)
+            if (Com != null)
             {
-                sp.Write(char.ConvertFromUtf32(28699) + char.ConvertFromUtf32(9472) + char.ConvertFromUtf32(3365));
-                sp.Close();
-                return Ok(Com);
-
-            }else
-
-            return Ok("this Com Is Not Find");
+                Encoding enc = Encoding.Unicode;
+                SerialPort sp = new SerialPort();
+                sp.PortName = Com;
+                sp.Encoding = enc;
+                sp.BaudRate = 38400;
+                sp.Parity = Parity.None;
+                sp.DataBits = 8;
+                sp.StopBits = StopBits.One;
+                sp.DtrEnable = true;
+                try
+                {
+                    sp.Open();
+                    sp.Write(char.ConvertFromUtf32(28699) + char.ConvertFromUtf32(9472) + char.ConvertFromUtf32(3365));
+                    sp.Close();
+                    return Ok(Com);
+                }
+                catch
+                {
+                    return Ok("this Com Is Not Find");
+                }
+            }
+            else return Ok(false);
         }
 
 

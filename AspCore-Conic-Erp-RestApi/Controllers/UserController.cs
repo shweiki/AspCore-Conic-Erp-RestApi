@@ -87,6 +87,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             response.avatar = DB.FileData.Where(x => x.TableName == "User" && x.Fktable == long.Parse(user.PhoneNumber))?.ToList()?.LastOrDefault()?.File;
             // Url.Content("~/Images/User/" + long.Parse() + ".jpeg");
             response.userrouter = DB.UserRouter.Where(x=>x.UserId == id)?.SingleOrDefault()?.Router;
+            response.defulateRedirect = DB.UserRouter.Where(x=>x.UserId == id)?.SingleOrDefault()?.DefulateRedirect;
             response.roles = roles.ToArray();
             return Ok(response);
         }
@@ -136,6 +137,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                              x.PhoneNumber,
                              avatar = Url.Content("~/Images/User/" + x.Id + ".jpeg"),
                              router = DB.UserRouter.Where(ur => ur.UserId == x.Id)?.SingleOrDefault()?.Router,
+                             Redirect = DB.UserRouter.Where(ur => ur.UserId == x.Id)?.SingleOrDefault()?.DefulateRedirect,
             Roles = (from R in DB.UserRoles.Where(ur=> ur.UserId == x.Id).ToList()
                                       let p = new
                                       {
@@ -195,6 +197,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             public string[] roles { get; set; }
             public string avatar { get; set; }
             public string userrouter { get; set; }
+            public string defulateRedirect { get; set; }
             public string introduction { get; set; }
 
         }
