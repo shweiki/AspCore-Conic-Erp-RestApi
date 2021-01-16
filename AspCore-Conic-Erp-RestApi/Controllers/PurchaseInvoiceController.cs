@@ -26,7 +26,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 FakeDate = x.FakeDate.Value.ToString("dd/MM/yyyy"),
                 x.PaymentMethod,
                 x.Status,
-                x.InvoicePurchaseDate,
+                InvoicePurchaseDate = x.InvoicePurchaseDate.ToString("dd/MM/yyyy"),
                 x.AccountInvoiceNumber,
                 x.Description,
                 InventoryMovements = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId == x.Id && i.TypeMove == "In").Select(m => new
@@ -130,6 +130,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Tax,
                 x.FakeDate,
                 x.InvoicePurchaseDate,
+                x.AccountInvoiceNumber,
                 x.PaymentMethod,
                 x.Status,
                 x.Description,
