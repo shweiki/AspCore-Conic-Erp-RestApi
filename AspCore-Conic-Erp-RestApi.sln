@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCore-Conic-Erp-RestApi", "AspCore-Conic-Erp-RestApi\AspCore-Conic-Erp-RestApi.csproj", "{5327F9BB-9896-4148-AA96-2615F0F48150}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspCore-Conic-Erp-RestApi", "AspCore-Conic-Erp-RestApi\AspCore-Conic-Erp-RestApi.csproj", "{5327F9BB-9896-4148-AA96-2615F0F48150}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "Entities\Entities.csproj", "{35D9AD22-330C-4560-A902-F22B13D134E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entities", "Entities\Entities.csproj", "{35D9AD22-330C-4560-A902-F22B13D134E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

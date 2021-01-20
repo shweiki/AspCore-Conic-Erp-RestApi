@@ -69,8 +69,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetActiveMember()
         {
             var membershiplist = DB.ActionLogs.Where(l => l.MembershipMovementId != null && l.PostingDateTime >= DateTime.Today).Select(x => x.MembershipMovementId).ToList();
-            var memberships = DB.MembershipMovements.Where(x => membershiplist.Contains(x.Id)).ToList();
-            var Members = memberships.Select(x => new {
+            var MembershipMovements = DB.MembershipMovements.Where(x => membershiplist.Contains(x.Id)).ToList();
+            var Members = MembershipMovements.Select(x => new {
                 x.Member.Id,
                 x.Member.Name,
                 x.Member.Ssn,

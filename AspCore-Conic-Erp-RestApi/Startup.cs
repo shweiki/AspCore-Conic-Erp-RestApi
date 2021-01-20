@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -73,7 +74,9 @@ namespace AspCore_Conic_Erp_RestApi
                 app.UseMigrationsEndPoint();
 
             }
-
+  
+   
+          
             app.UseHttpsRedirection();
 
             app.UseDefaultFiles();
@@ -92,13 +95,8 @@ namespace AspCore_Conic_Erp_RestApi
 
             app.UseAuthentication();
             app.UseAuthorization();
-            app.Run(async context =>
-            {
-                var location =  new Uri($"{context.Request.Scheme}://{context.Request.Host}");//{context.Request.Path}{context.Request.QueryString}");
-               OpenBrowser(location.ToString());
-                await context.Response.WriteAsync("Hello from 2nd delegate.");
-            });
 
+ 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();
@@ -106,41 +104,6 @@ namespace AspCore_Conic_Erp_RestApi
             });
 
         }
-        public  void OpenBrowser(string contentRoot)
-        {
-            string rootUrl = contentRoot;
-            ProcessStartInfo psi = new ProcessStartInfo("chrome", "--app=\"" + rootUrl + "\"") { UseShellExecute = true };
-            try
-            {
-                Process.Start(psi);
-            }
-            catch
-            {
-                try
-                {
-                    psi.FileName = "firefox";
-                    psi.Arguments = rootUrl;
-                    Process.Start(psi);
-                }
-                catch
-                {
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    {
-                        psi.FileName = "edge";
-                    }
-                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    {
-                        psi.FileName = "safari";
-                    }
-                    try
-                    {
-                        Process.Start(psi);
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
-        }
+ 
     }
 }

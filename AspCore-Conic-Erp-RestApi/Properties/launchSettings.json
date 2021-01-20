@@ -3,8 +3,8 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:49944",
-      "sslPort": 44376
+      "applicationUrl": "http://localhost:8090",
+      "sslPort": 44393
     }
   },
   "profiles": {
@@ -13,7 +13,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "sqlDebugging": false
+      "sqlDebugging": false,
+      "nativeDebugging": false
     },
     "AspCore_Conic_Erp_RestApi": {
       "commandName": "Project",
