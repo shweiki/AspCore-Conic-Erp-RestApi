@@ -19,7 +19,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private readonly ILogger<UserController> _logger;
         private ConicErpContext DB = new ConicErpContext();
 
-        public UserController( UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
+        public UserController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -57,13 +57,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
                 if (result.IsLockedOut)
                 {
+
                     return Ok("User account locked out.");
 
                 }
                 else
                 {
                     //  ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Ok(false);
+                    return Ok("User Name Or PassWord Is Not Correct");
                 }
             }
             else return Ok("Fack u");
@@ -86,8 +87,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             response.introduction = "I am a super hero";
             response.avatar = DB.FileData.Where(x => x.TableName == "User" && x.Fktable == long.Parse(user.PhoneNumber))?.ToList()?.LastOrDefault()?.File;
             // Url.Content("~/Images/User/" + long.Parse() + ".jpeg");
-            response.userrouter = DB.UserRouter.Where(x=>x.UserId == id)?.SingleOrDefault()?.Router;
-            response.defulateRedirect = DB.UserRouter.Where(x=>x.UserId == id)?.SingleOrDefault()?.DefulateRedirect;
+            response.userrouter = DB.UserRouter.Where(x => x.UserId == id)?.SingleOrDefault()?.Router;
+            response.defulateRedirect = DB.UserRouter.Where(x => x.UserId == id)?.SingleOrDefault()?.DefulateRedirect;
             response.roles = roles.ToArray();
             return Ok(response);
         }
@@ -112,7 +113,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = new IdentityUser() { UserName = model.UserName, Email = model.Email, PhoneNumber = model.PhoneNumber ,PhoneNumberConfirmed = true , EmailConfirmed= true };
+            var user = new IdentityUser() { UserName = model.UserName, Email = model.Email, PhoneNumber = model.PhoneNumber, PhoneNumberConfirmed = true, EmailConfirmed = true };
 
             IdentityResult result = await _userManager.CreateAsync(user, model.Password);
 
@@ -138,22 +139,44 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                              avatar = Url.Content("~/Images/User/" + x.Id + ".jpeg"),
                              router = DB.UserRouter.Where(ur => ur.UserId == x.Id)?.SingleOrDefault()?.Router,
                              Redirect = DB.UserRouter.Where(ur => ur.UserId == x.Id)?.SingleOrDefault()?.DefulateRedirect,
-            Roles = (from R in DB.UserRoles.Where(ur=> ur.UserId == x.Id).ToList()
+                             Roles = (from R in DB.UserRoles.Where(ur => ur.UserId == x.Id).ToList()
                                       let p = new
                                       {
-                                          Id= DB.Roles.Where(r=>r.Id == R.RoleId).SingleOrDefault().Id,
-                                          Name = DB.Roles.Where(r=>r.Id == R.RoleId).SingleOrDefault().Name
+                                          Id = DB.Roles.Where(r => r.Id == R.RoleId).SingleOrDefault().Id,
+                                          Name = DB.Roles.Where(r => r.Id == R.RoleId).SingleOrDefault().Name
                                       }
                                       select p).ToList(),
                          }).ToList();
             return Ok(Users);
+        }
+        [HttpPost]
+        [Route("User/UnLockout")]
+        public async Task<IActionResult> UnLockout(string UserId)
+        {
+            
+            IdentityUser user = await _userManager.FindByIdAsync(UserId);
+            var result = await _userManager.SetLockoutEnabledAsync(user, true);
+            if (result.Succeeded)
+                return Ok(true);
+            else return Ok(false);
+        }
+        [HttpPost]
+        [Route("User/ChangePassword")]
+        public async Task<IActionResult> ChangePassword(string OldPassword, string NewPassword)
+        {
+            var id = _userManager.GetUserId(User); // Get user id:
+            IdentityUser user = await _userManager.FindByIdAsync(id);
+            IdentityResult result = await _userManager.ChangePasswordAsync(user, OldPassword, NewPassword);
+            if (result.Succeeded)
+                return Ok(true);
+            else return Ok(false);
         }
 
         [HttpPost]
         [Route("User/AddRoleForUser")]
         public async Task<IActionResult> AddRoleForUser(string UserName, string RoleName)
         {
-            IdentityUser user =await  _userManager.FindByNameAsync(UserName);
+            IdentityUser user = await _userManager.FindByNameAsync(UserName);
 
             await _userManager.AddToRoleAsync(user, RoleName);
 
@@ -166,9 +189,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             IdentityUser user = await _userManager.FindByNameAsync(UserName);
             await _userManager.RemoveFromRoleAsync(user, RoleName);
             return Ok(true);
-          
+
         }
-        public  string  GetUserId()
+        public string GetUserId()
         {
             var id = _userManager.GetUserId(User); // Get user id:
 

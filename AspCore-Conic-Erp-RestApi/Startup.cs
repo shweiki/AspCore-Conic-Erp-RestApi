@@ -1,14 +1,21 @@
 using Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
-
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
 
 namespace AspCore_Conic_Erp_RestApi
 {
@@ -50,10 +57,13 @@ namespace AspCore_Conic_Erp_RestApi
             services.AddCors();
             services.AddHttpContextAccessor();
 
-            services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc; // this should be set if you always expect UTC dates in method bodies, if not, you can use RoundTrip instead.
+            });
           
         }
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -82,6 +92,12 @@ namespace AspCore_Conic_Erp_RestApi
 
             app.UseAuthentication();
             app.UseAuthorization();
+            app.Run(async context =>
+            {
+                var location =  new Uri($"{context.Request.Scheme}://{context.Request.Host}");//{context.Request.Path}{context.Request.QueryString}");
+               OpenBrowser(location.ToString());
+                await context.Response.WriteAsync("Hello from 2nd delegate.");
+            });
 
             app.UseEndpoints(endpoints =>
             {
@@ -89,6 +105,42 @@ namespace AspCore_Conic_Erp_RestApi
 
             });
 
+        }
+        public  void OpenBrowser(string contentRoot)
+        {
+            string rootUrl = contentRoot;
+            ProcessStartInfo psi = new ProcessStartInfo("chrome", "--app=\"" + rootUrl + "\"") { UseShellExecute = true };
+            try
+            {
+                Process.Start(psi);
+            }
+            catch
+            {
+                try
+                {
+                    psi.FileName = "firefox";
+                    psi.Arguments = rootUrl;
+                    Process.Start(psi);
+                }
+                catch
+                {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        psi.FileName = "edge";
+                    }
+                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    {
+                        psi.FileName = "safari";
+                    }
+                    try
+                    {
+                        Process.Start(psi);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
         }
     }
 }
