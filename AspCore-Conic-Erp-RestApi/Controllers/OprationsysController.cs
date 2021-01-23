@@ -121,7 +121,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult ChangeObjStatusByTableName(long ObjID, string TableName, int Status, string Description)
         {
             Oprationsy Op = DB.Oprationsys.Where(x => x.TableName == TableName && x.Status == Status).SingleOrDefault();
-            if (ChangeStatus(ObjID, Op.Id, Description))
+            if (ChangeStatus(ObjID, Op, Description))
             {
                 return Ok(true);
             }
@@ -131,18 +131,22 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpPost]
         public IActionResult ChangeObjStatus(long ObjID, long OprationID, string Description)
         {
-            if (ChangeStatus(ObjID, OprationID, Description)){
+            Oprationsy Op = DB.Oprationsys.Where(x => x.Id == OprationID).SingleOrDefault();
+
+            if (ChangeStatus(ObjID, Op, Description)){
                 return Ok();
             } else return NotFound(true);
         }
 
         [Route("Oprationsys/ChangeArrObjStatus")]
         [HttpPost]
-        public IActionResult ChangeArrObjStatus(List<long> ObjsID, long? OprationID, string Description)
+        public IActionResult ChangeArrObjStatus(List<int> ObjsID,  string TableName, int Status, string Description)
         {
+            Oprationsy Op = DB.Oprationsys.Where(x => x.TableName == TableName && x.Status == Status).SingleOrDefault();
+
             foreach (long O in ObjsID)
             {
-                this.ChangeStatus(O, OprationID, Description);
+                this.ChangeStatus(O, Op , Description);
             }
             return Ok(true);
         }
@@ -206,9 +210,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("Oprationsys/ChangeStatus")]
         [HttpPost]
-        public Boolean ChangeStatus(long? ObjID, long? OprationID, string Description)
+        public Boolean ChangeStatus(long? ObjID, Oprationsy Oprationsys, string Description)
         {
-            Oprationsy Oprationsys = DB.Oprationsys.Where(x => x.Id == OprationID).SingleOrDefault();
             ActionLog log = new ActionLog();
             // var claimsIdentity = (ClaimsIdentity)HttpContext.User.Identity;
             //  var claim = claimsIdentity.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Web;
 using Microsoft.AspNetCore.Authorization;
-using Entities; 
+using Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
@@ -30,7 +30,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.AccountId,
                 x.Tag,
                 TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
-                TotalCredit =DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum() 
+                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum()
             }).ToList();
 
             return Ok(Members);
@@ -39,7 +39,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetPayablesMember()
         {
-            var Members = DB.Members.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) < 0).Select(x => new {
+            var Members = DB.Members.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) < 0).Select(x => new
+            {
                 x.Id,
                 x.Name,
                 x.Ssn,
@@ -52,15 +53,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
                 TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum()
             }).ToList();
-                   
+
             return Ok(Members);
         }
         [Route("Member/GetMember")]
         [HttpGet]
         public IActionResult GetMember()
         {
-            var Members = DB.Members.Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1 , x.Tag}).ToList();
-                      
+            var Members = DB.Members.Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1, x.Tag }).ToList();
+
             return Ok(Members);
         }
 
@@ -68,42 +69,40 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetActiveMember()
         {
-            var membershiplist = DB.ActionLogs.Where(l => l.MembershipMovementId != null && l.PostingDateTime >= DateTime.Today).Select(x => x.MembershipMovementId).ToList();
-            var MembershipMovements = DB.MembershipMovements.Where(x => membershiplist.Contains(x.Id)).ToList();
-            var Members = MembershipMovements.Select(x => new {
-                x.Member.Id,
-                x.Member.Name,
-                x.Member.Ssn,
-                x.Member.PhoneNumber1,
-                x.Member.PhoneNumber2,
-                x.Status,
-                x.Member.Tag,
-                x.Member.AccountId,
-                ActiveMemberShip = new
+            try
+            {
+
+                var membershiplist = DB.ActionLogs.Where(l => l.MembershipMovementId != null && l.PostingDateTime >= DateTime.Today).Select(x => x.MembershipMovementId).ToList();
+
+              var Members = DB.MembershipMovements.Where(x => membershiplist.Contains(x.Id)).ToList().Select(x => new
                 {
                     x.Id,
-                    x.Membership.Name,
+                    Name = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
                     x.VisitsUsed,
                     x.Type,
                     x.StartDate,
                     x.EndDate,
                     x.TotalAmmount,
                     x.Description,
-                }
-            }).ToList();
-                      
+                    x.Status,
+                 // lastLog = DB.MemberLogs.Where(ml => ml.MemberId == x.MemberId).LastOrDefault().DateTime,
+                  x.MemberId
+                }).ToList();
+                return Ok(Members);
+            }
+            catch
+            {
+                return Ok("None Active");
 
-            return Ok(Members);
-       
-        
+            }
+        }
 
-    }
-
-    [Route("Member/GetMemberByStatus")]
+        [Route("Member/GetMemberByStatus")]
         [HttpGet]
         public IActionResult GetMemberByStatus(int Status)
         {
-            var Members = DB.Members.Where(f => f.Status == Status).Select(x => new {
+            var Members = DB.Members.Where(f => f.Status == Status).Select(x => new
+            {
                 x.Id,
                 x.Name,
                 x.Ssn,
@@ -117,10 +116,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum()
                 // Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg").ToString(),
             }).ToList();
-                        
+
             return Ok(Members);
         }
-        
+
         [Route("Member/Create")]
         [HttpPost]
         public IActionResult Create(Member collection)
@@ -187,43 +186,45 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMemberByID(long? ID)
         {
-            var Members = DB.Members.Where(m=>m.Id ==  ID).Select(
-                x=> new
-                           {
-                               x.Id,
-                               x.Name,
-                               x.Ssn,
-                               x.DateofBirth,
-                               x.Email,
-                               x.PhoneNumber1,
-                               x.PhoneNumber2,
-                               x.Description,
-                               x.Status,
-                               x.Type,
-                               x.Tag,
-                              HaveFaceOnDevice = x.MemberFaces.Count() > 0 ? true : false, 
-                               Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg"),
+            var Members = DB.Members.Where(m => m.Id == ID).Select(
+                x => new
+                {
+                    x.Id,
+                    x.Name,
+                    x.Ssn,
+                    x.DateofBirth,
+                    x.Email,
+                    x.PhoneNumber1,
+                    x.PhoneNumber2,
+                    x.Description,
+                    x.Status,
+                    x.Type,
+                    x.Tag,
+                    HaveFaceOnDevice = x.MemberFaces.Count() > 0 ? true : false,
+                    Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg"),
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
                     x.AccountId,
-                              // lastLog =x.MemberLogs.LastOrDefault().DateTime,
-                               ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == x.Id && f.Status > 0).Select(MS=>new {
-                                   MS.Id,
-                                   MS.Membership.Name,
-                                   MS.VisitsUsed,
-                                   MS.Type,
-                                   MS.StartDate,
-                                   MS.EndDate,
-                                   MS.Description,
-                               }).FirstOrDefault(),
+                    lastLog =DB.MemberLogs.Where(ml=>ml.MemberId == x.Id).LastOrDefault().DateTime,
+                    ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == x.Id && f.Status > 0).Select(MS => new
+                    {
+                        MS.Id,
+                        MS.Membership.Name,
+                        MS.VisitsUsed,
+                        MS.Type,
+                        MS.StartDate,
+                        MS.EndDate,
+                        MS.Description,
+                    }).FirstOrDefault(),
 
-                    ServiceInvoices =  DB.SalesInvoices.Where(f => f.MemberId == x.Id && f.IsPrime == true).Select(SI=>new
+                    ServiceInvoices = DB.SalesInvoices.Where(f => f.MemberId == x.Id && f.IsPrime == true).Select(SI => new
                     {
                         SI.Id,
                         SI.Name,
                         SI.Status,
                         SI.Description,
-                        InventoryMovements = SI.InventoryMovements.Select(m=>new {
+                        InventoryMovements = SI.InventoryMovements.Select(m => new
+                        {
                             m.Id,
                             m.Status,
                             m.Items.Name,
@@ -231,7 +232,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             m.SellingPrice,
                             m.Description
                         }).ToList(),
-                                                                
+
                     }).ToList(),
 
 
@@ -239,7 +240,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Members);
         }
 
-  
+
         [Route("Member/CheckMembers")]
         [HttpGet]
         public IActionResult CheckMembers()
@@ -254,22 +255,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
                 var ActiveMemberShip = M.MembershipMovements.Where(m => m.Status == 0).SingleOrDefault();
 
-                if (ActiveMemberShip != null) {
+                if (ActiveMemberShip != null)
+                {
 
                     var HowManyDaysLeft = (ActiveMemberShip.EndDate - DateTime.Today).TotalDays;
-                    if (HowManyDaysLeft == 3  ){
+                    if (HowManyDaysLeft == 3)
+                    {
                         Massage msg = new Massage();
-                        msg.Body = "عزيزي " + M.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ "+ ActiveMemberShip.EndDate.ToString("dd/MM/yyyy") + " وشكرا";
+                        msg.Body = "عزيزي " + M.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + ActiveMemberShip.EndDate.ToString("dd/MM/yyyy") + " وشكرا";
                         msg.Status = 0;
-                        msg.TableName ="Member";
-                        msg.Fktable =M.Id;
-                        msg.PhoneNumber =M.PhoneNumber1;
+                        msg.TableName = "Member";
+                        msg.Fktable = M.Id;
+                        msg.PhoneNumber = M.PhoneNumber1;
                         msg.SendDate = DateTime.Today;
                         msg.Type = "رسالة تذكير";
                         DB.Massages.Add(msg);
                         DB.SaveChanges();
                     }
-                      
+
                 }
             }
 
