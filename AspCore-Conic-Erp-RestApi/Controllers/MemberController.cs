@@ -205,7 +205,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
                     x.AccountId,
-                    lastLog =DB.MemberLogs.Where(ml=>ml.MemberId == x.Id).LastOrDefault().DateTime,
+                   // lastLog =DB.MemberLogs.Where(ml=>ml.MemberId == x.Id).ToList().LastOrDefault().DateTime.ToString(),
                     ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == x.Id && f.Status > 0).Select(MS => new
                     {
                         MS.Id,
