@@ -23,6 +23,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                       
             return Ok(Members);
         }
+        [Route("MemberLog/GetlastLogByMemberId")]
+        [HttpGet]
+        public IActionResult GetlastLogByMemberId(long MemberId)
+        {
+
+            return Ok(DB.MemberLogs.Where(ml => ml.MemberId == MemberId)?.ToList()?.LastOrDefault()?.DateTime.ToString());
+        }
         [Route("MemberLog/GetMemberLogByStatus")]
         [HttpGet]
         public IActionResult GetMemberLogByStatus(int Status)
