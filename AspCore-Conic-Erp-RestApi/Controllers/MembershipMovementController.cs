@@ -72,7 +72,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult CheckMembershipMovement()
         {
-           IList<MembershipMovement>  MembershipMovements = DB.MembershipMovements.Where(x=>x.Status >0 || x.Status == -2  )?.ToList();
+           IList<MembershipMovement>  MembershipMovements = DB.MembershipMovements.Where(x=>x.Status >0 || x.Status == -2 )?.ToList();
             foreach (MembershipMovement MS in MembershipMovements)
             {
                 var member = DB.Members.Where(x => x.Id == MS.MemberId).SingleOrDefault();

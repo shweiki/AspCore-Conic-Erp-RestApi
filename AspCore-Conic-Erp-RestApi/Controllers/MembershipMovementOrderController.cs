@@ -75,6 +75,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
             }
             return Ok(false);
+        }    
+        [Route("MembershipMovementOrder/CreateMulti")]
+        [HttpPost]
+        public IActionResult CreateMulti(IList<MembershipMovementOrder> collection)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+
+                    DB.MembershipMovementOrders.AddRange(collection);
+                    DB.SaveChanges();
+                    return Ok(true);
+
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            return Ok(false);
         }
 
    
