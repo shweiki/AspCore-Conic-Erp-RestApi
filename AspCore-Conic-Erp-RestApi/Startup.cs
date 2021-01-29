@@ -54,7 +54,12 @@ namespace AspCore_Conic_Erp_RestApi
                 .AddEntityFrameworkStores<ConicErpContext>()
                 .AddRoleManager<RoleManager<IdentityRole>>()
                 .AddUserManager<UserManager<IdentityUser>>();
-
+            services.AddAuthentication("esvlogin")
+          .AddCookie("esvlogin", act => {
+              act.LoginPath = "/home/login";
+              act.AccessDeniedPath = "/home/login";
+              act.SlidingExpiration = true;
+          });
             services.AddCors();
             services.AddHttpContextAccessor();
 
