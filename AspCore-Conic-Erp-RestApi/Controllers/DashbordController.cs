@@ -45,7 +45,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Clients = DB.Vendors.Where(x => x.Type == "Customer").Count(),
                     Suppliers = DB.Vendors.Where(x => x.Type == "Supplier").Count(),
                     Members = DB.Members.Count(),
-                    MembersActive = DB.Members.Where(x => x.Status == 0).Count(),
+                    MembersActive = DB.Members.Where(x => x.Status >= 0).Count(),
                     MsgCredit
                 };
                 return Ok(Data);
