@@ -1,4 +1,5 @@
 ﻿using Entities;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +47,44 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+
+                    var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, model.Username),
+                new Claim(ClaimTypes.Name, model.Username),
+                new Claim(ClaimTypes.Role, "Administrator"),
+            };
+
+                    var claimsIdentity = new ClaimsIdentity(
+                        claims, "esvlogin");
+
+                    var authProperties = new AuthenticationProperties
+                    {
+                        //AllowRefresh = <bool>,
+                        // Refreshing the authentication session should be allowed.
+
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10)
+                        // The time at which the authentication ticket expires. A 
+                        // value set here overrides the ExpireTimeSpan option of 
+                        // CookieAuthenticationOptions set with AddCookie.
+
+                        //IsPersistent = true,
+                        // Whether the authentication session is persisted across 
+                        // multiple requests. When used with cookies, controls
+                        // whether the cookie's lifetime is absolute (matching the
+                        // lifetime of the authentication ticket) or session-based.
+
+                        //IssuedUtc = DateTimeOffset.UtcNow,
+                        // The time at which the authentication ticket was issued.
+
+                        //RedirectUri = <string>
+                        // The full path or absolute URI to be used as an http 
+                        // redirect response value.
+                    };
+
+                    await HttpContext.SignInAsync(
+                       "esvlogin",
+                        new ClaimsPrincipal(claimsIdentity), authProperties);
                     //var userID = User.Claims.Where(a => a.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value;
 
                     return Ok("User logged in.");
@@ -76,19 +115,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("User/Info")]
         public async Task<IActionResult> Info()
         {
-            var id = _userManager.GetUserId(User); // Get user id:
             UserResponse response = new UserResponse();
-            IdentityUser user = await _userManager.FindByIdAsync(id);
+            IdentityUser user = await _userManager.FindByNameAsync(User.Identity.Name);
             var roles = await _userManager.GetRolesAsync(user);
             roles.Add("Gest");
-            response.Id = id;
-            response.name = User.Identity.Name;
+            response.Id = user.Id;
+            response.name = user.UserName;
             response.phone = long.Parse(user.PhoneNumber);
             response.introduction = "I am a super hero";
             response.avatar = DB.FileData.Where(x => x.TableName == "User" && x.Fktable == long.Parse(user.PhoneNumber))?.ToList()?.LastOrDefault()?.File;
             // Url.Content("~/Images/User/" + long.Parse() + ".jpeg");
-            response.userrouter = DB.UserRouter.Where(x => x.UserId == id)?.SingleOrDefault()?.Router;
-            response.defulateRedirect = DB.UserRouter.Where(x => x.UserId == id)?.SingleOrDefault()?.DefulateRedirect;
+            response.userrouter = DB.UserRouter.Where(x => x.UserId == user.Id)?.SingleOrDefault()?.Router;
+            response.defulateRedirect = DB.UserRouter.Where(x => x.UserId == user.Id)?.SingleOrDefault()?.DefulateRedirect;
             response.roles = roles.ToArray();
             return Ok(response);
         }
@@ -164,8 +202,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("User/ChangePassword")]
         public async Task<IActionResult> ChangePassword(string OldPassword, string NewPassword)
         {
-            var id = _userManager.GetUserId(User); // Get user id:
-            IdentityUser user = await _userManager.FindByIdAsync(id);
+            var UserName = _userManager.GetUserId(User); // Get user id:
+            IdentityUser user = await _userManager.FindByNameAsync(UserName);
             IdentityResult result = await _userManager.ChangePasswordAsync(user, OldPassword, NewPassword);
             if (result.Succeeded)
                 return Ok(true);
