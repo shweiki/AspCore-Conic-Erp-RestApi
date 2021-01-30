@@ -63,7 +63,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         //AllowRefresh = <bool>,
                         // Refreshing the authentication session should be allowed.
 
-                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10)
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(100000)
                         // The time at which the authentication ticket expires. A 
                         // value set here overrides the ExpireTimeSpan option of 
                         // CookieAuthenticationOptions set with AddCookie.
