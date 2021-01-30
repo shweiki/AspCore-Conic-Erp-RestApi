@@ -31,7 +31,7 @@ namespace AspCore_Conic_Erp_RestApi
         {
 
 
-            string rootUrl = "http://127.0.0.1";
+            string rootUrl = "http://localhost";
                 //_httpContextAccessor.HttpContext.Request.Scheme.ToString();// host;
             ProcessStartInfo psi = new ProcessStartInfo("chrome", "--app=\"" + rootUrl + "\"") { UseShellExecute = true };
             try
