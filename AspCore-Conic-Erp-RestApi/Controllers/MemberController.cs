@@ -246,14 +246,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult CheckMembers()
         {
             IList<Member> Members = DB.Members?.ToList();
-
+        
             foreach (Member M in Members)
             {
+                int OStatus = M.Status;
+
+            
                 if (M.MembershipMovements.Count() == 0)
                 {
                     M.Status = -1;
                 }
-                var ActiveMemberShip = M.MembershipMovements.Where(m => m.Status == 0).SingleOrDefault();
+                var ActiveMemberShip = M.MembershipMovements.Where(m => m.Status == 1).SingleOrDefault();
 
                 if (ActiveMemberShip != null)
                 {
@@ -273,6 +276,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         DB.SaveChanges();
                     }
 
+                }
+                if (OStatus == -2)
+                {
+
+                    M.Status = -2;
                 }
             }
 

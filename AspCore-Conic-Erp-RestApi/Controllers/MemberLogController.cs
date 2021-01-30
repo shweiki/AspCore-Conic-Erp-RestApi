@@ -45,7 +45,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Member.AccountId).Select(d => d.Debit).Sum(),
                 TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Member.AccountId).Select(c => c.Credit).Sum(),
                 ActiveMemberShip = x.Member.MembershipMovements.Where(f => f.MemberId == x.MemberId && f.Status == 1).Select(ms => new { ms.Id, ms.Type }).FirstOrDefault(),
-            }).ToList();
+            }).Take(25).ToList();
                           
                              
 

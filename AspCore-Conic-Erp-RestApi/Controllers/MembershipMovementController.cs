@@ -73,16 +73,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult CheckMembershipMovement()
         {
             DateTime MaxDate = new DateTime(2020, 11, 1);
-            IList<MembershipMovement>  MembershipMovements = DB.MembershipMovements.Where(x=>x.Status >0 || x.Status == -2 || x.Status == -1 && x.EndDate  > MaxDate)?.ToList();
+            IList<MembershipMovement>  MembershipMovements = DB.MembershipMovements.Where(x=> x.EndDate  >= MaxDate)?.ToList();
             foreach (MembershipMovement MS in MembershipMovements)
             {
               
                 var member = DB.Members.Where(x => x.Id == MS.MemberId).SingleOrDefault();
+                int OStatus = member.Status;
+        
+
                 if ((DateTime.Today >= MS.StartDate && DateTime.Today <= MS.EndDate))
                 {
                         MS.Status = 1;
-                    if (member.Status == -2) member.Status = -2;
-                    else
                         member.Status = 0;
 
                 }
@@ -96,27 +97,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     {
 
                         MS.Status = -1;
-                        if (member.Status == -2) member.Status = -2;
-                        else
                             member.Status = -1;
                     }
                 }
              
-                foreach (MembershipMovementOrder MSO in DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id && x.Status == 1).ToList())
+                foreach (MembershipMovementOrder MSO in DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id &&( x.Status == 1 || x.Status == 2)).ToList())
                 {
+                    if (MSO.Status == 2)
+                    {
+                        MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
+                        MSO.Status = -2;
+                    }
                     if ((DateTime.Today >= MSO.StartDate && DateTime.Today <= MSO.EndDate))
                     {
                         if (MSO.Type == "Freeze")
                         {
                             MS.Status = 2;
-                            if (member.Status == -2) member.Status = -2;
-                            else member.Status = 1;
+                            member.Status = 1;
                         }
                         if (MSO.Type == "Extra")
                         {
                             MS.Status = 3;
-                            if (member.Status == -2) member.Status = -2;
-                            else member.Status = 2;
+                           member.Status = 2;
 
                         }
                     }
@@ -140,20 +142,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                    
                   
                     MS.Status = 1;
-                        if (member.Status == -2) member.Status = -2;
-                        else member.Status = 1;
+                        member.Status = 1;
 
                 }
                 if (MS == null )
                 {
-                        if (member.Status == -2) member.Status = -2;
-                        else member.Status = -1;
+                        member.Status = -1;
                     }
 
                 }
 
+                if (OStatus == -2) member.Status = -2;
 
-                DB.SaveChanges();
+                    DB.SaveChanges();
 
             }
             return Ok(true);
@@ -233,8 +234,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.TotalAmmount,
                 x.Tax,
-                x.StartDate,
-                x.EndDate,
+                StartDate =x.StartDate.ToString("yyyy-MM-dd"),
+                EndDate=  x.EndDate.ToString("yyyy-MM-dd"),
                 x.Type,
                 x.VisitsUsed,
                 x.Discount,
@@ -256,12 +257,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMembershipMovementByDateIn(DateTimeOffset DateIn)
         {
+         
             var MembershipMovements = DB.MembershipMovements.Where(z => DateIn >= z.StartDate && DateIn <= z.EndDate).Select(x => new {
                 x.Id,
                 x.TotalAmmount,
                 x.Tax,
-                x.StartDate,
-                x.EndDate,
+                StartDate =x.StartDate.ToString("yyyy-MM-dd"),
+                EndDate=  x.EndDate.ToString("yyyy-MM-dd"),
                 x.Type,
                 x.VisitsUsed,
                 x.Discount,
