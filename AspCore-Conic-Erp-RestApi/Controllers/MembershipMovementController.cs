@@ -72,9 +72,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult CheckMembershipMovement()
         {
-           IList<MembershipMovement>  MembershipMovements = DB.MembershipMovements.Where(x=>x.Status >0 || x.Status == -2 )?.ToList();
+            DateTime MaxDate = new DateTime(2020, 11, 1);
+            IList<MembershipMovement>  MembershipMovements = DB.MembershipMovements.Where(x=>x.Status >0 || x.Status == -2 || x.Status == -1 && x.EndDate  > MaxDate)?.ToList();
             foreach (MembershipMovement MS in MembershipMovements)
             {
+              
                 var member = DB.Members.Where(x => x.Id == MS.MemberId).SingleOrDefault();
                 if ((DateTime.Today >= MS.StartDate && DateTime.Today <= MS.EndDate))
                 {
@@ -99,7 +101,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             member.Status = -1;
                     }
                 }
-                foreach (MembershipMovementOrder MSO in MS.MembershipMovementOrders.Where(x => x.Status == 1).ToList())
+             
+                foreach (MembershipMovementOrder MSO in DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id && x.Status == 1).ToList())
                 {
                     if ((DateTime.Today >= MSO.StartDate && DateTime.Today <= MSO.EndDate))
                     {
@@ -185,6 +188,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     MSO.Type,
                     MSO.StartDate,
                     MSO.EndDate,
+                    MSO.Status,
                     MSO.Description,
                 }).ToList(),
 
@@ -226,6 +230,33 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetMembershipMovementByStatus(int? Status)
         {
             var MembershipMovements = DB.MembershipMovements.Where(z => z.Status == Status).Select(x => new {
+                x.Id,
+                x.TotalAmmount,
+                x.Tax,
+                x.StartDate,
+                x.EndDate,
+                x.Type,
+                x.VisitsUsed,
+                x.Discount,
+                x.DiscountDescription,
+                x.Description,
+                x.Status,
+                x.EditorName,
+                x.MemberId,
+                x.Member.AccountId,
+                MemberName = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
+                MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
+            }).ToList();
+                         
+                              
+            return Ok(MembershipMovements);
+        }     
+        
+        [Route("MembershipMovement/GetMembershipMovementByDateIn")]
+        [HttpGet]
+        public IActionResult GetMembershipMovementByDateIn(DateTimeOffset DateIn)
+        {
+            var MembershipMovements = DB.MembershipMovements.Where(z => DateIn >= z.StartDate && DateIn <= z.EndDate).Select(x => new {
                 x.Id,
                 x.TotalAmmount,
                 x.Tax,

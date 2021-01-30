@@ -78,7 +78,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }    
         [Route("MembershipMovementOrder/CreateMulti")]
         [HttpPost]
-        public IActionResult CreateMulti(IList<MembershipMovementOrder> collection)
+        public IActionResult CreateMulti(List<MembershipMovementOrder> collection)
         {
             if (ModelState.IsValid)
             {

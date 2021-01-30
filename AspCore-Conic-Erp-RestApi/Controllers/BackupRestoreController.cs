@@ -34,6 +34,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult Backup()
         {
+
             DateTime DateTime = DateTime.Now;
             ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "\\SQLEXPRESS");
             Server server = new Server(serverConnection);
@@ -46,7 +47,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 Directory.CreateDirectory(BackUpPath);
             }
-            string name = BackUpPath + DatabaseName + "-" + DateTime.ToString("dd-MM-yyyy hh-mm-tt") + ".bak";
+            string name = BackUpPath + DB.CompanyInfos.Where(x => x.Id == 1).SingleOrDefault().Name + "-" + DateTime.ToString("dd-MM-yyyy hh-mm-tt") + ".bak";
             BackupDeviceItem deviceItem = new BackupDeviceItem(name, DeviceType.File);
             backup.Devices.Add(deviceItem);
             backup.Incremental = false;
@@ -105,7 +106,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
 
 
-
+         
             // split script on GO command
             IEnumerable<string> commandStrings = Regex.Split(commandSql, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 

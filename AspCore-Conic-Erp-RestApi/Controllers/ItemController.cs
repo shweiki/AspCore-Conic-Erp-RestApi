@@ -139,6 +139,30 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         }).SingleOrDefault();
             return Ok(Item);
         }
+        [Route("Item/GetItemByBarcode")]
+        [HttpGet]
+        public IActionResult GetItemByBarcode(string BarCode)
+        {
+            var Item = DB.Items.Where(x=>x.Barcode == BarCode).Select(x=> new 
+                        {
+                            x.Id,
+                            x.Name,
+                            x.CostPrice,
+                            x.SellingPrice,
+                            x.OtherPrice,
+                            x.LowOrder,
+                            x.Tax,
+                            x.Rate,
+                            x.Barcode,
+                            x.Description,
+                            x.IsPrime,
+                            x.Status,
+                          //  InventoryQty = CalculateInventoryItemQty(x.Id)
+                        }).SingleOrDefault();
+            if(Item != null)
+            return Ok(Item);
+            else return Ok(false);
+        }
         [Route("Item/Create")]
         [HttpPost]
         public IActionResult Create(Item collection)
