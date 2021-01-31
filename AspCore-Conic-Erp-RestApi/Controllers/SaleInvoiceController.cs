@@ -15,7 +15,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("SaleInvoice/GetSaleInvoice")]
         [HttpGet]
-        public IActionResult GetSaleInvoice(DateTimeOffset DateFrom, DateTimeOffset DateTo)
+        public IActionResult GetSaleInvoice(DateTime DateFrom, DateTime DateTo)
         {
             var Invoices = DB.SalesInvoices.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new {
 

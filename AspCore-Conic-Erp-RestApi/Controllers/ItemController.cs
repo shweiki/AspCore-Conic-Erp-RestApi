@@ -96,7 +96,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Description,
                 x.PurchaseInvoiceId,
                 Type = "مشتريات",
-                                x.ItemsId
+                x.ItemsId
             }).ToList();
 
             var OrderInventoryMove = DB.InventoryMovements.Where(i => i.OrderInventoryId != null && i.ItemsId == ItemID && i.OrderInventory.FakeDate >= DateFrom && i.OrderInventory.FakeDate <= DateTo).Select(x => new {
@@ -111,7 +111,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Description,
                 x.OrderInventoryId,
                 Type = "سند مخزون",
-                                x.ItemsId
+                x.ItemsId
             }).ToList();
 
             return Ok(new { OrderInventoryMove, PurchaseInvoiceMove, SalesInvoiceMove });

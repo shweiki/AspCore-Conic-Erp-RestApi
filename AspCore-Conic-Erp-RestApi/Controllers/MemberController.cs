@@ -7,6 +7,7 @@ using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -223,6 +224,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         SI.Name,
                         SI.Status,
                         SI.Description,
+                        FakeDate= SI.FakeDate.ToString(CultureInfo.CurrentUICulture.DateTimeFormat.ShortDatePattern),
                         InventoryMovements = SI.InventoryMovements.Select(m => new
                         {
                             m.Id,
@@ -234,8 +236,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         }).ToList(),
 
                     }).ToList(),
-
-
                 }).SingleOrDefault();
             return Ok(Members);
         }
