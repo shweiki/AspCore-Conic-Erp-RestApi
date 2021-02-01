@@ -10,7 +10,7 @@ WITH cte AS (
                 DateTime
         ) row_num
      FROM 
-        [Gym].[Gym].[MemberLog]
+       Conic_Erp.dbo.[MemberLog]
 )
 DELETE FROM cte
 WHERE row_num > 1;
@@ -29,7 +29,7 @@ WITH msg AS (
                 SendDate
         ) row_num
      FROM 
-        [Gym].Config.Massage
+        Conic_Erp.dbo.Massage
 )
 DELETE FROM msg
 WHERE row_num > 1;

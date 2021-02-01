@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210201074943_Add Category To Items")]
+    partial class AddCategoryToItems
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1294,9 +1296,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasMaxLength(255)
                         .IsUnicode(false)
                         .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Color")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ControllerName")
                         .HasMaxLength(255)

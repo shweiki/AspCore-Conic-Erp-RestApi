@@ -19,6 +19,7 @@ namespace Entities
         public int? ReferenceStatus { get; set; }
         public string OprationDescription { get; set; }
         public string ControllerName { get; set; }
+        public string Color { get; set; }
         public string ClassName { get; set; }
         public string RoleName { get; set; }
         public string ArabicOprationDescription { get; set; }

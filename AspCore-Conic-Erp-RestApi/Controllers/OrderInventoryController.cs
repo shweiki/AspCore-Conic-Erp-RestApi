@@ -14,7 +14,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private ConicErpContext DB = new ConicErpContext();
         [Route("OrderInventory/GetOrderInventory")]
         [HttpGet]
-        public IActionResult GetOrderInventory(DateTimeOffset DateFrom, DateTimeOffset DateTo)
+        public IActionResult GetOrderInventory(DateTime DateFrom, DateTime DateTo)
         {
             var Orders = DB.OrderInventories.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new {
                 x.Id,

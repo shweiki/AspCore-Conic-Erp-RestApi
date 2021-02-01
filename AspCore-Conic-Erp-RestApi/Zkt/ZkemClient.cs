@@ -58,7 +58,7 @@ namespace AspCore_Conic_Erp_RestApi
             if (objCZKEM.Connect_Net(IPAdd, Port))
             {
                 //65535, 32767
-                if (objCZKEM.RegEvent(1, 32767))
+                if (objCZKEM.RegEvent(1, 65535))
                 {
                     // [ Register your events here ]
                     // [ Go through the _IZKEMEvents_Event class for a complete list of events
@@ -105,7 +105,6 @@ namespace AspCore_Conic_Erp_RestApi
         {
             //  Disconnect();
    
-            DeviceController device = new DeviceController();
             MemberLogController MemberLog = new MemberLogController();
             DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
             int ID = Convert.ToInt32(EnrollNumber);
@@ -855,7 +854,7 @@ namespace AspCore_Conic_Erp_RestApi
 
         public bool SetDeviceTime2(int dwMachineNumber, int dwYear, int dwMonth, int dwDay, int dwHour, int dwMinute, int dwSecond)
         {
-            throw new NotImplementedException();
+            return objCZKEM.SetDeviceTime2(dwMachineNumber, dwYear,dwMonth ,dwDay ,dwHour , dwMinute ,dwSecond);
         }
 
         public bool SetEnrollData(int dwMachineNumber, int dwEnrollNumber, int dwEMachineNumber, int dwBackupNumber, int dwMachinePrivilege, ref int dwEnrollData, int dwPassWord)

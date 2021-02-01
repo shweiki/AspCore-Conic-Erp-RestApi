@@ -23,11 +23,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Discount,
                 x.Tax,
                 Name = x.Vendor.Name + " " + x.Member.Name + " - " + x.Name,
-                FakeDate = x.FakeDate.ToString("dd/MM/yyyy"),
+                x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
                 x.Description,
-                AccountID = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
+                AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
                 InventoryMovements = DB.InventoryMovements.Where(i => i.SalesInvoiceId == x.Id && i.TypeMove == "Out").Select(m => new {
                     m.Id,
                     m.Items.Name ,//= DB.Items.Where(x => x.Id == m.ItemsId).SingleOrDefault().Name,
@@ -44,7 +44,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     }
         [Route("SaleInvoice/GetSaleItem")]
         [HttpGet]
-        public IActionResult GetSaleItem(long ItemID, DateTimeOffset DateFrom, DateTimeOffset DateTo )
+        public IActionResult GetSaleItem(long ItemID, DateTime DateFrom, DateTime DateTo )
         {
             var Invoices =  DB.InventoryMovements.Where(i => i.SalesInvoiceId != null && i.ItemsId == ItemID && i.SalesInvoice.FakeDate >= DateFrom && i.SalesInvoice.FakeDate <= DateTo).Select(x => new
             {
@@ -55,7 +55,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Tax,
                 x.TypeMove,
                 Name = x.SalesInvoice.Vendor.Name + x.SalesInvoice.Member.Name,
-                FakeDate = x.SalesInvoice.FakeDate.ToString("dd/MM/yyyy"),
+                x.SalesInvoice.FakeDate,
                 x.Description,
                 x.SalesInvoiceId,
                 x.ItemsId,
@@ -74,7 +74,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Discount,
                 x.Tax,
                 Name =DB.Vendors.Where(v=>v.Id == x.VendorId).SingleOrDefault().Name+ DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
-                FakeDate = x.FakeDate.ToString("dd/MM/yyyy"),
+                x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
                 x.Description,

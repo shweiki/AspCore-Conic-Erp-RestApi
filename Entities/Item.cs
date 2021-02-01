@@ -24,6 +24,7 @@ namespace Entities
         public double? Tax { get; set; }
         public double? Rate { get; set; }
         public string Barcode { get; set; }
+        public string Category { get; set; }
         public string Description { get; set; }
         public int Status { get; set; }
         public bool IsPrime { get; set; }

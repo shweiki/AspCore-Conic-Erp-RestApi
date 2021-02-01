@@ -14,12 +14,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private ConicErpContext DB = new ConicErpContext();
         [Route("StockInventory/GetStockInventory")]
         [HttpGet]
-        public IActionResult GetStockInventory(DateTimeOffset DateFrom, DateTimeOffset DateTo)
+        public IActionResult GetStockInventory(DateTime DateFrom, DateTime DateTo)
         {
             var Orders = DB.StocktakingInventories.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new
             {
                 x.Id,
-                FakeDate = x.FakeDate.ToString("dd/MM/yyyy"),
+                x.FakeDate,
                 x.Status,
                 x.Description,
                 StockMovements = DB.StockMovements.Where(i => i.StocktakingInventoryId == x.Id).Select(m => new

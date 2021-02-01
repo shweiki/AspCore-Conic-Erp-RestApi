@@ -65,7 +65,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("Item/GetItemMove")]
         [HttpGet]
-        public IActionResult GetItemMove(long ItemID, DateTimeOffset DateFrom, DateTimeOffset DateTo)
+        public IActionResult GetItemMove(long ItemID, DateTime DateFrom, DateTime DateTo)
         {
             var SalesInvoiceMove = DB.InventoryMovements.Where(i => i.SalesInvoiceId != null && i.ItemsId == ItemID && i.SalesInvoice.FakeDate >= DateFrom && i.SalesInvoice.FakeDate <= DateTo).Select(x => new
             {
@@ -76,7 +76,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Tax,
                 x.TypeMove,
                 Name = DB.SalesInvoices.Where(S=>S.VendorId == x.SalesInvoice.VendorId).SingleOrDefault().Name + " " + DB.SalesInvoices.Where(S => S.MemberId == x.SalesInvoice.MemberId).SingleOrDefault().Name,
-                FakeDate = x.SalesInvoice.FakeDate.ToString("dd/MM/yyyy"),
+                x.SalesInvoice.FakeDate,
                 x.Description,
                 x.SalesInvoiceId,
                 x.ItemsId,
@@ -92,7 +92,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Tax,
                 x.TypeMove,
                 Name = DB.PurchaseInvoices.Where(S => S.VendorId == x.PurchaseInvoice.VendorId).SingleOrDefault().Name + " ",
-                FakeDate = x.PurchaseInvoice.FakeDate.Value.ToString("dd/MM/yyyy"),
+                x.PurchaseInvoice.FakeDate,
                 x.Description,
                 x.PurchaseInvoiceId,
                 Type = "مشتريات",
@@ -107,7 +107,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Tax,
                 x.TypeMove,
                 Name =  "سند " +x.OrderInventory.OrderType,
-                FakeDate = x.OrderInventory.FakeDate.Value.ToString("dd/MM/yyyy"),
+                x.OrderInventory.FakeDate,
                 x.Description,
                 x.OrderInventoryId,
                 Type = "سند مخزون",

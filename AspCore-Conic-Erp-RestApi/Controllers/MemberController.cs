@@ -206,7 +206,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
                     x.AccountId,
-                   // lastLog =DB.MemberLogs.Where(ml=>ml.MemberId == x.Id).ToList().LastOrDefault().DateTime.ToString(),
                     ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == x.Id && f.Status > 0).Select(MS => new
                     {
                         MS.Id,
@@ -224,7 +223,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         SI.Name,
                         SI.Status,
                         SI.Description,
-                        FakeDate= SI.FakeDate.ToString(CultureInfo.CurrentUICulture.DateTimeFormat.ShortDatePattern),
+                        SI.FakeDate,
                         InventoryMovements = SI.InventoryMovements.Select(m => new
                         {
                             m.Id,
@@ -265,7 +264,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     if (HowManyDaysLeft == 3)
                     {
                         Massage msg = new Massage();
-                        msg.Body = "عزيزي " + M.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + ActiveMemberShip.EndDate.ToString("dd/MM/yyyy") + " وشكرا";
+                        msg.Body = "عزيزي " + M.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + ActiveMemberShip.EndDate + " وشكرا";
                         msg.Status = 0;
                         msg.TableName = "Member";
                         msg.Fktable = M.Id;

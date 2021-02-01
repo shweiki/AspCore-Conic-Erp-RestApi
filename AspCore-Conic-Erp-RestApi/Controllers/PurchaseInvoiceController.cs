@@ -14,7 +14,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("PurchaseInvoice/GetPurchaseInvoice")]
         [HttpGet]
-        public IActionResult GetPurchaseInvoice(DateTimeOffset DateFrom, DateTimeOffset DateTo)
+        public IActionResult GetPurchaseInvoice(DateTime DateFrom, DateTime DateTo)
         {
             var Invoices = DB.PurchaseInvoices.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new
             {
@@ -23,10 +23,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Name = x.Vendor.Name + " - " + x.Name,
                 x.Discount,
                 x.Tax,
-                FakeDate = x.FakeDate.Value.ToString("dd/MM/yyyy"),
+                x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
-                InvoicePurchaseDate = x.InvoicePurchaseDate.ToString("dd/MM/yyyy"),
+                x.InvoicePurchaseDate,
                 x.AccountInvoiceNumber,
                 x.Description,
                 InventoryMovements = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId == x.Id && i.TypeMove == "In").Select(m => new
@@ -45,7 +45,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("PurchaseInvoice/GetPurchaseItem")]
         [HttpGet]
-        public IActionResult GetPurchaseItem(long? ItemID, DateTimeOffset DateFrom, DateTimeOffset DateTo)
+        public IActionResult GetPurchaseItem(long? ItemID, DateTime DateFrom, DateTime DateTo)
         {
             var Invoices = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId != null && i.ItemsId == ItemID && i.PurchaseInvoice.FakeDate >= DateFrom && i.PurchaseInvoice.FakeDate <= DateTo).Select(x => new
             {
@@ -54,7 +54,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Qty,
                 x.Status,
                 x.Tax,
-                FakeDate = x.PurchaseInvoice.FakeDate.Value.ToString("dd/MM/yyyy"),
+                x.PurchaseInvoice.FakeDate,
                 x.Description,
 
             }).ToList();

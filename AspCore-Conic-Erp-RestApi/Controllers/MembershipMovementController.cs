@@ -73,7 +73,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult CheckMembershipMovement()
         {
             DateTime MaxDate = new DateTime(2020, 11, 1);
-            IList<MembershipMovement>  MembershipMovements = DB.MembershipMovements.Where(x=> x.EndDate  >= MaxDate)?.ToList();
+            IList<MembershipMovement>  MembershipMovements = DB.MembershipMovements.Where(x=>  x.EndDate  >= MaxDate)?.ToList();
+         
             foreach (MembershipMovement MS in MembershipMovements)
             {
               
@@ -85,6 +86,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                         MS.Status = 1;
                         member.Status = 0;
+                    var HowManyDaysLeft = (MS.EndDate - DateTime.Today).TotalDays;
+                    if (HowManyDaysLeft == 3)
+                    {
+                        Massage msg = new Massage();
+                        msg.Body = "عزيزي " + member.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + MS.EndDate + " وشكرا";
+                        msg.Status = 0;
+                        msg.TableName = "Member";
+                        msg.Fktable = member.Id;
+                        msg.PhoneNumber = member.PhoneNumber1;
+                        msg.SendDate = DateTime.Today;
+                        msg.Type = "رسالة تذكير";
+                        DB.Massages.Add(msg);
+                    }
 
                 }
                 else
@@ -97,7 +111,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     {
 
                         MS.Status = -1;
-                            member.Status = -1;
+                        member.Status = -1;
                     }
                 }
              
@@ -234,8 +248,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.TotalAmmount,
                 x.Tax,
-                StartDate =x.StartDate.ToString("yyyy-MM-dd"),
-                EndDate=  x.EndDate.ToString("yyyy-MM-dd"),
+                x.StartDate,
+                x.EndDate,
                 x.Type,
                 x.VisitsUsed,
                 x.Discount,
@@ -255,15 +269,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         
         [Route("MembershipMovement/GetMembershipMovementByDateIn")]
         [HttpGet]
-        public IActionResult GetMembershipMovementByDateIn(DateTimeOffset DateIn)
+        public IActionResult GetMembershipMovementByDateIn(DateTime DateIn)
         {
          
             var MembershipMovements = DB.MembershipMovements.Where(z => DateIn >= z.StartDate && DateIn <= z.EndDate).Select(x => new {
                 x.Id,
                 x.TotalAmmount,
                 x.Tax,
-                StartDate =x.StartDate.ToString("yyyy-MM-dd"),
-                EndDate=  x.EndDate.ToString("yyyy-MM-dd"),
+                x.StartDate,
+                x.EndDate,
                 x.Type,
                 x.VisitsUsed,
                 x.Discount,

@@ -15,7 +15,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("Payment/GetPayment")]
         [HttpGet]
-        public ActionResult GetPayment(DateTimeOffset DateFrom, DateTimeOffset DateTo , int Status)
+        public ActionResult GetPayment(DateTime DateFrom, DateTime DateTo , int Status)
         {
             var Payments = DB.Payments.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo && i.Status == Status).Select(x => new
             {
@@ -28,7 +28,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PaymentMethod,
                 x.Status,
                 x.Description,
-                AccountID = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
+                AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
             }).ToList();
      
             
@@ -48,7 +48,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PaymentMethod,
                 ObjectID = x.VendorId == null ? x.MemberId : x.VendorId,
                 x.Description,
-                AccountID = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
+                AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
                x.Status
             }).ToList();
 
@@ -70,7 +70,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 ObjectID = x.VendorId == null ? x.MemberId : x.VendorId,
                 x.Status,
                 x.Description,
-                AccountID = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
+                AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
             }).ToList();
                 
 

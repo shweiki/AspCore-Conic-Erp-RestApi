@@ -12,15 +12,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     {
         private ConicErpContext DB = new ConicErpContext();
         [HttpGet]
-        public IActionResult GetEntryAccounting(long AccountID, DateTimeOffset DateFrom, DateTimeOffset DateTo)
+        public IActionResult GetEntryAccounting(long AccountId, DateTime DateFrom, DateTime DateTo)
         {
-            var EntryMovements = DB.EntryMovements.Where(i => i.AccountId == AccountID && i.Entry.FakeDate >= DateFrom && i.Entry.FakeDate <= DateTo).Select(x=>new {
+            var EntryMovements = DB.EntryMovements.Where(i => i.AccountId == AccountId && i.Entry.FakeDate >= DateFrom && i.Entry.FakeDate <= DateTo).Select(x=>new {
                 x.Id,
                 x.Debit,
                 x.Credit,
                 x.Description,
                 x.EntryId,
-                FakeDate = x.Entry.FakeDate.ToString("dd/MM/yyyy"),
+                x.Entry.FakeDate,
             }).ToList();
                    
 

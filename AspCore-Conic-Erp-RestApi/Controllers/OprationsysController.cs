@@ -44,6 +44,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.ReferenceStatus,
                 x.IconClass,
                 x.ClassName,
+                x.Color,
             }).ToList();
                  
                           
@@ -66,7 +67,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.ReferenceStatus,
                 x.IconClass,
-                x.ClassName
+                x.ClassName,
+                x.Color,
             }).ToList();
                            
             return Ok(Oprations);
@@ -88,7 +90,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.ReferenceStatus,
                 x.IconClass,
-                x.ClassName
+                x.ClassName,
+                x.Color,
             }).SingleOrDefault();
 
             return Ok(Oprations);
@@ -110,7 +113,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.ReferenceStatus,
                 x.IconClass,
-                x.ClassName
+                x.ClassName,
+                x.Color,
             }).ToList();
 
             return Ok(NextOprations);
@@ -190,6 +194,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Opration.IconClass = collection.IconClass;
                 Opration.TableName = collection.TableName;
                 Opration.RoleName = collection.RoleName;
+                Opration.Color = collection.Color;
                 try
                 {
 

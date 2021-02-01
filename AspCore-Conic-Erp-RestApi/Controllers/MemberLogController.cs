@@ -28,28 +28,41 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetlastLogByMemberId(long MemberId)
         {
 
-            return Ok(DB.MemberLogs.Where(ml => ml.MemberId == MemberId)?.ToList()?.LastOrDefault()?.DateTime.ToString());
+            return Ok(DB.MemberLogs.Where(ml => ml.MemberId == MemberId)?.ToList()?.LastOrDefault()?.DateTime);
         }
         [Route("MemberLog/GetMemberLogByStatus")]
         [HttpGet]
         public IActionResult GetMemberLogByStatus(int Status)
         {
+           // DB.MemberLogs.RemoveRange(students);
+
             var MemberLogs = DB.MemberLogs.Where(x => x.Status == Status).Select(x => new {
                 x.Id,
                 x.MemberId,
                 x.Member.Name,
-                DateTime = x.DateTime.ToString("hh:mm tt"),
+                x.DateTime,
                 x.Description,
                 DeviceName = x.Device.Name,
                 x.Member.Status,
+                Color = DB.Oprationsys.Where(o=>o.Status == x.Member.Status && o.TableName=="Member").SingleOrDefault().Color,
+                ClassName = DB.Oprationsys.Where(o=>o.Status == x.Member.Status && o.TableName=="Member").SingleOrDefault().ClassName,
+                IconClass = DB.Oprationsys.Where(o=>o.Status == x.Member.Status && o.TableName=="Member").SingleOrDefault().IconClass,
                 TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Member.AccountId).Select(d => d.Debit).Sum(),
                 TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Member.AccountId).Select(c => c.Credit).Sum(),
                 ActiveMemberShip = x.Member.MembershipMovements.Where(f => f.MemberId == x.MemberId && f.Status == 1).Select(ms => new { ms.Id, ms.Type }).FirstOrDefault(),
-            }).Take(25).ToList();
-                          
-                             
+            }).ToList();
 
-             MemberLogs = MemberLogs.GroupBy(a => a.MemberId)
+            var  DuplicateRow = MemberLogs.GroupBy(s => new { s.MemberId, s.DateTime}).Select(grp => grp.Skip(1)).ToList();
+            foreach (var Dup in DuplicateRow)
+            {
+                if (Dup.Count() == 0)
+                    continue;
+                List<MemberLog> duplog = Dup.Select(c =>new MemberLog {Id = c.Id }).ToList();
+                DB.MemberLogs.RemoveRange(duplog);
+                DB.SaveChanges();
+            }
+
+            MemberLogs = MemberLogs.GroupBy(a => new { a.MemberId, a.DateTime })
                    .Select(g => g.Last()).ToList();
 
             return Ok(MemberLogs);
@@ -110,7 +123,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public Boolean RegisterMemberLog(long? ID , DateTime datetime)
         {
             var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
-
+            if (member == null) return false;
             var isLogSaveIt = DB.MemberLogs.Where(l => l.MemberId == member.Id).ToList();
             isLogSaveIt = DB.MemberLogs.Where(Ld => Ld.DateTime == datetime).ToList();
 
@@ -163,9 +176,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
                 if (member.Status == -1)// متهي
                 {
-                    var ActiveMemberShip = (from MS in DB.MembershipMovements.Where(f => f.MemberId == member.Id && f.Status > 0).ToList()
-                                            select MS
-                      ).FirstOrDefault();
+                    var ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == member.Id && f.Status > 0).FirstOrDefault();
                     if (ActiveMemberShip != null)
                     {
                         Msg.Body = "عزيزي " + member.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بتجديد إشتراكك للفترة الحالية";
@@ -184,9 +195,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
                 if (member.Status == 0)// المتجاوز الفترة الصباحية
                 {
-                    var ActiveMemberShip = (from MS in DB.MembershipMovements.Where(f => f.MemberId == member.Id && f.Status > 0).ToList()
-                                            select new { MS.Type }
-                                              ).FirstOrDefault();
+                    var ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == member.Id && f.Status > 0).FirstOrDefault();
                     if (ActiveMemberShip.Type == "Morning" && datetime.Hour > 15)
                     {
 
@@ -212,30 +221,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
                 if (member.Status == 0)// قائمة معلق
                 {
-                    var HoldMembership = (from MS in DB.MembershipMovements.Where(f => f.MemberId == member.Id && f.Status == -2).ToList()
-                                          select new
-                                          {
-                                              MS.Id,
-                                              MS.Membership.Name,
-                                              MS.VisitsUsed,
-                                              MS.Type,
-                                              MS.StartDate,
-                                              MS.EndDate,
-                                              MS.Description,
-                                          }
-                      ).FirstOrDefault();
-                    var ActiveMemberShip = (from MS in DB.MembershipMovements.Where(f => f.MemberId == member.Id && f.Status > 0).ToList()
-                                            select new
-                                            {
-                                                MS.Id,
-                                                MS.Membership.Name,
-                                                MS.VisitsUsed,
-                                                MS.Type,
-                                                MS.StartDate,
-                                                MS.EndDate,
-                                                MS.Description,
-                                            }
-                      ).FirstOrDefault();
+                    var HoldMembership =  DB.MembershipMovements.Where(f => f.MemberId == member.Id && f.Status == -2).FirstOrDefault();
+                    var ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == member.Id && f.Status > 0).FirstOrDefault();
                     if (HoldMembership != null && ActiveMemberShip == null)
                     {
                         Msg.Body = "المعلق " + member.Name + " - " + member.Id + "متواجد في الصالة .";

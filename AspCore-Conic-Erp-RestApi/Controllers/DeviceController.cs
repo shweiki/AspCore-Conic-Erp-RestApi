@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Authorization;
 using Entities;
 using System.IO.Ports;
@@ -209,6 +208,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 objZkeeper = new ZkemClient(RaiseDeviceEvent);
                 Device.Description = "Is Device Connected : ";
                 IsDeviceConnected = objZkeeper.Connect_Net(Device.Ip, Device.Port);
+                objZkeeper.SetDeviceTime2((int)Device.Id, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+
             }
             DB.SaveChanges();
             return IsDeviceConnected;
