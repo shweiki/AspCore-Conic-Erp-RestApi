@@ -82,7 +82,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             foreach (Massage M in Massages)
             {
-                SendSms(M.PhoneNumber, M.Body);
+              //  SendSms(M.PhoneNumber, M.Body);
                 M.Status = 1;
                 DB.SaveChanges();
             }
