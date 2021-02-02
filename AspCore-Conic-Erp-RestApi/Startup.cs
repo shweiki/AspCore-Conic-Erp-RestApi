@@ -66,7 +66,8 @@ namespace AspCore_Conic_Erp_RestApi
             services.AddControllers().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-               // options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc; // this should be set if you always expect UTC dates in method bodies, if not, you can use RoundTrip instead.
+               // options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local; 
+                options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local; // this should be set if you always expect UTC dates in method bodies, if not, you can use RoundTrip instead.
             });
           
         }

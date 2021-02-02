@@ -85,7 +85,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
              var version = "Ok";
              return Ok(version); */
         }
+        [Route("Setting/RestDefualtSetting")]
+        [HttpGet]
+        public IActionResult RestDefualtSetting()
+        {
+            try
+            {
+                DB.Settings.RemoveRange(DB.Settings.ToList());
+                DB.SaveChanges();
+                return Ok(true);
 
+            }
+            catch
+            {
+                //Console.WriteLine(collection);
+                return Ok(false);
+            }
+ 
+        }
         [Route("Setting/Edit")]
         [HttpPost]
         public IActionResult Edit(Setting collection)
