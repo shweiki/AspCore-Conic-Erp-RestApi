@@ -47,7 +47,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 Directory.CreateDirectory(BackUpPath);
             }
-            string name = BackUpPath + DB.CompanyInfos.Where(x => x.Id == 1).SingleOrDefault().Name + "-" + DateTime + ".bak";
+            string name = BackUpPath + DB.CompanyInfos.Where(x => x.Id == 1).SingleOrDefault().Name + "-" + DateTime.ToString("dd-MM-yyyy HH-mm-ss") + ".bak";
             BackupDeviceItem deviceItem = new BackupDeviceItem(name, DeviceType.File);
             backup.Devices.Add(deviceItem);
             backup.Incremental = false;

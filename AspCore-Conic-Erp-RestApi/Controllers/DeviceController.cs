@@ -190,11 +190,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         public bool CheckDeviceHere(int ID)
         {
-            
 
             var Device = DB.Devices.Where(x => x.Id == ID).SingleOrDefault();
-    
-            
             bool IsDeviceConnected = false;
             bool isValidIpA = UniversalStatic.ValidateIP(Device.Ip);
 
@@ -217,7 +214,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public bool DisconnectDeviceHere(int ID)
         {
             var Device = DB.Devices.Where(x => x.Id == ID).SingleOrDefault();
-            int DeviceId = (int)Device.Id;
             bool isValidIpA = UniversalStatic.ValidateIP(Device.Ip);
 
             if (!isValidIpA)
@@ -257,14 +253,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (CheckDeviceHere((int)DeviceId))
             {
-                IList<Member> Members = DB.Members?.ToList();
+                IList<Member> Members = DB.Members.Where(x=>x.MembershipMovements.Count() != 0).ToList();
                 DateTime last = DateTime.Today.AddMonths(-3);
 
                 foreach (Member M in Members)
                 {
-                    if (M.MembershipMovements.Count() <= 0) continue;
-                    if (M.MembershipMovements.LastOrDefault().EndDate < last) continue;
-                    bool SetUser = objZkeeper.SSR_SetUserInfo((int)DeviceId, M.Id.ToString(), M.Name, "", 0, false);
+                    var MemberShipLast = DB.MembershipMovements.Where(mm => mm.MemberId == M.Id && mm.EndDate >= last).ToList();
+                    if (MemberShipLast.Count() <=0 ) continue;
+                    bool SetUser = objZkeeper.SSR_SetUserInfo(0, M.Id.ToString(), M.Name, "", 0, false);
                     if (SetUser)
                     {
                         var memeberface = DB.MemberFaces.Where(f => f.MemberId == M.Id).SingleOrDefault();
@@ -338,16 +334,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (CheckDeviceHere((int)DeviceId))
             {
-                ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, objZkeeper.MachineNumber);
+                ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, 0);
                 if (MachineLog != null && MachineLog.Count > 0)
                 {
                 
                         foreach (var ML in MachineLog.ToList())
                         {
                         var member = DB.Members.Where(x => x.Id == ML.IndRegID).SingleOrDefault();
-
-                             DateTime datetime = DateTime.Parse(ML.DateTimeRecord);
-                            datetime =  new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour , datetime.Minute, 0);
+                        if (member != null)
+                        {
+                            DateTime datetime = DateTime.Parse(ML.DateTimeRecord);
+                            datetime = new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour, datetime.Minute, 0);
                             var isLogSaveIt = DB.MemberLogs.Where(l => l.MemberId == member.Id && l.DateTime == datetime).Count();
                             if (isLogSaveIt <= 0)
                             {
@@ -365,15 +362,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                 DB.MemberLogs.Add(Log);
                                 DB.SaveChanges();
                             }
-                            else {
+                            else
+                            {
                                 continue;
-                                    }
-
+                            }
                         }
+                        else continue;
+                    }
 
                         DB.SaveChanges();
 
-                    objZkeeper.ClearGLog(objZkeeper.MachineNumber);
+                    objZkeeper.ClearGLog(0);
                 return Ok(true);
                 }
                 else
@@ -385,8 +384,39 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             else
                 return Ok("Device Is Not Connected");
         }
+        [Route("Device/ClearUserLog")]
+        [HttpGet]
+        public IActionResult ClearUserLog(long DeviceId)
+        {
+            if (CheckDeviceHere((int)DeviceId))
+            {
+               bool ClearKeeperData = objZkeeper.ClearKeeperData(0);
+               bool ClearGLog = objZkeeper.ClearGLog(0);
+               bool ClearSLog = objZkeeper.ClearSLog(0);
+                return Ok("ClearKeeperData : " + ClearKeeperData + "-ClearGLog : "+ ClearGLog+ "-ClearSLog : "+ ClearSLog);
 
-        private void RaiseDeviceEvent(object sender, string actionType)
+            }
+            else
+                return Ok("Device Is Not Connected");
+        }
+        [Route("Device/RestartDevice")]
+        [HttpGet]
+        public IActionResult RestartDevice(long DeviceId)
+        {
+            if (CheckDeviceHere((int)DeviceId))
+            {
+             
+                    if (objZkeeper.RestartDevice(0))
+                        return  Ok("The device is being restarted, Please wait...  true");
+                    
+                else
+                        return Ok("Operation failed,please try again false" );
+                }
+            else
+                return Ok("Device Is Not Connected");
+        }
+
+    private void RaiseDeviceEvent(object sender, string actionType)
         {
             switch (actionType)
             {

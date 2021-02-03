@@ -104,14 +104,20 @@ namespace AspCore_Conic_Erp_RestApi
         private void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
         {
             //  Disconnect();
-   
-            MemberLogController MemberLog = new MemberLogController();
             DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
             int ID = Convert.ToInt32(EnrollNumber);
-    
-            MemberLog.RegisterMemberLog(ID, datetime);
-            //device.GetAllLogMembers(3);
+            var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
 
+            if ( member != null)
+            {
+                MemberLogController MemberLog = new MemberLogController();
+                var isLogSaveIt = DB.MemberLogs.Where(Ld => Ld.DateTime == datetime && Ld.MemberId == ID).ToList();
+                if(isLogSaveIt.Count() <= 0)
+
+
+                MemberLog.RegisterMemberLog(ID, datetime);
+                //device.GetAllLogMembers(3);
+            }
         }
 
 
@@ -347,7 +353,7 @@ namespace AspCore_Conic_Erp_RestApi
 
         public bool ClearKeeperData(int dwMachineNumber)
         {
-            throw new NotImplementedException();
+             return objCZKEM.ClearKeeperData(dwMachineNumber);
         }
 
         public bool ClearLCD()
@@ -362,7 +368,7 @@ namespace AspCore_Conic_Erp_RestApi
 
         public bool ClearSLog(int dwMachineNumber)
         {
-            throw new NotImplementedException();
+            return objCZKEM.ClearSLog(dwMachineNumber);
         }
 
         public bool ClearSMS(int dwMachineNumber)
