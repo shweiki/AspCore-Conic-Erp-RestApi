@@ -62,10 +62,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("BackupRestore/Restore")]
         [HttpGet]
-        public IActionResult Restore(int backUpId)
+        public IActionResult Restore(string DirectoryBak)
         {
 
-            var Backup = DB.BackUps.Where(x => x.Id == backUpId).SingleOrDefault();
                 ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "\\SQLEXPRESS");
                 Server dbServer = new Server(serverConnection);
 
@@ -76,14 +75,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     ReplaceDatabase = true,
                     NoRecovery = false
                 };
-            if (!System.IO.File.Exists(Backup.Name))
+            if (!System.IO.File.Exists(DirectoryBak))
             {
              return Ok("File is not Exsit");
 
             }
             else
             {
-                BackupDeviceItem source = new BackupDeviceItem(Backup.Name, DeviceType.File);
+                BackupDeviceItem source = new BackupDeviceItem(DirectoryBak, DeviceType.File);
                 _Restore.Devices.Add(source);
                 CloseAllConnection("USE master alter database " + DatabaseName + " set offline with rollback immediate");
 

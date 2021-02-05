@@ -28,6 +28,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PaymentMethod,
                 x.Status,
                 x.Description,
+                x.MemberId,
                 AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
             }).ToList();
      
