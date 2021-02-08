@@ -121,6 +121,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     {
                         MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
                         MSO.Status = -2;
+                        continue;
                     }
                     if ((DateTime.Today >= MSO.StartDate && DateTime.Today <= MSO.EndDate))
                     {

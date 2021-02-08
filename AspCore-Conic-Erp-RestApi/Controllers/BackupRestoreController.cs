@@ -36,7 +36,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
 
             DateTime DateTime = DateTime.Now;
-            ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "");
+            ServerConnection serverConnection = new ServerConnection("(localdb)\\mssqllocaldb");
             Server server = new Server(serverConnection);
             Backup backup = new Backup();
             backup.Action = BackupActionType.Database;
@@ -47,7 +47,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 Directory.CreateDirectory(BackUpPath);
             }
-            string name = BackUpPath + DB.CompanyInfos.Where(x => x.Id == 1).SingleOrDefault().Name + "-" + DateTime.ToString("dd-MM-yyyy HH-mm-ss") + ".bak";
+            string name = BackUpPath + DB.Settings.Where(x => x.Name == "title").SingleOrDefault().Value + "-" + DateTime.ToString("dd-MM-yyyy HH-mm-ss") + ".bak";
             BackupDeviceItem deviceItem = new BackupDeviceItem(name, DeviceType.File);
             backup.Devices.Add(deviceItem);
             backup.Incremental = false;
@@ -66,6 +66,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
 
                 ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "");
+         //       ServerConnection serverConnection = new ServerConnection("(localdb)\\mssqllocaldb");
                 Server dbServer = new Server(serverConnection);
 
                 Restore _Restore = new Restore()
@@ -110,7 +111,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             IEnumerable<string> commandStrings = Regex.Split(commandSql, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
 
-            SqlConnection _connection = new SqlConnection("Server="+ Environment.MachineName + "; Database="+ DatabaseName + ";Trusted_Connection=True;MultipleActiveResultSets=true");
+            SqlConnection _connection = new SqlConnection("Server="+ Environment.MachineName + "\\SQLEXPRESS; Database=" + DatabaseName + ";Trusted_Connection=True;MultipleActiveResultSets=true");
+        //    SqlConnection _connection = new SqlConnection("Server=(localdb)\\mssqllocaldb; Database="+ DatabaseName + ";Trusted_Connection=True;MultipleActiveResultSets=true");
 
             _connection.Open();
             foreach (string commandString in commandStrings)

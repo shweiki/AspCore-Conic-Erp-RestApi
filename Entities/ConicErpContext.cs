@@ -63,7 +63,8 @@ namespace Entities
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source="+ Environment.MachineName+";Initial Catalog=Conic_Erp;Integrated Security=True");
+                optionsBuilder.UseSqlServer("Data Source=" + Environment.MachineName + "//SQLEXPRESS;Initial Catalog=Conic_Erp;Integrated Security=True");
+              //  optionsBuilder.UseSqlServer("Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Conic_Erp;Integrated Security=True");
             }
         }
 

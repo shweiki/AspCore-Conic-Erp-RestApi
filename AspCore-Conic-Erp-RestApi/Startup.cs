@@ -32,7 +32,11 @@ namespace AspCore_Conic_Erp_RestApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string Con = "Server=" + Environment.MachineName + ";Database=Conic_Erp;Trusted_Connection=True;MultipleActiveResultSets=true";
+
+
+
+            string Con = "Server=" + Environment.MachineName + "//SQLEXPRESS;Database=Conic_Erp;Trusted_Connection=True;MultipleActiveResultSets=true";
+         //   string Con = "Server=(localdb)\\mssqllocaldb;Database=Conic_Erp;Trusted_Connection=True;MultipleActiveResultSets=true";
             services.AddDbContext<ConicErpContext>(options =>
                 options.UseSqlServer(
                  //   Configuration.GetConnectionString("DefaultConnection"),

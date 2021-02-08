@@ -21,6 +21,8 @@ namespace Entities
                     }
                     catch (Exception ex)
                     {
+                       // appContext.Database.EnsureDeleted();
+                        //appContext.Database.EnsureDeleted();
                         //Log errors or do anything you think it's needed
                         throw;
                     }

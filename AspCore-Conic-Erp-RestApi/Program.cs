@@ -16,6 +16,7 @@ namespace AspCore_Conic_Erp_RestApi
         {
             OpenBrowser();
             CreateHostBuilder(args).Build().MigrateDatabase().Run();
+           // CreateHostBuilder(args).Build().Run();
 
          
         }
