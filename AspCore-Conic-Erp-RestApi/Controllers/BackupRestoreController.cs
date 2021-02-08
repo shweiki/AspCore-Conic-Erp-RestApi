@@ -36,7 +36,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
 
             DateTime DateTime = DateTime.Now;
-            ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "\\SQLEXPRESS");
+            ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "");
             Server server = new Server(serverConnection);
             Backup backup = new Backup();
             backup.Action = BackupActionType.Database;
@@ -65,7 +65,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult Restore(string DirectoryBak)
         {
 
-                ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "\\SQLEXPRESS");
+                ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "");
                 Server dbServer = new Server(serverConnection);
 
                 Restore _Restore = new Restore()
@@ -110,7 +110,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             IEnumerable<string> commandStrings = Regex.Split(commandSql, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
 
-            SqlConnection _connection = new SqlConnection("Server="+ Environment.MachineName + "\\SQLEXPRESS; Database="+ DatabaseName + ";Trusted_Connection=True;MultipleActiveResultSets=true");
+            SqlConnection _connection = new SqlConnection("Server="+ Environment.MachineName + "; Database="+ DatabaseName + ";Trusted_Connection=True;MultipleActiveResultSets=true");
 
             _connection.Open();
             foreach (string commandString in commandStrings)
