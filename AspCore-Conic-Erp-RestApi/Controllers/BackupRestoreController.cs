@@ -36,7 +36,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
 
             DateTime DateTime = DateTime.Now;
-            ServerConnection serverConnection = new ServerConnection("(localdb)\\mssqllocaldb");
+            ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "\\SQLEXPRESS");
+            //   ServerConnection serverConnection = new ServerConnection("(localdb)\\mssqllocaldb");
             Server server = new Server(serverConnection);
             Backup backup = new Backup();
             backup.Action = BackupActionType.Database;
@@ -65,7 +66,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult Restore(string DirectoryBak)
         {
 
-                ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "");
+                ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "\\SQLEXPRESS");
          //       ServerConnection serverConnection = new ServerConnection("(localdb)\\mssqllocaldb");
                 Server dbServer = new Server(serverConnection);
 

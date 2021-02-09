@@ -35,7 +35,7 @@ namespace AspCore_Conic_Erp_RestApi
 
 
 
-            string Con = "Server=" + Environment.MachineName + "//SQLEXPRESS;Database=Conic_Erp;Trusted_Connection=True;MultipleActiveResultSets=true";
+            string Con = "Server=" + Environment.MachineName + "\\SQLEXPRESS;Database=Conic_Erp;Trusted_Connection=True;MultipleActiveResultSets=true";
          //   string Con = "Server=(localdb)\\mssqllocaldb;Database=Conic_Erp;Trusted_Connection=True;MultipleActiveResultSets=true";
             services.AddDbContext<ConicErpContext>(options =>
                 options.UseSqlServer(
