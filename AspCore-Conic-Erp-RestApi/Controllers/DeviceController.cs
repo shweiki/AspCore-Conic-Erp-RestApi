@@ -398,6 +398,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else
                 return Ok("Device Is Not Connected");
+        }        [Route("Device/ClearAdministrators")]
+        [HttpGet]
+        public IActionResult ClearAdministrators(long DeviceId)
+        {
+            if (CheckDeviceHere((int)DeviceId))
+            {
+               bool ClearAdministrators = objZkeeper.ClearAdministrators(0);
+                return Ok("ClearAdministrators : " + ClearAdministrators + "");
+
+            }
+            else
+                return Ok("Device Is Not Connected");
         }
         [Route("Device/RestartDevice")]
         [HttpGet]

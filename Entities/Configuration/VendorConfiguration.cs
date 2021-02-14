@@ -14,13 +14,13 @@ namespace Entities.Configuration
 
                 builder.HasIndex(e => e.AccountId, "IX_Vendor_AccountID");
 
-            builder.Property(e => e.Id).HasColumnName("ID");
+            builder.Property(e => e.Id);
 
-                builder.Property(e => e.AccountId).HasColumnName("AccountID");
+                builder.Property(e => e.AccountId);
 
-                builder.Property(e => e.Address).HasColumnType("nvarchar(max)");
+                builder.Property(e => e.Address);
 
-                builder.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                builder.Property(e => e.Description);
 
                 builder.Property(e => e.Email)
                     .HasMaxLength(255)
@@ -53,7 +53,6 @@ namespace Entities.Configuration
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Vendor_Account");
-
 
 
             builder.HasData

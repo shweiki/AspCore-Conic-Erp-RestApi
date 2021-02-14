@@ -2,6 +2,10 @@
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost/AspCore-Conic-Erp-RestApi",
+      "sslPort": 0
+    },
     "iisExpress": {
       "applicationUrl": "http://localhost:8090",
       "sslPort": 0

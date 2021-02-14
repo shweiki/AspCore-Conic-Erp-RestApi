@@ -11,21 +11,20 @@ namespace Entities.Configuration
    
                 builder.ToTable("Account");
 
-                builder.Property(e => e.Id).HasColumnName("ID");
+                builder.Property(e => e.Id);
 
                 builder.Property(e => e.Code)
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-                builder.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                builder.Property(e => e.Description);
 
                 builder.Property(e => e.Name)
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
                 builder.Property(e => e.Type)
-                    .IsRequired()
-                    .HasColumnType("nvarchar(max)");
+                    .IsRequired();
 
 
             builder.HasData

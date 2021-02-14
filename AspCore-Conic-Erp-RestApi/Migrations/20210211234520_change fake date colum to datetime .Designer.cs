@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210211234520_change fake date colum to datetime ")]
+    partial class changefakedatecolumtodatetime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,6 +27,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Code")
@@ -112,92 +115,122 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<long?>("AccountId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("AccountID");
 
                     b.Property<int?>("BankId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("BankID");
 
                     b.Property<int?>("CashId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("CashID");
 
                     b.Property<int?>("ChequeId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("ChequeID");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int?>("DiscountId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("DiscountID");
 
                     b.Property<long?>("EntryId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("EntryID");
 
                     b.Property<int?>("InventoryItemId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("InventoryItemID");
 
                     b.Property<long?>("InventoryMovementId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("InventoryMovementID");
 
                     b.Property<long?>("ItemsId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("ItemsID");
 
                     b.Property<long?>("MemberId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("MemberID");
 
                     b.Property<int?>("MembershipId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("MembershipID");
 
                     b.Property<long?>("MembershipMovementId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("MembershipMovementID");
 
                     b.Property<int?>("MembershipMovementOrderId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("MembershipMovementOrderID");
 
                     b.Property<int?>("MenuId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("MenuID");
 
                     b.Property<int>("OprationId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("OprationID");
 
                     b.Property<long?>("OrderInventoryId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("OrderInventoryID");
 
                     b.Property<int?>("OriginId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("OriginID");
 
                     b.Property<long?>("PaymentId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("PaymentID");
 
                     b.Property<DateTime>("PostingDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<long?>("PurchaseInvoiceId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("PurchaseInvoiceID");
 
                     b.Property<long?>("SalesInvoiceId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("SalesInvoiceID");
 
                     b.Property<int?>("ServiceId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("ServiceID");
 
                     b.Property<long?>("StockMovementId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("StockMovementID");
 
                     b.Property<long?>("StocktakingInventoryId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("StocktakingInventoryID");
 
                     b.Property<int?>("UnitId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("UnitID");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .HasColumnName("UserID");
 
                     b.Property<long?>("VendorId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("VendorID");
 
                     b.HasKey("Id");
 
@@ -211,26 +244,32 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("BackUpPath")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("DataBaseName")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime?>("DateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .HasColumnName("UserID");
 
                     b.HasKey("Id");
 
@@ -242,10 +281,12 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<long?>("AccountId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("AccountID");
 
                     b.Property<long?>("AccountNumber")
                         .HasColumnType("bigint");
@@ -266,10 +307,12 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<long?>("Iban")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("IBAN");
 
                     b.Property<bool>("IsPrime")
                         .HasColumnType("bit");
@@ -277,7 +320,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -294,16 +338,21 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<long?>("AccountId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("AccountID");
 
                     b.Property<string>("Btcash")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("BTCash");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<bool>("IsPrime")
                         .HasColumnType("bit");
@@ -315,7 +364,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Pcip")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("PCIP");
 
                     b.Property<int?>("Status")
                         .HasColumnType("int");
@@ -345,6 +395,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("BankAddress")
@@ -353,7 +404,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .IsFixedLength(true);
 
                     b.Property<string>("BankName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<double?>("ChequeAmount")
                         .HasColumnType("float");
@@ -368,16 +420,18 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("FakeDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<bool>("IsPrime")
                         .HasColumnType("bit");
 
                     b.Property<string>("Payee")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("PaymentType")
                         .HasMaxLength(10)
@@ -388,7 +442,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("int");
 
                     b.Property<long>("VendorId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("VendorID");
 
                     b.HasKey("Id");
 
@@ -402,22 +457,26 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Address")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("BusinessDescription")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Fax")
                         .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(25)");
 
                     b.Property<string>("FooterReport")
                         .HasColumnType("nvarchar(max)");
@@ -430,31 +489,38 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("NickName")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("PhoneNumber1")
                         .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(25)");
 
                     b.Property<string>("PhoneNumber2")
                         .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(25)");
 
                     b.Property<string>("RateNumber")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("TaxNumber")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Website")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
@@ -466,27 +532,32 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Ip")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("IP");
 
                     b.Property<bool>("IsPrime")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastSetDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("Port")
                         .HasColumnType("int");
@@ -504,11 +575,13 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<bool>("IsPrime")
                         .HasColumnType("bit");
@@ -516,7 +589,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -524,7 +598,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<double>("Value")
                         .HasColumnType("float");
@@ -542,12 +617,14 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
@@ -559,13 +636,14 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("FakeDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -584,10 +662,12 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<long>("AccountId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("AccountID");
 
                     b.Property<double>("Credit")
                         .HasColumnType("float");
@@ -599,7 +679,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("EntryId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("EntryID");
 
                     b.HasKey("Id");
 
@@ -615,6 +696,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("File")
@@ -624,10 +706,12 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("FileType")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<long>("Fktable")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("FKTable");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -635,7 +719,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("TableName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
@@ -647,6 +732,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
@@ -684,29 +770,36 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("InventoryItemId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("InventoryItemID");
 
                     b.Property<long>("ItemsId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("ItemsID");
 
                     b.Property<long?>("OrderInventoryId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("OrderInventoryID");
 
                     b.Property<long?>("PurchaseInvoiceId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("PurchaseInvoiceID");
 
                     b.Property<double>("Qty")
                         .HasColumnType("float");
 
                     b.Property<long?>("SalesInvoiceId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("SalesInvoiceID");
 
                     b.Property<double>("SellingPrice")
                         .HasColumnType("float");
@@ -720,7 +813,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("TypeMove")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
@@ -742,11 +836,13 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Barcode")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
@@ -756,7 +852,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<bool>("IsPrime")
                         .HasColumnType("bit");
@@ -767,7 +864,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<double?>("OtherPrice")
                         .HasColumnType("float");
@@ -794,23 +892,29 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<long?>("ItemsId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("ItemsID");
 
                     b.Property<int?>("MenuItemId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("MenuItemID");
 
                     b.Property<int?>("OriginItemId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("OriginItemID");
 
                     b.Property<int?>("UnitItemId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("UnitItemID");
 
                     b.HasKey("Id");
 
@@ -830,6 +934,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Body")
@@ -837,14 +942,16 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("Fktable")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("FKTable");
 
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(13)");
 
                     b.Property<DateTime>("SendDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -852,12 +959,14 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("TableName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
@@ -869,44 +978,53 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<long>("AccountId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("AccountID");
 
                     b.Property<DateTime?>("DateofBirth")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)");
 
                     b.Property<string>("PhoneNumber1")
                         .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(13)");
 
                     b.Property<string>("PhoneNumber2")
                         .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(13)");
 
                     b.Property<string>("Ssn")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("SSN");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("Tag")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -924,6 +1042,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("FaceLength")
@@ -934,7 +1053,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("MemberId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("MemberID");
 
                     b.HasKey("Id");
 
@@ -948,19 +1068,22 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("DeviceId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("DeviceID");
 
                     b.Property<long>("MemberId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("MemberID");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -983,11 +1106,13 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<double>("FullDayPrice")
                         .HasColumnType("float");
@@ -1004,7 +1129,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("NumberDays")
                         .HasColumnType("int");
@@ -1028,6 +1154,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
@@ -1038,22 +1165,26 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<string>("DiscountDescription")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("EditorName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<long>("MemberId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("MemberID");
 
                     b.Property<int>("MembershipId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("MembershipID");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -1085,29 +1216,33 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EditorName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<long>("MemberShipMovementId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("MemberShipMovementID");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("Type")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");
 
@@ -1121,6 +1256,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
@@ -1132,7 +1268,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -1147,35 +1284,42 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ArabicOprationDescription")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ClassName")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Color")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ControllerName")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("IconClass")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("OprationDescription")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("OprationName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int?>("ReferenceStatus")
                         .HasColumnType("int");
@@ -1189,7 +1333,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<string>("TableName")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
@@ -1201,18 +1346,20 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("FakeDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<string>("OrderType")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -1227,6 +1374,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
@@ -1238,7 +1386,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -1253,30 +1402,35 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EditorName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)");
 
                     b.Property<DateTime>("FakeDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<bool>("IsPrime")
                         .HasColumnType("bit");
 
                     b.Property<long?>("MemberId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("MemberID");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -1288,7 +1442,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("VendorId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("VendorID");
 
                     b.HasKey("Id");
 
@@ -1304,6 +1459,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AccountInvoiceNumber")
@@ -1317,18 +1473,20 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("float");
 
                     b.Property<DateTime?>("FakeDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("InvoicePurchaseDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -1337,7 +1495,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("float");
 
                     b.Property<long>("VendorId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("VendorID");
 
                     b.HasKey("Id");
 
@@ -1384,6 +1543,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
@@ -1399,15 +1559,18 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("bit");
 
                     b.Property<long?>("MemberId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("MemberID");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -1419,7 +1582,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("VendorId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("VendorID");
 
                     b.HasKey("Id");
 
@@ -1435,22 +1599,26 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<bool>("IsPrime")
                         .HasColumnType("bit");
 
                     b.Property<long>("ItemId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("ItemID");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<int>("Qty")
                         .HasColumnType("int");
@@ -1464,7 +1632,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");
 
@@ -1505,17 +1674,21 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("InventoryItemId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("InventoryItemID");
 
                     b.Property<long?>("ItemsId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("ItemsID");
 
                     b.Property<double>("Qty")
                         .HasColumnType("float");
@@ -1524,7 +1697,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("int");
 
                     b.Property<long>("StocktakingInventoryId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("StocktakingInventoryID");
 
                     b.HasKey("Id");
 
@@ -1542,13 +1716,14 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("FakeDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -1563,6 +1738,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
@@ -1574,7 +1750,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -1610,10 +1787,12 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
+                        .HasColumnName("ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<long>("AccountId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("AccountID");
 
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");

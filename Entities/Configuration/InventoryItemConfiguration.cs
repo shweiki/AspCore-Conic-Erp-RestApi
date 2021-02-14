@@ -12,9 +12,9 @@ namespace Entities.Configuration
 
             builder.ToTable("InventoryItem");
 
-            builder.Property(e => e.Id).HasColumnName("ID");
+            builder.Property(e => e.Id);
 
-            builder.Property(e => e.Description).HasColumnType("nvarchar(max)");
+            builder.Property(e => e.Description);
 
             builder.Property(e => e.Name)
                     .IsRequired()

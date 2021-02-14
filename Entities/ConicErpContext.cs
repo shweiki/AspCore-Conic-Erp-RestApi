@@ -89,7 +89,7 @@ namespace Entities
 
                 b.Property<string>("ConcurrencyStamp")
                     .IsConcurrencyToken()
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 b.Property<string>("Name")
                     .HasColumnType("nvarchar(256)")
@@ -131,10 +131,10 @@ namespace Entities
                     .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                 b.Property<string>("ClaimType")
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 b.Property<string>("ClaimValue")
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 b.Property<string>("RoleId")
                     .IsRequired()
@@ -157,7 +157,7 @@ namespace Entities
 
                 b.Property<string>("ConcurrencyStamp")
                     .IsConcurrencyToken()
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 b.Property<string>("Email")
                     .HasColumnType("nvarchar(256)")
@@ -181,16 +181,16 @@ namespace Entities
                     .HasMaxLength(256);
 
                 b.Property<string>("PasswordHash")
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 b.Property<string>("PhoneNumber")
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 b.Property<bool>("PhoneNumberConfirmed")
                     .HasColumnType("bit");
 
                 b.Property<string>("SecurityStamp")
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 b.Property<bool>("TwoFactorEnabled")
                     .HasColumnType("bit");
@@ -238,10 +238,10 @@ namespace Entities
                     .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                 b.Property<string>("ClaimType")
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 b.Property<string>("ClaimValue")
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 b.Property<string>("UserId")
                     .IsRequired()
@@ -265,7 +265,7 @@ namespace Entities
                     .HasMaxLength(128);
 
                 b.Property<string>("ProviderDisplayName")
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 b.Property<string>("UserId")
                     .IsRequired()
@@ -316,7 +316,7 @@ namespace Entities
                     .HasMaxLength(128);
 
                 b.Property<string>("Value")
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 b.HasKey("UserId", "LoginProvider", "Name");
 
@@ -384,68 +384,65 @@ namespace Entities
 
                 entity.HasIndex(e => e.OprationId, "IX_ActionLog_OprationID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.AccountId).HasColumnName("AccountID");
+                entity.Property(e => e.AccountId);
 
-                entity.Property(e => e.BankId).HasColumnName("BankID");
+                entity.Property(e => e.BankId);
 
-                entity.Property(e => e.CashId).HasColumnName("CashID");
+                entity.Property(e => e.CashId);
 
-                entity.Property(e => e.ChequeId).HasColumnName("ChequeID");
+                entity.Property(e => e.ChequeId);
 
-                entity.Property(e => e.Description)
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
+                entity.Property(e => e.Description);
 
-                entity.Property(e => e.DiscountId).HasColumnName("DiscountID");
+                entity.Property(e => e.DiscountId);
 
-                entity.Property(e => e.EntryId).HasColumnName("EntryID");
+                entity.Property(e => e.EntryId);
 
-                entity.Property(e => e.InventoryItemId).HasColumnName("InventoryItemID");
+                entity.Property(e => e.InventoryItemId);
 
-                entity.Property(e => e.InventoryMovementId).HasColumnName("InventoryMovementID");
+                entity.Property(e => e.InventoryMovementId);
 
-                entity.Property(e => e.ItemsId).HasColumnName("ItemsID");
+                entity.Property(e => e.ItemsId);
 
-                entity.Property(e => e.MemberId).HasColumnName("MemberID");
+                entity.Property(e => e.MemberId);
 
-                entity.Property(e => e.MembershipId).HasColumnName("MembershipID");
+                entity.Property(e => e.MembershipId);
 
-                entity.Property(e => e.MembershipMovementId).HasColumnName("MembershipMovementID");
+                entity.Property(e => e.MembershipMovementId);
 
-                entity.Property(e => e.MembershipMovementOrderId).HasColumnName("MembershipMovementOrderID");
+                entity.Property(e => e.MembershipMovementOrderId);
 
-                entity.Property(e => e.MenuId).HasColumnName("MenuID");
+                entity.Property(e => e.MenuId);
 
-                entity.Property(e => e.OprationId).HasColumnName("OprationID");
+                entity.Property(e => e.OprationId);
 
-                entity.Property(e => e.OrderInventoryId).HasColumnName("OrderInventoryID");
+                entity.Property(e => e.OrderInventoryId);
 
-                entity.Property(e => e.OriginId).HasColumnName("OriginID");
+                entity.Property(e => e.OriginId);
 
-                entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
+                entity.Property(e => e.PaymentId);
 
-                entity.Property(e => e.PostingDateTime).HasColumnType("datetime");
+                entity.Property(e => e.PostingDateTime);
 
-                entity.Property(e => e.PurchaseInvoiceId).HasColumnName("PurchaseInvoiceID");
+                entity.Property(e => e.PurchaseInvoiceId);
 
-                entity.Property(e => e.SalesInvoiceId).HasColumnName("SalesInvoiceID");
+                entity.Property(e => e.SalesInvoiceId);
 
-                entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
+                entity.Property(e => e.ServiceId);
 
-                entity.Property(e => e.StockMovementId).HasColumnName("StockMovementID");
+                entity.Property(e => e.StockMovementId);
 
-                entity.Property(e => e.StocktakingInventoryId).HasColumnName("StocktakingInventoryID");
+                entity.Property(e => e.StocktakingInventoryId);
 
-                entity.Property(e => e.UnitId).HasColumnName("UnitID");
+                entity.Property(e => e.UnitId);
 
                 entity.Property(e => e.UserId)
                     .IsRequired()
-                    .HasMaxLength(128)
-                    .HasColumnName("UserID");
+                    ;
 
-                entity.Property(e => e.VendorId).HasColumnName("VendorID");
+                entity.Property(e => e.VendorId);
 
                 entity.HasOne(d => d.Opration)
                     .WithMany(p => p.ActionLogs)
@@ -461,26 +458,25 @@ namespace Entities
             {
                 entity.ToTable("BackUp");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.BackUpPath)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.DataBaseName)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.DateTime).HasColumnType("datetime");
+                entity.Property(e => e.DateTime);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.UserId)
-                    .HasMaxLength(128)
-                    .HasColumnName("UserID");
+                    ;
             });
 
             modelBuilder.Entity<Bank>(entity =>
@@ -489,9 +485,9 @@ namespace Entities
 
                 entity.HasIndex(e => e.AccountId, "IX_Bank_AccountID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.AccountId).HasColumnName("AccountID");
+                entity.Property(e => e.AccountId);
 
                 entity.Property(e => e.AccountType)
                     .HasMaxLength(100)
@@ -505,14 +501,14 @@ namespace Entities
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.Iban).HasColumnName("IBAN");
+                entity.Property(e => e.Iban);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.Banks)
@@ -528,13 +524,13 @@ namespace Entities
 
                 entity.HasIndex(e => e.VendorId, "IX_Cheque_VendorID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.BankAddress)
                     .HasMaxLength(10)
                     .IsFixedLength(true);
 
-                entity.Property(e => e.BankName).HasMaxLength(500);
+                entity.Property(e => e.BankName);
 
                 entity.Property(e => e.Currency)
                     .HasMaxLength(100)
@@ -542,17 +538,17 @@ namespace Entities
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.FakeDate).HasColumnType("date");
+                entity.Property(e => e.FakeDate);
 
-                entity.Property(e => e.Payee).HasMaxLength(100);
+                entity.Property(e => e.Payee);
 
                 entity.Property(e => e.PaymentType)
                     .HasMaxLength(10)
                     .IsFixedLength(true);
 
-                entity.Property(e => e.VendorId).HasColumnName("VendorID");
+                entity.Property(e => e.VendorId);
 
                 entity.HasOne(d => d.Vendor)
                     .WithMany(p => p.Cheques)
@@ -565,127 +561,126 @@ namespace Entities
             {
                 entity.ToTable("CompanyInfo");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.Address)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
 
-                entity.Property(e => e.BusinessDescription).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.BusinessDescription);
 
 
                 entity.Property(e => e.Email)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.Fax)
                     .HasMaxLength(25)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.Logo).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Logo);
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(50)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.NickName)
                     .HasMaxLength(50)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.PhoneNumber1)
                     .HasMaxLength(25)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.PhoneNumber2)
                     .HasMaxLength(25)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.RateNumber)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
 
 
                 entity.Property(e => e.TaxNumber)
                     .HasMaxLength(100)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.Website)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
             });
 
             modelBuilder.Entity<Device>(entity =>
             {
                 entity.ToTable("Device");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.Ip)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("IP");
+                    ;
 
-                entity.Property(e => e.LastSetDateTime).HasColumnType("datetime");
+                entity.Property(e => e.LastSetDateTime);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
             });
 
             modelBuilder.Entity<Discount>(entity =>
             {
                 entity.ToTable("Discount");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(50)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.Type)
                     .IsRequired()
                     .HasMaxLength(50)
-                    .IsUnicode(false);
+                    ;
             });
 
             modelBuilder.Entity<EditorsUser>(entity =>
             {
                 entity.ToTable("EditorsUser");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
             });
 
             modelBuilder.Entity<EntryAccounting>(entity =>
             {
                 entity.ToTable("EntryAccounting");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
-                entity.Property(e => e.FakeDate).HasColumnType("date");
+                entity.Property(e => e.FakeDate);
 
                 entity.Property(e => e.Type)
                     .IsRequired()
-                    .HasColumnType("nvarchar(max)");
+                    ;
             });
 
             modelBuilder.Entity<EntryMovement>(entity =>
@@ -696,13 +691,13 @@ namespace Entities
 
                 entity.HasIndex(e => e.EntryId, "IX_EntryMovement_EntryID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.AccountId).HasColumnName("AccountID");
+                entity.Property(e => e.AccountId);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
-                entity.Property(e => e.EntryId).HasColumnName("EntryID");
+                entity.Property(e => e.EntryId);
 
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.EntryMovements)
@@ -721,23 +716,23 @@ namespace Entities
             {
                 entity.ToTable("FileData");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.File)
                     .IsRequired()
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 entity.Property(e => e.FileType)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.Fktable).HasColumnName("FKTable");
+                entity.Property(e => e.Fktable);
 
                 entity.Property(e => e.TableName)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
             });
 
 
@@ -756,26 +751,26 @@ namespace Entities
 
                 entity.HasIndex(e => e.SalesInvoiceId, "IX_InventoryMovement_SalesInvoiceID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.InventoryItemId).HasColumnName("InventoryItemID");
+                entity.Property(e => e.InventoryItemId);
 
-                entity.Property(e => e.ItemsId).HasColumnName("ItemsID");
+                entity.Property(e => e.ItemsId);
 
-                entity.Property(e => e.OrderInventoryId).HasColumnName("OrderInventoryID");
+                entity.Property(e => e.OrderInventoryId);
 
-                entity.Property(e => e.PurchaseInvoiceId).HasColumnName("PurchaseInvoiceID");
+                entity.Property(e => e.PurchaseInvoiceId);
 
-                entity.Property(e => e.SalesInvoiceId).HasColumnName("SalesInvoiceID");
+                entity.Property(e => e.SalesInvoiceId);
 
                 entity.Property(e => e.TypeMove)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.HasOne(d => d.InventoryItem)
                     .WithMany(p => p.InventoryMovements)
@@ -809,20 +804,20 @@ namespace Entities
             {
                 entity.ToTable("Item");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.Barcode)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
             });
 
             modelBuilder.Entity<ItemMuo>(entity =>
@@ -837,19 +832,19 @@ namespace Entities
 
                 entity.HasIndex(e => e.UnitItemId, "IX_ItemMUO_UnitItemID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.ItemsId).HasColumnName("ItemsID");
+                entity.Property(e => e.ItemsId);
 
-                entity.Property(e => e.MenuItemId).HasColumnName("MenuItemID");
+                entity.Property(e => e.MenuItemId);
 
-                entity.Property(e => e.OriginItemId).HasColumnName("OriginItemID");
+                entity.Property(e => e.OriginItemId);
 
-                entity.Property(e => e.UnitItemId).HasColumnName("UnitItemID");
+                entity.Property(e => e.UnitItemId);
 
                 entity.HasOne(d => d.Items)
                     .WithMany(p => p.ItemMuos)
@@ -876,29 +871,29 @@ namespace Entities
             {
                 entity.ToTable("Massage");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.Body)
                     .IsRequired()
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
-                entity.Property(e => e.Fktable).HasColumnName("FKTable");
+                entity.Property(e => e.Fktable);
 
                 entity.Property(e => e.PhoneNumber)
                     .HasMaxLength(13)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.SendDate).HasColumnType("datetime");
+                entity.Property(e => e.SendDate);
 
                 entity.Property(e => e.TableName)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.Type)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
             });
 
             modelBuilder.Entity<Member>(entity =>
@@ -907,43 +902,42 @@ namespace Entities
 
                 entity.HasIndex(e => e.AccountId, "IX_Member_AccountID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.AccountId).HasColumnName("AccountID");
+                entity.Property(e => e.AccountId);
 
-                entity.Property(e => e.DateofBirth).HasColumnType("date");
+                entity.Property(e => e.DateofBirth);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
                 entity.Property(e => e.Email)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.Name)
                     .IsRequired()
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.PhoneNumber1)
                     .HasMaxLength(13)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.PhoneNumber2)
                     .HasMaxLength(13)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.Ssn)
                     .IsRequired()
                     .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("SSN");
+                    ;
 
                 entity.Property(e => e.Tag)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.Type)
                     .IsRequired()
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.Members)
@@ -958,11 +952,11 @@ namespace Entities
 
                 entity.HasIndex(e => e.MemberId, "IX_MemberFace_MemberID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.FaceStr).IsRequired();
 
-                entity.Property(e => e.MemberId).HasColumnName("MemberID");
+                entity.Property(e => e.MemberId);
 
                 entity.HasOne(d => d.Member)
                     .WithMany(p => p.MemberFaces)
@@ -979,19 +973,19 @@ namespace Entities
 
                 entity.HasIndex(e => e.MemberId, "IX_MemberLog_MemberID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.DateTime).HasColumnType("datetime");
+                entity.Property(e => e.DateTime);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
-                entity.Property(e => e.DeviceId).HasColumnName("DeviceID");
+                entity.Property(e => e.DeviceId);
 
-                entity.Property(e => e.MemberId).HasColumnName("MemberID");
+                entity.Property(e => e.MemberId);
 
                 entity.Property(e => e.Type)
                     .IsRequired()
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 entity.HasOne(d => d.Device)
                     .WithMany(p => p.MemberLogs)
@@ -1010,16 +1004,16 @@ namespace Entities
             {
                 entity.ToTable("Membership");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
             });
 
             modelBuilder.Entity<MembershipMovement>(entity =>
@@ -1030,27 +1024,27 @@ namespace Entities
 
                 entity.HasIndex(e => e.MembershipId, "IX_MembershipMovement_MembershipID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
                 entity.Property(e => e.DiscountDescription)
                     .HasMaxLength(50)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.EditorName).IsUnicode(false);
+                entity.Property(e => e.EditorName);
 
-                entity.Property(e => e.EndDate).HasColumnType("date");
+                entity.Property(e => e.EndDate);
 
-                entity.Property(e => e.MemberId).HasColumnName("MemberID");
+                entity.Property(e => e.MemberId);
 
-                entity.Property(e => e.MembershipId).HasColumnName("MembershipID");
+                entity.Property(e => e.MembershipId);
 
-                entity.Property(e => e.StartDate).HasColumnType("date");
+                entity.Property(e => e.StartDate);
 
                 entity.Property(e => e.Type)
                     .IsRequired()
-                    .HasColumnType("nvarchar(max)");
+                    ;
 
                 entity.HasOne(d => d.Member)
                     .WithMany(p => p.MembershipMovements)
@@ -1071,21 +1065,21 @@ namespace Entities
 
                 entity.HasIndex(e => e.MemberShipMovementId, "IX_MembershipMovementOrder_MemberShipMovementID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
-                entity.Property(e => e.EditorName).IsUnicode(false);
+                entity.Property(e => e.EditorName);
 
-                entity.Property(e => e.EndDate).HasColumnType("date");
+                entity.Property(e => e.EndDate);
 
-                entity.Property(e => e.MemberShipMovementId).HasColumnName("MemberShipMovementID");
+                entity.Property(e => e.MemberShipMovementId);
 
-                entity.Property(e => e.StartDate).HasColumnType("date");
+                entity.Property(e => e.StartDate);
 
                 entity.Property(e => e.Type)
                     .HasMaxLength(50)
-                    .IsUnicode(false);
+                    ;
 
                 entity.HasOne(d => d.MemberShipMovement)
                     .WithMany(p => p.MembershipMovementOrders)
@@ -1098,82 +1092,82 @@ namespace Entities
             {
                 entity.ToTable("MenuItem");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
             });
 
             modelBuilder.Entity<Oprationsy>(entity =>
             {
                 entity.ToTable("Oprationsys");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.ArabicOprationDescription)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.ClassName)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.ControllerName)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.IconClass)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.OprationDescription)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.OprationName)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.RoleName).HasMaxLength(256);
 
                 entity.Property(e => e.TableName)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
             });
 
             modelBuilder.Entity<OrderInventory>(entity =>
             {
                 entity.ToTable("OrderInventory");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
-                entity.Property(e => e.FakeDate).HasColumnType("date");
+                entity.Property(e => e.FakeDate);
 
                 entity.Property(e => e.OrderType)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
             });
 
             modelBuilder.Entity<OriginItem>(entity =>
             {
                 entity.ToTable("OriginItem");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
             });
 
             modelBuilder.Entity<Payment>(entity =>
@@ -1184,26 +1178,26 @@ namespace Entities
 
                 entity.HasIndex(e => e.VendorId, "IX_Payment_VendorID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
-                entity.Property(e => e.EditorName).IsUnicode(false);
+                entity.Property(e => e.EditorName);
 
-                entity.Property(e => e.FakeDate).HasColumnType("date");
+                entity.Property(e => e.FakeDate);
 
-                entity.Property(e => e.MemberId).HasColumnName("MemberID");
+                entity.Property(e => e.MemberId);
 
-                entity.Property(e => e.Name).IsUnicode(false);
+                entity.Property(e => e.Name);
 
                 entity.Property(e => e.PaymentMethod)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.Type).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Type);
 
-                entity.Property(e => e.VendorId).HasColumnName("VendorID");
+                entity.Property(e => e.VendorId);
 
                 entity.HasOne(d => d.Member)
                     .WithMany(p => p.Payments)
@@ -1222,25 +1216,25 @@ namespace Entities
 
                 entity.HasIndex(e => e.VendorId, "IX_PurchaseInvoice_VendorID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.AccountInvoiceNumber).HasMaxLength(50);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
-                entity.Property(e => e.FakeDate).HasColumnType("date");
+                entity.Property(e => e.FakeDate);
 
-                entity.Property(e => e.InvoicePurchaseDate).HasColumnType("date");
+                entity.Property(e => e.InvoicePurchaseDate);
 
                 entity.Property(e => e.Name)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.PaymentMethod)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.VendorId).HasColumnName("VendorID");
+                entity.Property(e => e.VendorId);
 
                 entity.HasOne(d => d.Vendor)
                     .WithMany(p => p.PurchaseInvoices)
@@ -1257,24 +1251,24 @@ namespace Entities
 
                 entity.HasIndex(e => e.VendorId, "IX_SalesInvoice_VendorID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
-                entity.Property(e => e.FakeDate).HasColumnType("date");
+                entity.Property(e => e.FakeDate);
 
-                entity.Property(e => e.MemberId).HasColumnName("MemberID");
+                entity.Property(e => e.MemberId);
 
-                entity.Property(e => e.Name).IsUnicode(false);
+                entity.Property(e => e.Name);
 
                 entity.Property(e => e.PaymentMethod)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.Type).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Type);
 
-                entity.Property(e => e.VendorId).HasColumnName("VendorID");
+                entity.Property(e => e.VendorId);
 
                 entity.HasOne(d => d.Member)
                     .WithMany(p => p.SalesInvoices)
@@ -1293,23 +1287,23 @@ namespace Entities
 
                 entity.HasIndex(e => e.ItemId, "IX_Service_ItemID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(50)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.ItemId).HasColumnName("ItemID");
+                entity.Property(e => e.ItemId);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50)
-                    .IsUnicode(false);
+                    ;
 
                 entity.Property(e => e.Type)
                     .IsRequired()
                     .HasMaxLength(50)
-                    .IsUnicode(false);
+                    ;
 
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.Services)
@@ -1328,17 +1322,17 @@ namespace Entities
 
                 entity.HasIndex(e => e.StocktakingInventoryId, "IX_StockMovement_StocktakingInventoryID");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
 
-                entity.Property(e => e.InventoryItemId).HasColumnName("InventoryItemID");
+                entity.Property(e => e.InventoryItemId);
 
-                entity.Property(e => e.ItemsId).HasColumnName("ItemsID");
+                entity.Property(e => e.ItemsId);
 
-                entity.Property(e => e.StocktakingInventoryId).HasColumnName("StocktakingInventoryID");
+                entity.Property(e => e.StocktakingInventoryId);
 
                 entity.HasOne(d => d.InventoryItem)
                     .WithMany(p => p.StockMovements)
@@ -1362,25 +1356,25 @@ namespace Entities
             {
                 entity.ToTable("StocktakingInventory");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
-                entity.Property(e => e.FakeDate).HasColumnType("date");
+                entity.Property(e => e.FakeDate);
             });
 
             modelBuilder.Entity<UnitItem>(entity =>
             {
                 entity.ToTable("UnitItem");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id);
 
-                entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.Description);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false);
+                    ;
             });
 
    

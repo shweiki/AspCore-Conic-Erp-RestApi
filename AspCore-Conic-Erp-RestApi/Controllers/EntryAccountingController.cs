@@ -51,6 +51,57 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
+        [Route("EntryAccounting/Edit")]
+        [HttpPost]
+        public IActionResult Edit(EntryAccounting collection)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    EntryAccounting Entry = DB.EntryAccountings.Where(x => x.Id == collection.Id).SingleOrDefault();
+
+                    Entry.FakeDate = collection.FakeDate;
+                    Entry.Description = collection.Description;
+                    Entry.Status = collection.Status;
+                    Entry.Type = collection.Type;
+                    DB.EntryMovements.RemoveRange(Entry.EntryMovements);
+                    Entry.EntryMovements = collection.EntryMovements;
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            else return Ok(false);
+        }
+        [Route("EntryAccounting/GetEntryByID")]
+        [HttpGet]
+        public IActionResult GetEntryByID(long? ID)
+        {
+            var Entrys = DB.EntryAccountings.Where(x => x.Id == ID).Select(x => new {
+                x.Id,
+                x.FakeDate,
+                x.Status,
+                x.Description,
+                x.Type,
+                EntryMovements = DB.EntryMovements.Where(Im => Im.EntryId == x.Id).Select(m => new {
+                    m.Id,
+                 m.Debit,
+                 m.Credit,
+                 m.EntryId,
+                 m.AccountId,
+                    m.Description
+
+                }).ToList()
+            }).SingleOrDefault();
+
+            return Ok(Entrys);
+        }
+
 
     }
 }

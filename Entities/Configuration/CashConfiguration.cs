@@ -14,22 +14,20 @@ namespace Entities.Configuration
 
                 builder.HasIndex(e => e.AccountId, "IX_Cash_AccountID");
 
-            builder.Property(e => e.Id).HasColumnName("ID");
+            builder.Property(e => e.Id);
 
-            builder.Property(e => e.AccountId).HasColumnName("AccountID");
+            builder.Property(e => e.AccountId);
 
-            builder.Property(e => e.Btcash).HasColumnName("BTCash");
+            builder.Property(e => e.Btcash);
 
-            builder.Property(e => e.Description)
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
+            builder.Property(e => e.Description);
 
             builder.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-            builder.Property(e => e.Pcip).HasColumnName("PCIP");
+            builder.Property(e => e.Pcip);
 
             builder.HasOne(d => d.Account)
                     .WithMany(p => p.Cashes)
