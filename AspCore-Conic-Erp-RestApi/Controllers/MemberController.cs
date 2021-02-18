@@ -78,7 +78,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
               var Members = DB.MembershipMovements.Where(x => membershiplist.Contains(x.Id)).ToList().Select(x => new
                 {
                     x.Id,
-                    Name = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
+                    Name = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
+                  MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
                     x.VisitsUsed,
                     x.Type,
                     x.StartDate,

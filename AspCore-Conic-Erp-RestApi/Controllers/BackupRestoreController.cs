@@ -11,16 +11,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.IO;
 using System.Security.Claims;
+using Microsoft.Extensions.Configuration;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
     [Authorize]
     public class BackupRestoreController : Controller
     {
+        public BackupRestoreController(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
 
 
         private ConicErpContext DB = new ConicErpContext();
-        private string DatabaseName = "Conic_Erp";
         private string BackUpPath = "C:\\BackUp\\";
 
         [Route("BackupRestore/GetBackup")]
@@ -36,14 +42,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
 
             DateTime DateTime = DateTime.Now;
-            ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "\\SQLEXPRESS");
-            //   ServerConnection serverConnection = new ServerConnection("(localdb)\\mssqllocaldb");
+            ServerConnection serverConnection = new ServerConnection(DB.GetServerName());
             Server server = new Server(serverConnection);
             Backup backup = new Backup();
             backup.Action = BackupActionType.Database;
             backup.BackupSetDescription = "AdventureWorks - full backup";
             backup.BackupSetName = "AdventureWorks backup";
-            backup.Database = DatabaseName;
+            backup.Database = DB.GetDataBaseName();
             if (!Directory.Exists(BackUpPath))
             {
                 Directory.CreateDirectory(BackUpPath);
@@ -54,7 +59,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             backup.Incremental = false;
             backup.LogTruncation = BackupTruncateLogType.Truncate;
             backup.SqlBackup(server);
-            BackUp backup1 = new BackUp { Name = name, BackUpPath = BackUpPath, DateTime = DateTime, UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value , DataBaseName = DatabaseName };
+            BackUp backup1 = new BackUp { Name = name, BackUpPath = BackUpPath, DateTime = DateTime, UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value , DataBaseName = DB.GetDataBaseName() };
             DB.BackUps.Add(backup1);
             DB.SaveChanges();
             return Ok(true);
@@ -66,13 +71,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult Restore(string DirectoryBak)
         {
 
-                ServerConnection serverConnection = new ServerConnection(Environment.MachineName + "\\SQLEXPRESS");
-         //       ServerConnection serverConnection = new ServerConnection("(localdb)\\mssqllocaldb");
+                ServerConnection serverConnection = new ServerConnection(DB.GetServerName());
                 Server dbServer = new Server(serverConnection);
 
                 Restore _Restore = new Restore()
                 {
-                    Database = DatabaseName,
+                    Database = DB.GetDataBaseName(),
                     Action = RestoreActionType.Database,
                     ReplaceDatabase = true,
                     NoRecovery = false
@@ -86,12 +90,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 BackupDeviceItem source = new BackupDeviceItem(DirectoryBak, DeviceType.File);
                 _Restore.Devices.Add(source);
-                CloseAllConnection("USE master alter database " + DatabaseName + " set offline with rollback immediate");
+                CloseAllConnection("USE master alter database " + DB.GetDataBaseName() + " set offline with rollback immediate");
 
                 //   _Restore.PercentComplete += DB_Restore_PersentComplete;
                 //      _Restore.Complete += DB_Restore_Complete;
                 _Restore.SqlRestore(dbServer);
-                CloseAllConnection("USE master alter database " + DatabaseName + " set online");
+                CloseAllConnection("USE master alter database " + DB.GetDataBaseName() + " set online");
 
                 return Ok(true);
             }
@@ -105,16 +109,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         // function to close any opend database connections
         private void CloseAllConnection(string commandSql)
         {
-
-
-         
             // split script on GO command
             IEnumerable<string> commandStrings = Regex.Split(commandSql, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-
-
-            SqlConnection _connection = new SqlConnection("Server="+ Environment.MachineName + "\\SQLEXPRESS; Database=" + DatabaseName + ";Trusted_Connection=True;MultipleActiveResultSets=true");
-        //    SqlConnection _connection = new SqlConnection("Server=(localdb)\\mssqllocaldb; Database="+ DatabaseName + ";Trusted_Connection=True;MultipleActiveResultSets=true");
-
+            SqlConnection _connection = new SqlConnection(DB.GetCon());
             _connection.Open();
             foreach (string commandString in commandStrings)
             {

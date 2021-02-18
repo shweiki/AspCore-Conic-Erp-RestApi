@@ -34,13 +34,12 @@ namespace AspCore_Conic_Erp_RestApi
         {
 
 
-
-            string Con = "Server=" + Environment.MachineName + "\\SQLEXPRESS;Database=Conic_Erp;Trusted_Connection=True;MultipleActiveResultSets=true";
-         //   string Con = "Server=(localdb)\\mssqllocaldb;Database=Conic_Erp;Trusted_Connection=True;MultipleActiveResultSets=true";
+            
+           
+            ConicErpContext d = new ConicErpContext();
             services.AddDbContext<ConicErpContext>(options =>
                 options.UseSqlServer(
-                 //   Configuration.GetConnectionString("DefaultConnection"),
-                 Con,
+                    d.GetCon(),
                          options => options.MigrationsAssembly("AspCore-Conic-Erp-RestApi")));
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.Configure<IdentityOptions>(options =>

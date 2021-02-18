@@ -58,16 +58,24 @@ namespace Entities
         public virtual DbSet<UnitItem> UnitItems { get; set; }
         public virtual DbSet<Vendor> Vendors { get; set; }
         public virtual DbSet<Report> Reports { get; set; }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=" + Environment.MachineName + "\\SQLEXPRESS;Initial Catalog=Conic_Erp;Integrated Security=True");
-              //  optionsBuilder.UseSqlServer("Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Conic_Erp;Integrated Security=True");
+                 optionsBuilder.UseSqlServer(GetCon());            
             }
         }
-
+        public string GetCon() {
+            return "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Conic_Erp;Integrated Security=True";
+        }
+        public string GetServerName()
+        {
+            return "(localdb)\\mssqllocaldb";
+        }
+        public string GetDataBaseName()
+        {
+            return "Conic_Erp";
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.UseCollation("Arabic_CI_AI");
