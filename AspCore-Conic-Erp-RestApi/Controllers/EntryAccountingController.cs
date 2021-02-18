@@ -22,8 +22,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.EntryId,
                 x.Entry.FakeDate,
             }).ToList();
-                   
-
             return Ok(EntryMovements);
         }
 
