@@ -66,11 +66,13 @@ namespace Entities
             }
         }
         public string GetCon() {
-            return "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Conic_Erp;Integrated Security=True";
+         //   return "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Conic_Erp;Integrated Security=True";
+            return "Data Source="+GetServerName()+";Initial Catalog="+GetDataBaseName()+";Integrated Security=True";
         }
         public string GetServerName()
         {
-            return "(localdb)\\mssqllocaldb";
+        //    return "(localdb)\\mssqllocaldb";
+            return ""+Environment.MachineName + "\\SQLEXPRESS";
         }
         public string GetDataBaseName()
         {
@@ -980,6 +982,7 @@ namespace Entities
                 entity.HasIndex(e => e.DeviceId, "IX_MemberLog_DeviceID");
 
                 entity.HasIndex(e => e.MemberId, "IX_MemberLog_MemberID");
+                entity.HasIndex(e => e.Status, "IX_MemberLog_Status");
 
                 entity.Property(e => e.Id);
 
