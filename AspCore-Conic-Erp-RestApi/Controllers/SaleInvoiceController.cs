@@ -136,7 +136,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Invoice.Name = collection.Name;
                     Invoice.MemberId = collection.MemberId;
                     Invoice.IsPrime = collection.IsPrime;
-                    DB.InventoryMovements.RemoveRange(Invoice.InventoryMovements);
+                    DB.InventoryMovements.RemoveRange(DB.InventoryMovements.Where(m=>m.SalesInvoiceId ==Invoice.Id).ToList());
                     Invoice.InventoryMovements = collection.InventoryMovements;
                     DB.SaveChanges();
 

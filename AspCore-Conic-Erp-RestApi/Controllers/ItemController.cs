@@ -158,7 +158,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             x.IsPrime,
                             x.Status,
                           //  InventoryQty = CalculateInventoryItemQty(x.Id)
-                        }).SingleOrDefault();
+                        }).FirstOrDefault();
             if(Item != null)
             return Ok(Item);
             else return Ok(false);
