@@ -80,13 +80,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
               
                 var member = DB.Members.Where(x => x.Id == MS.MemberId).SingleOrDefault();
                 int OStatus = member.Status;
-        
+                if (MS.Status == 0) continue;
 
-                if ((DateTime.Today >= MS.StartDate && DateTime.Today <= MS.EndDate))
+                if ((DateTime.Now >= MS.StartDate && DateTime.Now <= MS.EndDate))
                 {
                         MS.Status = 1;
                         member.Status = 0;
-                    var HowManyDaysLeft = (MS.EndDate - DateTime.Today).TotalDays;
+                    var HowManyDaysLeft = (MS.EndDate - DateTime.Now).TotalDays;
                     if (HowManyDaysLeft == 3)
                     {
                         Massage msg = new Massage();
@@ -95,7 +95,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         msg.TableName = "Member";
                         msg.Fktable = member.Id;
                         msg.PhoneNumber = member.PhoneNumber1;
-                        msg.SendDate = DateTime.Today;
+                        msg.SendDate = DateTime.Now;
                         msg.Type = "رسالة تذكير";
                         DB.Massages.Add(msg);
                     }
@@ -104,7 +104,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 else
                 {
 
-                    if ( MS.StartDate > DateTime.Today ) {// معلق
+                    if ( MS.StartDate > DateTime.Now ) {// معلق
                         MS.Status = -2;
                     }
                     else
@@ -123,7 +123,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         MSO.Status = -2;
                         continue;
                     }
-                    if ((DateTime.Today >= MSO.StartDate && DateTime.Today <= MSO.EndDate))
+                    if ((DateTime.Now >= MSO.StartDate && DateTime.Now <= MSO.EndDate))
                     {
                         if (MSO.Type == "Freeze")
                         {
@@ -144,7 +144,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
                             MSO.Status = -3;
                         }
-                        if (DateTime.Today > MSO.EndDate)
+                        if (DateTime.Now > MSO.EndDate)
                         {
 
                             MS.EndDate =  MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
@@ -152,7 +152,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         }
 
                 }
-                if ((MS.EndDate > DateTime.Today))
+                if ((MS.EndDate > DateTime.Now))
                 {
                    
                   
