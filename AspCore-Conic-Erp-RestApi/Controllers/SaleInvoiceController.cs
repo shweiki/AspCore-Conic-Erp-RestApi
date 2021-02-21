@@ -66,9 +66,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("SaleInvoice/GetSaleInvoiceByStatus")]
         [HttpGet]
-        public IActionResult GetSaleInvoiceByStatus(int? Status)
+        public IActionResult GetSaleInvoiceByStatus(DateTime DateFrom, DateTime DateTo, int? Status)
         {
-            var Invoices = DB.SalesInvoices.Where(s => s.Status == Status).Select(x => new
+            var Invoices = DB.SalesInvoices.Where(s => s.FakeDate >= DateFrom && s.FakeDate <= DateTo && s.Status == Status).Select(x => new
+            
             {
                 x.Id,
                 x.Discount,
