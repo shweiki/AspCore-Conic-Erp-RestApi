@@ -109,6 +109,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="161.46041.41" />
+    <PackageReference Include="NinjaNye.SearchExtensions" Version="3.0.1" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.1" />
     <PackageReference Include="System.IO.Ports" Version="5.0.0" />
   </ItemGroup>

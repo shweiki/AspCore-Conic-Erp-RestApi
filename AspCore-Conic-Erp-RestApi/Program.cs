@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Win32;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -14,6 +15,11 @@ namespace AspCore_Conic_Erp_RestApi
 
         public static void Main(string[] args)
         {
+    /*        RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"Control Panel\International", true);
+            rk.SetValue("sTimeFormat", "HH:mm:ss"); // HH for 24hrs, hh for 12 hrs
+     
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"Control Panel\International", true);
+            rk.SetValue("sTimeFormat", "dd-MM-yyyy");*/
             OpenBrowser();
             CreateHostBuilder(args).Build().MigrateDatabase().Run();
            // CreateHostBuilder(args).Build().Run();

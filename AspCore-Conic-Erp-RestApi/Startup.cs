@@ -65,17 +65,21 @@ namespace AspCore_Conic_Erp_RestApi
           });
             services.AddCors();
             services.AddHttpContextAccessor();
-
+            TimeZoneInfo localZone = TimeZoneInfo.Local;
+            Console.WriteLine("Local Time Zone ID: {0}", localZone.Id);
+            Console.WriteLine("   Display Name is: {0}.", localZone.DisplayName);
+            Console.WriteLine("   Standard name is: {0}.", localZone.StandardName);
+            Console.WriteLine("   Daylight saving name is: {0}.", localZone.DaylightName); 
             services.AddControllers().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-               // options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local; 
-                options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local; // this should be set if you always expect UTC dates in method bodies, if not, you can use RoundTrip instead.
+             //   options.SerializerSettings.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
+             options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
             });
           
         }
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {

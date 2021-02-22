@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
-
+using System.Collections.Generic;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -13,6 +13,38 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     {
         private ConicErpContext DB = new ConicErpContext();
 
+        [Route("SaleInvoice/GetByListQ")]
+        [HttpPost]
+        public IActionResult GetByListQ(int Limit ,string Sort,int Page, string User, DateTime DateFrom, DateTime DateTo)
+        {
+             
+            var Invoices = DB.ActionLogs.Where(i => i.SalesInvoiceId !=null && i.UserId == User && i.PostingDateTime >= DateFrom && i.PostingDateTime <= DateTo )
+                .Select(x => x.SalesInvoiceId).ToList();
+
+            var result = DB.SalesInvoices.Where(s => Invoices.Contains(s.Id)).Skip((Page - 1) * Limit).Take(Limit).Select(x => new
+            {
+                x.Id,
+                x.Discount,
+                x.Tax,
+                Name = x.Vendor.Name + " " + x.Member.Name + " - " + x.Name,
+                x.FakeDate,
+                x.PaymentMethod,
+                x.Status,
+                x.Description,
+                AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
+                InventoryMovements = DB.InventoryMovements.Where(i => i.SalesInvoiceId == x.Id && i.TypeMove == "Out").Select(m => new
+                {
+                    m.Id,
+                    m.Items.Name,//= DB.Items.Where(x => x.Id == m.ItemsId).SingleOrDefault().Name,
+                    m.Qty,
+                    InventoryName = m.InventoryItem.Name,//DB.InventoryItems.Where(x => x.Id == m.InventoryItemId).SingleOrDefault().Name,
+                    m.SellingPrice,
+                    m.Description
+
+                }).ToList()
+            }).ToList();
+            return Ok(new {items = result, total = Invoices.Count() });
+    } 
         [Route("SaleInvoice/GetSaleInvoice")]
         [HttpGet]
         public IActionResult GetSaleInvoice(DateTime DateFrom, DateTime DateTo)
@@ -66,9 +98,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("SaleInvoice/GetSaleInvoiceByStatus")]
         [HttpGet]
-        public IActionResult GetSaleInvoiceByStatus(DateTime DateFrom, DateTime DateTo, int? Status)
+        public IActionResult GetSaleInvoiceByStatus(int? Status)
         {
-            var Invoices = DB.SalesInvoices.Where(s => s.FakeDate >= DateFrom && s.FakeDate <= DateTo && s.Status == Status).Select(x => new
+            var Invoices = DB.SalesInvoices.Where(s => s.Status == Status).Select(x => new
             
             {
                 x.Id,
@@ -103,6 +135,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 try
                 {
                     // TODO: Add insert logic here
+                 //   collection.FakeDate = collection.FakeDate.ToLocalTime();
                     DB.SalesInvoices.Add(collection);
                     DB.SaveChanges();
                     return Ok(collection.Id);
