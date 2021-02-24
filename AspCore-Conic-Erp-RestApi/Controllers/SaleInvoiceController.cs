@@ -15,36 +15,39 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("SaleInvoice/GetByListQ")]
         [HttpPost]
-        public IActionResult GetByListQ(int Limit ,string Sort,int Page, string User, DateTime DateFrom, DateTime DateTo)
+        public IActionResult GetByListQ(int Limit ,string Sort,int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status ,string Any)
         {
-             
-            var Invoices = DB.ActionLogs.Where(i => i.SalesInvoiceId !=null && i.UserId == User && i.PostingDateTime >= DateFrom && i.PostingDateTime <= DateTo )
-                .Select(x => x.SalesInvoiceId).ToList();
-
-            var result = DB.SalesInvoices.Where(s => Invoices.Contains(s.Id)).Skip((Page - 1) * Limit).Take(Limit).Select(x => new
+            var Invoices = DB.SalesInvoices.Where(s =>(Any != null?  s.Id.ToString().Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+            && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true)).Select(x => new
             {
                 x.Id,
                 x.Discount,
                 x.Tax,
-                Name = x.Vendor.Name + " " + x.Member.Name + " - " + x.Name,
+                Name = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
                 x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
                 x.Description,
-                Total = x.InventoryMovements.Sum(item => item.SellingPrice),
-                AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
-                InventoryMovements = DB.InventoryMovements.Where(i => i.SalesInvoiceId == x.Id && i.TypeMove == "Out").Select(m => new
-                {
-                    m.Id,
-                    m.Items.Name,//= DB.Items.Where(x => x.Id == m.ItemsId).SingleOrDefault().Name,
-                    m.Qty,
-                    InventoryName = m.InventoryItem.Name,//DB.InventoryItems.Where(x => x.Id == m.InventoryItemId).SingleOrDefault().Name,
-                    m.SellingPrice,
-                    m.Description
-
-                }).ToList()
+                Total = x.InventoryMovements.Sum(s=>s.SellingPrice),
+                Logs= DB.ActionLogs.Where(l=>l.SalesInvoiceId == x.Id).ToList(),
+                AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
+                InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == x.Id).Select(imx => new {
+                    imx.Id,
+                    imx.ItemsId,
+                    imx.Items.Name,
+                    imx.TypeMove,
+                    imx.InventoryItemId,
+                    imx.Qty,
+                    imx.SellingPrice,
+                    imx.Description
+                }).ToList(),
             }).ToList();
-            return Ok(new {items = result, total = Invoices.Count() });
+            if (User != null) {
+                
+                Invoices =  Invoices.Where(s => s.Logs.Where(l=>l.UserId == User).SingleOrDefault() != null ).ToList();            
+            }
+         
+            return Ok(new {items = Invoices.OrderBy(s => s.Id).Skip((Page - 1) * Limit).Take(Limit).ToList(), Total = Invoices.Sum(s=>s.Total) , total = Invoices.Count() });
     } 
         [Route("SaleInvoice/GetSaleItem")]
         [HttpGet]
