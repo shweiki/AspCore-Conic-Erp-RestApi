@@ -71,7 +71,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetMemberByAny(string Any)
         {
             Any.ToLower();
-            var Members = DB.Members.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Contains(Any.Replace("0","")) || m.PhoneNumber2.Contains(Any) || m.Tag.Contains(Any))
+            var Members = DB.Members.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0","").Replace(" ","").Contains(Any.Replace("0", "").Replace(" ", "")) || m.Tag.Contains(Any))
                 .Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1, x.Tag }).ToList();
 
             return Ok(Members);

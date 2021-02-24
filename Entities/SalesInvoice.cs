@@ -24,9 +24,10 @@ namespace Entities
         public bool IsPrime { get; set; }
         public long? MemberId { get; set; }
         public string Type { get; set; }
-
         public virtual Member Member { get; set; }
         public virtual Vendor Vendor { get; set; }
         public virtual ICollection<InventoryMovement> InventoryMovements { get; set; }
+ 
+
     }
 }

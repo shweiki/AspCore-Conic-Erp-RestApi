@@ -386,8 +386,6 @@ namespace Entities
 
 ////////////////////////////////////////////////////////////////
 
-
-
             modelBuilder.Entity<ActionLog>(entity =>
             {
                 entity.ToTable("ActionLog");
@@ -461,9 +459,6 @@ namespace Entities
                     .HasConstraintName("FK_ActionLog_Oprationsys");
             });
 
-
-
-
             modelBuilder.Entity<BackUp>(entity =>
             {
                 entity.ToTable("BackUp");
@@ -525,8 +520,6 @@ namespace Entities
                     .HasForeignKey(d => d.AccountId)
                     .HasConstraintName("FK_Bank_Account");
             });
-
-
 
             modelBuilder.Entity<Cheque>(entity =>
             {

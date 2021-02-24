@@ -188,6 +188,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Users);
         }
         [HttpPost]
+        [Route("User/GetUsersNames")]
+        public IActionResult GetUsersNames()
+        {
+            var Users = DB.Users.Select(x => new { x.UserName }).ToList();
+                                  return Ok(Users);
+        }
+        [HttpPost]
         [Route("User/UnLockout")]
         public async Task<IActionResult> UnLockout(string UserId)
         {
