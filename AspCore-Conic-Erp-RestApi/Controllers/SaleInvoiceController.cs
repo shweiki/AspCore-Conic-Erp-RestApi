@@ -17,7 +17,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpPost]
         public IActionResult GetByListQ(int Limit ,string Sort,int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status ,string Any)
         {
-            var Invoices = DB.SalesInvoices.Where(s =>(Any != null?  s.Id.ToString().Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+            var Invoices = DB.SalesInvoices.Where(s =>(Any != null?  s.Id.ToString().Contains(Any)||s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true)).Select(x => new
             {
                 x.Id,
@@ -47,7 +47,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Invoices =  Invoices.Where(s => s.Logs.Where(l=>l.UserId == User).SingleOrDefault() != null ).ToList();            
             }
          
-            return Ok(new {items = Invoices.OrderBy(s => s.Id).Skip((Page - 1) * Limit).Take(Limit).ToList(), Total = Invoices.Sum(s=>s.Total) , total = Invoices.Count() });
+            return Ok(new {items = Invoices.OrderBy(s => s.Id).Skip((Page - 1) * Limit).Take(Limit).ToList(), Totals = new {
+            Rows = Invoices.Count(),
+            Totals = Invoices.Sum(s => s.Total),
+            Cash = Invoices.Where(i=>i.PaymentMethod == "Cash").Sum(s => s.Total),
+            Receivables = Invoices.Where(i=>i.PaymentMethod == "Receivables").Sum(s => s.Total),
+            Visa = Invoices.Where(i=>i.PaymentMethod == "Visa").Sum(s => s.Total)
+            } });
     } 
         [Route("SaleInvoice/GetSaleItem")]
         [HttpGet]
