@@ -30,8 +30,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.AccountId,
                 x.Tag,
-                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
-                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum()
+                TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
+                TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum()
             }).ToList();
 
             return Ok(Members);
@@ -51,8 +51,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.AccountId,
                 x.Tag,
-                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
-                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum()
+                TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
+                TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum()
             }).ToList();
 
             return Ok(Members);
@@ -76,6 +76,39 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(Members);
         }
+        [HttpPost]
+        [Route("Member/GetByListQ")]
+        public IActionResult GetByListQ(int Limit, string Sort, int Page,int? Status, string? Any)
+        {
+            var Members = DB.Members.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+            {
+                x.Id,
+                x.Name,
+                x.Ssn,
+                x.PhoneNumber1,
+                x.PhoneNumber2,
+                x.Status,
+                x.Type,
+                x.AccountId,
+                x.Tag,
+                TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
+                TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum(),
+
+            }).ToList();
+            Members = (Sort == "+id" ? Members.OrderBy(s => s.Id).ToList() : Members.OrderByDescending(s => s.Id).ToList());
+            return Ok(new
+            {
+                items = Members.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Members.Count(),
+                    Totals = Members.Sum(s => s.TotalCredit - s.TotalDebit),
+                    TotalCredit = Members.Sum(s => s.TotalCredit),
+                    TotalDebit = Members.Sum(s => s.TotalDebit),
+                }
+            });
+        }
+
         [Route("Member/CheckMemberIsExist")]
         [HttpGet]
         public IActionResult CheckMemberIsExist(string Ssn , string PhoneNumber)

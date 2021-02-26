@@ -12,10 +12,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class SaleInvoiceController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
-
-        [Route("SaleInvoice/GetByListQ")]
         [HttpPost]
-        public IActionResult GetByListQ(int Limit ,string Sort,int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status ,string Any)
+        [Route("SaleInvoice/GetByListQ")]
+        public IActionResult GetByListQ(int Limit ,string Sort,int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status ,string? Any)
         {
             var Invoices = DB.SalesInvoices.Where(s =>(Any != null?  s.Id.ToString().Contains(Any)||s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&(User != null ? DB.ActionLogs.Where(l =>l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
@@ -28,10 +27,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PaymentMethod,
                 x.Status,
                 x.Description,
-                Total = x.InventoryMovements.Sum(s=>s.SellingPrice),
+                Total = x.InventoryMovements.Sum(s=>s.SellingPrice *s.Qty) - x.Discount,
                 Logs= DB.ActionLogs.Where(l=>l.SalesInvoiceId == x.Id).ToList(),
                 AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
-                InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == x.Id).Select(imx => new {
+                InventoryMovements = x.InventoryMovements.Select(imx => new {
                     imx.Id,
                     imx.ItemsId,
                     imx.Items.Name,

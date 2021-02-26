@@ -7,6 +7,7 @@ using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -44,23 +45,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Description,
                 DeviceName = x.Device.Name,
                 x.Member.Status,
-                Color = DB.Oprationsys.Where(o=>o.Status == x.Member.Status && o.TableName=="Member").SingleOrDefault().Color,
-                ClassName = DB.Oprationsys.Where(o=>o.Status == x.Member.Status && o.TableName=="Member").SingleOrDefault().ClassName,
-                IconClass = DB.Oprationsys.Where(o=>o.Status == x.Member.Status && o.TableName=="Member").SingleOrDefault().IconClass,
-                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Member.AccountId).Select(d => d.Debit).Sum(),
-                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Member.AccountId).Select(c => c.Credit).Sum(),
+                Style = DB.Oprationsys.Where(o => o.Status == x.Member.Status && o.TableName == "Member").Select(o=> new { 
+                    o.Color,
+                o.ClassName,
+                o.IconClass
+                }).SingleOrDefault(),
+                TotalDebit =x.Member.Account.EntryMovements.Select(d => d.Debit).Sum(),
+                TotalCredit = x.Member.Account.EntryMovements.Select(c => c.Credit).Sum(),
                 ActiveMemberShip = x.Member.MembershipMovements.Where(f => f.MemberId == x.MemberId && f.Status == 1).Select(ms => new { ms.Id, ms.Type }).FirstOrDefault(),
             }).ToList();
-
-            var  DuplicateRow = MemberLogs.GroupBy(s => new { s.MemberId, s.DateTime}).Select(grp => grp.Skip(1)).ToList();
-            foreach (var Dup in DuplicateRow)
-            {
-                if (Dup.Count() == 0)
-                    continue;
-                List<MemberLog> duplog = Dup.Select(c =>new MemberLog {Id = c.Id }).ToList();
-                DB.MemberLogs.RemoveRange(duplog);
-                DB.SaveChanges();
-            }
 
             MemberLogs = MemberLogs.GroupBy(a => new { a.MemberId, a.DateTime })
                    .Select(g => g.Last()).ToList();
@@ -91,9 +84,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
           
                     DB.MemberLogs.Add(collection);
                     DB.SaveChanges();
-  
-                        DB.SaveChanges();
-                        return Ok(true);
+                    return Ok(true);
                 }
                 catch
                 {
@@ -101,6 +92,33 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     return Ok(false);
                 }
             }
+            return Ok(false);
+        }
+        [HttpGet]
+        [Route("MemberLog/RemoveDuplicate")]
+        public IActionResult RemoveDuplicate()
+        {
+
+                try
+                {
+
+                    var DuplicateRow = DB.MemberLogs.GroupBy(s => new { s.MemberId, s.DateTime }).Select(grp => grp.Skip(1)).ToList();
+                    foreach (var Dup in DuplicateRow)
+                    {
+                        if (Dup.Count() == 0)
+                            continue;
+                        List<MemberLog> duplog = Dup.Select(c => new MemberLog { Id = c.Id }).ToList();
+                        DB.MemberLogs.RemoveRange(duplog);
+                        DB.SaveChanges();
+                    }
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            
             return Ok(false);
         }
 
