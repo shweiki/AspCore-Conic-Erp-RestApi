@@ -37,7 +37,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
            // DB.MemberLogs.RemoveRange(students);
 
-            var MemberLogs = DB.MemberLogs.Where(x => x.Status == Status).Select(x => new {
+            var MemberLogs = DB.MemberLogs.Where(x => x.Status == Status && x.DateTime.Date == DateTime.Today).Select(x => new {
                 x.Id,
                 x.MemberId,
                 x.Member.Name,
