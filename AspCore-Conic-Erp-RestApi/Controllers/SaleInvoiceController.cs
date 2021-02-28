@@ -34,6 +34,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     imx.Id,
                     imx.ItemsId,
                     imx.Items.Name,
+                    imx.Items.CostPrice,
                     imx.TypeMove,
                     imx.InventoryItemId,
                     imx.Qty,
