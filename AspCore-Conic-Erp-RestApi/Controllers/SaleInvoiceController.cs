@@ -12,13 +12,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class SaleInvoiceController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
-
-        [Route("SaleInvoice/GetByListQ")]
         [HttpPost]
-        public IActionResult GetByListQ(int Limit ,string Sort,int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status ,string Any)
+        [Route("SaleInvoice/GetByListQ")]
+        public IActionResult GetByListQ(int Limit ,string Sort,int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status ,string? Any)
         {
             var Invoices = DB.SalesInvoices.Where(s =>(Any != null?  s.Id.ToString().Contains(Any)||s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
-            && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+            && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&(User != null ? DB.ActionLogs.Where(l =>l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
             {
                 x.Id,
                 x.Discount,
@@ -28,10 +27,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PaymentMethod,
                 x.Status,
                 x.Description,
-                Total = x.InventoryMovements.Sum(s=>s.SellingPrice),
+                Total = x.InventoryMovements.Sum(s=>s.SellingPrice *s.Qty) - x.Discount,
                 Logs= DB.ActionLogs.Where(l=>l.SalesInvoiceId == x.Id).ToList(),
                 AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
-                InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == x.Id).Select(imx => new {
+                InventoryMovements = x.InventoryMovements.Select(imx => new {
                     imx.Id,
                     imx.ItemsId,
                     imx.Items.Name,
@@ -42,12 +41,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     imx.Description
                 }).ToList(),
             }).ToList();
-            if (User != null) {
-                
-                Invoices =  Invoices.Where(s => s.Logs.Where(l=>l.UserId == User).SingleOrDefault() != null ).ToList();            
-            }
-         
-            return Ok(new {items = Invoices.OrderBy(s => s.Id).Skip((Page - 1) * Limit).Take(Limit).ToList(), Totals = new {
+            Invoices =  (Sort == "+id" ? Invoices.OrderBy(s => s.Id).ToList() : Invoices.OrderByDescending(s => s.Id).ToList());
+            return Ok(new {items = Invoices.Skip((Page - 1) * Limit).Take(Limit).ToList(), 
+            Totals = new {
             Rows = Invoices.Count(),
             Totals = Invoices.Sum(s => s.Total),
             Cash = Invoices.Where(i=>i.PaymentMethod == "Cash").Sum(s => s.Total),
@@ -97,6 +93,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     imx.Id,
                     imx.ItemsId,
                     imx.Items.Name,
+                    imx.Items.CostPrice,
                     imx.TypeMove,
                     imx.InventoryItemId,
                     imx.Qty,

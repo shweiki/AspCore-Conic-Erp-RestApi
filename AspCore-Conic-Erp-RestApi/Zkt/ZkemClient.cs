@@ -101,23 +101,16 @@ namespace AspCore_Conic_Erp_RestApi
         {
             return objCZKEM.DisableDeviceWithTimeOut(dwMachineNumber, TimeOutSec);
         }
-        private void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
+        private  void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
         {
             //  Disconnect();
             DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
             int ID = Convert.ToInt32(EnrollNumber);
             var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
-
-            if ( member != null)
-            {
                 MemberLogController MemberLog = new MemberLogController();
-                var isLogSaveIt = DB.MemberLogs.Where(Ld => Ld.DateTime == datetime && Ld.MemberId == ID).ToList();
-                if(isLogSaveIt.Count() <= 0)
-
-
-                MemberLog.RegisterMemberLog(ID, datetime);
+                 MemberLog.RegisterMemberLog(ID, datetime);
                 //device.GetAllLogMembers(3);
-            }
+           
         }
 
 

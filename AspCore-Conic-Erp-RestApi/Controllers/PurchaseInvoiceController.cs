@@ -11,6 +11,51 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class PurchaseInvoiceController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
+        [HttpPost]
+        [Route("PurchaseInvoice/GetByListQ")]
+        public IActionResult GetByListQ(int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string? Any)
+        {
+            var Invoices = DB.PurchaseInvoices.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+            && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (User != null ? DB.ActionLogs.Where(l => l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+            {
+                x.Id,
+                x.Discount,
+                x.Tax,
+                Name = x.Vendor.Name ,
+                x.FakeDate,
+                x.PaymentMethod,
+                x.Status,
+                x.Description,
+                x.AccountInvoiceNumber,
+                x.InvoicePurchaseDate,
+                Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+                Logs = DB.ActionLogs.Where(l => l.PurchaseInvoiceId == x.Id).ToList(),
+                AccountId = x.Vendor.AccountId,
+                InventoryMovements = x.InventoryMovements.Select(imx => new {
+                    imx.Id,
+                    imx.ItemsId,
+                    imx.Items.Name,
+                    imx.TypeMove,
+                    imx.InventoryItemId,
+                    imx.Qty,
+                    imx.SellingPrice,
+                    imx.Description
+                }).ToList(),
+            }).ToList();
+            Invoices = (Sort == "+id" ? Invoices.OrderBy(s => s.Id).ToList() : Invoices.OrderByDescending(s => s.Id).ToList());
+            return Ok(new
+            {
+                items = Invoices.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Invoices.Count(),
+                    Totals = Invoices.Sum(s => s.Total),
+                    Cash = Invoices.Where(i => i.PaymentMethod == "Cash").Sum(s => s.Total),
+                    Receivables = Invoices.Where(i => i.PaymentMethod == "Receivables").Sum(s => s.Total),
+                    Visa = Invoices.Where(i => i.PaymentMethod == "Visa").Sum(s => s.Total)
+                }
+            });
+        }
 
         [Route("PurchaseInvoice/GetPurchaseInvoice")]
         [HttpGet]
@@ -103,7 +148,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Invoice.FakeDate = collection.FakeDate;
                     Invoice.InvoicePurchaseDate = collection.InvoicePurchaseDate;
                     Invoice.PaymentMethod = collection.PaymentMethod;
-                    DB.InventoryMovements.RemoveRange(Invoice.InventoryMovements);
+                    DB.InventoryMovements.RemoveRange(DB.InventoryMovements.Where(x=>x.PurchaseInvoiceId == Invoice.Id).ToList());
                     Invoice.InventoryMovements = collection.InventoryMovements;
                     DB.SaveChanges();
 
