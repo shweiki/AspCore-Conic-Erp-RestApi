@@ -160,8 +160,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         }).SingleOrDefault();
             return Ok(Item);
         }
-        [Route("Item/GetItemByBarcode")]
         [HttpGet]
+        [Route("Item/GetItemByBarcode")]
         public IActionResult GetItemByBarcode(string? BarCode )
         {
             var Item = DB.Items.Where(x=>x.Barcode == BarCode).Select(x=> new 
