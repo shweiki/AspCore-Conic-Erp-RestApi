@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
+using NinjaNye.SearchExtensions;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -11,14 +12,34 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class ItemController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
+        [HttpGet]
 
         [Route("Item/GetItem")]
-        [HttpGet]
         public IActionResult GetItem()
         {
             var Items = DB.Items.Select(x => new { x.Id, x.Name, x.Barcode, x.SellingPrice, x.OtherPrice ,x.CostPrice }).ToList();
 
             return Ok(Items);
+        }
+        [HttpGet]
+        [Route("Item/GetItemByAny")]
+        public IActionResult GetItemByAny(string Any)
+        {
+           Any =  Any.ToLower();
+            var Items = DB.Items.Search(x => x.Name, x =>x.Barcode , x=> x.Id.ToString() ,x=>x.Category ).Containing(Any)
+                .Select(x => new { x.Id, x.Name, x.Barcode, x.SellingPrice, x.OtherPrice, x.CostPrice, x.Category }).ToList();
+
+            return Ok(Items);
+        }
+        [HttpGet]
+
+        [Route("Item/CheckItemIsExist")]
+        public IActionResult CheckItemIsExist(string? Name, string? BarCode)
+        {
+            var Items = DB.Items.Where(m => (BarCode != null ? m.Barcode.ToLower() == BarCode.ToLower() : false)
+ ||(Name != null ? m.Name.ToLower()== Name.ToLower() : false)).ToList();
+
+            return Ok(Items.Count() > 0 ? true : false);
         }
         [Route("Item/GetIsPrimeItem")]
         [HttpGet]
@@ -35,6 +56,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.IsPrime,
                 x.Rate,
                 x.Barcode,
+                x.Category,
                 x.Description,
              //   InventoryQty = CalculateInventoryItemQty(x.Id),
             }).ToList();
@@ -58,6 +80,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Rate,
                 x.Barcode,
                 x.Description,
+                x.Category,
                // InventoryQty = CalculateInventoryItemQty(x.Id),
             }).ToList();
 
@@ -135,13 +158,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             x.Description,
                             x.IsPrime,
                             x.Status,
+                            x.Category,
                           //  InventoryQty = CalculateInventoryItemQty(x.Id)
                         }).SingleOrDefault();
             return Ok(Item);
         }
         [Route("Item/GetItemByBarcode")]
         [HttpGet]
-        public IActionResult GetItemByBarcode(string BarCode)
+        public IActionResult GetItemByBarcode(string? BarCode )
         {
             var Item = DB.Items.Where(x=>x.Barcode == BarCode).Select(x=> new 
                         {
@@ -157,6 +181,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             x.Description,
                             x.IsPrime,
                             x.Status,
+                            x.Category,
                           //  InventoryQty = CalculateInventoryItemQty(x.Id)
                         }).FirstOrDefault();
             if(Item != null)
@@ -201,6 +226,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 item.Barcode = collection.Barcode;
                 item.IsPrime = collection.IsPrime;
                 item.Description = collection.Description;
+                item.Category = collection.Category;
                 try
                 {
                     DB.SaveChanges();

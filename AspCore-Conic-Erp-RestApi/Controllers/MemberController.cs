@@ -93,7 +93,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Tag,
                 TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
                 TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum(),
-
             }).ToList();
             Members = (Sort == "+id" ? Members.OrderBy(s => s.Id).ToList() : Members.OrderByDescending(s => s.Id).ToList());
             return Ok(new

@@ -13,7 +13,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private ConicErpContext DB = new ConicErpContext();
         [HttpPost]
         [Route("PurchaseInvoice/GetByListQ")]
-        public IActionResult GetByListQ(int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string? Any)
+        public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
         {
             var Invoices = DB.PurchaseInvoices.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (User != null ? DB.ActionLogs.Where(l => l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
@@ -115,7 +115,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 try
                 {
                     // TODO: Add insert logic here
-                    DB.InventoryMovements.ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
+                    collection.InventoryMovements.ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
                     DB.PurchaseInvoices.Add(collection);
                     DB.SaveChanges();
                     return Ok(collection.Id);
@@ -150,6 +150,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Invoice.PaymentMethod = collection.PaymentMethod;
                     DB.InventoryMovements.RemoveRange(DB.InventoryMovements.Where(x=>x.PurchaseInvoiceId == Invoice.Id).ToList());
                     Invoice.InventoryMovements = collection.InventoryMovements;
+                    Invoice.InventoryMovements.ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
+
                     DB.SaveChanges();
 
                     return Ok(true);
