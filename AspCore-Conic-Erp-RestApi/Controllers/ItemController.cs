@@ -13,7 +13,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     {
         private ConicErpContext DB = new ConicErpContext();
         [HttpGet]
-
         [Route("Item/GetItem")]
         public IActionResult GetItem()
         {
@@ -32,17 +31,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Items);
         }
         [HttpGet]
-
         [Route("Item/CheckItemIsExist")]
         public IActionResult CheckItemIsExist(string? Name, string? BarCode)
         {
             var Items = DB.Items.Where(m => (BarCode != null ? m.Barcode.ToLower() == BarCode.ToLower() : false)
- ||(Name != null ? m.Name.ToLower()== Name.ToLower() : false)).ToList();
+             ||(Name != null ? m.Name.ToLower()== Name.ToLower() : false)).ToList();
 
             return Ok(Items.Count() > 0 ? true : false);
         }
-        [Route("Item/GetIsPrimeItem")]
         [HttpGet]
+        [Route("Item/GetIsPrimeItem")]
         public IActionResult GetIsPrimeItem()
         {
             var Items = DB.Items.Where(i => i.IsPrime == true).Select(x => new {
@@ -64,8 +62,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
           
             return Ok(Items);
         }
-        [Route("Item/GetActiveItem")]
         [HttpGet]
+        [Route("Item/GetActiveItem")]
         public IActionResult GetActiveItem()
         {
             var Items = DB.Items.Where(i => i.Status == 0).Select(x => new {
@@ -86,8 +84,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(Items);
         }
-        [Route("Item/GetItemMove")]
         [HttpGet]
+        [Route("Item/GetItemMove")]
         public IActionResult GetItemMove(long ItemID, DateTime DateFrom, DateTime DateTo)
         {
             var SalesInvoiceMove = DB.InventoryMovements.Where(i => i.SalesInvoiceId != null && i.ItemsId == ItemID && i.SalesInvoice.FakeDate >= DateFrom && i.SalesInvoice.FakeDate <= DateTo).Select(x => new
@@ -139,9 +137,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(new { OrderInventoryMove, PurchaseInvoiceMove, SalesInvoiceMove });
         }
-
-        [Route("Item/GetItemByID")]
         [HttpGet]
+        [Route("Item/GetItemByID")]
         public IActionResult GetItemByID(long ID)
         {
             var Item = DB.Items.Where(x=>x.Id == ID).Select(x=> new 
