@@ -26,6 +26,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
+                x.Type,
                 x.Description,
                 Total = x.InventoryMovements.Sum(s=>s.SellingPrice *s.Qty) - x.Discount,
                 Logs= DB.ActionLogs.Where(l=>l.SalesInvoiceId == x.Id).ToList(),
@@ -88,6 +89,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
+                x.Type,
                 x.Description,
                 AccountId =  DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
                 InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == x.Id).Select(imx => new {
@@ -149,6 +151,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Invoice.Name = collection.Name;
                     Invoice.MemberId = collection.MemberId;
                     Invoice.IsPrime = collection.IsPrime;
+                    Invoice.Type = collection.Type;
                     DB.InventoryMovements.RemoveRange(DB.InventoryMovements.Where(m=>m.SalesInvoiceId ==Invoice.Id).ToList());
                     Invoice.InventoryMovements = collection.InventoryMovements;
                     DB.SaveChanges();
@@ -177,6 +180,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
+                x.Type,
                 x.Description,
                 InventoryMovements = DB.InventoryMovements.Where(Im => Im.SalesInvoiceId == x.Id).Select(m => new {
                     m.Id,
