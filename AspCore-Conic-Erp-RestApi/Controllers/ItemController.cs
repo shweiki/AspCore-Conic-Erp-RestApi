@@ -20,6 +20,43 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(Items);
         }
+        [HttpPost]
+        [Route("Item/GetByListQ")]
+        public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string? Any)
+        {
+            var Items = DB.Items.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Category.Contains(Any) : true) && (Status != null ? s.Status == Status : true))
+              .Select(x=>new   {
+                x.Id,
+                x.Name,
+                x.CostPrice,
+                x.SellingPrice,
+                x.OtherPrice,
+                x.LowOrder,
+                x.Tax,
+                x.Status,
+                x.IsPrime,
+                x.Rate,
+                x.Barcode,
+                x.Category,
+                x.Description,
+                  TotalIn = x.InventoryMovements.Where(x => x.TypeMove == "In").Count(),
+                  TotalOut = x.InventoryMovements.Where(x => x.TypeMove == "Out").Count(),
+              }
+        ).ToList();
+            Items = (Sort == "+id" ? Items.OrderBy(s => s.Id).ToList() : Items.OrderByDescending(s => s.Id).ToList());
+            return Ok(new
+            {
+                items = Items.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Items.Count(),
+                    TotalIn = Items.Sum(s => s.TotalIn),
+                    TotalOut = Items.Sum(s => s.TotalOut),
+                    Totals = Items.Sum(s => s.TotalIn) - Items.Sum(s => s.TotalOut),
+
+                }
+            });
+        }
         [HttpGet]
         [Route("Item/GetItemByAny")]
         public IActionResult GetItemByAny(string Any)
