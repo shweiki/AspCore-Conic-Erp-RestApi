@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
+using NinjaNye.SearchExtensions;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -45,6 +46,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
 
         }
+
+        [HttpGet]
+        [Route("Account/GetAccountByAny")]
+        public IActionResult GetAccountByAny(string Any)
+        {
+            var Accounts = DB.Accounts.Search(x => x.Name , x => x.Id.ToString()).Containing(Any)
+              .Select(x => new { x.Id, x.Name }).ToList();
+            return Ok(Accounts);
+        }
+
         [Route("Account/GetInComeAccounts")]
         [HttpGet]
         public IActionResult GetInComeAccounts()
