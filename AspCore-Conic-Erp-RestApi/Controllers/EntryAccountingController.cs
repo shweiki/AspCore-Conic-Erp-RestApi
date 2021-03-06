@@ -63,7 +63,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Entry.Description = collection.Description;
                     Entry.Status = collection.Status;
                     Entry.Type = collection.Type;
-                    DB.EntryMovements.RemoveRange(Entry.EntryMovements);
+                    DB.EntryMovements.RemoveRange(DB.EntryMovements.Where(x=>x.EntryId == Entry.Id).ToList());
                     Entry.EntryMovements = collection.EntryMovements;
                     DB.SaveChanges();
                     return Ok(true);
