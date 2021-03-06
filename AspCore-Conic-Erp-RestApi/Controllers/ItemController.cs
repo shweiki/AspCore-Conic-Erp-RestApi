@@ -57,8 +57,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
             });
         }
-        [HttpGet]
         [Route("Item/GetItemByAny")]
+        [HttpGet]
         public IActionResult GetItemByAny(string Any)
         {
            Any =  Any.ToLower();
