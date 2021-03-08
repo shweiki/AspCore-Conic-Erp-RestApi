@@ -49,11 +49,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             Totals = new {
             Rows = Invoices.Count(),
             Totals = Invoices.Sum(s => s.Total),
-                TotalCost = Invoices.Sum(s => s.TotalCost),
-                Profit = Invoices.Sum(s => s.Total) - Invoices.Sum(s => s.TotalCost),
-                Cash = Invoices.Where(i=>i.PaymentMethod == "Cash").Sum(s => s.Total),
+            TotalCost = Invoices.Sum(s => s.TotalCost),
+            Profit = Invoices.Sum(s => s.Total) - Invoices.Sum(s => s.TotalCost),
+            Cash = Invoices.Where(i=>i.PaymentMethod == "Cash").Sum(s => s.Total),
             Receivables = Invoices.Where(i=>i.PaymentMethod == "Receivables").Sum(s => s.Total),
-                Discount = Invoices.Sum(s => s.Discount),
+            Discount = Invoices.Sum(s => s.Discount),
             Visa = Invoices.Where(i=>i.PaymentMethod == "Visa").Sum(s => s.Total)
             } });
     } 
