@@ -57,9 +57,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Device);
         }
 
+        [HttpGet]
 
         [Route("Device/CheckDevice")]
-        [HttpGet]
         public IActionResult CheckDevice(int ID)
         {
             var Device = DB.Devices.Where(x => x.Id == ID).SingleOrDefault();

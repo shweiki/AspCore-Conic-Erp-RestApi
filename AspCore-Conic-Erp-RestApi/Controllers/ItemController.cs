@@ -291,7 +291,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(InventoryItemsQty);
         }
+        [HttpGet]
 
+        [Route("Item/CalculateCostPrice")]
+        public  IActionResult CalculateCostPrice()
+        {
+            DB.InventoryMovements.Where(i=> i.PurchaseInvoiceId != null).ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
+
+            DB.SaveChanges();
+            return Ok(true);
+        }
     }
 
 }
