@@ -73,7 +73,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult CheckMembershipMovement()
         {
             DateTime MaxDate = new DateTime(2020, 11, 1);
-            IList<MembershipMovement>  MembershipMovements = DB.MembershipMovements.Where(x=>  x.EndDate  >= MaxDate)?.ToList();
+            IList<MembershipMovement>  MembershipMovements = DB.MembershipMovements.Where(x=>  x.EndDate  >= MaxDate)?.OrderBy(s => s.Id).ToList();
          
             foreach (MembershipMovement MS in MembershipMovements)
             {

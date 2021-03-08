@@ -14,7 +14,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private ConicErpContext DB = new ConicErpContext();
         [HttpPost]
         [Route("SaleInvoice/GetByListQ")]
-        public IActionResult GetByListQ(int Limit ,string Sort,int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status ,string? Any)
+        public IActionResult GetByListQ(int Limit ,string Sort,int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status ,string Any)
         {
             var Invoices = DB.SalesInvoices.Where(s =>(Any != null?  s.Id.ToString().Contains(Any)||s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&(User != null ? DB.ActionLogs.Where(l =>l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
@@ -28,6 +28,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.Type,
                 x.Description,
+                TotalCost = x.InventoryMovements.Sum(s => s.Items.CostPrice * s.Qty),
                 Total = x.InventoryMovements.Sum(s=>s.SellingPrice *s.Qty) - x.Discount,
                 Logs= DB.ActionLogs.Where(l=>l.SalesInvoiceId == x.Id).ToList(),
                 AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
@@ -48,8 +49,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             Totals = new {
             Rows = Invoices.Count(),
             Totals = Invoices.Sum(s => s.Total),
-            Cash = Invoices.Where(i=>i.PaymentMethod == "Cash").Sum(s => s.Total),
+                TotalCost = Invoices.Sum(s => s.TotalCost),
+                Profit = Invoices.Sum(s => s.Total) - Invoices.Sum(s => s.TotalCost),
+                Cash = Invoices.Where(i=>i.PaymentMethod == "Cash").Sum(s => s.Total),
             Receivables = Invoices.Where(i=>i.PaymentMethod == "Receivables").Sum(s => s.Total),
+                Discount = Invoices.Sum(s => s.Discount),
             Visa = Invoices.Where(i=>i.PaymentMethod == "Visa").Sum(s => s.Total)
             } });
     } 
