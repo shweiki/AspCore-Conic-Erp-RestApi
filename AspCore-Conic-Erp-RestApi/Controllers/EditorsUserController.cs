@@ -12,9 +12,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private ConicErpContext DB = new ConicErpContext();
 
         // GET: EditorsUsers
-        [Route("EditorsUser/GetEditorsUser")]
+        [Route("EditorsUser/Get")]
         [HttpGet]
-        public IActionResult GetEditorsUser()
+        public IActionResult Get()
         {
             var EditorsUsers = DB.EditorsUsers.Select(x => new
             {

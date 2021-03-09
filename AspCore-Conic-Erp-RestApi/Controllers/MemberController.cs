@@ -78,7 +78,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [HttpPost]
         [Route("Member/GetByListQ")]
-        public IActionResult GetByListQ(int Limit, string Sort, int Page,int? Status, string? Any)
+        public IActionResult GetByListQ(int Limit, string Sort, int Page,int? Status, string Any)
         {
             var Members = DB.Members.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
             {
@@ -290,7 +290,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }).SingleOrDefault();
             return Ok(Members);
         }
+        [Route("Member/FixPhoneNumber")]
+        [HttpGet]
+        public IActionResult FixPhoneNumber()
+        {
+            DB.Members.Where(i => i.PhoneNumber1 != null).ToList().ForEach(s => {
+                s.PhoneNumber1 = s.PhoneNumber1.Replace(" ", "");
+                s.PhoneNumber1 = s.PhoneNumber1.Length == 10 ? s.PhoneNumber1.Substring(1) : s.PhoneNumber1; 
+            });
 
+            DB.SaveChanges();
+     
+
+            return Ok(true);
+        }
 
         [Route("Member/CheckMembers")]
         [HttpGet]

@@ -340,7 +340,7 @@ namespace AspCore_Conic_Erp_RestApi
 
         public bool ClearAdministrators(int dwMachineNumber)
         {
-            throw new NotImplementedException();
+            return objCZKEM.ClearAdministrators(dwMachineNumber);
         }
 
 
