@@ -25,10 +25,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.Description,
             }).ToList();
-                           
-
-                           
-                            
+    
             return Ok(Discounts);
         }
         [Route("Discount/GetActiveDiscount")]
