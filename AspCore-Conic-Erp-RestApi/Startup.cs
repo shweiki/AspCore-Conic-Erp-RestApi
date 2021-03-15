@@ -32,14 +32,10 @@ namespace AspCore_Conic_Erp_RestApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
-
-            
-           
-            ConicErpContext d = new ConicErpContext();
+            ConicErpContext DB = new ConicErpContext();
             services.AddDbContext<ConicErpContext>(options =>
                 options.UseSqlServer(
-                    d.GetCon(),
+                   DB.GetCon(),
                          options => options.MigrationsAssembly("AspCore-Conic-Erp-RestApi")));
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.Configure<IdentityOptions>(options =>
@@ -87,9 +83,7 @@ namespace AspCore_Conic_Erp_RestApi
                 app.UseMigrationsEndPoint();
 
             }
-  
-   
-          
+ 
             app.UseHttpsRedirection();
 
             app.UseDefaultFiles();
