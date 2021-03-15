@@ -23,6 +23,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Btcash,
                 x.Description,
                 x.Name,
+                x.Status,
             }).ToList();
                 
        
@@ -48,6 +49,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 cash.Pcip = collection.Pcip;
                 cash.Btcash = collection.Btcash;
                 cash.Description = collection.Description;
+                cash.Status = collection.Status;
                 cash.Name = collection.Name;
                 try
                 {

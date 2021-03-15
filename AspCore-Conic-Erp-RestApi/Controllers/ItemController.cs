@@ -61,6 +61,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetItemByAny(string Any)
         {
+            if (Any == null) return NotFound();
            Any =  Any.ToLower();
             var Items = DB.Items.Search(x => x.Name, x =>x.Barcode , x=> x.Id.ToString() ,x=>x.Category ).Containing(Any)
                 .Select(x => new { x.Id, x.Name, x.Barcode, x.SellingPrice, x.OtherPrice, x.CostPrice, x.Category }).ToList();
