@@ -1,0 +1,133 @@
+﻿using System;
+using System.Data;
+using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using Entities; 
+using Microsoft.AspNetCore.Mvc;
+
+namespace AspCore_Conic_Erp_RestApi.Controllers
+{
+    [Authorize]
+    public class ReportController : Controller
+    {
+        private ConicErpContext DB = new ConicErpContext();
+        [HttpPost]
+        [Route("Report/GetByListQ")]
+        public IActionResult GetByListQ(int Limit, string Sort, int Page,  string Any)
+        {
+            var Reports = DB.Reports.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true)  ).Select(x => new
+            {
+                x.Id,
+             x.Name ,
+             x.PrintType ,
+             x.Keys ,
+             x.Html ,
+             x.Printer ,
+             x.Style 
+            
+            }).ToList();
+            Reports = (Sort == "+id" ? Reports.OrderBy(s => s.Id).ToList() : Reports.OrderByDescending(s => s.Id).ToList());
+            return Ok(new
+            {
+                items = Reports.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Reports.Count(),
+                  
+                }
+            });
+        }
+
+        [Route("Report/GetReport")]
+        [HttpGet]
+        public IActionResult GetReport(int Id)
+        {
+            var Invoices = DB.Reports.Where(i => i.Id == Id ).Select(x => new
+            {
+
+                x.Id,
+                x.Name,
+                x.PrintType,
+                x.Keys,
+                x.Html,
+                x.Printer,
+                x.Style
+            }).ToList();
+                            
+
+            return Ok(Invoices);
+        }
+   [Route("Report/Create")]
+        [HttpPost]
+        public IActionResult Create(Report collection)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // TODO: Add insert logic here
+                    DB.Reports.Add(collection);
+                    DB.SaveChanges();
+                    return Ok(collection.Id);
+
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            else return Ok(false);
+        }
+        [Route("Report/Edit")]
+        [HttpPost]
+        public IActionResult Edit(Report collection)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Report Report = DB.Reports.Where(x => x.Id == collection.Id).SingleOrDefault();
+       
+                    Report.Name = collection.Name;
+                    Report.PrintType = collection.PrintType;
+                    Report.Keys = collection.Keys;
+                    Report.Html = collection.Html;
+                    Report.Printer = collection.Printer;
+                    Report.Style = collection.Style;
+
+                    DB.SaveChanges();
+
+                    return Ok(true);
+
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            else return Ok(false);
+        }
+        [Route("Report/GetReportByID")]
+        [HttpGet]
+        public IActionResult GetReportByID(long? ID)
+        {
+            var Report = DB.Reports.Where(i => i.Id == ID).Select(x => new {
+                x.Id,
+                x.Name,
+                x.PrintType,
+                x.Keys,
+                x.Html,
+                x.Printer,
+                x.Style
+
+            }).SingleOrDefault();
+                       
+                        
+
+            return Ok(Report);
+        }
+
+    }
+}

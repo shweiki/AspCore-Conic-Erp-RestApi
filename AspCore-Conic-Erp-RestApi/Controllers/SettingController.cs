@@ -6,6 +6,8 @@ using Entities;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System;
+using System.Reflection;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -24,8 +26,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.Description,
             }).ToList();
-
-
             return Ok(Settings);
         }
         [Authorize]
@@ -42,6 +42,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Description,
             }).ToList();
             return Ok(Settings);
+        }
+        [Route("Setting/GetProperties")]
+        [HttpGet]
+        public IActionResult GetProperties(string ObjName)
+        {
+
+            PropertyInfo[] myPropertyInfo;
+            // Get the properties of 'Type' class object.
+            myPropertyInfo = Type.GetType(ObjName).GetProperties();
+            return Ok(myPropertyInfo);
         }
         [Route("Setting/Create")]
         [HttpPost]

@@ -9,12 +9,12 @@ namespace Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Type { get; set; }
-        public string Json { get; set; }
-        public string HtmlDesgin { get; set; }
+        public string PrintType { get; set; }
+        public string Keys { get; set; }
         public string Printer { get; set; }
-        public string TableName { get; set; }
-        public long Fktable { get; set; }
+        public string Html { get; set; }
+        public string Style { get; set; }
+
 
     }
 }

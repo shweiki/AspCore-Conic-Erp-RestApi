@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Entities;
 using System.IO.Ports;
 using System.Text;
+using ESC_POS_USB_NET.Printer;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -45,6 +46,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
             }
             else return Ok(false);
+        }
+
+
+        [HttpGet]
+        [Route("Device/DirectlyPrint")]
+        public IActionResult DirectlyPrint(string? PrinterName ,string? Ip ,string? PortName )
+        {
+            Printer printer = new Printer(PrinterName);
+            printer.Append("يسشيس)");
+
+            printer.FullPaperCut();
+            printer.PrintDocument();
+            return Ok(true);
         }
 
 
