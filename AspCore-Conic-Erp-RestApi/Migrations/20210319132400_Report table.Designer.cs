@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210319132400_Report table")]
+    partial class Reporttable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1371,9 +1373,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Style")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
