@@ -17,14 +17,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             var Reports = DB.Reports.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true)  ).Select(x => new
             {
-                x.Id,
+             x.Id,
              x.Name ,
-             x.PrintType ,
+             x.AutoPrint ,
              x.Keys ,
              x.Html ,
              x.Printer ,
-             x.Style 
-            
+             x.Icon 
             }).ToList();
             Reports = (Sort == "+id" ? Reports.OrderBy(s => s.Id).ToList() : Reports.OrderByDescending(s => s.Id).ToList());
             return Ok(new
@@ -47,11 +46,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                 x.Id,
                 x.Name,
-                x.PrintType,
+                x.AutoPrint,
                 x.Keys,
                 x.Html,
                 x.Printer,
-                x.Style
+                x.Icon
             }).ToList();
                             
 
@@ -90,11 +89,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Report Report = DB.Reports.Where(x => x.Id == collection.Id).SingleOrDefault();
        
                     Report.Name = collection.Name;
-                    Report.PrintType = collection.PrintType;
+                    Report.AutoPrint = collection.AutoPrint;
                     Report.Keys = collection.Keys;
                     Report.Html = collection.Html;
                     Report.Printer = collection.Printer;
-                    Report.Style = collection.Style;
+                    Report.Icon = collection.Icon;
 
                     DB.SaveChanges();
 
@@ -116,16 +115,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             var Report = DB.Reports.Where(i => i.Id == ID).Select(x => new {
                 x.Id,
                 x.Name,
-                x.PrintType,
+                x.AutoPrint,
                 x.Keys,
                 x.Html,
                 x.Printer,
-                x.Style
-
+                x.Icon
             }).SingleOrDefault();
-                       
-                        
-
             return Ok(Report);
         }
 

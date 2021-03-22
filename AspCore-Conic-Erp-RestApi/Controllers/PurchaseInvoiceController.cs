@@ -200,7 +200,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                 
             }).SingleOrDefault();
                        
-                        
 
             return Ok(Invoices);
         }

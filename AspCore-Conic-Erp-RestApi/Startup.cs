@@ -1,9 +1,6 @@
 using Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,12 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
+
 
 namespace AspCore_Conic_Erp_RestApi
 {
@@ -63,7 +55,7 @@ namespace AspCore_Conic_Erp_RestApi
             services.AddHttpContextAccessor();
            services.AddControllers().AddNewtonsoftJson(options =>
             {
-                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+             options.SerializerSettings.ContractResolver = new DefaultContractResolver();
              //   options.SerializerSettings.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
              options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
             });
@@ -76,28 +68,21 @@ namespace AspCore_Conic_Erp_RestApi
             {
                 app.UseDeveloperExceptionPage();
                 app.UseMigrationsEndPoint();
-
             }
  
             app.UseHttpsRedirection();
-
             app.UseDefaultFiles();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseCors(x => x
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .SetIsOriginAllowed(origin => true) // allow any origin
                 .AllowCredentials()
                 ); // allow credentials
-
             app.UseCookiePolicy();
-
             app.UseAuthentication();
             app.UseAuthorization();
-
  
             app.UseEndpoints(endpoints =>
             {

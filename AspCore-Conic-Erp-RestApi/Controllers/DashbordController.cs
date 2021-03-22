@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
     [Authorize]
-
     public class DashbordController : Controller
     {
 
