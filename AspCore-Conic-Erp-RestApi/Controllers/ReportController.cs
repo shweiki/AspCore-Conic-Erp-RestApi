@@ -20,6 +20,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
              x.Id,
              x.Name ,
              x.AutoPrint ,
+             x.Type ,
              x.Keys ,
              x.Html ,
              x.Printer ,
@@ -46,6 +47,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                 x.Id,
                 x.Name,
+                x.Type,
                 x.AutoPrint,
                 x.Keys,
                 x.Html,
@@ -90,6 +92,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
        
                     Report.Name = collection.Name;
                     Report.AutoPrint = collection.AutoPrint;
+                    Report.Type = collection.Type;
                     Report.Keys = collection.Keys;
                     Report.Html = collection.Html;
                     Report.Printer = collection.Printer;
@@ -115,6 +118,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             var Report = DB.Reports.Where(i => i.Id == ID).Select(x => new {
                 x.Id,
                 x.Name,
+                x.Type,
                 x.AutoPrint,
                 x.Keys,
                 x.Html,
