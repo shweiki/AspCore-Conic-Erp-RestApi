@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Entities; 
@@ -11,11 +10,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class ReportController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
+
         [HttpPost]
         [Route("Report/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page,  string Any)
         {
-            var Reports = DB.Reports.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true)  ).Select(x => new
+            var Reports = DB.Reports.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Type.Contains(Any) : true)  ).Select(x => new
             {
              x.Id,
              x.Name ,
@@ -57,8 +57,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             
 
             return Ok(Invoices);
+        }  
+        
+        [Route("Report/GetTotal")]
+        [HttpGet]
+        public IActionResult GetTotal()
+        {                            
+
+            return Ok(DB.Reports.Count());
         }
-   [Route("Report/Create")]
+
+        [Route("Report/Create")]
         [HttpPost]
         public IActionResult Create(Report collection)
         {
@@ -80,6 +89,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
+
         [Route("Report/Edit")]
         [HttpPost]
         public IActionResult Edit(Report collection)
@@ -111,6 +121,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
+
         [Route("Report/GetReportByID")]
         [HttpGet]
         public IActionResult GetReportByID(long? ID)
