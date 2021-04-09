@@ -117,6 +117,7 @@
 
   <ItemGroup>
     <Folder Include="Images\" />
+    <Folder Include="Excel\" />
   </ItemGroup>
 
   <ItemGroup>
