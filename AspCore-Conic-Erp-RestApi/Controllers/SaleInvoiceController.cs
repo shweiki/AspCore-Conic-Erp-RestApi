@@ -14,9 +14,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private ConicErpContext DB = new ConicErpContext();
         [HttpPost]
         [Route("SaleInvoice/GetByListQ")]
-        public IActionResult GetByListQ(int Limit ,string Sort,int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status ,string Any)
+        public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
         {
-            var Invoices = DB.SalesInvoices.Where(s =>(Any != null?  s.Id.ToString().Contains(Any)||s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+            var Invoices = DB.SalesInvoices.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any)|| s.Description.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&(User != null ? DB.ActionLogs.Where(l =>l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
             {
                 x.Id,
@@ -26,6 +26,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
+                x.Region,
+                x.DeliveryPrice,
                 x.Type,
                 x.Description,
                 TotalCost = x.InventoryMovements.Sum(s => s.Items.CostPrice * s.Qty),
@@ -69,6 +71,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.Tax,
                 x.TypeMove,
+                x.SalesInvoice.Region,
+                x.SalesInvoice.DeliveryPrice,
                 Name = x.SalesInvoice.Vendor.Name + x.SalesInvoice.Member.Name,
                 x.SalesInvoice.FakeDate,
                 x.Description,
@@ -93,6 +97,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
+                x.Region,
+                x.DeliveryPrice,
                 x.Type,
                 x.Description,
                 AccountId =  DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
@@ -113,6 +119,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Invoices);
         }
         [HttpPost]
+        [Route("SaleInvoice/Create")]
+
         public IActionResult Create(SalesInvoice collection)
         {
             if (ModelState.IsValid)
@@ -120,7 +128,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 try
                 {
                     // TODO: Add insert logic here
-                 //   collection.FakeDate = collection.FakeDate.ToLocalTime();
+                  // collection.FakeDate = collection.FakeDate.ToLocalTime();
                     DB.SalesInvoices.Add(collection);
                     DB.SaveChanges();
                     return Ok(collection.Id);
@@ -152,6 +160,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Invoice.VendorId = collection.VendorId;
                     Invoice.FakeDate = collection.FakeDate;
                     Invoice.PaymentMethod = collection.PaymentMethod;
+                    Invoice.DeliveryPrice = collection.DeliveryPrice;
+                    Invoice.Region = collection.Region;
                     Invoice.Name = collection.Name;
                     Invoice.MemberId = collection.MemberId;
                     Invoice.IsPrime = collection.IsPrime;
@@ -183,6 +193,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Tax,
                 x.FakeDate,
                 x.PaymentMethod,
+                x.Region,
+                x.DeliveryPrice,
                 x.Status,
                 x.Type,
                 x.Description,
