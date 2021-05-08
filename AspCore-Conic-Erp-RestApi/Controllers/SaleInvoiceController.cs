@@ -22,7 +22,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.Discount,
                 x.Tax,
-                Name = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+                Name = x.Name + DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
                 x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
@@ -30,9 +30,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.DeliveryPrice,
                 x.Type,
                 x.Description,
+                x.VendorId,
+                x.PhoneNumber,
+                x.Vendor,
                 TotalCost = x.InventoryMovements.Sum(s => s.Items.CostPrice * s.Qty),
                 Total = x.InventoryMovements.Sum(s=>s.SellingPrice *s.Qty) - x.Discount,
-                Logs= DB.ActionLogs.Where(l=>l.SalesInvoiceId == x.Id).ToList(),
+                ActionLogs = DB.ActionLogs.Where(l=>l.SalesInvoiceId == x.Id).ToList(),
                 AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
                 InventoryMovements = x.InventoryMovements.Select(imx => new {
                     imx.Id,
@@ -99,6 +102,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.Region,
                 x.DeliveryPrice,
+                x.PhoneNumber,
                 x.Type,
                 x.Description,
                 AccountId =  DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
@@ -164,6 +168,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Invoice.Region = collection.Region;
                     Invoice.Name = collection.Name;
                     Invoice.MemberId = collection.MemberId;
+                    Invoice.PhoneNumber = collection.PhoneNumber;
                     Invoice.IsPrime = collection.IsPrime;
                     Invoice.Type = collection.Type;
                     DB.InventoryMovements.RemoveRange(DB.InventoryMovements.Where(m=>m.SalesInvoiceId ==Invoice.Id).ToList());
@@ -198,17 +203,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.Type,
                 x.Description,
+                x.PhoneNumber,
                 InventoryMovements = DB.InventoryMovements.Where(Im => Im.SalesInvoiceId == x.Id).Select(m => new {
                     m.Id,
                     m.ItemsId,
                     m.TypeMove,
                     m.Status,
                     m.Qty,
-                    Itemx = new
-                    {
-                        m.SellingPrice,
-                        m.Items.Name
-                    },
+                    m.Items.Name,
                     m.SalesInvoiceId,
                     m.InventoryItemId,
                     m.SellingPrice,

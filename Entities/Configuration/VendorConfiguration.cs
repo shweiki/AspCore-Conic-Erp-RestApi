@@ -18,7 +18,7 @@ namespace Entities.Configuration
 
                 builder.Property(e => e.AccountId);
 
-                builder.Property(e => e.Address);
+                builder.Property(e => e.Region);
 
                 builder.Property(e => e.Description);
 
@@ -63,7 +63,7 @@ namespace Entities.Configuration
                     Name = "زبون نقدي",
                     Description = "",
                     Status = 0,
-                    Address = null,
+                    Region = null,
                     Email = null,
                     PhoneNumber1 = null,
                     PhoneNumber2 = null,

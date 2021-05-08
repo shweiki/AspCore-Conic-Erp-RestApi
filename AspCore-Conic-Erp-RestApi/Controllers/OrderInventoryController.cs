@@ -104,10 +104,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     m.Qty,
                     m.ItemsId,
                     m.TypeMove,
-                    Itemx = new
-                    {
-                        m.Items.Name
-                    },
+                    m.Items.Name,
                     m.InventoryItemId,
                     InventoryName = m.InventoryItem.Name,
                     m.Description

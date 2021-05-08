@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210504194002_add PhoneNumber to sale invoice")]
+    partial class addPhoneNumbertosaleinvoice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

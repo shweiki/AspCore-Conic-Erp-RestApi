@@ -17,7 +17,8 @@ namespace Entities
 
         public long Id { get; set; }
         public string Name { get; set; }
-        public string Address { get; set; }
+        public string Ssn { get; set; }
+        public string Region { get; set; }
         public string Email { get; set; }
         public string PhoneNumber1 { get; set; }
         public string PhoneNumber2 { get; set; }

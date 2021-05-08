@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210501184849_Change Address to Region")]
+    partial class ChangeAddresstoRegion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1414,9 +1416,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Region")
                         .HasColumnType("nvarchar(max)");
 
@@ -1662,9 +1661,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("varchar(13)");
 
                     b.Property<string>("Region")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Ssn")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")

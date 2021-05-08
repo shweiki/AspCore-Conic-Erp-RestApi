@@ -2,7 +2,7 @@
 using System.Data;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
-using Entities; 
+using Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
@@ -21,7 +21,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.Discount,
                 x.Tax,
-                Name = x.Vendor.Name ,
+                Name = x.Vendor.Name,
                 x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
@@ -31,7 +31,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
                 Logs = DB.ActionLogs.Where(l => l.PurchaseInvoiceId == x.Id).ToList(),
                 AccountId = x.Vendor.AccountId,
-                InventoryMovements = x.InventoryMovements.Select(imx => new {
+                InventoryMovements = x.InventoryMovements.Select(imx => new
+                {
                     imx.Id,
                     imx.ItemsId,
                     imx.Items.Name,
@@ -84,7 +85,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     m.Description
                 }).ToList()
             }).ToList();
-                            
+
 
             return Ok(Invoices);
         }
@@ -148,7 +149,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Invoice.FakeDate = collection.FakeDate;
                     Invoice.InvoicePurchaseDate = collection.InvoicePurchaseDate;
                     Invoice.PaymentMethod = collection.PaymentMethod;
-                    DB.InventoryMovements.RemoveRange(DB.InventoryMovements.Where(x=>x.PurchaseInvoiceId == Invoice.Id).ToList());
+                    DB.InventoryMovements.RemoveRange(DB.InventoryMovements.Where(x => x.PurchaseInvoiceId == Invoice.Id).ToList());
                     Invoice.InventoryMovements = collection.InventoryMovements;
                     Invoice.InventoryMovements.ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
 
@@ -169,7 +170,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetPurchaseInvoiceByID(long? ID)
         {
-            var Invoices = DB.PurchaseInvoices.Where(i => i.Id == ID).Select(x => new {
+            var Invoices = DB.PurchaseInvoices.Where(i => i.Id == ID).Select(x => new
+            {
                 x.Id,
                 Name = x.Vendor.Name + " - " + x.Name,
                 x.VendorId,
@@ -181,25 +183,22 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PaymentMethod,
                 x.Status,
                 x.Description,
-                InventoryMovements = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId == x.Id && i.TypeMove == "In").Select(m => new {
+                InventoryMovements = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId == x.Id && i.TypeMove == "In").Select(m => new
+                {
                     m.Id,
                     m.ItemsId,
                     m.TypeMove,
                     m.Status,
                     m.Qty,
-                    Itemx = new
-                    {
-                        m.SellingPrice,
-                        m.Items.Name
-                    },
+                    m.SellingPrice,
+                    m.Items.Name,
                     m.PurchaseInvoiceId,
                     m.InventoryItemId,
-                    m.SellingPrice,
                     m.Description
                 }).ToList()
-                                
+
             }).SingleOrDefault();
-                       
+
 
             return Ok(Invoices);
         }
