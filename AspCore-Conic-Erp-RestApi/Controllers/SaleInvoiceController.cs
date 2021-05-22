@@ -16,13 +16,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("SaleInvoice/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
         {
-            var Invoices = DB.SalesInvoices.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any)|| s.Description.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+            var Invoices = DB.SalesInvoices.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any)|| s.Description.Contains(Any)  || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any)|| s.Region.Contains(Any) : true ) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&(User != null ? DB.ActionLogs.Where(l =>l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
             {
                 x.Id,
                 x.Discount,
                 x.Tax,
-                Name = x.Name + DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+                Name = x.Name , //+ DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
                 x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
