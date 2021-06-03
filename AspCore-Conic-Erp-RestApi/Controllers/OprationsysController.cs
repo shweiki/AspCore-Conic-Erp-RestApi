@@ -46,8 +46,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.ClassName,
                 x.Color,
             }).ToList();
-                 
-                          
             return Ok(Oprations);
 
         }

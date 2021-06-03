@@ -31,6 +31,7 @@ namespace Entities
         public virtual DbSet<Device> Devices { get; set; }
         public virtual DbSet<Discount> Discounts { get; set; }
         public virtual DbSet<EditorsUser> EditorsUsers { get; set; }
+        public virtual DbSet<Driver> Drivers { get; set; }
         public virtual DbSet<EntryAccounting> EntryAccountings { get; set; }
         public virtual DbSet<EntryMovement> EntryMovements { get; set; }
         public virtual DbSet<FileDatum> FileData { get; set; }
