@@ -65,7 +65,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.Name,
                 x.Description,
-             
+              //  InventoryQty = InventoryQty(x.Id)
             }).ToList();
 
             return Ok(InventoryItems);
@@ -82,9 +82,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("InventoryItem/InventoryQty")]
         [HttpPost]
-        public IActionResult InventoryQty(long ID)
+        public IActionResult InventoryQty(long Id)
         {
-            var InventoryQty = (from i in DB.InventoryMovements.Where(o => o.InventoryItemId == ID).ToList()
+            var InventoryQty = (from i in DB.InventoryMovements.Where(o => o.InventoryItemId == Id).ToList()
                                 group i by i.ItemsId into g
                                 select new
                                 {

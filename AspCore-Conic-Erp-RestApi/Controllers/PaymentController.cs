@@ -82,7 +82,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Name = x.Vendor.Name + " " + x.Member.Name + " - " + x.Name,
                 x.FakeDate,
                 x.PaymentMethod,
-                ObjectID = x.VendorId == null ? x.MemberId : x.VendorId,
+                ObjectId = x.VendorId == null ? x.MemberId : x.VendorId,
                 x.Description,
                 AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
                x.Status
@@ -103,7 +103,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Name = x.Vendor.Name + " " + x.Member.Name + " - " + x.Name,
                 x.FakeDate,
                 x.PaymentMethod,
-                ObjectID = x.VendorId == null ? x.MemberId : x.VendorId,
+               ObjectId = x.VendorId == null ? x.MemberId : x.VendorId,
                 x.Status,
                 x.Description,
                 AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,

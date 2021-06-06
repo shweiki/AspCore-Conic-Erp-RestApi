@@ -121,11 +121,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(false);
         }
 
-        [Route("MemberLog/GetMemberLogByID")]
+        [Route("MemberLog/GetMemberLogById")]
         [HttpGet]
-        public IActionResult GetMemberLogByID(long? ID)
+        public IActionResult GetMemberLogById(long? Id)
         {
-            var MemberLogs = DB.MemberLogs.Where(i => i.MemberId == ID).Select(x => new {
+            var MemberLogs = DB.MemberLogs.Where(i => i.MemberId == Id).Select(x => new {
                 x.Status,
                 x.Type,
                 x.DateTime,
@@ -137,9 +137,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                           
             return Ok(MemberLogs);
         }
-        public Boolean RegisterMemberLog(long? ID , DateTime datetime)
+        public Boolean RegisterMemberLog(long? Id , DateTime datetime)
         {
-            var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
+            var member = DB.Members.Where(m => m.Id == Id).FirstOrDefault();
             if (member == null) return false;
             var isLogSaveIt = DB.MemberLogs.Where(l => l.MemberId == member.Id).ToList();
             isLogSaveIt = DB.MemberLogs.Where(Ld => Ld.DateTime == datetime).ToList();

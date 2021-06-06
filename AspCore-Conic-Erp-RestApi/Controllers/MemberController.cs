@@ -30,6 +30,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.AccountId,
                 x.Tag,
+                x.Vaccine,
                 TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
                 TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum()
             }).ToList();
@@ -51,6 +52,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.AccountId,
                 x.Tag,
+                x.Vaccine,
                 TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
                 TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum()
             }).ToList();
@@ -91,6 +93,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.AccountId,
                 x.Tag,
+                x.Vaccine,
                 TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
                 TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum(),
             }).ToList();
@@ -138,7 +141,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.TotalAmmount,
                     x.Description,
                     x.Status,
-                 // lastLog = DB.MemberLogs.Where(ml => ml.MemberId == x.MemberId).LastOrDefault().DateTime,
+                  x.Member.Vaccine,
+                  // lastLog = DB.MemberLogs.Where(ml => ml.MemberId == x.MemberId).LastOrDefault().DateTime,
                   x.MemberId
                 }).ToList();
                 return Ok(Members);
@@ -165,6 +169,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.AccountId,
                 x.Tag,
+                x.Vaccine,
                 TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
                 TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum()
                 // Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg").ToString(),
@@ -222,6 +227,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 member.Status = collection.Status;
                 member.Type = collection.Type;
                 member.Tag = collection.Tag;
+                member.Vaccine = collection.Vaccine;
                 try
                 {
                     DB.SaveChanges();
@@ -235,11 +241,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
         }
-        [Route("Member/GetMemberByID")]
+        [Route("Member/GetMemberById")]
         [HttpGet]
-        public IActionResult GetMemberByID(long? ID)
+        public IActionResult GetMemberById(long? Id)
         {
-            var Members = DB.Members.Where(m => m.Id == ID).Select(
+            var Members = DB.Members.Where(m => m.Id == Id).Select(
                 x => new
                 {
                     x.Id,
@@ -253,6 +259,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Status,
                     x.Type,
                     x.Tag,
+                    x.Vaccine,
                     HaveFaceOnDevice = x.MemberFaces.Count() > 0 ? true : false,
                     Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg"),
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
@@ -363,14 +370,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             //    if (DeviceIsEnable)
             //        if (DoorZtk.LastSetDateTime < DateTime.Today)
             //        {
-            //            device.EnableMemberToDevice(DoorZtk.ID, M.Id, EnableToDevice);
+            //            device.EnableMemberToDevice(DoorZtk.Id, M.Id, EnableToDevice);
             //        }
 
             //}
 
             //    DoorZtk.LastSetDateTime = DateTime.Today;
 
-            /////device.DisconnectDeviceHere((int)DoorZtk.ID);
+            /////device.DisconnectDeviceHere((int)DoorZtk.Id);
             DB.SaveChanges();
 
             return Ok(true);

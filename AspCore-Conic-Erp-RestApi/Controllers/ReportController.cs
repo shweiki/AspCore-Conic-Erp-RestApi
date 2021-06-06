@@ -122,11 +122,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             else return Ok(false);
         }
 
-        [Route("Report/GetReportByID")]
+        [Route("Report/GetReportById")]
         [HttpGet]
-        public IActionResult GetReportByID(long? ID)
+        public IActionResult GetReportById(long? Id)
         {
-            var Report = DB.Reports.Where(i => i.Id == ID).Select(x => new {
+            var Report = DB.Reports.Where(i => i.Id == Id).Select(x => new {
                 x.Id,
                 x.Name,
                 x.Type,

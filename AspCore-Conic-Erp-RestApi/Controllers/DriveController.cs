@@ -154,11 +154,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
         }
-        [Route("Driver/GetDriverByID")]
+        [Route("Driver/GetDriverById")]
         [HttpGet]
-        public IActionResult GetDriverByID(long? ID)
+        public IActionResult GetDriverById(long? Id)
         {
-            var Drivers = DB.Drivers.Where(m => m.Id == ID).Select(
+            var Drivers = DB.Drivers.Where(m => m.Id == Id).Select(
                 x => new
                 {
                     x.Id,

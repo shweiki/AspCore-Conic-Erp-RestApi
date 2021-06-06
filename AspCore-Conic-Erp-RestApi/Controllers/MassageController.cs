@@ -18,12 +18,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class MassageController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
-        [Route("Massage/GetMassageObjID")]
+        [Route("Massage/GetMassageObjId")]
         [HttpGet]
-        public IActionResult GetMassageObjID(string TableName , long ObjID )
+        public IActionResult GetMassageObjId(string TableName , long ObjId )
         {
 
-            var Massage = DB.Massages.Where(i => i.TableName == TableName && i.Fktable == ObjID).Select(x => new {
+            var Massage = DB.Massages.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new {
                 x.Id,
                 x.SendDate,
                 x.Type,

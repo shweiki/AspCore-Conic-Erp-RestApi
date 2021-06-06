@@ -124,11 +124,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
         }
-        [Route("Vendor/GetByID")]
+        [Route("Vendor/GetById")]
         [HttpGet]
-        public IActionResult GetByID(long? ID)
+        public IActionResult GetById(long? Id)
         {
-            var Vendor = DB.Vendors.Where(m => m.Id == ID).Select(
+            var Vendor = DB.Vendors.Where(m => m.Id == Id).Select(
                 x => new
                 {
                     x.Id,

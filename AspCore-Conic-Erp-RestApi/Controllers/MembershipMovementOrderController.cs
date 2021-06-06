@@ -12,11 +12,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class MembershipMovementOrderController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
-        [Route("MembershipMovementOrder/GetMembershipMovementOrderByMemberShipID")]
+        [Route("MembershipMovementOrder/GetMembershipMovementOrderByMemberShipId")]
         [HttpGet]
-        public IActionResult GetMembershipMovementOrderByMemberShipID(long? MemberShipID)
+        public IActionResult GetMembershipMovementOrderByMemberShipId(long? MemberShipId)
         {
-            var MembershipMovementOrder = DB.MembershipMovementOrders.Where(i => i.MemberShipMovementId == MemberShipID).Select(x => new
+            var MembershipMovementOrder = DB.MembershipMovementOrders.Where(i => i.MemberShipMovementId == MemberShipId).Select(x => new
             {
                 x.Id,
                 x.EditorName,

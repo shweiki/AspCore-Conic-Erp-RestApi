@@ -28,6 +28,7 @@ namespace Entities
         public long AccountId { get; set; }
         public string Ssn { get; set; }
         public string Tag { get; set; }
+        public string Vaccine { get; set; }
 
         public virtual Account Account { get; set; }
         public virtual ICollection<MemberFace> MemberFaces { get; set; }

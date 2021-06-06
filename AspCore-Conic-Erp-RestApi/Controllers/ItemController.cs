@@ -39,8 +39,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Barcode,
                 x.Category,
                 x.Description,
-                  TotalIn = x.InventoryMovements.Where(x => x.TypeMove == "In").Count(),
-                  TotalOut = x.InventoryMovements.Where(x => x.TypeMove == "Out").Count(),
+                x.Ingredients,
+                TotalIn = x.InventoryMovements.Where(x => x.TypeMove == "In").Count(),
+                TotalOut = x.InventoryMovements.Where(x => x.TypeMove == "Out").Count(),
               }
         ).ToList();
             Items = (Sort == "+id" ? Items.OrderBy(s => s.Id).ToList() : Items.OrderByDescending(s => s.Id).ToList());
@@ -94,6 +95,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Barcode,
                 x.Category,
                 x.Description,
+                x.Ingredients,
              //   InventoryQty = CalculateInventoryItemQty(x.Id),
             }).ToList();
                          
@@ -117,16 +119,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Barcode,
                 x.Description,
                 x.Category,
-               // InventoryQty = CalculateInventoryItemQty(x.Id),
+                x.Ingredients,
+                // InventoryQty = CalculateInventoryItemQty(x.Id),
             }).ToList();
 
             return Ok(Items);
         }
         [HttpGet]
         [Route("Item/GetItemMove")]
-        public IActionResult GetItemMove(long ItemID, DateTime DateFrom, DateTime DateTo)
+        public IActionResult GetItemMove(long ItemId, DateTime DateFrom, DateTime DateTo)
         {
-            var SalesInvoiceMove = DB.InventoryMovements.Where(i => i.SalesInvoiceId != null && i.ItemsId == ItemID && i.SalesInvoice.FakeDate >= DateFrom && i.SalesInvoice.FakeDate <= DateTo).Select(x => new
+            var SalesInvoiceMove = DB.InventoryMovements.Where(i => i.SalesInvoiceId != null && i.ItemsId == ItemId && i.SalesInvoice.FakeDate >= DateFrom && i.SalesInvoice.FakeDate <= DateTo).Select(x => new
             {
                 x.Id,
                 x.SellingPrice,
@@ -142,7 +145,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Type = "مبيعات"
             }).ToList();
 
-            var PurchaseInvoiceMove = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId != null && i.ItemsId == ItemID && i.PurchaseInvoice.FakeDate >= DateFrom && i.PurchaseInvoice.FakeDate <= DateTo).Select(x => new
+            var PurchaseInvoiceMove = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId != null && i.ItemsId == ItemId && i.PurchaseInvoice.FakeDate >= DateFrom && i.PurchaseInvoice.FakeDate <= DateTo).Select(x => new
             {
                 x.Id,
                 x.SellingPrice,
@@ -158,7 +161,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.ItemsId
             }).ToList();
 
-            var OrderInventoryMove = DB.InventoryMovements.Where(i => i.OrderInventoryId != null && i.ItemsId == ItemID && i.OrderInventory.FakeDate >= DateFrom && i.OrderInventory.FakeDate <= DateTo).Select(x => new {
+            var OrderInventoryMove = DB.InventoryMovements.Where(i => i.OrderInventoryId != null && i.ItemsId == ItemId && i.OrderInventory.FakeDate >= DateFrom && i.OrderInventory.FakeDate <= DateTo).Select(x => new {
                 x.Id,
                 x.SellingPrice,
                 x.Qty,
@@ -176,10 +179,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(new { OrderInventoryMove, PurchaseInvoiceMove, SalesInvoiceMove });
         }
         [HttpGet]
-        [Route("Item/GetItemByID")]
-        public IActionResult GetItemByID(long ID)
+        [Route("Item/GetItemById")]
+        public IActionResult GetItemById(long Id)
         {
-            var Item = DB.Items.Where(x=>x.Id == ID).Select(x=> new 
+            var Item = DB.Items.Where(x=>x.Id == Id).Select(x=> new 
                         {
                             x.Id,
                             x.Name,
@@ -194,8 +197,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             x.IsPrime,
                             x.Status,
                             x.Category,
-                          //  InventoryQty = CalculateInventoryItemQty(x.Id)
-                        }).SingleOrDefault();
+                x.Ingredients,
+
+                //  InventoryQty = CalculateInventoryItemQty(x.Id)
+            }).SingleOrDefault();
             return Ok(Item);
         }
         [HttpGet]
@@ -217,8 +222,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             x.IsPrime,
                             x.Status,
                             x.Category,
-                          //  InventoryQty = CalculateInventoryItemQty(x.Id)
-                        }).FirstOrDefault();
+                x.Ingredients,
+
+                //  InventoryQty = CalculateInventoryItemQty(x.Id)
+            }).FirstOrDefault();
             if(Item != null)
             return Ok(Item);
             else return Ok(false);
@@ -262,6 +269,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 item.IsPrime = collection.IsPrime;
                 item.Description = collection.Description;
                 item.Category = collection.Category;
+                item.Ingredients = collection.Ingredients;
+
                 try
                 {
                     DB.SaveChanges();
@@ -278,13 +287,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("Item/CalculateInventoryItemQty")]
         [HttpPost]
-        public IActionResult CalculateInventoryItemQty(long ID)
+        public IActionResult CalculateInventoryItemQty(long Id)
         {
-            var InventoryItemsQty = from x in DB.InventoryMovements.Where(i => i.ItemsId == ID && i.Status == 0).ToList()
+            var InventoryItemsQty = from x in DB.InventoryMovements.Where(i => i.ItemsId == Id && i.Status == 0).ToList()
                                     group x by x.InventoryItemId into g
                                     select new
                                     {
-                                        InventoryItemID = g.Key,
+                                        InventoryItemId = g.Key,
                                         InventoryName = DB.InventoryItems.Where(a => a.Id == g.Key).Select(c => c.Name).FirstOrDefault(),
                                         QtyIn = g.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty),
                                         QtyOut = g.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty)

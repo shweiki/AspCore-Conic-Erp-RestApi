@@ -88,11 +88,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
-        [Route("OrderInventory/GetOrderInventoryByID")]
+        [Route("OrderInventory/GetOrderInventoryById")]
         [HttpGet]
-        public IActionResult GetOrderInventoryByID(long? ID)
+        public IActionResult GetOrderInventoryById(long? Id)
         {
-            var Orders = DB.OrderInventories.Where(i => i.Id == ID).Select(x => new {
+            var Orders = DB.OrderInventories.Where(i => i.Id == Id).Select(x => new {
 
                 x.Id,
                 x.FakeDate,

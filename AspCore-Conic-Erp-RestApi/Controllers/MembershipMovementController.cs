@@ -72,7 +72,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult CheckMembershipMovement()
         {
-            DateTime MaxDate = new DateTime(2020, 11, 1);
+            DateTime MaxDate = new DateTime(2021, 1, 1);
             IList<MembershipMovement>  MembershipMovements = DB.MembershipMovements.Where(x=>  x.EndDate  >= MaxDate)?.OrderBy(s => s.Id).ToList();
          
             foreach (MembershipMovement MS in MembershipMovements)
@@ -217,11 +217,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(MembershipMovements);
         }
-        [Route("MembershipMovement/GetMembershipMovementByID")]
+        [Route("MembershipMovement/GetMembershipMovementById")]
         [HttpGet]
-        public IActionResult GetMembershipMovementByID(long? ID)
+        public IActionResult GetMembershipMovementById(long? Id)
         {
-            var MembershipMovements = DB.MembershipMovements.Where(z => z.Id == ID).Select(x => new {
+            var MembershipMovements = DB.MembershipMovements.Where(z => z.Id == Id).Select(x => new {
                 x.Id,
                 x.VisitsUsed,
                 x.Type,
@@ -272,8 +272,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMembershipMovementByDateIn(DateTime DateIn)
         {
+
          
-            var MembershipMovements = DB.MembershipMovements.Where(z => DateIn >= z.StartDate && DateIn <= z.EndDate).Select(x => new {
+            var MembershipMovements = DB.MembershipMovements.Where(z => DateIn >= z.StartDate && z.EndDate  >= DateIn).Select(x => new {
                 x.Id,
                 x.TotalAmmount,
                 x.Tax,
@@ -291,9 +292,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 MemberName = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
                 MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
             }).ToList();
-                         
+     
                               
-            return Ok(MembershipMovements);
+          return Ok(MembershipMovements);
         }
     }
 }

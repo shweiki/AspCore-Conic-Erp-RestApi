@@ -74,9 +74,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
 
         [Route("Device/CheckDevice")]
-        public IActionResult CheckDevice(int ID)
+        public IActionResult CheckDevice(int Id)
         {
-            var Device = DB.Devices.Where(x => x.Id == ID).SingleOrDefault();
+            var Device = DB.Devices.Where(x => x.Id == Id).SingleOrDefault();
             if (Device != null)
             {
                 int DeviceId = (int)Device.Id;
@@ -89,7 +89,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 if (!isValidIpA)
                     Device.Description = "The device at " + Device.Ip + ":" + Device.Port + " did not respond!!";
 
-                if (isValidIpA && DisconnectDeviceHere(ID))
+                if (isValidIpA && DisconnectDeviceHere(Id))
                 {
                     objZkeeper = new ZkemClient(RaiseDeviceEvent);
                     Device.Description = "Is Device Connected : ";
@@ -104,11 +104,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("Device/SetUser")]
         [HttpGet]
-        public IActionResult SetUser(long DeviceId ,  long UserID  )
+        public IActionResult SetUser(long DeviceId ,  long UserId  )
         {
             if (CheckDeviceHere((int)DeviceId)) {
 
-                var member = DB.Members.Where(m => m.Id == UserID).FirstOrDefault();
+                var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
      
                 bool SetUser = objZkeeper.SSR_SetUserInfo((int)DeviceId, member.Id.ToString(), member.Name, "", 0, true);
                 if (SetUser)
@@ -149,7 +149,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("Device/GetUserLog")]
         [HttpGet]
-        public IActionResult GetUserLog(long DeviceId, long UserID)
+        public IActionResult GetUserLog(long DeviceId, long UserId)
         {
             try
             {
@@ -159,7 +159,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                     if (MachineLog != null && MachineLog.Count > 0)
                     {
-                        var member = DB.Members.Where(m => m.Id == UserID).FirstOrDefault();
+                        var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
 
                         foreach (var ML in MachineLog.Where(mlo=> mlo.IndRegID == (int)member.Id).ToList())
                         {
@@ -202,10 +202,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             
         }
-        public bool CheckDeviceHere(int ID)
+        public bool CheckDeviceHere(int Id)
         {
 
-            var Device = DB.Devices.Where(x => x.Id == ID).SingleOrDefault();
+            var Device = DB.Devices.Where(x => x.Id == Id).SingleOrDefault();
             bool IsDeviceConnected = false;
             bool isValidIpA = UniversalStatic.ValidateIP(Device.Ip);
 
@@ -214,7 +214,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             isValidIpA = UniversalStatic.PingTheDevice(Device.Ip);
             if (!isValidIpA)
                 Device.Description = "The device at " + Device.Ip + ":" + Device.Port + " did not respond!!";
-            if (isValidIpA && DisconnectDeviceHere(ID))
+            if (isValidIpA && DisconnectDeviceHere(Id))
             {
                 objZkeeper = new ZkemClient(RaiseDeviceEvent);
                 Device.Description = "Is Device Connected : ";
@@ -225,9 +225,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             DB.SaveChanges();
             return IsDeviceConnected;
         }
-        public bool DisconnectDeviceHere(int ID)
+        public bool DisconnectDeviceHere(int Id)
         {
-            var Device = DB.Devices.Where(x => x.Id == ID).SingleOrDefault();
+            var Device = DB.Devices.Where(x => x.Id == Id).SingleOrDefault();
             bool isValidIpA = UniversalStatic.ValidateIP(Device.Ip);
 
             if (!isValidIpA)
@@ -244,11 +244,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             DB.SaveChanges();
             return true;
         }
-        public bool EnableMemberToDevice(long DeviceId , long UserID , bool Enable)
+        public bool EnableMemberToDevice(long DeviceId , long UserId , bool Enable)
         {
             if (CheckDeviceHere((int)DeviceId))
             {
-                var member = DB.Members.Where(m => m.Id == UserID).FirstOrDefault();
+                var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
 
                 bool SetUser = objZkeeper.SSR_SetUserInfo((int)DeviceId, member.Id.ToString(), member.Name, "", 0, Enable);
                 if (!SetUser)

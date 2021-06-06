@@ -16,12 +16,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class FileDataController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
-        [Route("Files/GetFileByObjID")]
+        [Route("Files/GetFileByObjId")]
         [HttpGet]
-        public IActionResult GetFileByObjID(string TableName , long ObjID )
+        public IActionResult GetFileByObjId(string TableName , long ObjId )
         {
 
-            var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjID).Select(x => new {
+            var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new {
                 x.Id,
                 x.File,
                 x.FileType

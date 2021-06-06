@@ -120,10 +120,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("Oprationsys/ChangeObjStatusByTableName")]
         [HttpPost]
-        public IActionResult ChangeObjStatusByTableName(long ObjID, string TableName, int Status, string Description)
+        public IActionResult ChangeObjStatusByTableName(long ObjId, string TableName, int Status, string Description)
         {
             Oprationsy Op = DB.Oprationsys.Where(x => x.TableName == TableName && x.Status == Status).SingleOrDefault();
-            if (ChangeStatus(ObjID, Op, Description))
+            if (ChangeStatus(ObjId, Op, Description))
             {
                 return Ok(true);
             }
@@ -131,22 +131,22 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("Oprationsys/ChangeObjStatus")]
         [HttpPost]
-        public IActionResult ChangeObjStatus(long ObjID, long OprationID, string Description)
+        public IActionResult ChangeObjStatus(long ObjId, long OprationId, string Description)
         {
-            Oprationsy Op = DB.Oprationsys.Where(x => x.Id == OprationID).SingleOrDefault();
+            Oprationsy Op = DB.Oprationsys.Where(x => x.Id == OprationId).SingleOrDefault();
 
-            if (ChangeStatus(ObjID, Op, Description)){
+            if (ChangeStatus(ObjId, Op, Description)){
                 return Ok();
             } else return NotFound(true);
         }
 
         [Route("Oprationsys/ChangeArrObjStatus")]
         [HttpPost]
-        public IActionResult ChangeArrObjStatus(List<int> ObjsID,  string TableName, int Status, string Description)
+        public IActionResult ChangeArrObjStatus(List<int> ObjsId,  string TableName, int Status, string Description)
         {
             Oprationsy Op = DB.Oprationsys.Where(x => x.TableName == TableName && x.Status == Status).SingleOrDefault();
 
-            foreach (long O in ObjsID)
+            foreach (long O in ObjsId)
             {
                 this.ChangeStatus(O, Op , Description);
             }
@@ -213,7 +213,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("Oprationsys/ChangeStatus")]
         [HttpPost]
-        public Boolean ChangeStatus(long? ObjID, Oprationsy Oprationsys, string Description)
+        public Boolean ChangeStatus(long? ObjId, Oprationsy Oprationsys, string Description)
         {
             ActionLog log = new ActionLog();
             // var claimsIdentity = (ClaimsIdentity)HttpContext.User.Identity;
@@ -226,99 +226,99 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             switch (Oprationsys.TableName)
             {
                 case "InventoryItem":
-                    log.InventoryItemId = (int)ObjID;
+                    log.InventoryItemId = (int)ObjId;
                     DB.InventoryItems.Where(x => x.Id == log.InventoryItemId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "OrderInventory":
-                    log.OrderInventoryId = ObjID;
+                    log.OrderInventoryId = ObjId;
                     DB.OrderInventories.Where(x => x.Id == log.OrderInventoryId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "StocktakingInventory":
-                    log.StocktakingInventoryId = ObjID;
+                    log.StocktakingInventoryId = ObjId;
                     DB.StocktakingInventories.Where(x => x.Id == log.StocktakingInventoryId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "UnitItem":
-                    log.UnitId = (int)ObjID;
+                    log.UnitId = (int)ObjId;
                     DB.UnitItems.Where(x => x.Id == log.UnitId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "MenuItem":
-                    log.MenuId = (int)ObjID;
+                    log.MenuId = (int)ObjId;
                     DB.MenuItems.Where(x => x.Id == log.MenuId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "OriginItem":
-                    log.OriginId = (int)ObjID;
+                    log.OriginId = (int)ObjId;
                     DB.OriginItems.Where(x => x.Id == log.OriginId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "Item":
-                    log.ItemsId = ObjID;
+                    log.ItemsId = ObjId;
                     DB.Items.Where(x => x.Id == log.ItemsId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "Vendor":
-                    log.VendorId = ObjID;
+                    log.VendorId = ObjId;
                     DB.Vendors.Where(x => x.Id == log.VendorId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "InventoryMovement":
-                    log.InventoryMovementId = ObjID;
+                    log.InventoryMovementId = ObjId;
                     DB.InventoryMovements.Where(x => x.Id == log.InventoryMovementId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "StockMovement":
-                    log.StockMovementId = ObjID;
+                    log.StockMovementId = ObjId;
                     DB.StockMovements.Where(x => x.Id == log.StockMovementId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "SalesInvoice":
-                    log.SalesInvoiceId = ObjID;
+                    log.SalesInvoiceId = ObjId;
                     DB.SalesInvoices.Where(x => x.Id == log.SalesInvoiceId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "PurchaseInvoice":
-                    log.PurchaseInvoiceId = ObjID;
+                    log.PurchaseInvoiceId = ObjId;
                     DB.PurchaseInvoices.Where(x => x.Id == log.PurchaseInvoiceId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "Account":
-                    log.AccountId = ObjID;
+                    log.AccountId = ObjId;
                     DB.Accounts.Where(x => x.Id == log.AccountId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "EntryAccounting":
-                    log.EntryId = ObjID;
+                    log.EntryId = ObjId;
                     DB.EntryAccountings.Where(x => x.Id == log.EntryId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "Payment":
-                    log.PaymentId = ObjID;
+                    log.PaymentId = ObjId;
                     DB.Payments.Where(x => x.Id == log.PaymentId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "Member":
-                    log.MemberId = ObjID;
+                    log.MemberId = ObjId;
                     DB.Members.Where(x => x.Id == log.MemberId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "Membership":
-                    log.MembershipId = (int)ObjID;
+                    log.MembershipId = (int)ObjId;
                     DB.Memberships.Where(x => x.Id == log.MembershipId).SingleOrDefault().Status = Oprationsys.Status;
                     break; 
                 case "MembershipMovement":
-                    log.MembershipMovementId = ObjID;
+                    log.MembershipMovementId = ObjId;
                     DB.MembershipMovements.Where(x => x.Id == log.MembershipMovementId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "MembershipMovementOrder":
-                    log.MembershipMovementOrderId = (int)ObjID;
+                    log.MembershipMovementOrderId = (int)ObjId;
                     DB.MembershipMovementOrders.Where(x => x.Id == log.MembershipMovementOrderId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "Bank":
-                    log.BankId = (int)ObjID;
+                    log.BankId = (int)ObjId;
                     DB.Banks.Where(x => x.Id == log.BankId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "Cheque":
-                    log.ChequeId = (int)ObjID;
+                    log.ChequeId = (int)ObjId;
                     DB.Cheques.Where(x => x.Id == log.ChequeId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "Cash":
-                    log.CashId = (int)ObjID;
+                    log.CashId = (int)ObjId;
                     DB.Cashes.Where(x => x.Id == log.CashId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "Discount":
-                    log.DiscountId = (int)ObjID;
+                    log.DiscountId = (int)ObjId;
                     DB.Discounts.Where(x => x.Id == log.DiscountId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "Service":
-                    log.ServiceId = (int)ObjID;
+                    log.ServiceId = (int)ObjId;
                     DB.Services.Where(x => x.Id == log.ServiceId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
             }

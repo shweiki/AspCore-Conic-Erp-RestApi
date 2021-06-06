@@ -85,7 +85,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     await HttpContext.SignInAsync(
                        "esvlogin",
                         new ClaimsPrincipal(claimsIdentity), authProperties);
-                    //var userID = User.Claims.Where(a => a.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value;
+                    //var userId = User.Claims.Where(a => a.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value;
 
                     return Ok("User logged in.");
                 }

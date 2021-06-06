@@ -91,9 +91,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("PurchaseInvoice/GetPurchaseItem")]
         [HttpGet]
-        public IActionResult GetPurchaseItem(long? ItemID, DateTime DateFrom, DateTime DateTo)
+        public IActionResult GetPurchaseItem(long? ItemId, DateTime DateFrom, DateTime DateTo)
         {
-            var Invoices = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId != null && i.ItemsId == ItemID && i.PurchaseInvoice.FakeDate >= DateFrom && i.PurchaseInvoice.FakeDate <= DateTo).Select(x => new
+            var Invoices = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId != null && i.ItemsId == ItemId && i.PurchaseInvoice.FakeDate >= DateFrom && i.PurchaseInvoice.FakeDate <= DateTo).Select(x => new
             {
                 x.Id,
                 x.SellingPrice,
@@ -166,11 +166,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
-        [Route("PurchaseInvoice/GetPurchaseInvoiceByID")]
+        [Route("PurchaseInvoice/GetPurchaseInvoiceById")]
         [HttpGet]
-        public IActionResult GetPurchaseInvoiceByID(long? ID)
+        public IActionResult GetPurchaseInvoiceById(long? Id)
         {
-            var Invoices = DB.PurchaseInvoices.Where(i => i.Id == ID).Select(x => new
+            var Invoices = DB.PurchaseInvoices.Where(i => i.Id == Id).Select(x => new
             {
                 x.Id,
                 Name = x.Vendor.Name + " - " + x.Name,

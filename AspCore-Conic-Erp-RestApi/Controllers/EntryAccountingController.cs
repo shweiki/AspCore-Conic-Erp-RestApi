@@ -76,11 +76,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
-        [Route("EntryAccounting/GetEntryByID")]
+        [Route("EntryAccounting/GetEntryById")]
         [HttpGet]
-        public IActionResult GetEntryByID(long? ID)
+        public IActionResult GetEntryById(long? Id)
         {
-            var Entrys = DB.EntryAccountings.Where(x => x.Id == ID).Select(x => new {
+            var Entrys = DB.EntryAccountings.Where(x => x.Id == Id).Select(x => new {
                 x.Id,
                 x.FakeDate,
                 x.Status,
