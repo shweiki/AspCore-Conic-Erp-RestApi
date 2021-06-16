@@ -31,6 +31,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.Description,
                 x.VendorId,
+                x.MemberId,
                 x.PhoneNumber,
                 x.Vendor,
                 TotalCost = x.InventoryMovements.Sum(s => s.Items.CostPrice * s.Qty),
@@ -220,6 +221,32 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }).ToList()
             }).SingleOrDefault();
 
+            return Ok(Invoices);
+        }
+        [Route("SaleInvoice/GetSaleInvoiceByMemberId")]
+        [HttpGet]
+        public IActionResult GetSaleInvoiceByMemberId(long? Id)
+        {
+            var Invoices = DB.SalesInvoices.Where(f => f.MemberId !=null && f.MemberId == Id && f.IsPrime == true).Select(SI => new
+            {
+                SI.Id,
+                SI.Name,
+                SI.Status,
+                SI.Type,
+                SI.Description,
+                SI.FakeDate,
+                SI.MemberId,
+                InventoryMovements = SI.InventoryMovements.Select(m => new
+                {
+                    m.Id,
+                    m.Status,
+                    m.Items.Name,
+                    m.Qty,
+                    m.SellingPrice,
+                    m.Description
+                }).ToList(),
+
+            }).ToList();
             return Ok(Invoices);
         }
 

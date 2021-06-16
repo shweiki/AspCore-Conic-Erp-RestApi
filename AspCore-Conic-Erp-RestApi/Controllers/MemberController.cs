@@ -276,24 +276,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         MS.Description,
                     }).FirstOrDefault(),
 
-                    ServiceInvoices = DB.SalesInvoices.Where(f => f.MemberId == x.Id && f.IsPrime == true).Select(SI => new
-                    {
-                        SI.Id,
-                        SI.Name,
-                        SI.Status,
-                        SI.Description,
-                        SI.FakeDate,
-                        InventoryMovements = SI.InventoryMovements.Select(m => new
-                        {
-                            m.Id,
-                            m.Status,
-                            m.Items.Name,
-                            m.Qty,
-                            m.SellingPrice,
-                            m.Description
-                        }).ToList(),
-
-                    }).ToList(),
+                
                 }).SingleOrDefault();
             return Ok(Members);
         }

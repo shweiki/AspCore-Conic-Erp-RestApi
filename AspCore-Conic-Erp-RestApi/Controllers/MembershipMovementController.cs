@@ -84,6 +84,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                 if ((DateTime.Now >= MS.StartDate && DateTime.Now <= MS.EndDate))
                 {
+                 
                         MS.Status = 1;
                         member.Status = 0;
                     var HowManyDaysLeft = (MS.EndDate - DateTime.Now).TotalDays;
