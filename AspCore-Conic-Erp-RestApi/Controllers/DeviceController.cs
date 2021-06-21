@@ -267,13 +267,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (CheckDeviceHere((int)DeviceId))
             {
-                IList<Member> Members = DB.Members.Where(x=>x.MembershipMovements.Count() != 0).ToList();
                 DateTime last = DateTime.Today.AddMonths(-3);
+                IList<Member> Members = DB.Members.Where(x=>x.MembershipMovements.Count() != 0 && (x.MembershipMovements != null ? x.MembershipMovements.OrderByDescending(x => x.Id).LastOrDefault().EndDate >= last : false )).ToList();
 
                 foreach (Member M in Members)
                 {
-                    var MemberShipLast = DB.MembershipMovements.Where(mm => mm.MemberId == M.Id && mm.EndDate >= last).ToList();
-                    if (MemberShipLast.Count() <=0 ) continue;
+                   // var MemberShipLast = DB.MembershipMovements.Where(mm => mm.MemberId == M.Id && mm.EndDate >= last).ToList();
+                   // if (MemberShipLast.Count() <=0 ) continue;
                     bool SetUser = objZkeeper.SSR_SetUserInfo(0, M.Id.ToString(), M.Name, "", 0, false);
                     if (SetUser)
                     {

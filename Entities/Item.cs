@@ -28,7 +28,7 @@ namespace Entities
         public string Category { get; set; }
         public string Description { get; set; }
         public string Ingredients { get; set; }
-
+     
         public int Status { get; set; }
         public bool IsPrime { get; set; }
 

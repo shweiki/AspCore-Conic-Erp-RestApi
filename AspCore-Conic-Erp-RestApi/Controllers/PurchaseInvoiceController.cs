@@ -39,6 +39,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     imx.TypeMove,
                     imx.InventoryItemId,
                     imx.Qty,
+                    imx.EXP,
                     imx.SellingPrice,
                     imx.Description
                 }).ToList(),
@@ -81,6 +82,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     m.Items.Name,
                     InventoryName = m.InventoryItem.Name,
                     m.Qty,
+                    m.EXP,
                     m.SellingPrice,
                     m.Description
                 }).ToList()
@@ -102,6 +104,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Tax,
                 x.PurchaseInvoice.FakeDate,
                 x.Description,
+                x.EXP,
 
             }).ToList();
 
@@ -194,7 +197,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     m.Items.Name,
                     m.PurchaseInvoiceId,
                     m.InventoryItemId,
-                    m.Description
+                    m.Description,
+                    m.EXP
                 }).ToList()
 
             }).SingleOrDefault();

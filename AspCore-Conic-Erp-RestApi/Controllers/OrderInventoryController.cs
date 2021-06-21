@@ -27,6 +27,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     m.Id,
                     m.Items.Name,
                     m.Qty,
+                    m.EXP,
                     InventoryName = m.InventoryItem.Name,
                     m.Description
                 }).ToList()
@@ -73,8 +74,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Order.Description = collection.Description;
                     Order.Status = collection.Status;
                     Order.FakeDate = collection.FakeDate;
-                    DB.InventoryMovements.RemoveRange(Order.InventoryMovements);
+                    DB.InventoryMovements.RemoveRange(DB.InventoryMovements.Where(x => x.OrderInventoryId == Order.Id).ToList());
                     Order.InventoryMovements = collection.InventoryMovements;
+                   
                     DB.SaveChanges();
 
                     return Ok(true);
@@ -105,6 +107,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     m.ItemsId,
                     m.TypeMove,
                     m.Items.Name,
+                    m.EXP,
                     m.InventoryItemId,
                     InventoryName = m.InventoryItem.Name,
                     m.Description

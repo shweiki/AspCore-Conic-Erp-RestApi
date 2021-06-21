@@ -47,6 +47,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     imx.TypeMove,
                     imx.InventoryItemId,
                     imx.Qty,
+                    imx.EXP,
                     imx.SellingPrice,
                     imx.Description
                 }).ToList(),
@@ -76,6 +77,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.Tax,
                 x.TypeMove,
+                x.EXP,
                 x.SalesInvoice.Region,
                 x.SalesInvoice.DeliveryPrice,
                 Name = x.SalesInvoice.Vendor.Name + x.SalesInvoice.Member.Name,
@@ -115,6 +117,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     imx.Items.CostPrice,
                     imx.TypeMove,
                     imx.InventoryItemId,
+                    imx.EXP,
                     imx.Qty,
                     imx.SellingPrice,
                     imx.Description
@@ -216,7 +219,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     m.SalesInvoiceId,
                     m.InventoryItemId,
                     m.SellingPrice,
-                    m.Description
+                    m.Description,
+                    m.EXP
 
                 }).ToList()
             }).SingleOrDefault();
@@ -227,23 +231,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetSaleInvoiceByMemberId(long? Id)
         {
-            var Invoices = DB.SalesInvoices.Where(f => f.MemberId !=null && f.MemberId == Id && f.IsPrime == true).Select(SI => new
+            var Invoices = DB.SalesInvoices.Where(f => f.MemberId !=null && f.MemberId == Id && f.IsPrime == true).Select(x => new
             {
-                SI.Id,
-                SI.Name,
-                SI.Status,
-                SI.Type,
-                SI.Description,
-                SI.FakeDate,
-                SI.MemberId,
-                InventoryMovements = SI.InventoryMovements.Select(m => new
+                x.Id,
+                Name =  x.Vendor.Name + x.Member.Name,
+                x.Status,
+                x.Type,
+                x.Description,
+                x.FakeDate,
+                x.MemberId,
+                InventoryMovements = x.InventoryMovements.Select(m => new
                 {
                     m.Id,
                     m.Status,
                     m.Items.Name,
                     m.Qty,
                     m.SellingPrice,
-                    m.Description
+                    m.Description,
+                    m.EXP
                 }).ToList(),
 
             }).ToList();

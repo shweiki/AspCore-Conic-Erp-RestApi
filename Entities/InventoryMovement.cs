@@ -19,6 +19,8 @@ namespace Entities
         public long? SalesInvoiceId { get; set; }
         public long? PurchaseInvoiceId { get; set; }
         public long? OrderInventoryId { get; set; }
+       // public DateTime MFG { get; set; }
+        public DateTime EXP { get; set; }
 
         public virtual InventoryItem InventoryItem { get; set; }
         public virtual Item Items { get; set; }

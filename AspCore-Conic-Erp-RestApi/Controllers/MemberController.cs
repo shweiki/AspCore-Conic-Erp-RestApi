@@ -275,8 +275,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         MS.EndDate,
                         MS.Description,
                     }).FirstOrDefault(),
-
-                
                 }).SingleOrDefault();
             return Ok(Members);
         }
