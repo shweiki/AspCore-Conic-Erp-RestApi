@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Entities; 
 using Microsoft.AspNetCore.Authorization;
-using Entities; 
 using Microsoft.AspNetCore.Mvc;
 using NinjaNye.SearchExtensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -112,7 +112,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             var Items = DB.Items.Where(s => (s.InventoryMovements != null ?
             s.InventoryMovements.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty) - s.InventoryMovements.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty) < s.LowOrder
             : false) && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Category.Contains(Any) || s.Barcode.Contains(Any) : true) && (Status != null ? s.Status == Status : true))
-      .Select(x => new {
+             .Select(x => new {
           x.Id,
           x.Name,
           x.CostPrice,
@@ -144,7 +144,47 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                 }
             });
-            return Ok(Items);
+        }
+        [Route("Item/GetEXP")]
+        [HttpPost]
+        public IActionResult GetEXP(int Limit, string Sort, int Page, int? Status, string? Any)
+        {
+            var Items = DB.Items.Where(s => (s.InventoryMovements != null ?
+           s.InventoryMovements.Where(d => d.EXP <= DateTime.Today) != null
+           : false) && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Category.Contains(Any) || s.Barcode.Contains(Any) : true) && (Status != null ? s.Status == Status : true))
+            .Select(x => new {
+                x.Id,
+                x.Name,
+                x.CostPrice,
+                x.SellingPrice,
+                x.OtherPrice,
+                x.LowOrder,
+                x.Tax,
+                x.Status,
+                x.IsPrime,
+                x.Rate,
+                x.Barcode,
+                x.Category,
+                x.Description,
+                x.Ingredients,
+                TotalIn = x.InventoryMovements.Where(x => x.TypeMove == "In").Count(),
+                TotalOut = x.InventoryMovements.Where(x => x.TypeMove == "Out").Count(),
+            }
+).ToList();
+            Items = (Sort == "+id" ? Items.OrderBy(s => s.Id).ToList() : Items.OrderByDescending(s => s.Id).ToList());
+            return Ok(new
+            {
+                items = Items.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Items.Count(),
+                    TotalIn = Items.Sum(s => s.TotalIn),
+                    TotalOut = Items.Sum(s => s.TotalOut),
+                    Totals = Items.Sum(s => s.TotalIn) - Items.Sum(s => s.TotalOut),
+
+                }
+            });
+           
         }
         [HttpGet]
         [Route("Item/GetActiveItem")]
