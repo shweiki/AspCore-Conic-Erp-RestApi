@@ -107,8 +107,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Item/GetLowOrder")]
         public IActionResult GetLowOrder(int Limit, string Sort, int Page, int? Status, string? Any)
         {
-        
-
             var Items = DB.Items.Where(s => (s.InventoryMovements != null ?
             s.InventoryMovements.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty) - s.InventoryMovements.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty) < s.LowOrder
             : false) && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Category.Contains(Any) || s.Barcode.Contains(Any) : true) && (Status != null ? s.Status == Status : true))
@@ -147,28 +145,26 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("Item/GetEXP")]
         [HttpPost]
-        public IActionResult GetEXP(int Limit, string Sort, int Page, int? Status, string? Any)
+        public IActionResult GetEXP(DateTime? DateFrom, DateTime? DateTo, int Limit, string Sort, int Page, int? Status, string? Any)
         {
-            var Items = DB.Items.Where(s => (s.InventoryMovements != null ?
-           s.InventoryMovements.Where(d => d.EXP <= DateTime.Today) != null
-           : false) && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Category.Contains(Any) || s.Barcode.Contains(Any) : true) && (Status != null ? s.Status == Status : true))
+            var Items = DB.InventoryMovements.Where(s => (DateTo != null ? s.EXP <= DateTo : true)&& (DateFrom != null ? s.EXP >= DateFrom : true))
             .Select(x => new {
-                x.Id,
-                x.Name,
-                x.CostPrice,
+                x.Items.Id,
+                x.Items.Name,
+                x.Items.CostPrice,
                 x.SellingPrice,
-                x.OtherPrice,
-                x.LowOrder,
-                x.Tax,
+                x.Items.OtherPrice,
+                x.Items.LowOrder,
+                x.Items.Tax,
                 x.Status,
-                x.IsPrime,
-                x.Rate,
-                x.Barcode,
-                x.Category,
+                x.Items.IsPrime,
+                x.Items.Rate,
+                x.Items.Barcode,
+                x.Items.Category,
                 x.Description,
-                x.Ingredients,
-                TotalIn = x.InventoryMovements.Where(x => x.TypeMove == "In").Count(),
-                TotalOut = x.InventoryMovements.Where(x => x.TypeMove == "Out").Count(),
+                x.Items.Ingredients,
+                TotalIn = x.Items.InventoryMovements.Where(x => x.TypeMove == "In").Count(),
+                TotalOut = x.Items.InventoryMovements.Where(x => x.TypeMove == "Out").Count(),
             }
 ).ToList();
             Items = (Sort == "+id" ? Items.OrderBy(s => s.Id).ToList() : Items.OrderByDescending(s => s.Id).ToList());
@@ -281,7 +277,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             x.IsPrime,
                             x.Status,
                             x.Category,
-                x.Ingredients,
+                            x.Ingredients,
 
                 //  InventoryQty = CalculateInventoryItemQty(x.Id)
             }).SingleOrDefault();
@@ -306,7 +302,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             x.IsPrime,
                             x.Status,
                             x.Category,
-                x.Ingredients,
+                            x.Ingredients,
 
                 //  InventoryQty = CalculateInventoryItemQty(x.Id)
             }).FirstOrDefault();
