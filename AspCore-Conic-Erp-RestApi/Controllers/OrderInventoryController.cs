@@ -12,29 +12,44 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class OrderInventoryController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
-        [Route("OrderInventory/GetOrderInventory")]
-        [HttpGet]
-        public IActionResult GetOrderInventory(DateTime DateFrom, DateTime DateTo)
+
+        [HttpPost]
+        [Route("OrderInventory/GetByListQ")]
+        public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
         {
-            var Orders = DB.OrderInventories.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new {
+            var OrderInventory = DB.OrderInventories.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.OrderType.Contains(Any) || s.Description.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+            && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&  (User != null ? DB.ActionLogs.Where(l => l.OrderInventoryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+            {
                 x.Id,
-                FakeDate = x.FakeDate.Value.ToString("dd/MM/yyyy"),
+                x.FakeDate,
                 x.OrderType,
                 x.Status,
                 x.Description,
-                InventoryMovements = DB.InventoryMovements.Where(i => i.OrderInventoryId == x.Id).Select(m => new
+                InventoryMovements = x.InventoryMovements.Select(imx => new {
+                    imx.Id,
+                    imx.ItemsId,
+                    imx.Items.Name,
+                    imx.Items.Ingredients,
+                    imx.Items.CostPrice,
+                    imx.TypeMove,
+                    imx.InventoryItemId,
+                    imx.Qty,
+                    imx.EXP,
+                    imx.SellingPrice,
+                    imx.Description
+                }).ToList(),
+            }).ToList();
+            OrderInventory = (Sort == "+id" ? OrderInventory.OrderBy(s => s.Id).ToList() : OrderInventory.OrderByDescending(s => s.Id).ToList());
+            return Ok(new
+            {
+                items = OrderInventory.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
                 {
-                    m.Id,
-                    m.Items.Name,
-                    m.Qty,
-                    m.EXP,
-                    InventoryName = m.InventoryItem.Name,
-                    m.Description
-                }).ToList()
-            }).ToList(); 
-                        
-            return Ok(Orders);
+                    Rows = OrderInventory.Count()                   
+                }
+            });
         }
+
 
 
         [HttpPost]
