@@ -232,6 +232,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 case "OrderInventory":
                     log.OrderInventoryId = ObjId;
                     DB.OrderInventories.Where(x => x.Id == log.OrderInventoryId).SingleOrDefault().Status = Oprationsys.Status;
+                    DB.InventoryMovements.Where(x => x.OrderInventoryId == ObjId).ToList().ForEach(b => b.Status = Oprationsys.Status);
+
                     break;
                 case "StocktakingInventory":
                     log.StocktakingInventoryId = ObjId;
@@ -268,10 +270,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 case "SalesInvoice":
                     log.SalesInvoiceId = ObjId;
                     DB.SalesInvoices.Where(x => x.Id == log.SalesInvoiceId).SingleOrDefault().Status = Oprationsys.Status;
+                    DB.InventoryMovements.Where(x => x.SalesInvoiceId == ObjId).ToList().ForEach(b => b.Status = Oprationsys.Status);
                     break;
                 case "PurchaseInvoice":
                     log.PurchaseInvoiceId = ObjId;
                     DB.PurchaseInvoices.Where(x => x.Id == log.PurchaseInvoiceId).SingleOrDefault().Status = Oprationsys.Status;
+                    DB.InventoryMovements.Where(x => x.PurchaseInvoiceId == ObjId).ToList().ForEach(b => b.Status = Oprationsys.Status);
                     break;
                 case "Account":
                     log.AccountId = ObjId;

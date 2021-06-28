@@ -24,7 +24,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Item/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string? Any)
         {
-           
             var Items = DB.Items.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Category.Contains(Any) || s.Barcode.Contains(Any) : true) && (Status != null ? s.Status == Status : true))
               .Select(x=>new   {
                 x.Id,
@@ -43,8 +42,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Ingredients,
                 TotalIn = x.InventoryMovements.Where(x => x.TypeMove == "In").Count(),
                 TotalOut = x.InventoryMovements.Where(x => x.TypeMove == "Out").Count(),
-              }
-        ).ToList();
+              }).ToList();
             Items = (Sort == "+id" ? Items.OrderBy(s => s.Id).ToList() : Items.OrderByDescending(s => s.Id).ToList());
             return Ok(new
             {
@@ -165,8 +163,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Items.Ingredients,
                 TotalIn = x.Items.InventoryMovements.Where(x => x.TypeMove == "In").Count(),
                 TotalOut = x.Items.InventoryMovements.Where(x => x.TypeMove == "Out").Count(),
-            }
-).ToList();
+            }).ToList();
             Items = (Sort == "+id" ? Items.OrderBy(s => s.Id).ToList() : Items.OrderByDescending(s => s.Id).ToList());
             return Ok(new
             {

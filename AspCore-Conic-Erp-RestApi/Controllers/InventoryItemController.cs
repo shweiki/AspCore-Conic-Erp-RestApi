@@ -65,6 +65,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.Name,
                 x.Description,
+                x.Status,
               //  InventoryQty = InventoryQty(x.Id)
             }).ToList();
 
@@ -88,15 +89,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                 group i by i.ItemsId into g
                                 select new
                                 {
-                                    Item = (from a in DB.Items.ToList()
-                                            where (a.Id == g.Key)
-                                            select new
-                                            {
-                                                a.Id,
-                                                a.CostPrice,
-                                                a.Name,
-                                                a.Barcode
-                                            }).FirstOrDefault(),
+                                
+                                    Item = DB.Items.Where(x=>x.Id == g.Key).Select(x=> new{
+                                        x.Id,
+                                        x.CostPrice,
+                                        x.Name,
+                                        x.Barcode
+                                    }).SingleOrDefault(),
                                     QtyIn = g.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty),
                                     QtyOut = g.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty)
                                 }).ToList();
