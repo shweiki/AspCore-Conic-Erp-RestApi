@@ -16,7 +16,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
         {
             var Invoices = DB.PurchaseInvoices.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
-            && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (User != null ? DB.ActionLogs.Where(l => l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+            && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (User != null ? DB.ActionLogs.Where(l => l.PurchaseInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
             {
                 x.Id,
                 x.Discount,
@@ -91,24 +91,58 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(Invoices);
         }
-        [Route("PurchaseInvoice/GetPurchaseItem")]
+        [Route("PurchaseInvoice/GetByItem")]
         [HttpGet]
-        public IActionResult GetPurchaseItem(long? ItemId, DateTime DateFrom, DateTime DateTo)
+        public IActionResult GetByItem(long ItemId, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
         {
-            var Invoices = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId != null && i.ItemsId == ItemId && i.PurchaseInvoice.FakeDate >= DateFrom && i.PurchaseInvoice.FakeDate <= DateTo).Select(x => new
+            var Invoices = DB.InventoryMovements.Where(s =>s.PurchaseInvoiceId !=null && s.ItemsId == ItemId && (Any != null ? s.Id.ToString().Contains(Any) || s.PurchaseInvoice.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PurchaseInvoice.Description.Contains(Any) || s.PurchaseInvoice.Name.Contains(Any) : true) && (DateFrom != null ? s.PurchaseInvoice.FakeDate >= DateFrom : true)
+              && (DateTo != null ? s.PurchaseInvoice.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&  (User != null ? DB.ActionLogs.Where(l => l.InventoryMovementId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+              {
+                  x.Id,
+                  x.PurchaseInvoiceId,
+                  x.PurchaseInvoice.Discount,
+                  x.Tax,
+                  Name = x.PurchaseInvoice.Name, //+ DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+                  x.PurchaseInvoice.FakeDate,
+                  x.PurchaseInvoice.InvoicePurchaseDate,
+                  x.PurchaseInvoice.PaymentMethod,
+                  x.Status,
+                  x.Description,
+                  x.PurchaseInvoice.VendorId,
+                  x.PurchaseInvoice.Vendor,
+                  Total = x.SellingPrice * x.Qty,
+                  //     ActionLogs = DB.ActionLogs.Where(l=>l.PurchaseInvoiceId == x.Id).ToList(),
+                  AccountId = DB.Vendors.Where(v => v.Id == x.PurchaseInvoice.VendorId).SingleOrDefault().AccountId.ToString(),
+                  InventoryMovements = x.PurchaseInvoice.InventoryMovements.Select(imx => new {
+                      imx.Id,
+                      imx.ItemsId,
+                      imx.Items.Name,
+                      imx.Items.Ingredients,
+                      imx.Items.CostPrice,
+                      imx.TypeMove,
+                      imx.InventoryItemId,
+                      imx.Qty,
+                      imx.EXP,
+                      imx.SellingPrice,
+                      imx.Description
+                  }).ToList(),
+              }).ToList();
+            Invoices = (Sort == "+id" ? Invoices.OrderBy(s => s.Id).ToList() : Invoices.OrderByDescending(s => s.Id).ToList());
+            return Ok(new
             {
-                x.Id,
-                x.SellingPrice,
-                x.Qty,
-                x.Status,
-                x.Tax,
-                x.PurchaseInvoice.FakeDate,
-                x.Description,
-                x.EXP,
+                items = Invoices.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Invoices.Count(),
+                    Totals = Invoices.Sum(s => s.Total),
+                    Cash = Invoices.Where(i => i.PaymentMethod == "Cash").Sum(s => s.Total),
+                    Receivables = Invoices.Where(i => i.PaymentMethod == "Receivables").Sum(s => s.Total),
+                    Discount = Invoices.Sum(s => s.Discount),
+                    Visa = Invoices.Where(i => i.PaymentMethod == "Visa").Sum(s => s.Total)
+                }
+            });
 
-            }).ToList();
 
-            return Ok(Invoices);
         }
         [Route("PurchaseInvoice/Create")]
         [HttpPost]

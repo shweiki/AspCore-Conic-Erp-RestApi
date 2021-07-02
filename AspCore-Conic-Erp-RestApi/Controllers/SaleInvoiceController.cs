@@ -16,7 +16,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("SaleInvoice/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any ,string Type)
         {
-            var Invoices = DB.SalesInvoices.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any)|| s.Description.Contains(Any)  || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any)|| s.Region.Contains(Any) : true ) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+            var Invoices = DB.SalesInvoices.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.PaymentMethod.Contains(Any) || s.Vendor.Name.Contains(Any)|| s.Description.Contains(Any)  || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any)|| s.Region.Contains(Any) : true ) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true)&&(Type != null ? s.Type == Type : true) && (User != null ? DB.ActionLogs.Where(l =>l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
             {
                 x.Id,
@@ -65,30 +65,60 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             Visa = Invoices.Where(i=>i.PaymentMethod == "Visa").Sum(s => s.Total)
             } });
     } 
-        [Route("SaleInvoice/GetSaleItem")]
+        [Route("SaleInvoice/GetByItem")]
         [HttpGet]
-        public IActionResult GetSaleItem(long ItemId, DateTime DateFrom, DateTime DateTo )
+        public IActionResult GetByItem(long ItemId,int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
         {
-            var Invoices =  DB.InventoryMovements.Where(i => i.SalesInvoiceId != null && i.ItemsId == ItemId && i.SalesInvoice.FakeDate >= DateFrom && i.SalesInvoice.FakeDate <= DateTo).Select(x => new
+            var Invoices = DB.InventoryMovements.Where(s => s.SalesInvoiceId != null &&  s.ItemsId == ItemId && (Any != null ? s.Id.ToString().Contains(Any) || s.SalesInvoice.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.SalesInvoice.PhoneNumber.Contains(Any) || s.SalesInvoice.Name.Contains(Any)  : true) && (DateFrom != null ? s.SalesInvoice.FakeDate >= DateFrom : true)
+              && (DateTo != null ? s.SalesInvoice.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (Type != null ? s.SalesInvoice.Type == Type : true) && (User != null ? DB.ActionLogs.Where(l => l.InventoryMovementId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+              {
+                  x.Id,
+                  x.SalesInvoiceId,
+                  x.SalesInvoice.Discount,
+                  x.Tax,
+                  Name = x.SalesInvoice.Name, //+ DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+                  x.SalesInvoice.FakeDate,
+                  x.SalesInvoice.PaymentMethod,
+                  x.Status,
+                  x.SalesInvoice.Type,
+                  x.Description,
+                  x.SalesInvoice.VendorId,
+                  x.SalesInvoice.MemberId,
+                  x.SalesInvoice.PhoneNumber,
+                  x.SalesInvoice.Vendor,
+                  Total = x.SellingPrice * x.Qty,
+                //     ActionLogs = DB.ActionLogs.Where(l=>l.SalesInvoiceId == x.Id).ToList(),
+                AccountId = DB.Vendors.Where(v => v.Id == x.SalesInvoice.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.SalesInvoice.MemberId).SingleOrDefault().AccountId.ToString(),
+                  InventoryMovements = x.SalesInvoice.InventoryMovements.Select(imx => new {
+                      imx.Id,
+                      imx.ItemsId,
+                      imx.Items.Name,
+                      imx.Items.Ingredients,
+                      imx.Items.CostPrice,
+                      imx.TypeMove,
+                      imx.InventoryItemId,
+                      imx.Qty,
+                      imx.EXP,
+                      imx.SellingPrice,
+                      imx.Description
+                  }).ToList(),
+              }).ToList();
+            Invoices = (Sort == "+id" ? Invoices.OrderBy(s => s.Id).ToList() : Invoices.OrderByDescending(s => s.Id).ToList());
+            return Ok(new
             {
-                x.Id,
-                x.SellingPrice,
-                x.Qty,
-                x.Status,
-                x.Tax,
-                x.TypeMove,
-                x.EXP,
-                x.SalesInvoice.Region,
-                x.SalesInvoice.DeliveryPrice,
-                Name = x.SalesInvoice.Vendor.Name + x.SalesInvoice.Member.Name,
-                x.SalesInvoice.FakeDate,
-                x.Description,
-                x.SalesInvoiceId,
-                x.ItemsId,
-                Type = "مبيعات"
-            }).ToList();
-
-            return Ok(Invoices);
+                items = Invoices.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Invoices.Count(),
+                    Totals = Invoices.Sum(s => s.Total),
+                    Cash = Invoices.Where(i => i.PaymentMethod == "Cash").Sum(s => s.Total),
+                    Receivables = Invoices.Where(i => i.PaymentMethod == "Receivables").Sum(s => s.Total),
+                    Discount = Invoices.Sum(s => s.Discount),
+                    Visa = Invoices.Where(i => i.PaymentMethod == "Visa").Sum(s => s.Total)
+                }
+            });
+         
+       
         }
         [Route("SaleInvoice/GetSaleInvoiceByStatus")]
         [HttpGet]

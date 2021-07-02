@@ -50,6 +50,46 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             });
         }
 
+        [Route("OrderInventory/GetByItem")]
+        [HttpGet]
+        public IActionResult GetByItem(long ItemId, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
+        {
+            var Invoices = DB.InventoryMovements.Where(s => s.OrderInventoryId != null && s.ItemsId == ItemId && (Any != null ? s.Id.ToString().Contains(Any)  || s.Description.Contains(Any) || s.OrderInventory.Description.Contains(Any) || s.OrderInventory.OrderType.Contains(Any) : true) && (DateFrom != null ? s.OrderInventory.FakeDate >= DateFrom : true)
+              && (DateTo != null ? s.OrderInventory.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (Type != null ? s.OrderInventory.OrderType == Type : true) && (User != null ? DB.ActionLogs.Where(l => l.InventoryMovementId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+              {
+                  x.Id,
+                  x.OrderInventoryId,
+                  x.OrderInventory.FakeDate,
+                  x.OrderInventory.OrderType,
+                  x.Status,
+                  x.Description,
+         
+                  InventoryMovements = x.OrderInventory.InventoryMovements.Select(imx => new {
+                      imx.Id,
+                      imx.ItemsId,
+                      imx.Items.Name,
+                      imx.Items.Ingredients,
+                      imx.Items.CostPrice,
+                      imx.TypeMove,
+                      imx.InventoryItemId,
+                      imx.Qty,
+                      imx.EXP,
+                      imx.SellingPrice,
+                      imx.Description
+                  }).ToList(),
+              }).ToList();
+            Invoices = (Sort == "+id" ? Invoices.OrderBy(s => s.Id).ToList() : Invoices.OrderByDescending(s => s.Id).ToList());
+            return Ok(new
+            {
+                items = Invoices.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Invoices.Count(),
+                }
+            });
+
+
+        }
 
 
         [HttpPost]
