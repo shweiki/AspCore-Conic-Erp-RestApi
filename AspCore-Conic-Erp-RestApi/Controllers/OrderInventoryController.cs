@@ -63,7 +63,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                   x.OrderInventory.OrderType,
                   x.Status,
                   x.Description,
-         
                   InventoryMovements = x.OrderInventory.InventoryMovements.Select(imx => new {
                       imx.Id,
                       imx.ItemsId,

@@ -40,8 +40,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Category,
                 x.Description,
                 x.Ingredients,
-                TotalIn = x.InventoryMovements.Where(x => x.TypeMove == "In").Count(),
-                TotalOut = x.InventoryMovements.Where(x => x.TypeMove == "Out").Count(),
+                TotalIn = x.InventoryMovements.Where(x => x.TypeMove == "In").Sum(s => s.Qty),
+                TotalOut = x.InventoryMovements.Where(x => x.TypeMove == "Out").Sum(s => s.Qty),
               }).ToList();
             Items = (Sort == "+id" ? Items.OrderBy(s => s.Id).ToList() : Items.OrderByDescending(s => s.Id).ToList());
             return Ok(new
@@ -123,8 +123,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
           x.Category,
           x.Description,
           x.Ingredients,
-          TotalIn = x.InventoryMovements.Where(x => x.TypeMove == "In").Count(),
-          TotalOut = x.InventoryMovements.Where(x => x.TypeMove == "Out").Count(),
+          TotalIn = x.InventoryMovements.Where(x => x.TypeMove == "In").Sum(s => s.Qty),
+          TotalOut = x.InventoryMovements.Where(x => x.TypeMove == "Out").Sum(s => s.Qty),
       }
 ).ToList();
             Items = (Sort == "+id" ? Items.OrderBy(s => s.Id).ToList() : Items.OrderByDescending(s => s.Id).ToList());
@@ -161,8 +161,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Items.Category,
                 x.Description,
                 x.Items.Ingredients,
-                TotalIn = x.Items.InventoryMovements.Where(x => x.TypeMove == "In").Count(),
-                TotalOut = x.Items.InventoryMovements.Where(x => x.TypeMove == "Out").Count(),
+                TotalIn = x.Items.InventoryMovements.Where(x => x.TypeMove == "In").Sum(s=>s.Qty),
+                TotalOut = x.Items.InventoryMovements.Where(x => x.TypeMove == "Out").Sum(s => s.Qty),
             }).ToList();
             Items = (Sort == "+id" ? Items.OrderBy(s => s.Id).ToList() : Items.OrderByDescending(s => s.Id).ToList());
             return Ok(new
@@ -366,7 +366,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpPost]
         public IActionResult CalculateInventoryItemQty(long Id)
         {
-            var InventoryItemsQty = from x in DB.InventoryMovements.Where(i => i.ItemsId == Id && i.Status == 0).ToList()
+            var InventoryItemsQty = from x in DB.InventoryMovements.Where(i => i.ItemsId == Id && i.Status >= 0).ToList()
                                     group x by x.InventoryItemId into g
                                     select new
                                     {
