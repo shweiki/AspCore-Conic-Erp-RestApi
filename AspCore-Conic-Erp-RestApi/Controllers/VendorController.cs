@@ -88,7 +88,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult CheckIsExist(string Name, string PhoneNumber , string Ssn)
         {
-            var Vendor = DB.Vendors.Where(m => m.Name == Name && m.Ssn == Ssn && m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", "")).ToList();
+            var Vendor = DB.Vendors.Where(m => (Name != null ?m.Name == Name: false) || (Ssn != null? m.Ssn == Ssn :false) || (PhoneNumber != null ? m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", ""): false )).ToList();
 
             return Ok(Vendor.Count() > 0 ? true : false);
         }

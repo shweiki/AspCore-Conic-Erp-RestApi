@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210710153947_Add wokShop table for data base")]
+    partial class AddwokShoptablefordatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2360,7 +2362,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
             modelBuilder.Entity("Entities.WorkShop", b =>
                 {
                     b.HasOne("Entities.Vendor", "Vendor")
-                        .WithMany("WorkShops")
+                        .WithMany()
                         .HasForeignKey("VendorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2532,8 +2534,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Navigation("PurchaseInvoices");
 
                     b.Navigation("SalesInvoices");
-
-                    b.Navigation("WorkShops");
                 });
 
             modelBuilder.Entity("Entities.WorkShop", b =>

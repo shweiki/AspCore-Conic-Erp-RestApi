@@ -12,6 +12,7 @@ namespace Entities
             Cheques = new HashSet<Cheque>();
             Payments = new HashSet<Payment>();
             PurchaseInvoices = new HashSet<PurchaseInvoice>();
+            WorkShops = new HashSet<WorkShop>();
             SalesInvoices = new HashSet<SalesInvoice>();
         }
 
@@ -34,6 +35,7 @@ namespace Entities
         public virtual ICollection<Cheque> Cheques { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
         public virtual ICollection<PurchaseInvoice> PurchaseInvoices { get; set; }
+        public virtual ICollection<WorkShop> WorkShops { get; set; }
         public virtual ICollection<SalesInvoice> SalesInvoices { get; set; }
     }
 }

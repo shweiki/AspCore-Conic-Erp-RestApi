@@ -29,6 +29,7 @@ namespace Entities
         public long? EntryId { get; set; }
         public long? SalesInvoiceId { get; set; }
         public long? PurchaseInvoiceId { get; set; }
+        public long? WorkShopId { get; set; }
         public int? MembershipId { get; set; }
         public long? MemberId { get; set; }
         public long? MembershipMovementId { get; set; }

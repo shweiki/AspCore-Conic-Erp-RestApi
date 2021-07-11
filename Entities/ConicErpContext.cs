@@ -52,6 +52,7 @@ namespace Entities
         public virtual DbSet<OriginItem> OriginItems { get; set; }
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<PurchaseInvoice> PurchaseInvoices { get; set; }
+        public virtual DbSet<WorkShop> WorkShops { get; set; }
         public virtual DbSet<SalesInvoice> SalesInvoices { get; set; }
         public virtual DbSet<Service> Services { get; set; }
         public virtual DbSet<StockMovement> StockMovements { get; set; }
@@ -67,8 +68,9 @@ namespace Entities
             }
         }
         public string GetCon() {
-         //   return "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Conic_Erp;Integrated Security=True";
-            return "Data Source="+GetServerName()+";Initial Catalog="+GetDataBaseName()+ ";Integrated Security=True;timeout=100000";
+            //   return "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Conic_Erp;Integrated Security=True";
+             return "Data Source="+GetServerName()+";Initial Catalog="+GetDataBaseName()+ ";Integrated Security=True;timeout=100000";
+           // return "Data Source=tcp:aspcore-conic-erp-restapidbserver.database.windows.net,1433;Initial Catalog=AspCore-Conic-Erp-RestApi_db;User Id=@aspcore-conic-erp-restapidbserver;Password=()=>{Allah}";
         }
         public string GetServerName()
         {
