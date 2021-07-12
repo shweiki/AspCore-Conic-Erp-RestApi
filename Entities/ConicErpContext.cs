@@ -69,8 +69,9 @@ namespace Entities
         }
         public string GetCon() {
             //   return "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Conic_Erp;Integrated Security=True";
-             return "Data Source="+GetServerName()+";Initial Catalog="+GetDataBaseName()+ ";Integrated Security=True;timeout=100000";
-           // return "Data Source=tcp:aspcore-conic-erp-restapidbserver.database.windows.net,1433;Initial Catalog=AspCore-Conic-Erp-RestApi_db;User Id=@aspcore-conic-erp-restapidbserver;Password=()=>{Allah}";
+           return "Data Source="+GetServerName()+";Initial Catalog="+GetDataBaseName()+ ";Integrated Security=True;timeout=100000";
+          //  return "Data Source=tcp:aspcore-conic-erp-restapidbserver.database.windows.net,1433;Initial Catalog=AspCore-Conic-Erp-RestApi_db;User Id=taha;Password=()=>{Allah}";
+        
         }
         public string GetServerName()
         {

@@ -208,14 +208,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     MSO.Status,
                     MSO.Description,
                 }).ToList(),
-
-
-
             }).ToList();
                                     
                                          
-                                 
-
+                 
             return Ok(MembershipMovements);
         }
         [Route("MembershipMovement/GetMembershipMovementById")]
