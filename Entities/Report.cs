@@ -11,7 +11,8 @@ namespace Entities
         public string Name { get; set; }
         public string Type { get; set; }
         public string AutoPrint { get; set; }
-        public string Keys { get; set; }
+        public string AutoSent { get; set; }
+        public string EmailSent { get; set; }
         public string Printer { get; set; }
         public string Html { get; set; }
         public string Icon { get; set; }

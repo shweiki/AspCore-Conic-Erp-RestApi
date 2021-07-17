@@ -125,16 +125,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMemberLogById(long? Id)
         {
-            var MemberLogs = DB.MemberLogs.Where(i => i.MemberId == Id).Select(x => new {
+            var MemberLogs = DB.MemberLogs.Where(x => x.MemberId == Id).Select(x => new {
                 x.Status,
                 x.Type,
                 x.DateTime,
                 x.Device.Name,
                 x.DeviceId,
                 x.Description,
-                x.Id
+                x.Id,
+                x.MemberId
             }).ToList();
-                          
+
+            MemberLogs = MemberLogs.GroupBy(a => new { a.MemberId, a.DateTime })
+                   .Select(g => g.Last()).ToList();
+       
             return Ok(MemberLogs);
         }
         public Boolean RegisterMemberLog(long? Id , DateTime datetime)

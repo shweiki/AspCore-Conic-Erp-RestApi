@@ -20,8 +20,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
              x.Id,
              x.Name ,
              x.AutoPrint ,
+             x.AutoSent ,
              x.Type ,
-             x.Keys ,
+             x.EmailSent ,
              x.Html ,
              x.Printer ,
              x.Icon 
@@ -42,21 +43,22 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetReport(int Id)
         {
-            var Invoices = DB.Reports.Where(i => i.Id == Id ).Select(x => new
+            var Reports = DB.Reports.Where(i => i.Id == Id ).Select(x => new
             {
 
                 x.Id,
                 x.Name,
                 x.Type,
                 x.AutoPrint,
-                x.Keys,
+                x.AutoSent,
+                x.EmailSent,
                 x.Html,
                 x.Printer,
                 x.Icon
             }).ToList();
                             
 
-            return Ok(Invoices);
+            return Ok(Reports);
         }  
         
         [Route("Report/GetTotal")]
@@ -103,7 +105,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Report.Name = collection.Name;
                     Report.AutoPrint = collection.AutoPrint;
                     Report.Type = collection.Type;
-                    Report.Keys = collection.Keys;
+                    Report.AutoSent = collection.AutoSent;
+                    Report.EmailSent = collection.EmailSent;
                     Report.Html = collection.Html;
                     Report.Printer = collection.Printer;
                     Report.Icon = collection.Icon;
@@ -131,7 +134,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Name,
                 x.Type,
                 x.AutoPrint,
-                x.Keys,
+                x.AutoSent,
+                x.EmailSent,
                 x.Html,
                 x.Printer,
                 x.Icon
