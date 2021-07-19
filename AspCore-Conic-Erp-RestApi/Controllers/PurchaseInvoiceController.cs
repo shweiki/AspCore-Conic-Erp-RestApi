@@ -29,7 +29,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.AccountInvoiceNumber,
                 x.InvoicePurchaseDate,
                 Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
-                Logs = DB.ActionLogs.Where(l => l.PurchaseInvoiceId == x.Id).ToList(),
+              //  Logs = DB.ActionLogs.Where(l => l.PurchaseInvoiceId == x.Id).ToList(),
                 AccountId = x.Vendor.AccountId,
                 InventoryMovements = x.InventoryMovements.Select(imx => new
                 {
