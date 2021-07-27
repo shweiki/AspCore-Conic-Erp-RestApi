@@ -23,6 +23,7 @@ namespace Entities
         public virtual DbSet<Setting> Settings { get; set; }
         public virtual DbSet<UserRouter> UserRouter { get; set; }
         public virtual DbSet<ActionLog> ActionLogs { get; set; }
+        public virtual DbSet<Area> Areas { get; set; }
         public virtual DbSet<BackUp> BackUps { get; set; }
         public virtual DbSet<Bank> Banks { get; set; }
         public virtual DbSet<Cash> Cashes { get; set; }
@@ -902,7 +903,7 @@ namespace Entities
                     .HasMaxLength(255)
                     ;
             });
-
+      
             modelBuilder.Entity<Member>(entity =>
             {
                 entity.ToTable("Member");
