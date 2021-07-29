@@ -30,7 +30,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetActiveMenuItem()
         {
-            var MenuItems = DB.MenuItems.Where(x => x.Status == 0).Select(x => new { value = x.Id, label = x.Name }).ToList();
+            var MenuItems = DB.MenuItems.Where(x => x.Status == 0).Select(x => new { value = x.Name, label = x.Name }).ToList();
             return Ok(MenuItems);
         }
 
