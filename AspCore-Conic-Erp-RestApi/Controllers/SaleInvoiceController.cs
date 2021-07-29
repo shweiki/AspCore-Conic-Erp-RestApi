@@ -49,6 +49,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     imx.Qty,
                     imx.EXP,
                     imx.SellingPrice,
+                    Total = imx.SellingPrice * imx.Qty,
                     imx.Description
                 }).ToList(),
             }).ToList();
@@ -100,6 +101,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                       imx.Qty,
                       imx.EXP,
                       imx.SellingPrice,
+                      Total = imx.SellingPrice * imx.Qty,
                       imx.Description
                   }).ToList(),
               }).ToList();
@@ -150,6 +152,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     imx.EXP,
                     imx.Qty,
                     imx.SellingPrice,
+                    Total = imx.SellingPrice * imx.Qty,
                     imx.Description
                 }).ToList(),
             }).ToList();
@@ -250,8 +253,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     m.InventoryItemId,
                     m.SellingPrice,
                     m.Description,
-                    m.EXP
-
+                    m.EXP,
+                    Total = m.SellingPrice * m.Qty,
                 }).ToList()
             }).SingleOrDefault();
 
@@ -278,7 +281,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     m.Qty,
                     m.SellingPrice,
                     m.Description,
-                    m.EXP
+                    m.EXP,
+                    Total = m.SellingPrice * m.Qty,
                 }).ToList(),
 
             }).ToList();
