@@ -217,7 +217,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 if (member.Status == 0)// المتجاوز الفترة الصباحية
                 {
                     var ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == member.Id && f.Status > 0).FirstOrDefault();
-                    if (ActiveMemberShip.Type == "Morning" && datetime.Hour > 15)
+                    if (ActiveMemberShip != null && ActiveMemberShip.Type == "Morning" && datetime.Hour > 15)
                     {
 
                         Msg.Body = "عزيزي " + member.Name + "نود تذكيرك بأن الوقت النهائي لدخول الصالة للفترة الصباحية الساعة 3:00 عصرا.دمتم بخير";

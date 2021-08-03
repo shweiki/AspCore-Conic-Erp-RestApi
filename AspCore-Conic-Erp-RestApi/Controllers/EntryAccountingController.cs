@@ -38,7 +38,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     // TODO: Add insert logic here
                     DB.EntryAccountings.Add(collection);
                     DB.SaveChanges();
-                    return Ok(true);
+                    return Ok(collection.Id);
 
                 }
                 catch
