@@ -24,7 +24,38 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }).ToList();
             return Ok(EntryMovements);
         }
+        [HttpPost]
+        [Route("EntryAccounting/GetByListQ")]
+        public IActionResult GetByListQ(long? AccountId, int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string? Any)
+        {
+            var EntryMovements = DB.EntryMovements.Where(s => s.AccountId == AccountId && (Any != null ? s.Id.ToString().Contains(Any) || s.Description.Contains(Any) : true) && (DateFrom != null ? s.Entry.FakeDate >= DateFrom : true)
+            && (DateTo != null ? s.Entry.FakeDate <= DateTo : true) && (Status != null ? s.Entry.Status == Status : true) &&
+            (User != null ? DB.ActionLogs.Where(l => l.PaymentId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
 
+            {
+                x.Id,
+                x.Debit,
+                x.Credit,
+                x.Description,
+                x.EntryId,
+                x.Entry.FakeDate,
+                x.Entry.Status,
+                x.Entry.Type,
+                EntryDescription= x.Entry.Description,
+            }).ToList();
+            EntryMovements = (Sort == "+id" ? EntryMovements.OrderBy(s => s.Id).ToList() : EntryMovements.OrderByDescending(s => s.Id).ToList());
+            return Ok(new
+            {
+                items = EntryMovements.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = EntryMovements.Count(),
+                    Totals = EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit)  ,
+                    Debit = EntryMovements.Sum(s => s.Debit),
+                    Credit = EntryMovements.Sum(s => s.Credit),
+                }
+            });
+        }
         [HttpPost]
         [Route("EntryAccounting/Create")]
         public IActionResult Create(EntryAccounting collection)

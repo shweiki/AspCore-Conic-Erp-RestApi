@@ -53,10 +53,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (Any == null) return NotFound();
             Any = Any.ToLower();
-            var Accounts = DB.Accounts.Search(x => x.Name, x => x.Code, x => x.Id.ToString(), x => x.Type , x =>x.Vendors.Where(v=>v.AccountId==x.Id).SingleOrDefault().Name).Containing(Any)
+            var Accounts = DB.Accounts.Search(x => x.Name, x => x.Code, x => x.Id.ToString(), x => x.Type , x =>x.Vendors.Where(v=>v.AccountId==x.Id).SingleOrDefault().Name , x => x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name).Containing(Any)
                 .Select(x => new { 
                     x.Id,
-                    Name =  x.Name + x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                    Name =  x.Name + x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name + x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
                     x.Code,
                     x.Type 
                 }).ToList();
