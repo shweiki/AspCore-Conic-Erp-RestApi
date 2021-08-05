@@ -25,6 +25,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Status,
                     x.Code,
                     x.Name,
+                    x.Ref,
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
                     x.Type,
@@ -43,8 +44,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 label = (x.Members.Where(m=>m.AccountId == x.Id).FirstOrDefault().Name !=null ? x.Members.Where(m => m.AccountId == x.Id).FirstOrDefault().Name : x.Vendors.Where(m => m.AccountId == x.Id).FirstOrDefault().Name )+ " - " + x.Name,
               }).ToList();
             return Ok(ActiveAccounts);
-
-
         }
 
         [HttpGet]
