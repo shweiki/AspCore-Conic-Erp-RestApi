@@ -56,6 +56,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     collection.Status = 0;
                     DB.Areas.Add(collection);
                     DB.SaveChanges();
+                    return Ok(true);
 
                 }
                 catch
@@ -64,7 +65,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     return Ok(false);
                 }
             }
-            return Ok(false);
+            else return Ok(false);
         }
 
         // DELETE: Banks/5
