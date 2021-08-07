@@ -19,7 +19,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
          {
              var Areas = DB.Areas.Select(x => new {
                  x.Id,
-                 x.Asress1,
+                 x.Adress1,
                  x.Adress2,
                 x.Adress3,
                  x.DelievryPrice,
@@ -35,7 +35,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             var Areas = DB.Areas.Select(x => new {
                 value = x.Id,
-                label = x.Adress2,
+                label = x.Adress1,
                 price = x.DelievryPrice
             }).ToList();
             return Ok(Areas);
@@ -75,7 +75,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             if (ModelState.IsValid)
             {
                 Area area = DB.Areas.Where(x => x.Id == collection.Id).SingleOrDefault();
-                area.Asress1 = collection.Asress1;
+                area.Adress1 = collection.Adress1;
                 area.Adress2 = collection.Adress2;
                 area.Adress3 = collection.Adress3;
                 area.DelievryPrice = collection.DelievryPrice;
