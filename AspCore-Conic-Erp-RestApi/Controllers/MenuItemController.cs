@@ -21,6 +21,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Name,
                 x.Description,
                 x.IsPrime,
+                x.Status,
             }).ToList();
 
             return Ok(MenuItems);

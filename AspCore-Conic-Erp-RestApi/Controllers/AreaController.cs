@@ -34,7 +34,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetAreasLabel()
         {
             var Areas = DB.Areas.Select(x => new {
-                value = x.Id,
+                value = x.Adress2,
                 label = x.Adress2,
                 price = x.DelievryPrice
             }).ToList();
