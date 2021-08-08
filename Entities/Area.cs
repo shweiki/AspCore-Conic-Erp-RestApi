@@ -12,7 +12,7 @@ namespace Entities
         //     Vendors = new HashSet<Vendor>();
       //  }
         public long Id { get; set; }
-        public string Asress1 { get; set; }
+        public string Adress1 { get; set; }
         public string Adress2 { get; set; }
         public string Adress3 { get; set; }
         public double? DelievryPrice { get; set; }

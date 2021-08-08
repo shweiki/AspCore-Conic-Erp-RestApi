@@ -19,9 +19,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
          {
              var Areas = DB.Areas.Select(x => new {
                  x.Id,
-                 x.Asress1,
+                 x.Adress1,
                  x.Adress2,
-                x.Adress3,
+                 x.Adress3,
                  x.DelievryPrice,
                  x.Status
                   
@@ -34,8 +34,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetAreasLabel()
         {
             var Areas = DB.Areas.Select(x => new {
-                value = x.Adress2,
-                label = x.Adress2,
+
+                value = x.Id,
+                label = x.Adress1,
+
                 price = x.DelievryPrice
             }).ToList();
             return Ok(Areas);
@@ -56,6 +58,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     collection.Status = 0;
                     DB.Areas.Add(collection);
                     DB.SaveChanges();
+                    return Ok(true);
 
                 }
                 catch
@@ -64,7 +67,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     return Ok(false);
                 }
             }
-            return Ok(false);
+            else return Ok(false);
         }
 
         // DELETE: Banks/5
@@ -75,7 +78,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             if (ModelState.IsValid)
             {
                 Area area = DB.Areas.Where(x => x.Id == collection.Id).SingleOrDefault();
-                area.Asress1 = collection.Asress1;
+                area.Adress1 = collection.Adress1;
                 area.Adress2 = collection.Adress2;
                 area.Adress3 = collection.Adress3;
                 area.DelievryPrice = collection.DelievryPrice;

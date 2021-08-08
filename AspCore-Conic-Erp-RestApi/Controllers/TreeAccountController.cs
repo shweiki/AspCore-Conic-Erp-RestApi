@@ -25,6 +25,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Status,
                     x.Code,
                     x.Name,
+                    x.Ref,
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
                     x.Type,
@@ -43,19 +44,53 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 label = (x.Members.Where(m=>m.AccountId == x.Id).FirstOrDefault().Name !=null ? x.Members.Where(m => m.AccountId == x.Id).FirstOrDefault().Name : x.Vendors.Where(m => m.AccountId == x.Id).FirstOrDefault().Name )+ " - " + x.Name,
               }).ToList();
             return Ok(ActiveAccounts);
-
-
         }
 
         [HttpGet]
         [Route("Account/GetAccountByAny")]
         public IActionResult GetAccountByAny(string Any)
         {
-            var Accounts = DB.Accounts.Search(x => x.Name , x => x.Id.ToString()).Containing(Any)
-              .Select(x => new { x.Id, x.Name }).ToList();
-            return Ok(Accounts);
-        }
+            if (Any == null) return NotFound();
+            Any = Any.ToLower();
+            var Accounts = DB.Accounts.Search(x => x.Name, x => x.Code, x => x.Id.ToString(), x => x.Type , x =>x.Vendors.Where(v=>v.AccountId==x.Id).SingleOrDefault().Name , x => x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name).Containing(Any)
+                .Select(x => new { 
+                    x.Id,
+                    Name =  x.Name + x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name + x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                    x.Code,
+                    x.Type 
+                }).ToList();
 
+            return Ok(Accounts);
+           
+        }
+        [HttpPost]
+        [Route("Account/GetByListQ")]
+        public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
+        {
+            var Accounts = DB.Accounts.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+            {
+                x.Id,
+                Name= x.Name + " " + x.Vendors.Where(v=>v.AccountId == x.Id).SingleOrDefault().Name + " " + x.Members.Where(m => m.AccountId == x.Id).SingleOrDefault().Name,
+                x.Code,
+                x.Status,
+                x.Type,
+                x.Description,
+                TotalDebit = x.EntryMovements.Select(d => d.Debit).Sum(),
+                TotalCredit = x.EntryMovements.Select(c => c.Credit).Sum(),
+            }).ToList();
+            Accounts = (Sort == "+id" ? Accounts.OrderBy(s => s.Id).ToList() : Accounts.OrderByDescending(s => s.Id).ToList());
+            return Ok(new
+            {
+                items = Accounts.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Accounts.Count(),
+                    Totals = Accounts.Sum(s => s.TotalCredit - s.TotalDebit),
+                    TotalCredit = Accounts.Sum(s => s.TotalCredit),
+                    TotalDebit = Accounts.Sum(s => s.TotalDebit),
+                }
+            });
+        }
         [Route("Account/GetInComeAccounts")]
         [HttpGet]
         public IActionResult GetInComeAccounts()

@@ -106,6 +106,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         Description = collection.Description,
                         Status = 0,
                         Code = ""
+                        
                     };
                     DB.Accounts.Add(NewAccount);
                     DB.SaveChanges();
