@@ -300,7 +300,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             x.Status,
                             x.Category,
                             x.Ingredients,
-
                 //  InventoryQty = CalculateInventoryItemQty(x.Id)
             }).FirstOrDefault();
             if(Item != null)
@@ -318,7 +317,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     DB.Items.Add(collection);
                     DB.SaveChanges();
                     return Ok(collection);
-
                 }
                 catch
                 {
