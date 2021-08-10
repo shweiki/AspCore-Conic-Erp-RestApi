@@ -105,8 +105,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         Type = "Vendor",
                         Description = collection.Description,
                         Status = 0,
-                        Code = ""
-                        
+                        Code = "",                        
                     };
                     DB.Accounts.Add(NewAccount);
                     DB.SaveChanges();

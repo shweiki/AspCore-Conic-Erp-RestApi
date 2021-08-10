@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210810084517_add type Ref to long account table")]
+    partial class addtypeReftolongaccounttable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,7 +45,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<long>("ParentId")
+                    b.Property<long>("Ref")
                         .HasColumnType("bigint");
 
                     b.Property<int>("Status")
@@ -65,7 +67,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                             Description = "",
                             IsPrime = false,
                             Name = "مبيعات",
-                            ParentId = 0L,
+                            Ref = 0L,
                             Status = 0,
                             Type = "InCome"
                         },
@@ -76,7 +78,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                             Description = "",
                             IsPrime = false,
                             Name = "اشتراكات",
-                            ParentId = 0L,
+                            Ref = 0L,
                             Status = 0,
                             Type = "InCome"
                         },
@@ -87,7 +89,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                             Description = "",
                             IsPrime = false,
                             Name = "مقبوضات",
-                            ParentId = 0L,
+                            Ref = 0L,
                             Status = 0,
                             Type = "InCome"
                         },
@@ -98,7 +100,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                             Description = "",
                             IsPrime = false,
                             Name = "خزينة 1",
-                            ParentId = 0L,
+                            Ref = 0L,
                             Status = 0,
                             Type = "Cash"
                         },
@@ -109,7 +111,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                             Description = "",
                             IsPrime = false,
                             Name = "زبون نقدي",
-                            ParentId = 0L,
+                            Ref = 0L,
                             Status = 0,
                             Type = "Vendor"
                         });

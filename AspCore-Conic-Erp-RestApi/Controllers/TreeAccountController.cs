@@ -25,7 +25,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Status,
                     x.Code,
                     x.Name,
-                    x.Ref,
+                    x.ParentId,
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
                     x.Type,
@@ -35,7 +35,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Accounts);
 
         }
+        [Route("Account/GetTreeAccount")]
+        [HttpGet]
+        public IActionResult GetTreeAccount()
+        {
 
+            var Accounts = DB.Accounts.Select(x => new
+            {
+                x.Id,
+                x.Description,
+                x.Status,
+                x.Code,
+                Name = x.Name + "-" + x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name+ "-" + x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                x.ParentId,
+                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
+                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
+                x.Type,
+                children = new { }
+            }).ToList();
+            
+            return Ok(Accounts);
+
+        }
         [Route("Account/GetActiveAccounts")]
         [HttpGet]
         public IActionResult GetActiveAccounts()
@@ -91,7 +112,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
             });
         }
-        [Route("Account/GetInComeAccounts")]
+        
+       [Route("Account/GetInComeAccounts")]
         [HttpGet]
         public IActionResult GetInComeAccounts()
         {
@@ -102,6 +124,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }).ToList();
                                  
             return Ok(InComeAccounts);
+        }
+        [Route("Account/GetById")]
+        [HttpGet]
+        public IActionResult GetById(long Id)
+        {
+            var Account = DB.Accounts.Where(i => i.Id == Id ).Select(x => new
+            {
+                x.Id,
+                Name = x.Name + " " + x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name + " " + x.Members.Where(m => m.AccountId == x.Id).SingleOrDefault().Name,
+                x.Code,
+                x.Status,
+                x.Type,
+                x.Description,
+                x.ParentId,
+
+            }).ToList();
+
+            return Ok(Account);
         }
         [Route("Account/Create")]
         [HttpPost]

@@ -23,7 +23,7 @@ namespace Entities
         public string Type { get; set; }
         public bool IsPrime { get; set; }
         public string Name { get; set; }
-        public string Ref { get; set; }
+        public long ParentId { get; set; }
 
         public virtual ICollection<Bank> Banks { get; set; }
         public virtual ICollection<Cash> Cashes { get; set; }
