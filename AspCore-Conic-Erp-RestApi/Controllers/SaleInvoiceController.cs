@@ -260,6 +260,34 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(Invoices);
         }
+        [Route("SaleInvoice/GetSaleInvoiceByVendorId")]
+        [HttpGet]
+        public IActionResult GetSaleInvoiceByVendorId(long? Id)
+        {
+            var Invoices = DB.SalesInvoices.Where(f => f.VendorId != null && f.VendorId == Id ).Select(x => new
+            {
+                x.Id,
+                Name = x.Vendor.Name + x.Member.Name,
+                x.Status,
+                x.Type,
+                x.Description,
+                x.FakeDate,
+                x.MemberId,
+                InventoryMovements = x.InventoryMovements.Select(m => new
+                {
+                    m.Id,
+                    m.Status,
+                    m.Items.Name,
+                    m.Qty,
+                    m.SellingPrice,
+                    m.Description,
+                    m.EXP,
+                    Total = m.SellingPrice * m.Qty,
+                }).ToList(),
+
+            }).ToList();
+            return Ok(Invoices);
+        }
         [Route("SaleInvoice/GetSaleInvoiceByMemberId")]
         [HttpGet]
         public IActionResult GetSaleInvoiceByMemberId(long? Id)

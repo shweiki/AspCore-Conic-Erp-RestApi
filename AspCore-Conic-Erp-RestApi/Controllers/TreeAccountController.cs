@@ -138,8 +138,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.Description,
                 x.ParentId,
-
-            }).ToList();
+            }).SingleOrDefault();
 
             return Ok(Account);
         }
@@ -171,12 +170,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (ModelState.IsValid)
             {
-                Account account = DB.Accounts.Where(x => x.Id == collection.Id).SingleOrDefault();
-                account.Code = collection.Code;
-                account.Type = collection.Type;
-                account.Description = collection.Description;
                 try
                 {
+                    Account account = DB.Accounts.Where(x => x.Id == collection.Id).SingleOrDefault();
+                    account.Name = collection.Name;
+                    account.Code = collection.Code;
+                    account.Type = collection.Type;
+                    account.Description = collection.Description;
+                    account.ParentId = collection.ParentId;
                     DB.SaveChanges();
                     return Ok(true);
                 }
