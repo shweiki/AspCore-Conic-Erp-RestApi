@@ -90,6 +90,27 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(Payments);
         }
+        [Route("Payment/GetPaymentsByVendorId")]
+        [HttpGet]
+        public IActionResult GetPaymentsByVendorId(long? VendorId)
+        {
+            var Payments = DB.Payments.Where(i => i.VendorId == VendorId).Select(x => new {
+                x.Id,
+                x.TotalAmmount,
+                x.Type,
+                x.EditorName,
+                Name = x.Vendor.Name + " " + x.Member.Name + " - " + x.Name,
+                x.FakeDate,
+                x.PaymentMethod,
+                ObjectId = x.VendorId == null ? x.MemberId : x.VendorId,
+                x.Description,
+                AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
+                x.Status
+            }).ToList();
+
+            return Ok(Payments);
+        }
+        
         [Route("Payment/GetPaymentByStatus")]
         [HttpGet]
         public IActionResult GetPaymentByStatus(int? Status)

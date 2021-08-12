@@ -38,14 +38,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
             });
         }
-
-        [Route("Report/GetReport")]
+        [Route("Report/GetReportByType")]
         [HttpGet]
-        public IActionResult GetReport(int Id)
+        public IActionResult GetReportByType(string Type)
         {
-            var Reports = DB.Reports.Where(i => i.Id == Id ).Select(x => new
+            var Reports = DB.Reports.Where(i => i.Type == Type).Select(x => new
             {
-
                 x.Id,
                 x.Name,
                 x.Type,
@@ -56,8 +54,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Printer,
                 x.Icon
             }).ToList();
-                            
-
+            return Ok(Reports);
+        }
+        [Route("Report/GetReport")]
+        [HttpGet]
+        public IActionResult GetReport(int Id)
+        {
+            var Reports = DB.Reports.Where(i => i.Id == Id ).Select(x => new
+            {
+                x.Id,
+                x.Name,
+                x.Type,
+                x.AutoPrint,
+                x.AutoSent,
+                x.EmailSent,
+                x.Html,
+                x.Printer,
+                x.Icon
+            }).ToList();
             return Ok(Reports);
         }  
         

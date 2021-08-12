@@ -240,6 +240,46 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(Invoices);
         }
+        [Route("PurchaseInvoice/GetPurchaseInvoiceByVendorId")]
+        [HttpGet]
+        public IActionResult GetPurchaseInvoiceByVendorId(long? Id)
+        {
+            var Invoices = DB.PurchaseInvoices.Where(i => i.VendorId == Id).Select(x => new
+            {
+                x.Id,
+                Name = x.Vendor.Name + " - " + x.Name,
+                x.VendorId,
+                x.Discount,
+                x.Tax,
+                x.FakeDate,
+                x.InvoicePurchaseDate,
+                x.AccountInvoiceNumber,
+                x.PaymentMethod,
+                x.Status,
+                x.Description,
+                Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+                InventoryMovements = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId == x.Id ).Select(m => new
+                {
+                    m.Id,
+                    m.ItemsId,
+                    m.TypeMove,
+                    m.Status,
+                    m.Qty,
+                    m.SellingPrice,
+                    m.Items.Name,
+                    m.PurchaseInvoiceId,
+                    m.InventoryItemId,
+                    m.Description,
+                    m.EXP
+                }).ToList()
+
+            }).ToList();
+
+
+            return Ok(Invoices);
+        }
+        
+
 
     }
 }

@@ -141,6 +141,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PhoneNumber,
                 x.Type,
                 x.Description,
+                Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
                 AccountId =  DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
                 InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == x.Id).Select(imx => new {
                     imx.Id,
@@ -242,6 +243,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.Description,
                 x.PhoneNumber,
+                Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
                 InventoryMovements = DB.InventoryMovements.Where(Im => Im.SalesInvoiceId == x.Id).Select(m => new {
                     m.Id,
                     m.ItemsId,
@@ -267,12 +269,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             var Invoices = DB.SalesInvoices.Where(f => f.VendorId != null && f.VendorId == Id ).Select(x => new
             {
                 x.Id,
-                Name = x.Vendor.Name + x.Member.Name,
+                Name = x.Vendor.Name,
                 x.Status,
                 x.Type,
                 x.Description,
+                x.PaymentMethod,
+                x.Discount,
                 x.FakeDate,
-                x.MemberId,
+                x.VendorId,
+                Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
                 InventoryMovements = x.InventoryMovements.Select(m => new
                 {
                     m.Id,
@@ -299,8 +304,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.Type,
                 x.Description,
+                x.Discount,
+                x.PaymentMethod,
                 x.FakeDate,
                 x.MemberId,
+                Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
                 InventoryMovements = x.InventoryMovements.Select(m => new
                 {
                     m.Id,
