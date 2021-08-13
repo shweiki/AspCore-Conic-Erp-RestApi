@@ -42,7 +42,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetEntryMovementsByAccountId(long? AccountId)
         {
             var EntryMovements = DB.EntryMovements.Where(l => l.AccountId == AccountId).Select(x => new {
-
                 x.Id,
                 x.Credit,
                 x.Debit,
@@ -50,6 +49,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Entry.Type,
                 x.Entry.FakeDate,
                 x.Description,
+                TotalRow = 0,
             }).ToList();
  
      

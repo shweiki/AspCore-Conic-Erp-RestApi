@@ -37,7 +37,9 @@ namespace Entities.Configuration
                     Status = 0,
                     Code = "",
                     Type = "InCome",
-                    IsPrime = false
+                    IsPrime = false,
+                    ParentId = 0
+
                 },
                 new Account
                 {
@@ -47,7 +49,9 @@ namespace Entities.Configuration
                     Status = 0,
                     Code = "",
                     Type = "InCome",
-                    IsPrime = false
+                    IsPrime = false,
+                    ParentId = 0
+
                 },
                 new Account
                 {
@@ -57,7 +61,9 @@ namespace Entities.Configuration
                     Status = 0,
                     Code = "",
                     Type = "InCome",
-                    IsPrime = false
+                    IsPrime = false,
+                    ParentId = 0
+
                 },
                 new Account
                 {
@@ -67,17 +73,20 @@ namespace Entities.Configuration
                     Status = 0,
                     Code = "",
                     Type = "Cash",
-                    IsPrime = false
+                    IsPrime = false,
+                    ParentId = 0
+
                 },
                 new Account
                 {
                     Id = 6,
-                    Name = "زبون نقدي",
+                    Name = "",
                     Description = "",
                     Status = 0,
                     Code = "",
                     Type = "Vendor",
-                    IsPrime = false
+                    IsPrime = false,
+                    ParentId = 0
                 }
             );
         }
