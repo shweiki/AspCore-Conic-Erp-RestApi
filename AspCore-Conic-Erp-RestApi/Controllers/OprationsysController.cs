@@ -325,6 +325,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     log.ServiceId = (int)ObjId;
                     DB.Services.Where(x => x.Id == log.ServiceId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
+                case "Area":
+                  //  log.are = (int)ObjId;
+                    DB.Areas.Where(x => x.Id == (int)ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                    break;
             }
             ActionLogController logCon = new ActionLogController();
             if (logCon.Create(log))
