@@ -24,7 +24,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Description,
                     x.Status,
                     x.Code,
-                    x.Name,
+                    Name = x.Name + " " + x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name + " " + x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
                     x.ParentId,
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
@@ -46,7 +46,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Description,
                 x.Status,
                 x.Code,
-                Name = x.Name + "-" + x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name+ "-" + x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                Name = x.Name + " " + x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name+ " " + x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
                 x.ParentId,
                 TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
                 TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
@@ -117,12 +117,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetInComeAccounts()
         {
-            var InComeAccounts = DB.Accounts.Where(i => i.Status == 0 && i.Type == "InCome").Select(x => new
+            var InComeAccounts = DB.Accounts.Where(i =>  i.Type == "InCome").Select(x => new
             {
                 value = x.Id,
                 label = x.Name
             }).ToList();
                                  
+            return Ok(InComeAccounts);
+        }
+        [Route("Account/GetMainAccount")]
+        [HttpGet]
+        public IActionResult GetMainAccount()
+        {
+            var InComeAccounts = DB.Accounts.Where(i =>  i.Type == "Main").Select(x => new
+            {
+                value = x.Id,
+                label = x.Name
+            }).ToList();
+
             return Ok(InComeAccounts);
         }
         [Route("Account/GetById")]

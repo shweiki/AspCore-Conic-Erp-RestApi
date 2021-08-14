@@ -202,7 +202,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         public bool CheckDeviceHere(int Id)
         {
-
             var Device = DB.Devices.Where(x => x.Id == Id).SingleOrDefault();
             bool IsDeviceConnected = false;
             bool isValidIpA = UniversalStatic.ValidateIP(Device.Ip);

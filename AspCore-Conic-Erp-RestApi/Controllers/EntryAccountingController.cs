@@ -118,14 +118,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Description,
                 x.Type,
                 EntryMovements = DB.EntryMovements.Where(Im => Im.EntryId == x.Id).Select(m => new {
-                    m.Id,
-                 m.Debit,
-                 m.Credit,
-                 m.EntryId,
-                 m.AccountId,
+                     m.Id,
+                     m.Debit,
+                     m.Credit,
+                     m.EntryId,
+                     m.AccountId,
+                    Name = m.Account.Name + "-" + m.Account.Vendors.Where(v => v.AccountId == m.AccountId).SingleOrDefault().Name + "-" + m.Account.Members.Where(v => v.AccountId == m.AccountId).SingleOrDefault().Name,
                     m.Description
-
-                }).ToList()
+                    }).ToList()
             }).SingleOrDefault();
 
             return Ok(Entrys);
