@@ -44,7 +44,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
 
         }
-  
         [Route("Area/Create")]
         [HttpPost]
         public IActionResult Create(Area collection)
