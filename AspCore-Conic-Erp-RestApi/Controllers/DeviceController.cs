@@ -109,7 +109,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             if (CheckDeviceHere((int)DeviceId)) {
 
                 var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
-     
+ 
                 bool SetUser = objZkeeper.SSR_SetUserInfo((int)DeviceId, member.Id.ToString(), member.Name, "", 0, true);
                 if (SetUser)
                 {
@@ -135,6 +135,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                 FaceStr = strface,
                                 MemberId = member.Id,
                             });
+                            bool SetUserFace = objZkeeper.SetUserFaceStr((int)DeviceId, member.Id.ToString(), 50, strface, length);
                         }
                     }
                 }
@@ -269,26 +270,36 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                 foreach (Member M in Members)
                 {
-                   // var MemberShipLast = DB.MembershipMovements.Where(mm => mm.MemberId == M.Id && mm.EndDate >= last).ToList();
-                   // if (MemberShipLast.Count() <=0 ) continue;
-                    bool SetUser = objZkeeper.SSR_SetUserInfo(0, M.Id.ToString(), M.Name, "", 0, false);
+                    bool SetUser = objZkeeper.SSR_SetUserInfo((int)DeviceId, M.Id.ToString(), M.Name, "", 0, true);
                     if (SetUser)
                     {
-                        var memeberface = DB.MemberFaces.Where(f => f.MemberId == M.Id).SingleOrDefault();
-                        if (memeberface != null)
+                        string strface = "";
+                        int length = 0;
+                        bool GetUserFace = objZkeeper.GetUserFaceStr((int)DeviceId, M.Id.ToString(), 50, ref strface, ref length);
+                        if (GetUserFace)
                         {
-                            bool SetUserFace = objZkeeper.SetUserFaceStr((int)DeviceId, M.Id.ToString(), 50, memeberface.FaceStr, memeberface.FaceLength);
-                            if (SetUserFace)
+                            var memeberface = DB.MemberFaces.Where(f => f.MemberId == M.Id).SingleOrDefault();
+                            if (memeberface != null)
                             {
-                                continue;
+                                memeberface.FaceLength = length;
+                                memeberface.FaceStr = strface;
+                                memeberface.MemberId = M.Id;
+
+                                bool SetUserFace = objZkeeper.SetUserFaceStr((int)DeviceId, M.Id.ToString(), 50, memeberface.FaceStr, memeberface.FaceLength);
                             }
+                            else
+                            {
+                                DB.MemberFaces.Add(new MemberFace
+                                {
+                                    FaceLength = length,
+                                    FaceStr = strface,
+                                    MemberId = M.Id,
+                                });
+                                bool SetUserFace = objZkeeper.SetUserFaceStr((int)DeviceId, M.Id.ToString(), 50, strface, length);
 
+                            }
                         }
-                        else  continue; 
-
                     }
-                    else continue;
-
                 }
                 return Ok(true);
 
