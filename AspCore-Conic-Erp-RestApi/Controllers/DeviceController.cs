@@ -236,7 +236,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             if (isValidIpA)
             {
                 objZkeeper = new ZkemClient(RaiseDeviceEvent);
-                Device.Description = "Is Disconnect Connected  ";
+                Device.Description = "Is Device Connected  ";
                  objZkeeper.Disconnect();
             }
             DB.SaveChanges();
@@ -300,6 +300,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             }
                         }
                     }
+                    DB.SaveChanges();
                 }
                 return Ok(true);
 

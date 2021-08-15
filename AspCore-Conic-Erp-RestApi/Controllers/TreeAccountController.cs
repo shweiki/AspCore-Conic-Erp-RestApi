@@ -24,7 +24,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Description,
                     x.Status,
                     x.Code,
-                    Name = x.Name + " " + x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name + " " + x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                    Name = x.Name == "" ? x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Name,
                     x.ParentId,
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
@@ -46,7 +46,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Description,
                 x.Status,
                 x.Code,
-                Name = x.Name + " " + x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name+ " " + x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                Name = x.Name == ""? x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Name  ,
                 x.ParentId,
                 TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
                 TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
@@ -73,10 +73,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (Any == null) return NotFound();
             Any = Any.ToLower();
-            var Accounts = DB.Accounts.Search(x => x.Name, x => x.Code, x => x.Id.ToString(), x => x.Type , x =>x.Vendors.Where(v=>v.AccountId==x.Id).SingleOrDefault().Name , x => x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name).Containing(Any)
+            var Accounts = DB.Accounts.Where(a=> a.Type != "Main").Search(x => x.Name, x => x.Code, x => x.Id.ToString(), x => x.Type , x =>x.Vendors.Where(v=>v.AccountId==x.Id).SingleOrDefault().Name , x => x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name).Containing(Any)
                 .Select(x => new { 
                     x.Id,
-                    Name =  x.Name + x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name + x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                    Name = x.Name == "" ? x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Name,
                     x.Code,
                     x.Type 
                 }).ToList();
@@ -91,7 +91,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             var Accounts = DB.Accounts.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
             {
                 x.Id,
-                Name= x.Name + " " + x.Vendors.Where(v=>v.AccountId == x.Id).SingleOrDefault().Name + " " + x.Members.Where(m => m.AccountId == x.Id).SingleOrDefault().Name,
+                Name = x.Name == "" ? x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Name,
                 x.Code,
                 x.Status,
                 x.Type,
@@ -144,7 +144,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             var Account = DB.Accounts.Where(i => i.Id == Id ).Select(x => new
             {
                 x.Id,
-                Name = x.Name + " " + x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name + " " + x.Members.Where(m => m.AccountId == x.Id).SingleOrDefault().Name,
+                Name = x.Name == "" ? x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Name,
                 x.Code,
                 x.Status,
                 x.Type,

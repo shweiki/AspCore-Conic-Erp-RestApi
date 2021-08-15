@@ -71,7 +71,7 @@ namespace Entities.Configuration
                     CreditLimit = 0,
                     IsPrime = true,
                     Type = "Customer",
-                    AccountId = 6
+                    AccountId = 15
                 }
               
             );

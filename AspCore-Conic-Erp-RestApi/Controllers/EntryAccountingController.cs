@@ -30,7 +30,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             var EntryMovements = DB.EntryMovements.Where(s => s.AccountId == AccountId && (Any != null ? s.Id.ToString().Contains(Any) || s.Description.Contains(Any) : true) && (DateFrom != null ? s.Entry.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.Entry.FakeDate <= DateTo : true) && (Status != null ? s.Entry.Status == Status : true) &&
-            (User != null ? DB.ActionLogs.Where(l => l.PaymentId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+            (User != null ? DB.ActionLogs.Where(l => l.EntryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
 
             {
                 x.Id,
@@ -38,6 +38,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Credit,
                 x.Description,
                 x.EntryId,
+                TotalRow=0,
                 x.Entry.FakeDate,
                 x.Entry.Status,
                 x.Entry.Type,
