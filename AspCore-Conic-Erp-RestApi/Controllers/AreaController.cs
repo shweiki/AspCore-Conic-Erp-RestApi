@@ -29,11 +29,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
               return Ok(Areas);
            }
+
         [Route("Area/GetAreasLabel")]
         [HttpGet]
         public IActionResult GetAreasLabel()
         {
-            var Areas = DB.Areas.Select(x => new {
+            var Areas = DB.Areas.Where(x => x.Status == 0).Select(x => new {
 
                 value = x.Id,
                 label = x.Adress1,
