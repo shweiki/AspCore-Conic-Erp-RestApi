@@ -100,12 +100,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
+                    var ParentAccount = collection.Type == "Customer" ? DB.Accounts.Where(i => i.Description == "عملاء").SingleOrDefault() : DB.Accounts.Where(i => i.Description == "موردين").SingleOrDefault();
                     Account NewAccount = new Account
                     {
                         Type = "Vendor",
                         Description = collection.Description,
                         Status = 0,
-                        Code = "",                        
+                        Code = ParentAccount.Code +'-'+ DB.Accounts.Where(i=>i.ParentId == ParentAccount.Id).Count()+1,
+                        ParentId = ParentAccount.Id
                     };
                     DB.Accounts.Add(NewAccount);
                     DB.SaveChanges();
