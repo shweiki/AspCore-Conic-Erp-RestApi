@@ -13,7 +13,8 @@ namespace Entities
         public double Debit { get; set; }
         public double Credit { get; set; }
         public long EntryId { get; set; }
-
+        public string TableName { get; set; }
+        public long Fktable { get; set; }
         public virtual Account Account { get; set; }
         public virtual EntryAccounting Entry { get; set; }
     }

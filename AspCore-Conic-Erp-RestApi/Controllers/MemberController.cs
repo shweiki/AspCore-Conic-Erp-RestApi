@@ -308,11 +308,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 int OStatus = M.Status;
 
-            
                if (DB.MembershipMovements.Where(x=>x.MemberId == M.Id).Count() <= 0)
                {
                    M.Status = -1;
                }
+
                 //var ActiveMemberShip = M.MembershipMovements.Where(m => m.Status == 1).SingleOrDefault();
 
                 //if (ActiveMemberShip != null)
@@ -384,13 +384,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     M.Status = DB.Oprationsys.Where(o=>o.Id == logblacklist.OprationId).SingleOrDefault().Status;
                 }
-
                 DB.SaveChanges();
-
             }
             return Ok(true);
-
-
         }
     }
 

@@ -33,6 +33,7 @@ namespace Entities
         public virtual DbSet<Discount> Discounts { get; set; }
         public virtual DbSet<EditorsUser> EditorsUsers { get; set; }
         public virtual DbSet<Visit> Visits { get; set; }
+        public virtual DbSet<CashPool> CashPools { get; set; }
         public virtual DbSet<Driver> Drivers { get; set; }
         public virtual DbSet<EntryAccounting> EntryAccountings { get; set; }
         public virtual DbSet<EntryMovement> EntryMovements { get; set; }

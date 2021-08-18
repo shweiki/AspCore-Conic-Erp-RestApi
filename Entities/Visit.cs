@@ -7,8 +7,6 @@ namespace Entities
 {
     public partial class Visit
     {
-
-
         public long Id { get; set; }
         public string Name { get; set; }
         public double? Tax { get; set; }
@@ -22,7 +20,5 @@ namespace Entities
         public string Type { get; set; }
         public double HourPrice { get; set; }
         public string PhoneNumber { get; set; }
- 
-
     }
 }
