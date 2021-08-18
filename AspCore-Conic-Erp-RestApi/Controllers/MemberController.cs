@@ -309,7 +309,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 int OStatus = M.Status;
 
             
-               if (M.MembershipMovements.Count() <= 0)
+               if (DB.MembershipMovements.Where(x=>x.MemberId == M.Id).Count() <= 0)
                 {
                    M.Status = -1;
                }
