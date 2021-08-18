@@ -302,15 +302,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult CheckMembers()
         {
-            IList<Member> Members = DB.Members?.ToList();
+           var Members = DB.Members?.ToList();
         
-            foreach (Member M in Members)
+            foreach (var M in Members)
             {
                 int OStatus = M.Status;
 
             
                if (DB.MembershipMovements.Where(x=>x.MemberId == M.Id).Count() <= 0)
-                {
+               {
                    M.Status = -1;
                }
                 //var ActiveMemberShip = M.MembershipMovements.Where(m => m.Status == 1).SingleOrDefault();
@@ -368,7 +368,31 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(true);
         }
+       
+        [Route("Member/CheckLastActionLogMembers")]
+        [HttpGet]
+        public IActionResult CheckLastActionLogMembers()
+        {
+            var Members = DB.Members?.ToList();
 
+            foreach (var M in Members)
+            {
+                int OStatus = M.Status;
+
+                var logblacklist = DB.ActionLogs.Where(x => x.MemberId == M.Id ).OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
+                if (logblacklist != null)
+                {
+                    M.Status = DB.Oprationsys.Where(o=>o.Id == logblacklist.OprationId).SingleOrDefault().Status;
+                }
+
+                DB.SaveChanges();
+
+            }
+            return Ok(true);
+
+
+        }
     }
+
 
 }

@@ -191,6 +191,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             bool SetUserFace = objZkeeper.SetUserFaceStr((int)DeviceId, member.Id.ToString(), 50, strface, length);
                         }
                     }
+                    else {
+                        var memeberface = DB.MemberFaces.Where(f => f.MemberId == member.Id).SingleOrDefault();
+
+                        bool SetUserFace = objZkeeper.SetUserFaceStr((int)DeviceId, member.Id.ToString(), 50, memeberface.FaceStr, memeberface.FaceLength);
+
+                    }
                 }
                 DB.SaveChanges();
                 return Ok(SetUser);
