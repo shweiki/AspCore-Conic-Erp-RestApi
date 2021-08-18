@@ -94,6 +94,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.AccountId,
                 x.Tag,
                 x.Vaccine,
+                lastLogByMember= x.MemberLogs.ToList().OrderBy(o=>o.DateTime).LastOrDefault().DateTime.ToString() + ' ',
+                MembershipsCount = x.MembershipMovements.Count(),
                 TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
                 TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum(),
             }).ToList();
@@ -186,16 +188,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
+                    var ParentAccount = DB.Accounts.Where(i => i.Description == "Member").SingleOrDefault();
+                    ParentAccount = ParentAccount ??= new Account { Id = 0, ParentId = 0, Code = "0" };
                     Account NewAccount = new Account
                     {
                         Type = "Member",
                         Description = collection.Description,
                         Status = 0,
-                        Code = ""
+                        Code = ParentAccount.Code + '-' + DB.Accounts.Where(i => i.ParentId == ParentAccount.Id).Count() + 1,
+                        ParentId = ParentAccount.Id
                     };
                     DB.Accounts.Add(NewAccount);
                     DB.SaveChanges();
-                    collection.Status = 0;
                     collection.AccountId = NewAccount.Id;
                     DB.Members.Add(collection);
                     DB.SaveChanges();
@@ -260,6 +264,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Type,
                     x.Tag,
                     x.Vaccine,
+                    MembershipsCount = x.MembershipMovements.Count(),
                     HaveFaceOnDevice = x.MemberFaces.Count() > 0 ? true : false,
                     Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg"),
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
@@ -304,36 +309,36 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 int OStatus = M.Status;
 
             
-                if (M.MembershipMovements.Count() == 0)
+               if (M.MembershipMovements.Count() <= 0)
                 {
-                    M.Status = -1;
-                }
-                var ActiveMemberShip = M.MembershipMovements.Where(m => m.Status == 1).SingleOrDefault();
+                   M.Status = -1;
+               }
+                //var ActiveMemberShip = M.MembershipMovements.Where(m => m.Status == 1).SingleOrDefault();
 
-                if (ActiveMemberShip != null)
-                {
+                //if (ActiveMemberShip != null)
+                //{
 
-                    var HowManyDaysLeft = (ActiveMemberShip.EndDate - DateTime.Today).TotalDays;
-                    if (HowManyDaysLeft == 3)
-                    {
-                        Massage msg = new Massage();
-                        msg.Body = "عزيزي " + M.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + ActiveMemberShip.EndDate + " وشكرا";
-                        msg.Status = 0;
-                        msg.TableName = "Member";
-                        msg.Fktable = M.Id;
-                        msg.PhoneNumber = M.PhoneNumber1;
-                        msg.SendDate = DateTime.Today;
-                        msg.Type = "رسالة تذكير";
-                        DB.Massages.Add(msg);
-                        DB.SaveChanges();
-                    }
+                //    var HowManyDaysLeft = (ActiveMemberShip.EndDate - DateTime.Today).TotalDays;
+                //    if (HowManyDaysLeft == 3)
+                //    {
+                //        Massage msg = new Massage();
+                //        msg.Body = "عزيزي " + M.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + ActiveMemberShip.EndDate + " وشكرا";
+                //        msg.Status = 0;
+                //        msg.TableName = "Member";
+                //        msg.Fktable = M.Id;
+                //        msg.PhoneNumber = M.PhoneNumber1;
+                //        msg.SendDate = DateTime.Today;
+                //        msg.Type = "رسالة تذكير";
+                //        DB.Massages.Add(msg);
+                //        DB.SaveChanges();
+                //    }
 
-                }
-                if (OStatus == -2)
-                {
+                //}
+                //if (OStatus == -2)
+                //{
 
-                    M.Status = -2;
-                }
+                //    M.Status = -2;
+                //}
             }
 
             //    if (M.Status == -2)

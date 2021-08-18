@@ -18,6 +18,59 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private ZkemClient objZkeeper;
 
         private ConicErpContext DB = new ConicErpContext();
+
+        [Route("Device/Create")]
+        [HttpPost]
+        public IActionResult Create(Device collection)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+          
+                    DB.Devices.Add(collection);
+                    DB.SaveChanges();
+                    return Ok(collection.Id);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            return Ok(false);
+        }
+
+        [Route("Device/Edit")]
+        [HttpPost]
+        public IActionResult Edit(Device collection)
+        {
+            if (ModelState.IsValid)
+            {
+
+                try
+                {
+                    Device Device = DB.Devices.Where(x => x.Id == collection.Id).SingleOrDefault();
+                Device.Name = collection.Name;
+                Device.Ip = collection.Ip;
+                Device.Port = collection.Port;
+                Device.IsPrime = collection.IsPrime;
+                Device.Status = collection.Status;
+                Device.LastSetDateTime = collection.LastSetDateTime;
+                Device.Description = collection.Description;
+             
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            return Ok(false);
+        }
+
         [Route("Device/OpenCashDrawer")]
         [HttpGet]
         public IActionResult OpenCashDrawer(string Com)

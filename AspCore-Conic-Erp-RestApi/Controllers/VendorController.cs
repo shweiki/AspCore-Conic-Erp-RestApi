@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -100,14 +101,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
-                    var ParentAccount = collection.Type == "Customer" ? DB.Accounts.Where(i => i.Description == "عملاء").SingleOrDefault() : DB.Accounts.Where(i => i.Description == "موردين").SingleOrDefault();
+                    var ParentAccount = collection.Type == "Customer" ? DB.Accounts.Where(i => i.Description == "Customer").SingleOrDefault() : DB.Accounts.Where(i => i.Description == "Supplier").SingleOrDefault() ;
+                    ParentAccount = ParentAccount ??= new Account { Id = 0, ParentId = 0, Code = "0" };
                     Account NewAccount = new Account
                     {
                         Type = "Vendor",
                         Description = collection.Description,
                         Status = 0,
                         Code = ParentAccount.Code +'-'+ DB.Accounts.Where(i=>i.ParentId == ParentAccount.Id).Count()+1,
-                        ParentId = ParentAccount.Id
+                        ParentId =  ParentAccount.Id 
                     };
                     DB.Accounts.Add(NewAccount);
                     DB.SaveChanges();
@@ -156,6 +158,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (ModelState.IsValid)
             {
+                try
+                {
                 Vendor vendor = DB.Vendors.Where(x => x.Id == collection.Id).SingleOrDefault();
                 vendor.Name = collection.Name;
                 vendor.Ssn = collection.Ssn;
@@ -169,8 +173,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 vendor.Status = collection.Status;
                 vendor.IsPrime = collection.IsPrime;
                 vendor.Type = collection.Type;
-                try
-                {
+            
                     DB.SaveChanges();
                     return Ok(true);
                 }
