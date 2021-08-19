@@ -13,9 +13,10 @@ namespace Entities
         public float TotalVisa { get; set; }
         public float TotalReject { get; set; }
         public float TotalOutlay { get; set; }
-        public float Totalrestitution { get; set; }
+        public float TotalRestitution { get; set; }
         public DateTime DateTime { get; set; }
         public int Status { get; set; }
+        public string Description { get; set; }
         public string TableName { get; set; }
         public long Fktable { get; set; }
     }
