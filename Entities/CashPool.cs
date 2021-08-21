@@ -18,6 +18,6 @@ namespace Entities
         public int Status { get; set; }
         public string Description { get; set; }
         public string TableName { get; set; }
-        public long Fktable { get; set; }
+        public string Fktable { get; set; }
     }
 }
