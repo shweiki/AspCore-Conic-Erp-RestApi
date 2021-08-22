@@ -64,7 +64,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             if (ModelState.IsValid)
             {
-                collection.Status = 0;
                 try
                 {
                     // TODO: Add insert logic here

@@ -55,7 +55,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 try
                 {
                     // TODO: Add insert logic here
-                  // collection.FakeDate = collection.FakeDate.ToLocalTime();
+                    collection.DateTime = DateTime.Now;
                     DB.CashPools.Add(collection);
                     DB.SaveChanges();
                     return Ok(collection.Id);

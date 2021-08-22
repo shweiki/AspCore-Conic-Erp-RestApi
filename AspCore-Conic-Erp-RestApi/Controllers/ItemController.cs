@@ -40,8 +40,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Category,
                 x.Description,
                 x.Ingredients,
-                TotalIn = x.InventoryMovements.Where(x => x.TypeMove == "In").Sum(s => s.Qty),
-                TotalOut = x.InventoryMovements.Where(x => x.TypeMove == "Out").Sum(s => s.Qty),
+                TotalIn =  DB.InventoryMovements.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty),
+                TotalOut = DB.InventoryMovements.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty),
               }).ToList();
             Items = (Sort == "+id" ? Items.OrderBy(s => s.Id).ToList() : Items.OrderByDescending(s => s.Id).ToList());
             return Ok(new
@@ -53,7 +53,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     TotalIn = Items.Sum(s => s.TotalIn),
                     TotalOut = Items.Sum(s => s.TotalOut),
                     Totals = Items.Sum(s => s.TotalIn) - Items.Sum(s => s.TotalOut),
-
                 }
             });
         }
