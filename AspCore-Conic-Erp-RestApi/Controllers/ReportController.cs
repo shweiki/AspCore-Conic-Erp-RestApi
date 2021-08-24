@@ -19,8 +19,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
              x.Id,
              x.Name ,
-             x.AutoPrint ,
-             x.AutoSent ,
              x.Type ,
              x.EmailSent ,
              x.Html ,
@@ -47,8 +45,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.Name,
                 x.Type,
-                x.AutoPrint,
-                x.AutoSent,
                 x.EmailSent,
                 x.Html,
                 x.Printer,
@@ -64,9 +60,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 x.Id,
                 x.Name,
-                x.Type,
-                x.AutoPrint,
-                x.AutoSent,
                 x.EmailSent,
                 x.Html,
                 x.Printer,
@@ -117,9 +110,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Report Report = DB.Reports.Where(x => x.Id == collection.Id).SingleOrDefault();
        
                     Report.Name = collection.Name;
-                    Report.AutoPrint = collection.AutoPrint;
                     Report.Type = collection.Type;
-                    Report.AutoSent = collection.AutoSent;
                     Report.EmailSent = collection.EmailSent;
                     Report.Html = collection.Html;
                     Report.Printer = collection.Printer;
@@ -147,8 +138,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.Name,
                 x.Type,
-                x.AutoPrint,
-                x.AutoSent,
                 x.EmailSent,
                 x.Html,
                 x.Printer,

@@ -21,6 +21,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 x.Id,
                 x.Type,
+                x.Total,
                 x.TotalCash,
                 x.TotalVisa,
                 x.TotalReject,
@@ -37,12 +38,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(new {items = List.Skip((Page - 1) * Limit).Take(Limit).ToList(), 
             Totals = new {
             Rows = List.Count(),
-                // Totals = List.Sum(s => s.Total),
-                TotalCash = List.Sum(s => s.TotalCash),
-                TotalVisa = List.Sum(s => s.TotalVisa),
-                TotalReject = List.Sum(s => s.TotalReject),
-                TotalOutlay = List.Sum(s => s.TotalOutlay),
-                TotalRestitution = List.Sum(s => s.TotalRestitution),
+                Totals = List.Sum(s => s.Total),
+                Cash = List.Sum(s => s.TotalCash),
+                Visa = List.Sum(s => s.TotalVisa),
+                Reject = List.Sum(s => s.TotalReject),
+                Outlay = List.Sum(s => s.TotalOutlay),
+                Restitution = List.Sum(s => s.TotalRestitution),
             } });
     } 
         [HttpPost]

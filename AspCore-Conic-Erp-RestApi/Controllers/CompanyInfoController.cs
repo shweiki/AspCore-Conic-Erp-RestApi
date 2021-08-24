@@ -36,9 +36,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     companyInfo.Fax = collection.Fax;
                     companyInfo.Email = collection.Email;
                     companyInfo.Website = collection.Website;
-                    companyInfo.HeaderReport = collection.HeaderReport;
-                    companyInfo.FooterReport = collection.FooterReport;
-
                 }
 
                 // TODO: Add update logic here

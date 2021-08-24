@@ -20,8 +20,7 @@ namespace Entities
         public string Fax { get; set; }
         public string Email { get; set; }
         public string Website { get; set; }
-        public string HeaderReport { get; set; }
-        public string FooterReport { get; set; }
+
 
 
     }

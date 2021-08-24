@@ -9,6 +9,8 @@ namespace Entities
     {
         public long Id { get; set; }
         public string Type { get; set; }
+        public float Total { get; set; }
+
         public float TotalCash { get; set; } 
         public float TotalVisa { get; set; }
         public float TotalReject { get; set; }
