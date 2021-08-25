@@ -21,8 +21,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 x.Id,
                 x.Type,
-                x.Total,
                 x.TotalCash,
+                x.TotalCoins,
                 x.TotalVisa,
                 x.TotalReject,
                 x.TotalOutlay,
@@ -30,22 +30,25 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.DateTime,
                 x.Status,
                 x.Description,
+                x.EditorName,
                 x.TableName,
                 x.Fktable,
-             
+
             }).ToList();
             List =  (Sort == "+id" ? List.OrderBy(s => s.Id).ToList() : List.OrderByDescending(s => s.Id).ToList());
             return Ok(new {items = List.Skip((Page - 1) * Limit).Take(Limit).ToList(), 
             Totals = new {
             Rows = List.Count(),
-                Totals = List.Sum(s => s.Total),
+             //   Totals = List.Sum(s => s.Total),
                 Cash = List.Sum(s => s.TotalCash),
+                Coins = List.Sum(s => s.TotalCoins),
                 Visa = List.Sum(s => s.TotalVisa),
                 Reject = List.Sum(s => s.TotalReject),
                 Outlay = List.Sum(s => s.TotalOutlay),
                 Restitution = List.Sum(s => s.TotalRestitution),
             } });
-    } 
+    }
+ 
         [HttpPost]
         [Route("CashPool/Create")]
 
@@ -82,6 +85,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                     Invoice.Type = collection.Type;
                     Invoice.TotalCash = collection.TotalCash;
+                    Invoice.TotalCoins = collection.TotalCoins;
                     Invoice.TotalVisa = collection.TotalVisa;
                     Invoice.TotalReject = collection.TotalReject;
                     Invoice.TotalOutlay = collection.TotalOutlay;
@@ -89,6 +93,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Invoice.DateTime = collection.DateTime;
                     Invoice.Status = collection.Status;
                     Invoice.Description = collection.Description;
+                    Invoice.EditorName = collection.EditorName;
                     Invoice.TableName = collection.TableName;
                     Invoice.Fktable = collection.Fktable;
                  
@@ -113,6 +118,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.Type,
                 x.TotalCash,
+                x.TotalCoins,
                 x.TotalVisa,
                 x.TotalReject,
                 x.TotalOutlay,
@@ -120,12 +126,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.DateTime,
                 x.Status,
                 x.Description,
+                x.EditorName,
                 x.TableName,
                 x.Fktable,
             }).SingleOrDefault();
 
             return Ok(List);
         }
+  
 
     }
 }

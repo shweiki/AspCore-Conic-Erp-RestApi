@@ -313,65 +313,22 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                    M.Status = -1;
                }
 
-                //var ActiveMemberShip = M.MembershipMovements.Where(m => m.Status == 1).SingleOrDefault();
+                var ActiveMemberShip = M.MembershipMovements.Where(m => m.Status == 1).SingleOrDefault();
+                if (ActiveMemberShip == null) {
+                    M.Status = -1;
+                }
 
-                //if (ActiveMemberShip != null)
-                //{
-
-                //    var HowManyDaysLeft = (ActiveMemberShip.EndDate - DateTime.Today).TotalDays;
-                //    if (HowManyDaysLeft == 3)
-                //    {
-                //        Massage msg = new Massage();
-                //        msg.Body = "عزيزي " + M.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + ActiveMemberShip.EndDate + " وشكرا";
-                //        msg.Status = 0;
-                //        msg.TableName = "Member";
-                //        msg.Fktable = M.Id;
-                //        msg.PhoneNumber = M.PhoneNumber1;
-                //        msg.SendDate = DateTime.Today;
-                //        msg.Type = "رسالة تذكير";
-                //        DB.Massages.Add(msg);
-                //        DB.SaveChanges();
-                //    }
-
-                //}
-                //if (OStatus == -2)
-                //{
-
-                //    M.Status = -2;
-                //}
             }
+            CheckBlackListActionLogMembers();
 
-            //    if (M.Status == -2)
-            //        EnableToDevice = false;
-
-            //    if (M.Status == -1)
-            //            EnableToDevice = false;
-            //        if (M.Status == 0)
-            //            EnableToDevice = true;
-            //        if (M.Status == 1)
-            //            EnableToDevice = true;
-            //        if (M.Status == 2)
-            //            EnableToDevice = true;
-
-            //    if (DeviceIsEnable)
-            //        if (DoorZtk.LastSetDateTime < DateTime.Today)
-            //        {
-            //            device.EnableMemberToDevice(DoorZtk.Id, M.Id, EnableToDevice);
-            //        }
-
-            //}
-
-            //    DoorZtk.LastSetDateTime = DateTime.Today;
-
-            /////device.DisconnectDeviceHere((int)DoorZtk.Id);
             DB.SaveChanges();
 
             return Ok(true);
         }
        
-        [Route("Member/CheckLastActionLogMembers")]
+        [Route("Member/CheckBlackListActionLogMembers")]
         [HttpGet]
-        public IActionResult CheckLastActionLogMembers()
+        public IActionResult CheckBlackListActionLogMembers()
         {
             var Members = DB.Members?.ToList();
 
@@ -379,7 +336,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 int OStatus = M.Status;
 
-                var logblacklist = DB.ActionLogs.Where(x => x.MemberId == M.Id ).OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
+                var logblacklist = DB.ActionLogs.Where(x => x.MemberId == M.Id  && x.Opration.OprationName== "BlackList").OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
                 if (logblacklist != null)
                 {
                     M.Status = DB.Oprationsys.Where(o=>o.Id == logblacklist.OprationId).SingleOrDefault().Status;

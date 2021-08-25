@@ -225,6 +225,43 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
+        [Route("SaleInvoice/GetSaleInvoiceByListId")]
+        [HttpGet]
+        public IActionResult GetSaleInvoiceByListId(string listid)
+        {
+            List<long> list = listid.Split(',').Select(long.Parse).ToList();
+            var Invoices = DB.SalesInvoices.Where(s => list.Contains(s.Id)).Select(x => new
+            {
+                x.Id,
+                x.Discount,
+                x.Tax,
+                Name = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+                x.FakeDate,
+                x.PaymentMethod,
+                x.Status,
+                x.Region,
+                x.DeliveryPrice,
+                x.PhoneNumber,
+                x.Type,
+                x.Description,
+                Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+                AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
+                InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == x.Id).Select(imx => new {
+                    imx.Id,
+                    imx.ItemsId,
+                    imx.Items.Name,
+                    imx.Items.CostPrice,
+                    imx.TypeMove,
+                    imx.InventoryItemId,
+                    imx.EXP,
+                    imx.Qty,
+                    imx.SellingPrice,
+                    Total = imx.SellingPrice * imx.Qty,
+                    imx.Description
+                }).ToList(),
+            }).ToList();
+            return Ok(Invoices); ///new { Total = x.Sum(ss => ss.InventoryMovements.Sum(si => si.SellingPrice * si.Qty) - ss.Discount) };
+        }
         [Route("SaleInvoice/GetSaleInvoiceById")]
         [HttpGet]
         public IActionResult GetSaleInvoiceById(long? Id)
