@@ -113,7 +113,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         
         [Route("Payment/GetPaymentByStatus")]
         [HttpGet]
-        public IActionResult GetPaymentByStatus(int? Status)
+        public IActionResult GetPaymentByStatus(int Limit, string Sort, int Page, int? Status)
         {
             var Payments = DB.Payments.Where(i => i.Status == Status).Select(x => new
             {
@@ -124,14 +124,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Name = x.Vendor.Name + " " + x.Member.Name + " - " + x.Name,
                 x.FakeDate,
                 x.PaymentMethod,
-               ObjectId = x.VendorId == null ? x.MemberId : x.VendorId,
                 x.Status,
                 x.Description,
+                ObjectId = x.VendorId == null ? x.MemberId : x.VendorId,
+
+                x.MemberId,
                 AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
             }).ToList();
+            Payments = (Sort == "+id" ? Payments.OrderBy(s => s.Id).ToList() : Payments.OrderByDescending(s => s.Id).ToList());
+            return Ok(new
+            {
+                items = Payments.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Payments.Count(),
+                    Totals = Payments.Sum(s => s.TotalAmmount),
+                    Cash = Payments.Where(i => i.PaymentMethod == "Cash").Sum(s => s.TotalAmmount),
+                    Cheque = Payments.Where(i => i.PaymentMethod == "Cheque").Sum(s => s.TotalAmmount),
+                    Visa = Payments.Where(i => i.PaymentMethod == "Visa").Sum(s => s.TotalAmmount)
+                }
+            });
                 
 
-            return Ok(Payments);
         }
         [HttpPost]
         public IActionResult Create(Payment collection)
