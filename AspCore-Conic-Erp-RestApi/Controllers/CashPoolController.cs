@@ -33,7 +33,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.EditorName,
                 x.TableName,
                 x.Fktable,
-
+                Total=0
             }).ToList();
             List =  (Sort == "+id" ? List.OrderBy(s => s.Id).ToList() : List.OrderByDescending(s => s.Id).ToList());
             return Ok(new {items = List.Skip((Page - 1) * Limit).Take(Limit).ToList(), 

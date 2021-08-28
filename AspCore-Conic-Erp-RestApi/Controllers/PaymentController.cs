@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
-
+using System.Collections.Generic;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -31,6 +31,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.Description,
                 x.MemberId,
+                ObjectId = x.VendorId == null ? x.MemberId : x.VendorId,
                 AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
             }).ToList();
             Invoices = (Sort == "+id" ? Invoices.OrderBy(s => s.Id).ToList() : Invoices.OrderByDescending(s => s.Id).ToList());
@@ -146,6 +147,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             });
                 
 
+        }
+        [Route("Payment/GetPaymentByListId")]
+        [HttpGet]
+        public IActionResult GetPaymentByListId(string listid)
+        {
+            List<long> list = listid.Split(',').Select(long.Parse).ToList();
+            var Payments = DB.Payments.Where(s => list.Contains(s.Id)).Select(x => new
+            {
+                x.Id,
+                x.TotalAmmount,
+                x.Type,
+                x.EditorName,
+                Name = x.Vendor.Name + " " + x.Member.Name + " - " + x.Name,
+                x.FakeDate,
+                x.PaymentMethod,
+                x.Status,
+                x.Description,
+                x.MemberId,
+                ObjectId = x.VendorId == null ? x.MemberId : x.VendorId,
+                AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
+            }).ToList();
+            return Ok(Payments); ///new { Total = x.Sum(ss => ss.InventoryMovements.Sum(si => si.SellingPrice * si.Qty) - ss.Discount) };
         }
         [HttpPost]
         public IActionResult Create(Payment collection)
