@@ -50,7 +50,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             Any.ToLower();
             var Vendors = DB.Vendors.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any)|| m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) )
-                .Select(x => new { x.Id, x.Name, x.PhoneNumber1 ,x.Ssn }).ToList();
+                .Select(x => new { x.Id, x.Name, x.PhoneNumber1 ,x.Ssn, x.AccountId }).ToList();
 
             return Ok(Vendors);
         }
