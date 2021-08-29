@@ -168,7 +168,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 ObjectId = x.VendorId == null ? x.MemberId : x.VendorId,
                 AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
             }).ToList();
-            return Ok(Payments); ///new { Total = x.Sum(ss => ss.InventoryMovements.Sum(si => si.SellingPrice * si.Qty) - ss.Discount) };
+            return Ok(new
+            {
+                items = Payments.ToList(),
+                Totals = new
+                {
+                    Rows = Payments.Count(),
+                    Totals = Payments.Sum(s => s.TotalAmmount),
+                    Cash = Payments.Where(i => i.PaymentMethod == "Cash").Sum(s => s.TotalAmmount),
+                    Cheque = Payments.Where(i => i.PaymentMethod == "Cheque").Sum(s => s.TotalAmmount),
+                    Visa = Payments.Where(i => i.PaymentMethod == "Visa").Sum(s => s.TotalAmmount)
+                }
+            });
         }
         [HttpPost]
         public IActionResult Create(Payment collection)

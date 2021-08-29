@@ -260,7 +260,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     imx.Description
                 }).ToList(),
             }).ToList();
-            return Ok(Invoices); ///new { Total = x.Sum(ss => ss.InventoryMovements.Sum(si => si.SellingPrice * si.Qty) - ss.Discount) };
+            return Ok(new
+            {
+                items = Invoices.ToList(),
+                Totals = new
+                {
+                    Rows = Invoices.Count(),
+                    Totals = Invoices.Sum(s => s.Total),
+                    Cash = Invoices.Where(i => i.PaymentMethod == "Cash").Sum(s => s.Total),
+                    Receivables = Invoices.Where(i => i.PaymentMethod == "Receivables").Sum(s => s.Total),
+                    Discount = Invoices.Sum(s => s.Discount),
+                    Visa = Invoices.Where(i => i.PaymentMethod == "Visa").Sum(s => s.Total)
+                }
+            });
         }
         [Route("SaleInvoice/GetSaleInvoiceById")]
         [HttpGet]
