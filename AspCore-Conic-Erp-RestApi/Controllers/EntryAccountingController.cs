@@ -58,6 +58,58 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             });
         }
         [HttpPost]
+        [Route("EntryAccounting/GetAccountStatement")]
+        public IActionResult GetAccountStatement(long? AccountId, DateTime DateFrom, DateTime DateTo)
+        {
+            var EntryMovements = DB.EntryMovements.Where(s => s.AccountId == AccountId &&  s.Entry.FakeDate >= DateFrom &&
+         s.Entry.FakeDate <= DateTo  ).Select(x => new
+            {
+                x.Id,
+                x.Debit,
+                x.Credit,
+                x.Description,
+                x.EntryId,
+                x.Fktable,
+                x.TableName,
+                TotalRow = 0,
+                x.Entry.FakeDate,
+                x.Entry.Status,
+                x.Entry.Type,
+                EntryDescription = x.Entry.Description,
+            }).ToList();
+            var AllTotal = DB.EntryMovements.Where(s => s.AccountId == AccountId).Sum(s => s.Credit) - DB.EntryMovements.Where(s => s.AccountId == AccountId).Sum(s => s.Debit);
+            if (AllTotal != (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit))) {
+                var Balancecarried = AllTotal - (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit));
+                EntryMovements.Add(new 
+                {
+                    Id = Convert.ToInt64(0),
+                    Debit = Balancecarried < 0 ? Balancecarried : 0,
+                    Credit = Balancecarried > 0 ? Balancecarried : 0,
+                    Description = "رصيد مدور",
+                    EntryId = Convert.ToInt64(0),
+                    Fktable = Convert.ToInt64(0),
+                    TableName = "BalanceCarried",
+                    TotalRow = 0,
+                    FakeDate = DateFrom.Date,
+                    Status = 0,
+                    Type = "رصيد مدور",
+                    EntryDescription = ""
+                }) ;
+            }
+            return Ok(new
+            {
+                items = EntryMovements.OrderBy(s => s.FakeDate).ToList(),
+                Totals = new
+                {
+                    Rows = EntryMovements.Count(),
+                    Totals = EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit),
+                    Debit = EntryMovements.Sum(s => s.Debit),
+                    Credit = EntryMovements.Sum(s => s.Credit),
+                }
+            });
+        }
+
+        [HttpPost]
         [Route("EntryAccounting/Create")]
         public IActionResult Create(EntryAccounting collection)
         {
@@ -123,7 +175,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                      m.Credit,
                      m.EntryId,
                      m.AccountId,
-                    Name = m.Account.Name + "-" + m.Account.Vendors.Where(v => v.AccountId == m.AccountId).SingleOrDefault().Name + "-" + m.Account.Members.Where(v => v.AccountId == m.AccountId).SingleOrDefault().Name,
+                    Name = m.Account.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? m.Account.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? m.Account.Name : m.Account.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : m.Account.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
                     m.Description
                     }).ToList()
             }).SingleOrDefault();

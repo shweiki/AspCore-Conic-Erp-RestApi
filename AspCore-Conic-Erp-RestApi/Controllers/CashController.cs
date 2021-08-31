@@ -34,7 +34,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetActiveCash()
         {
-            var Cash = DB.Cashes.Where(x => x.Status == 0).Select(x => new { value = x.AccountId, label = x.Name   }).ToList();
+            var Cash = DB.Cashes.Select(x => new { value = x.AccountId, label = x.Name   }).ToList();
             return Ok(Cash);
         }
 

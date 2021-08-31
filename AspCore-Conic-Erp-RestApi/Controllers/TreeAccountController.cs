@@ -137,6 +137,66 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(InComeAccounts);
         }
+        [HttpGet]
+        [Route("Account/GetPayables")]
+        public IActionResult GetPayables(int Limit, string Sort, int Page,bool WithZero ,string Any)
+        {
+            var Accounts = DB.Accounts.Where(f => (Any != null ? f.Id.ToString().Contains(Any):true)&&(f.EntryMovements.Select(d => d.Credit).Sum() - f.EntryMovements.Select(d => d.Debit).Sum()) < 0).Select(x => new
+            {
+                x.Id,
+                x.Description,
+                x.Status,
+                x.Code,
+                Name = x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Name : x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                x.ParentId,
+                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
+                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
+                x.Type,
+            }).ToList();
+            Accounts = (Sort == "+id" ? Accounts.OrderBy(s => s.Id).ToList() : Accounts.OrderByDescending(s => s.Id).ToList());
+
+            return Ok(new
+            {
+                items = Accounts.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Accounts.Count(),
+                    Totals = Accounts.Sum(s => s.TotalCredit - s.TotalDebit),
+                    TotalCredit = Accounts.Sum(s => s.TotalCredit),
+                    TotalDebit = Accounts.Sum(s => s.TotalDebit),
+                }
+            });
+        }
+        [HttpGet]
+        [Route("Account/GetReceivables")]
+        public IActionResult GetReceivables(int Limit, string Sort, int Page, bool WithZero, string Any)
+        {
+            var Accounts = DB.Accounts.Where(f => (Any != null ? f.Id.ToString().Contains(Any) : true) && (f.EntryMovements.Select(d => d.Credit).Sum() - f.EntryMovements.Select(d => d.Debit).Sum()) > 0).Select(x => new
+            {
+                x.Id,
+                x.Description,
+                x.Status,
+                x.Code,
+                Name = x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Name : x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                x.ParentId,
+                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
+                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
+                x.Type,
+            }).ToList();
+            Accounts = (Sort == "+id" ? Accounts.OrderBy(s => s.Id).ToList() : Accounts.OrderByDescending(s => s.Id).ToList());
+
+            return Ok(new
+            {
+                items = Accounts.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Accounts.Count(),
+                    Totals = Accounts.Sum(s => s.TotalCredit - s.TotalDebit),
+                    TotalCredit = Accounts.Sum(s => s.TotalCredit),
+                    TotalDebit = Accounts.Sum(s => s.TotalDebit),
+                }
+            });
+        }
         [Route("Account/GetById")]
         [HttpGet]
         public IActionResult GetById(long Id)

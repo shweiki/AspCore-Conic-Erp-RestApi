@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using NinjaNye.SearchExtensions;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -65,7 +66,51 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             Discount = Invoices.Sum(s => s.Discount),
             Visa = Invoices.Where(i=>i.PaymentMethod == "Visa").Sum(s => s.Total)
             } });
-    } 
+    }
+        [HttpPost]
+        [Route("SaleInvoice/GetByAny")]
+        public IActionResult GetByAny(string Any, DateTime? DateFrom, DateTime? DateTo )
+        {
+            if (Any == null || Any == "") return Ok();
+            var Invoices = DB.SalesInvoices.Where(s => s.FakeDate >= DateFrom && s.FakeDate <= DateTo &&
+            (s.Id.ToString().Contains(Any)  || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any) )
+            ).Select(x => new
+                {
+                    x.Id,
+                    x.Discount,
+                    x.Tax,
+                    Name = x.Name, //+ DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+                    x.FakeDate,
+                    x.PaymentMethod,
+                    x.Status,
+                    x.Region,
+                    x.DeliveryPrice,
+                    x.Type,
+                    x.Description,
+                    x.VendorId,
+                    x.MemberId,
+                    x.PhoneNumber,
+                    x.Vendor,
+                    Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+                    AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
+                    InventoryMovements = x.InventoryMovements.Select(imx => new {
+                        imx.Id,
+                        imx.ItemsId,
+                        imx.Items.Name,
+                        imx.Items.Ingredients,
+                        imx.Items.CostPrice,
+                        imx.TypeMove,
+                        imx.InventoryItemId,
+                        imx.Qty,
+                        imx.EXP,
+                        imx.SellingPrice,
+                        Total = imx.SellingPrice * imx.Qty,
+                        imx.Description
+                    }).ToList(),
+                }).ToList();
+
+            return Ok(Invoices);
+        }
         [Route("SaleInvoice/GetByItem")]
         [HttpGet]
         public IActionResult GetByItem(long ItemId,int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
@@ -216,6 +261,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                     return Ok(true);
 
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            else return Ok(false);
+        }
+        
+        [HttpPost]
+        [Route("SaleInvoice/EditPaymentMethod")]
+        public IActionResult EditPaymentMethod(long ID , string PaymentMethod)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    SalesInvoice Invoice = DB.SalesInvoices.Where(x => x.Id == ID).SingleOrDefault();
+                    Invoice.PaymentMethod = PaymentMethod;
+                    DB.SaveChanges();
+                    return Ok(true);
                 }
                 catch
                 {
