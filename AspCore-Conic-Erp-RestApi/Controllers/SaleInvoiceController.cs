@@ -23,7 +23,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.Discount,
                 x.Tax,
-                Name = x.Name , //+ DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+                Name = x.Name + x.Vendor.Name == null ?  x.Member.Name : x.Vendor.Name,
                 x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
@@ -31,6 +31,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.DeliveryPrice,
                 x.Type,
                 x.Description,
+                AccountId = x.Vendor.AccountId == null ? x.Member.AccountId : x.Vendor.AccountId,
                 x.VendorId,
                 x.MemberId,
                 x.PhoneNumber,
@@ -38,7 +39,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 TotalCost = x.InventoryMovements.Sum(s => s.Items.CostPrice * s.Qty),
                 Total = x.InventoryMovements.Sum(s=>s.SellingPrice *s.Qty) - x.Discount,
            //     ActionLogs = DB.ActionLogs.Where(l=>l.SalesInvoiceId == x.Id).ToList(),
-                AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
                 InventoryMovements = x.InventoryMovements.Select(imx => new {
                     imx.Id,
                     imx.ItemsId,
@@ -69,11 +69,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     }
         [HttpPost]
         [Route("SaleInvoice/GetByAny")]
-        public IActionResult GetByAny(string Any, DateTime? DateFrom, DateTime? DateTo )
+        public IActionResult GetByAny(string Any, int Status)
         {
             if (Any == null || Any == "") return Ok();
-            var Invoices = DB.SalesInvoices.Where(s => s.FakeDate >= DateFrom && s.FakeDate <= DateTo &&
-            (s.Id.ToString().Contains(Any)  || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any) )
+            var Invoices = DB.SalesInvoices.Where(s => s.Status == Status &&  (s.Id.ToString().Contains(Any)  || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any) )
             ).Select(x => new
                 {
                     x.Id,
