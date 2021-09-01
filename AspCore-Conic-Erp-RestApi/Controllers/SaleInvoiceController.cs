@@ -310,6 +310,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PhoneNumber,
                 x.Type,
                 x.Description,
+                TotalCost = x.InventoryMovements.Sum(s => s.Items.CostPrice * s.Qty),
                 Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
                 AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
                 InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == x.Id).Select(imx => new {
@@ -317,6 +318,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     imx.ItemsId,
                     imx.Items.Name,
                     imx.Items.CostPrice,
+                    imx.Items.Ingredients,
                     imx.TypeMove,
                     imx.InventoryItemId,
                     imx.EXP,
@@ -333,6 +335,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     Rows = Invoices.Count(),
                     Totals = Invoices.Sum(s => s.Total),
+                    TotalCost = Invoices.Sum(s => s.TotalCost),
+                    Profit = Invoices.Sum(s => s.Total) - Invoices.Sum(s => s.TotalCost),
                     Cash = Invoices.Where(i => i.PaymentMethod == "Cash").Sum(s => s.Total),
                     Receivables = Invoices.Where(i => i.PaymentMethod == "Receivables").Sum(s => s.Total),
                     Discount = Invoices.Sum(s => s.Discount),
