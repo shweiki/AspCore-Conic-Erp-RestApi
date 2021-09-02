@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210902055949_OrderDeliveryq")]
+    partial class OrderDeliveryq
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -279,9 +281,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.Property<int>("OprationId")
                         .HasColumnType("int");
-
-                    b.Property<long?>("OrderDeliveryId")
-                        .HasColumnType("bigint");
 
                     b.Property<long?>("OrderInventoryId")
                         .HasColumnType("bigint");
@@ -755,16 +754,10 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DriverUserId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Pass")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber1")
@@ -1481,8 +1474,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<double>("DeliveryPrice")
-                        .HasColumnType("float");
+                    b.Property<long?>("AreaId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -1508,9 +1501,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<double>("TotalPill")
-                        .HasColumnType("float");
-
                     b.Property<double>("TotalPrice")
                         .HasColumnType("float");
 
@@ -1518,6 +1508,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AreaId");
 
                     b.HasIndex("DriverId");
 
@@ -2628,6 +2620,10 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
             modelBuilder.Entity("Entities.OrderDelivery", b =>
                 {
+                    b.HasOne("Entities.Area", "Area")
+                        .WithMany("OrderDeliveries")
+                        .HasForeignKey("AreaId");
+
                     b.HasOne("Entities.Driver", "Driver")
                         .WithMany()
                         .HasForeignKey("DriverId");
@@ -2635,6 +2631,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.HasOne("Entities.Vendor", "Vendor")
                         .WithMany("OrderDeliveries")
                         .HasForeignKey("VendorId");
+
+                    b.Navigation("Area");
 
                     b.Navigation("Driver");
 
@@ -2832,6 +2830,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
             modelBuilder.Entity("Entities.Area", b =>
                 {
+                    b.Navigation("OrderDeliveries");
+
                     b.Navigation("Vendors");
                 });
 

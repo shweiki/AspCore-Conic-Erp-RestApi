@@ -38,6 +38,7 @@ namespace Entities
         public int? MembershipMovementOrderId { get; set; }
         public long? PaymentId { get; set; }
         public long? ReceiveId { get; set; }
+        public long? OrderDeliveryId { get; set; }
 
         public virtual Oprationsy Opration { get; set; }
     }

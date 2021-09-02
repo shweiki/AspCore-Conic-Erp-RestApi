@@ -21,6 +21,8 @@ namespace Entities
         public string Company { get; set; }
         public string Ssn { get; set; }
         public string Tag { get; set; }
+        public string Pass { get; set; }
+        public string DriverUserId { get; set; }
 
 
     }

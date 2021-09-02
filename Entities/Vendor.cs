@@ -38,5 +38,6 @@ namespace Entities
         public virtual ICollection<PurchaseInvoice> PurchaseInvoices { get; set; }
         public virtual ICollection<WorkShop> WorkShops { get; set; }
         public virtual ICollection<SalesInvoice> SalesInvoices { get; set; }
+        public virtual ICollection<OrderDelivery> OrderDeliveries { get; set; }
     }
 }
