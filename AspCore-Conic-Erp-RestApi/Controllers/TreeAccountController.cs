@@ -197,8 +197,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
             });
         }
-        [Route("Account/GetById")]
         [HttpGet]
+        [Route("Account/GetById")]
         public IActionResult GetById(long Id)
         {
             var Account = DB.Accounts.Where(i => i.Id == Id ).Select(x => new
@@ -236,8 +236,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
-        [Route("Account/Edit")]
         [HttpPost]
+        [Route("Account/Edit")]
         public IActionResult Edit(Account collection)
         {
             if (ModelState.IsValid)
@@ -262,6 +262,36 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             else return Ok(false);
         }
 
-
+        [HttpPost]
+        [Route("Account/Delete")]
+        public IActionResult Delete(long Id)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Account collection = DB.Accounts.Where(x => x.Id == Id).SingleOrDefault();
+                    if (DB.Banks.Where(x => x.AccountId == collection.Id).SingleOrDefault() != null || DB.Cashes.Where(x => x.AccountId == collection.Id).SingleOrDefault() != null)
+                        return Ok(false);
+                    if (DB.Vendors.Where(x => x.AccountId == collection.Id).SingleOrDefault() != null || DB.Members.Where(x => x.AccountId == collection.Id).SingleOrDefault() != null)
+                        return Ok(false);
+                    if (DB.EntryMovements.Where(x=>x.AccountId == collection.Id).SingleOrDefault() !=null || DB.Accounts.Where(x => x.ParentId == collection.Id).SingleOrDefault() !=null)
+                        return Ok(false);
+                    else
+                    {
+                        DB.Accounts.Remove(collection);
+                        DB.SaveChanges();
+                        return Ok(true);
+                    }
+              
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            else return Ok(false);
+        }
     }
 }
