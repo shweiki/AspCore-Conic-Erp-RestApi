@@ -19,6 +19,5 @@ namespace Entities
         public int Status { get; set; }
         public virtual List<Vendor> Vendors { get; set; }
 
-
     }
 }

@@ -64,6 +64,8 @@ namespace Entities
         public virtual DbSet<UnitItem> UnitItems { get; set; }
         public virtual DbSet<Vendor> Vendors { get; set; }
         public virtual DbSet<Report> Reports { get; set; }
+        public virtual DbSet<OrderDelivery> OrderDeliveries { get; set; }
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -121,7 +123,7 @@ namespace Entities
 
                 b.HasIndex("NormalizedName")
                     .IsUnique()
-                    .HasName("RoleNameIndex")
+                    .HasDatabaseName("RoleNameIndex")
                     .HasFilter("[NormalizedName] IS NOT NULL");
 
                 b.ToTable("AspNetRoles");
@@ -220,11 +222,11 @@ namespace Entities
                 b.HasKey("Id");
 
                 b.HasIndex("NormalizedEmail")
-                    .HasName("EmailIndex");
+                    .HasDatabaseName("EmailIndex");
 
                 b.HasIndex("NormalizedUserName")
                     .IsUnique()
-                    .HasName("UserNameIndex")
+                    .HasDatabaseName("UserNameIndex")
                     .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                 b.ToTable("AspNetUsers");
