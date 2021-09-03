@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using static AspCore_Conic_Erp_RestApi.Controllers.UserController;
 using AspCore_Conic_Erp_RestApi.Migrations;
 using Driver = Entities.Driver;
+using System.Threading;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -80,6 +81,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
             });
         }
+        
 
         [Route("Driver/CheckDriverIsExist")]
         [HttpGet]
@@ -112,72 +114,68 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Drivers);
         }
 
-
-
-
+        public IdentityResult result = new IdentityResult();
+        public IdentityUser NewUser = new IdentityUser();
+        public async Task<ActionResult> userf(string password) {
+           result = await _userManager.CreateAsync(NewUser, password);
+            return Ok();
+        }
+        
         [Route("Driver/Create")]
         [HttpPost]
         public async Task<ActionResult> Create(Driver collection)
         {
             if (ModelState.IsValid)
             {
-                try
-                {
-                    // var ParentAccount = DB.Users.Where(i => i.Description == "Member").SingleOrDefault();
-                    //  ParentAccount = ParentAccount ??= new Account { Id = 0, ParentId = 0, Code = "0" };
 
-                    var NewUser = new IdentityUser
-                   {
-                        Email = collection.Email,
-                        UserName = collection.Name,
-                        PhoneNumber = collection.PhoneNumber1,
 
-                    };
-                    IdentityResult result = await _userManager.CreateAsync(NewUser, collection.Pass);
-                   DB.Users.Add(NewUser);
-                    DB.SaveChanges();
-                    collection.Pass = NewUser.PasswordHash;
-                    collection.DriverUserId = NewUser.Id;
-                    DB.Drivers.Add(collection);
-                    DB.SaveChanges();
+
+                NewUser.Email = collection.Email;
+                    NewUser.UserName = collection.Name;
+                    NewUser.PhoneNumber = collection.PhoneNumber1;
+                    NewUser.PhoneNumberConfirmed = true;
+                    NewUser.EmailConfirmed = true;
+
+                Task t = Task.Run(() => {
+
+                    _ = userf(collection.Pass);
+                    DB.Users.Add(NewUser);
+                    
+                });
+                DB.SaveChanges();
+                await _userManager.SetLockoutEnabledAsync(NewUser, false);
+                collection.Pass = NewUser.PasswordHash;
+                collection.DriverUserId = NewUser.Id;
+                DB.Drivers.Add(collection);
+                DB.SaveChanges();
+                
                 //    UserRouter NewRole = new UserRouter
                 //    {
                 //        UserId = NewUser.Id,
                 //        Router = "['/Settings/Drivers']",
-                 //       DefulateRedirect = "/",
-               // };
-                   // DB.UserRouter.Add(NewRole);
+                //       DefulateRedirect = "/",
+                // };
+                // DB.UserRouter.Add(NewRole);
                 //    DB.SaveChanges();
-                    return Ok(collection.Id);
-                }
-                catch
-                {
-                    Console.WriteLine(collection);
-                    return Ok(false);
-                }
-            }
-            else { return Ok(false); }
-            }
-        
-        /*{
-            if (ModelState.IsValid)
-            {
-                try
-                {
-               
-                    DB.Drivers.Add(collection);
-                    DB.SaveChanges();
-                    return Ok(collection.Id);
-                }
-                catch
-                {
-                    //Console.WriteLine(collection);
-                    return Ok(false);
-                }
+                ///     return Ok(collection.Id);
+
+                //   catch
+                //  {
+                //    Console.WriteLine(collection);
+                //    return Ok(false);
+                // }
+
+                // else { return Ok(false); }
+
+
+
+                return Ok(collection);
+                
             }
             return Ok(false);
-        }*/
-
+        }
+        
+      
         [Route("Driver/Edit")]
         [HttpPost]
         public IActionResult Edit(Driver collection)
