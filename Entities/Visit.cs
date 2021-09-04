@@ -16,8 +16,8 @@ namespace Entities
         public string Description { get; set; }
         public int Status { get; set; }
         public int PersonCount { get; set; }
-        public bool IsPrime { get; set; }
         public string Type { get; set; }
+        public double HourCount { get; set; }
         public double HourPrice { get; set; }
         public string PhoneNumber { get; set; }
     }
