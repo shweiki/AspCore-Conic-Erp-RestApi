@@ -10,10 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
-using static AspCore_Conic_Erp_RestApi.Controllers.UserController;
-using AspCore_Conic_Erp_RestApi.Migrations;
+
 using Driver = Entities.Driver;
-using System.Threading;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -23,16 +21,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private ConicErpContext DB = new ConicErpContext();
         private readonly UserManager<IdentityUser> _userManager;
         public DriverController(UserManager<IdentityUser> userManager)
+
         {
             _userManager = userManager;
-  
+
         }
 
         [Route("Driver/GetDriver")]
         [HttpGet]
         public IActionResult GetDriver()
         {
-            var Drivers = DB.Drivers.Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1, x.Tag , x.Company}).ToList();
+            var Drivers = DB.Drivers.Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1, x.Tag, x.Company }).ToList();
 
             return Ok(Drivers);
         }
@@ -40,8 +39,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetActiveDriver()
         {
-            var Drivers = DB.Drivers.Where(x => x.Status == 0).Select(x => new { 
-                value = x.Id, label = x.Name , phone = x.PhoneNumber1 , x.Company}).ToList();
+            var Drivers = DB.Drivers.Where(x => x.Status == 0).Select(x => new {
+                value = x.Id, label = x.Name, phone = x.PhoneNumber1, x.Company }).ToList();
             return Ok(Drivers);
         }
         [Route("Driver/GetDriverByAny")]
@@ -49,14 +48,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetDriverByAny(string Any)
         {
             Any.ToLower();
-            var Drivers = DB.Drivers.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0","").Replace(" ","").Contains(Any.Replace("0", "").Replace(" ", "")) || m.Tag.Contains(Any))
+            var Drivers = DB.Drivers.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.Tag.Contains(Any))
                 .Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1, x.Tag }).ToList();
 
             return Ok(Drivers);
         }
         [HttpPost]
         [Route("Driver/GetByListQ")]
-        public IActionResult GetByListQ(int Limit, string Sort, int Page,int? Status, string Any)
+        public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
         {
             var Drivers = DB.Drivers.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
             {
@@ -77,22 +76,22 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Totals = new
                 {
                     Rows = Drivers.Count(),
-              
+
                 }
             });
         }
-        
+
 
         [Route("Driver/CheckDriverIsExist")]
         [HttpGet]
-        public IActionResult CheckDriverIsExist(string Ssn , string PhoneNumber)
+        public IActionResult CheckDriverIsExist(string Ssn, string PhoneNumber)
         {
             var Drivers = DB.Drivers.Where(m => m.Ssn == Ssn || m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", "")).ToList();
 
             return Ok(Drivers.Count() > 0 ? true : false);
         }
 
-  
+
         [Route("Driver/GetDriverByStatus")]
         [HttpGet]
         public IActionResult GetDriverByStatus(int Status)
@@ -114,61 +113,45 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Drivers);
         }
 
-        public IdentityResult result = new IdentityResult();
-        public IdentityUser NewUser = new IdentityUser();
-        public async Task<ActionResult> userf(string password) {
-           result = await _userManager.CreateAsync(NewUser, password);
-            return Ok();
-        }
-        
-        [Route("Driver/Create")]
+     
+    [Route("Driver/Create")]
         [HttpPost]
         public async Task<ActionResult> Create(Driver collection)
         {
             if (ModelState.IsValid)
             {
 
+                var NewUser = new IdentityUser()
+                {
 
-
-                NewUser.Email = collection.Email;
-                    NewUser.UserName = collection.Name;
-                    NewUser.PhoneNumber = collection.PhoneNumber1;
-                    NewUser.PhoneNumberConfirmed = true;
-                    NewUser.EmailConfirmed = true;
-
-                Task t = Task.Run(() => {
-
-                    _ = userf(collection.Pass);
-                    DB.Users.Add(NewUser);
-                    
-                });
-                DB.SaveChanges();
-                await _userManager.SetLockoutEnabledAsync(NewUser, false);
+                    Email = collection.Email,
+                    UserName = collection.Name,
+                    PhoneNumber = collection.PhoneNumber1,
+                    PhoneNumberConfirmed = true,
+                    EmailConfirmed = true,
+                };
+            IdentityResult result = await _userManager.CreateAsync(NewUser, collection.Pass);
+              
+                var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
+                if (!result.Succeeded)
+                {
+                    return Ok(result);
+                }
                 collection.Pass = NewUser.PasswordHash;
                 collection.DriverUserId = NewUser.Id;
                 DB.Drivers.Add(collection);
                 DB.SaveChanges();
                 
-                //    UserRouter NewRole = new UserRouter
-                //    {
-                //        UserId = NewUser.Id,
-                //        Router = "['/Settings/Drivers']",
-                //       DefulateRedirect = "/",
-                // };
-                // DB.UserRouter.Add(NewRole);
-                //    DB.SaveChanges();
-                ///     return Ok(collection.Id);
-
-                //   catch
-                //  {
-                //    Console.WriteLine(collection);
-                //    return Ok(false);
-                // }
-
-                // else { return Ok(false); }
-
-
-
+                   UserRouter NewRole = new UserRouter()
+                   {
+                       UserId = NewUser.Id,
+                       Router = "[\"/Settings/Drivers\"]",
+                       DefulateRedirect = "/",
+                 };
+                   DB.UserRouter.Add(NewRole);
+                   DB.SaveChanges();
+                   
+             
                 return Ok(collection);
                 
             }
