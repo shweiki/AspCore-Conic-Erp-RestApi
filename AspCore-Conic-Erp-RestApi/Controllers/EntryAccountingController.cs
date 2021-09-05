@@ -62,7 +62,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetAccountStatement(long? AccountId, DateTime DateFrom, DateTime DateTo)
         {
             var EntryMovements = DB.EntryMovements.Where(s => s.AccountId == AccountId &&  s.Entry.FakeDate >= DateFrom &&
-         s.Entry.FakeDate <= DateTo  ).Select(x => new
+         s.Entry.FakeDate <= DateTo ).Select(x => new
             {
                 x.Id,
                 x.Debit,

@@ -119,19 +119,21 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (ModelState.IsValid)
             {
-                Setting Setting = DB.Settings.Where(x => x.Name == collection.Name).SingleOrDefault();
-                if (Setting != null) {
-                    Setting.Name = collection.Name;
-                    Setting.Status = collection.Status;
-                    Setting.Value = collection.Value;
-                    Setting.Type = collection.Type;
-                    Setting.Description = collection.Description;
-                } else
-                {
-                    DB.Settings.Add(collection);
-                }
                 try
                 {
+                    Setting Setting = DB.Settings.Where(x => x.Name == collection.Name).SingleOrDefault();
+                    if (Setting != null)
+                    {
+                        Setting.Name = collection.Name;
+                        Setting.Status = collection.Status;
+                        Setting.Value = collection.Value;
+                        Setting.Type = collection.Type;
+                        Setting.Description = collection.Description;
+                    }
+                    else
+                    {
+                        DB.Settings.Add(collection);
+                    }
                     DB.SaveChanges();
                     return Ok(collection);
                 }
