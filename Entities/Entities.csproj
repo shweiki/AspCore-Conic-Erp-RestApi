@@ -20,18 +20,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="ClassDiagram1.cd">
-      <TransformOnBuild>true</TransformOnBuild>
-    </None>
-    <None Update="ClassDiagram1.Debug.cd">
-      <IsTransformFile>true</IsTransformFile>
-      <DependentUpon>ClassDiagram1.cd</DependentUpon>
-    </None>
-    <None Update="ClassDiagram1.Release.cd">
-      <IsTransformFile>true</IsTransformFile>
-      <DependentUpon>ClassDiagram1.cd</DependentUpon>
-    </None>
-  </ItemGroup>
-
 </Project>
