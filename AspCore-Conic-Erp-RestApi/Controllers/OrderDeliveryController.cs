@@ -68,8 +68,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
-
-       
     }
 
 }

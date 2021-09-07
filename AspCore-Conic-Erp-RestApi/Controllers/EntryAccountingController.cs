@@ -3,7 +3,8 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using Microsoft.AspNetCore.Authorization;
-using Entities; 
+using Entities;
+using System.Collections.Generic;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -26,23 +27,23 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [HttpPost]
         [Route("EntryAccounting/GetByListQ")]
-        public IActionResult GetByListQ(long? AccountId, int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string? Any)
+        public IActionResult GetByListQ( int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string? Any)
         {
-            var EntryMovements = DB.EntryMovements.Where(s => s.AccountId == AccountId && (Any != null ? s.Id.ToString().Contains(Any) || s.Description.Contains(Any) : true) && (DateFrom != null ? s.Entry.FakeDate >= DateFrom : true)
+            var EntryMovements = DB.EntryMovements.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Description.Contains(Any) : true) && (DateFrom != null ? s.Entry.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.Entry.FakeDate <= DateTo : true) && (Status != null ? s.Entry.Status == Status : true) &&
-            (User != null ? DB.ActionLogs.Where(l => l.EntryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
-
+            (User != null ? DB.ActionLogs.Where(l => l.EntryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new { x , x.Entry}).AsEnumerable().Select(x => new
             {
-                x.Id,
-                x.Debit,
-                x.Credit,
-                x.Description,
-                x.EntryId,
+                x.x.Id,
+                x.x.Debit,
+                x.x.Credit,
+                x.x.Description,
+                x.x.EntryId,
                 TotalRow=0,
+                FakeDate= 
                 x.Entry.FakeDate,
                 x.Entry.Status,
                 x.Entry.Type,
-                EntryDescription= x.Entry.Description,
+                FkDescription = x.x.TableName != null ? GetFkDescription(x.x.TableName, x.x.Fktable) : ""
             }).ToList();
             EntryMovements = (Sort == "+id" ? EntryMovements.OrderBy(s => s.Id).ToList() : EntryMovements.OrderByDescending(s => s.Id).ToList());
             return Ok(new
@@ -59,25 +60,26 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [HttpPost]
         [Route("EntryAccounting/GetAccountStatement")]
-        public IActionResult GetAccountStatement(long? AccountId, DateTime DateFrom, DateTime DateTo)
+        public IActionResult GetAccountStatement(long? AccountId, long? MergeAccountId,  DateTime DateFrom, DateTime DateTo)
         {
-            var EntryMovements = DB.EntryMovements.Where(s => s.AccountId == AccountId &&  s.Entry.FakeDate >= DateFrom &&
-         s.Entry.FakeDate <= DateTo ).Select(x => new
-            {
-                x.Id,
-                x.Debit,
-                x.Credit,
-                x.Description,
-                x.EntryId,
-                x.Fktable,
-                x.TableName,
-                TotalRow = 0,
-                x.Entry.FakeDate,
-                x.Entry.Status,
-                x.Entry.Type,
-                EntryDescription = x.Entry.Description,
-            }).ToList();
-            var AllTotal = DB.EntryMovements.Where(s => s.AccountId == AccountId).Sum(s => s.Credit) - DB.EntryMovements.Where(s => s.AccountId == AccountId).Sum(s => s.Debit);
+            var EntryMovements = DB.EntryMovements.Where(s => s.AccountId == AccountId && (MergeAccountId != null ? s.AccountId == MergeAccountId : true) && s.Entry.FakeDate >= DateFrom && s.Entry.FakeDate <= DateTo)
+                .Select(x => new { x, x.Entry }).AsEnumerable()
+                        .Select(x => new
+                          {
+                            x.x.Id,
+                            x.x.Debit,
+                            x.x.Credit,
+                            x.x.Description,
+                            x.x.EntryId,
+                            x.x.Fktable,
+                            x.x.TableName,
+                            TotalRow = 0,
+                            x.Entry.FakeDate,
+                            x.Entry.Status,
+                            x.Entry.Type,
+                            FkDescription = x.x.TableName !=null? GetFkDescription(x.x.TableName , x.x.Fktable) :""
+                        }).ToList();
+            var AllTotal = DB.EntryMovements.Where(s => s.AccountId == AccountId || (MergeAccountId != null ? s.AccountId == MergeAccountId : true)).Sum(s => s.Credit) - DB.EntryMovements.Where(s => s.AccountId == AccountId || (MergeAccountId != null ? s.AccountId == MergeAccountId : true)).Sum(s => s.Debit);
             if (AllTotal != (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit))) {
                 var Balancecarried = AllTotal - (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit));
                 EntryMovements.Add(new 
@@ -93,7 +95,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     FakeDate = DateFrom.Date,
                     Status = 0,
                     Type = "رصيد مدور",
-                    EntryDescription = ""
+                    FkDescription = ""
                 }) ;
             }
             return Ok(new
@@ -108,7 +110,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
             });
         }
-
+ 
+   
         [HttpPost]
         [Route("EntryAccounting/Create")]
         public IActionResult Create(EntryAccounting collection)
@@ -159,6 +162,33 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
+        [Route("EntryAccounting/EditEntryByFktable")]
+        [HttpPost]
+        public IActionResult EditEntryByFktable(string TableName ,long Fktable , EntryAccounting collection)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                   var EntryMovements = DB.EntryMovements.Where(e => e.Fktable == Fktable && e.TableName == TableName).FirstOrDefault();
+                   var  Entry = DB.EntryAccountings.Where(e => e.Id == EntryMovements.EntryId).FirstOrDefault();
+                    Entry.FakeDate = collection.FakeDate;
+                    Entry.Description = collection.Description;
+                    Entry.Status = collection.Status;
+                    Entry.Type = collection.Type;
+                    DB.EntryMovements.RemoveRange(DB.EntryMovements.Where(x => x.EntryId == Entry.Id).ToList());
+                    Entry.EntryMovements = collection.EntryMovements;
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            else return Ok(false);
+        }
         [Route("EntryAccounting/GetEntryById")]
         [HttpGet]
         public IActionResult GetEntryById(long? Id)
@@ -182,7 +212,43 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(Entrys);
         }
+        public string GetFkDescription(string TableName, long Fktable)
+        {
+                     ConicErpContext DBx = new ConicErpContext();
 
+        var Object = "";
+            switch (TableName)
+            {
+                case "CashPool":
+                    Object = DBx.CashPools.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    break;
+                case "SaleInvoice":
+                    Object= DBx.SalesInvoices.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    break;
+                case "PurchaseInvoice":
+                    Object= DBx.PurchaseInvoices.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    break;
+                case "EntryAccounting":
+                    Object= DBx.EntryAccountings.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    break;
+                case "Payment":
+                    Object = DBx.Payments.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    break;
+                case "Receive":
+                    Object = DBx.Receives.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    break;
+                case "MembershipMovement":
+                    Object = DBx.MembershipMovements.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    break;
+                case "Cheque":
+                    Object = DBx.Cheques.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    break;
+             
+            }
+
+
+            return Object;
+        }
 
     }
 }
