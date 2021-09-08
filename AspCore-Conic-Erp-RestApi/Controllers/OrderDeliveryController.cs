@@ -47,7 +47,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetOrderDelivery()
 
         {
-            var Orders = DB.OrderDeliveries.Select(x => new {
+            var Orders = DB.OrderDeliveries.Where(x => x.Status == 0 || x.Status == 1 || x.Status == 2).Select(x => new {
                 x.Id,
                 x.Name,
                 x.PhoneNumber,
@@ -85,6 +85,30 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
             }
             else return Ok(false);
+        }
+
+        [Route("OrderDelivery/SetDriver")]
+        [HttpPost]
+        public IActionResult SetDriver(OrderDelivery collection)
+        {
+            if (ModelState.IsValid)
+            {
+                OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == collection.Id).SingleOrDefault();
+                Order.DriverId = collection.DriverId;
+                Order.Status = 1;
+                
+                try
+                {
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            return Ok(false);
         }
     }
 
