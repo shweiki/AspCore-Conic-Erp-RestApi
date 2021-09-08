@@ -33,13 +33,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.EditorName,
                 x.TableName,
                 x.Fktable,
-                Totals=0
             }).ToList();
             List =  (Sort == "+id" ? List.OrderBy(s => s.Id).ToList() : List.OrderByDescending(s => s.Id).ToList());
             return Ok(new {items = List.Skip((Page - 1) * Limit).Take(Limit).ToList(), 
             Totals = new {
-            Rows = List.Count(),
-                Totals = List.Sum(s => s.Totals),
+                Rows = List.Count(),
                 Cash = List.Sum(s => s.TotalCash),
                 Coins = List.Sum(s => s.TotalCoins),
                 Visa = List.Sum(s => s.TotalVisa),
