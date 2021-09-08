@@ -228,7 +228,21 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(true);
         }
 
- 
+        [Route("Driver/GetDriversLabel")]
+        [HttpGet]
+        public IActionResult GetDriversLabel()
+        {
+            var Drivers = DB.Drivers.Where(x => x.Status == 0).Select(x => new {
+
+                value = x.Id,
+                label = x.Name,
+            }).ToList();
+            return Ok(Drivers);
+
+
+        }
+
+
     }
 
 }

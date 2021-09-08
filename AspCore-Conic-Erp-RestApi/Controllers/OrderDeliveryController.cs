@@ -11,8 +11,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class OrderDeliveryController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
-
-
         [HttpPost]
         [Route("OrderDelivery/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string? Any)
@@ -42,9 +40,31 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     Rows = Deliveries.Count()
                 }
-                });
+             });
         }
+        [Route("OrderDelivery/GetOrderDelivery")]
+        [HttpGet]
+        public IActionResult GetOrderDelivery()
 
+        {
+            var Orders = DB.OrderDeliveries.Select(x => new {
+                x.Id,
+                x.Name,
+                x.PhoneNumber,
+                x.TotalPill,
+                x.TotalPrice,
+                x.Status,
+                x.Content,
+                x.Description,
+                x.FakeDate,
+                x.Region,
+                x.DeliveryPrice,
+                x.Driver,
+
+            }).ToList();
+
+            return Ok(Orders);
+        }
         [Route("OrderDelivery/Create")]
         [HttpPost]
         public IActionResult Create(OrderDelivery collection)
@@ -57,7 +77,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     DB.OrderDeliveries.Add(collection);
                     DB.SaveChanges();
                     return Ok(true);
-
                 }
                 catch
                 {
