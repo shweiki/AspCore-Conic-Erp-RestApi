@@ -5,6 +5,7 @@
     <UserSecretsId>aspnet-AspCore_Conic_Erp_RestApi-DAAF96C1-C6E8-4638-9DE4-F5E21222436E</UserSecretsId>
     <RootNamespace>AspCore_Conic_Erp_RestApi</RootNamespace>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
+    <StartupObject>AspCore_Conic_Erp_RestApi.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -99,7 +100,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="ESC-POS-USB-NET" Version="1.1.3" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.9" />

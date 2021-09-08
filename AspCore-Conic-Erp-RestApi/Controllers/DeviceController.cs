@@ -16,9 +16,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         DeviceManipulator manipulator = new DeviceManipulator();
 
         private ZkemClient objZkeeper;
+        private int iCanSaveTmp = 0;
 
         private ConicErpContext DB = new ConicErpContext();
+        [Route("Device/GetById")]
+        [HttpGet]
+        public IActionResult GetById(long? Id)
+        {
+            var Device = DB.Devices.Where(x => x.Id == Id).Select(x=> new { x.Id, x.Name, x.Feel, x.Status, x.Port, x.Ip, x.Description }).SingleOrDefault();
 
+            return Ok(Device);
+        }
         [Route("Device/Create")]
         [HttpPost]
         public IActionResult Create(Device collection)
@@ -27,7 +35,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
-          
                     DB.Devices.Add(collection);
                     DB.SaveChanges();
                     return Ok(collection.Id);
@@ -54,7 +61,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Device.Name = collection.Name;
                 Device.Ip = collection.Ip;
                 Device.Port = collection.Port;
-                Device.IsPrime = collection.IsPrime;
+                Device.Feel = collection.Feel;
                 Device.Status = collection.Status;
                 Device.LastSetDateTime = collection.LastSetDateTime;
                 Device.Description = collection.Description;
@@ -70,7 +77,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
         }
-
+        
+        [Route("Device/FeelDevice")]
+        [HttpGet]
+        public IActionResult FeelDevice()
+        {
+            var Devices = DB.Devices.Where(x=>x.Feel ==true).ToList();
+            Devices.ForEach(e => CheckDeviceHere((int)e.Id));
+            return Ok(true);
+        }
         [Route("Device/OpenCashDrawer")]
         [HttpGet]
         public IActionResult OpenCashDrawer(string Com)
@@ -119,7 +134,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetDevice()
         {
-            var Device = DB.Devices.Select(d => new { d.Id, d.Name , d.IsPrime , d.Status, d.Port ,d.Ip , d.Description }).ToList();
+            var Device = DB.Devices.Select(d => new { d.Id, d.Name , d.Feel, d.Status, d.Port ,d.Ip , d.Description }).ToList();
                         
             return Ok(Device);
         }
@@ -129,32 +144,40 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Device/CheckDevice")]
         public IActionResult CheckDevice(int Id)
         {
-            var Device = DB.Devices.Where(x => x.Id == Id).SingleOrDefault();
-            if (Device != null)
-            {
-                int DeviceId = (int)Device.Id;
-                bool IsDeviceConnected = false;
-                bool isValidIpA = UniversalStatic.ValidateIP(Device.Ip);
-
-                if (!isValidIpA)
-                    Device.Description = "The Device IP is invalid !!";
-                isValidIpA = UniversalStatic.PingTheDevice(Device.Ip);
-                if (!isValidIpA)
-                    Device.Description = "The device at " + Device.Ip + ":" + Device.Port + " did not respond!!";
-
-                if (isValidIpA && DisconnectDeviceHere(Id))
-                {
-                    objZkeeper = new ZkemClient(RaiseDeviceEvent);
-                    Device.Description = "Is Device Connected : ";
-                    IsDeviceConnected = objZkeeper.Connect_Net(Device.Ip, Device.Port);
-                }
-                DB.SaveChanges();
-                return Ok(IsDeviceConnected);
-            }
-            else return  Ok("false");
+            if (CheckDeviceHere(Id))
+                return Ok(true);
+            else return Ok(false);
 
         }
+        [Route("Device/StartEnrollUser")]
+        [HttpGet]
+        public IActionResult StartEnrollUser(long DeviceId, long UserId)
+        {
+            if (CheckDeviceHere((int)DeviceId))
+            {
 
+                string sUserID = UserId.ToString();
+                int iFingerIndex = 1;
+                int iFlag = 0;
+                int idwErrorCode = 0;
+
+                objZkeeper.CancelOperation();
+                objZkeeper.SSR_DeleteEnrollData((int)DeviceId,sUserID, 0);//If the specified index of user's templates has existed ,delete it first.(SSR_DelUserTmp is also available sometimes)
+                if (objZkeeper.StartEnrollEx(sUserID, iFingerIndex, iFlag))
+                {
+                    iCanSaveTmp = 1;
+                    objZkeeper.StartIdentify();//After enrolling templates,you should let the device into the 1:N verification condition
+
+                }
+                else
+                {
+                    objZkeeper.GetLastError(ref idwErrorCode);
+                }
+                return Ok(iCanSaveTmp ==1? true: false);
+            }
+            else
+                return Ok("Device Is Not Connected");
+        }
         [Route("Device/SetUser")]
         [HttpGet]
         public IActionResult SetUser(long DeviceId ,  long UserId  )
@@ -329,37 +352,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                 foreach (Member M in Members)
                 {
-                    bool SetUser = objZkeeper.SSR_SetUserInfo((int)DeviceId, M.Id.ToString(), M.Name, "", 0, true);
-                    if (SetUser)
-                    {
-                        string strface = "";
-                        int length = 0;
-                        bool GetUserFace = objZkeeper.GetUserFaceStr((int)DeviceId, M.Id.ToString(), 50, ref strface, ref length);
-                        if (GetUserFace)
-                        {
-                            var memeberface = DB.MemberFaces.Where(f => f.MemberId == M.Id).SingleOrDefault();
-                            if (memeberface != null)
-                            {
-                                memeberface.FaceLength = length;
-                                memeberface.FaceStr = strface;
-                                memeberface.MemberId = M.Id;
-
-                                bool SetUserFace = objZkeeper.SetUserFaceStr((int)DeviceId, M.Id.ToString(), 50, memeberface.FaceStr, memeberface.FaceLength);
-                            }
-                            else
-                            {
-                                DB.MemberFaces.Add(new MemberFace
-                                {
-                                    FaceLength = length,
-                                    FaceStr = strface,
-                                    MemberId = M.Id,
-                                });
-                                bool SetUserFace = objZkeeper.SetUserFaceStr((int)DeviceId, M.Id.ToString(), 50, strface, length);
-
-                            }
-                        }
-                    }
-                    DB.SaveChanges();
+                    SetUser((int)DeviceId, M.Id);
                 }
                 return Ok(true);
 
@@ -391,7 +384,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                 FaceLength = length,
                                 FaceStr = strface,
                                 MemberId = M.Id,
-
                             });
 
                         }
@@ -399,11 +391,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     else {
                         continue;
                     }
-
                     DB.SaveChanges();
-
                 }
-
                 return Ok(true);
             }
             else

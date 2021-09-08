@@ -17,7 +17,7 @@ namespace Entities
         public string Ip { get; set; }
         public int Port { get; set; }
         public int? Status { get; set; }
-        public bool IsPrime { get; set; }
+        public bool Feel { get; set; }
         public DateTime? LastSetDateTime { get; set; }
         public string Description { get; set; }
 
