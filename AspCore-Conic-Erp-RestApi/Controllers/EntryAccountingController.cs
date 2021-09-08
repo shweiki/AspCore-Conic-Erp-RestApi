@@ -78,7 +78,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             x.Entry.Status,
                             x.Entry.Type,
                             FkDescription = x.x.TableName !=null? GetFkDescription(x.x.TableName , x.x.Fktable) :""
-                        }).ToList();
+                            }).ToList();
             var AllTotal = DB.EntryMovements.Where(s => s.AccountId == AccountId && (MergeAccountId != null ? s.AccountId == MergeAccountId : true)).Sum(s => s.Credit) - DB.EntryMovements.Where(s => s.AccountId == AccountId && (MergeAccountId != null ? s.AccountId == MergeAccountId : true)).Sum(s => s.Debit);
             if (AllTotal != (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit))) {
                 var Balancecarried = AllTotal - (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit));
