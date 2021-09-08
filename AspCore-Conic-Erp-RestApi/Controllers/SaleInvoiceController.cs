@@ -17,8 +17,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("SaleInvoice/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any ,string Type)
         {
-            var Invoices = DB.SalesInvoices.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.PaymentMethod.Contains(Any) || s.Vendor.Name.Contains(Any)|| s.Description.Contains(Any)  || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any)|| s.Region.Contains(Any) : true ) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
-            && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true)&&(Type != null ? s.Type == Type : true) && (User != null ? DB.ActionLogs.Where(l =>l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+            var Invoices = DB.SalesInvoices.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.PaymentMethod.Contains(Any) || s.Vendor.Name.Contains(Any)|| s.Description.Contains(Any)  || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any)|| s.Region.Contains(Any) : true ) && 
+            (DateFrom != null ? s.FakeDate >= DateFrom : true) && (DateTo != null ? s.FakeDate <= DateTo : true) && 
+            (Status != null ? s.Status == Status : true)&&(Type != null ? s.Type == Type : true) && (User != null ? DB.ActionLogs.Where(l =>l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
             {
                 x.Id,
                 x.Discount,
@@ -72,7 +73,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetByAny(string Any, int Status)
         {
             if (Any == null || Any == "") return Ok();
-            var Invoices = DB.SalesInvoices.Where(s => s.Status == Status &&  (s.Id.ToString().Contains(Any)  || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any) )
+            var Invoices = DB.SalesInvoices.Where(s => s.Status == Status &&  (s.FakeDate >= DateTime.Today ) && ( s.FakeDate <= DateTime.Today.AddHours(23).AddMinutes(59).AddSeconds(59) ) && (s.Id.ToString().Contains(Any)  || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any) )
             ).Select(x => new
                 {
                     x.Id,

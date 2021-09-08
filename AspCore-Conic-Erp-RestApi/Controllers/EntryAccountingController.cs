@@ -62,7 +62,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("EntryAccounting/GetAccountStatement")]
         public IActionResult GetAccountStatement(long? AccountId, long? MergeAccountId,  DateTime DateFrom, DateTime DateTo)
         {
-            var EntryMovements = DB.EntryMovements.Where(s => s.AccountId == AccountId && (MergeAccountId != null ? s.AccountId == MergeAccountId : true) && s.Entry.FakeDate >= DateFrom && s.Entry.FakeDate <= DateTo)
+            var EntryMovements = DB.EntryMovements.Where(s => s.AccountId == AccountId && (MergeAccountId != null ?  s.AccountId == MergeAccountId : true) && s.Entry.FakeDate >= DateFrom && s.Entry.FakeDate <= DateTo)
                 .Select(x => new { x, x.Entry }).AsEnumerable()
                         .Select(x => new
                           {
