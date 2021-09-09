@@ -58,7 +58,7 @@ namespace AspCore_Conic_Erp_RestApi
             if (objCZKEM.Connect_Net(IPAdd, Port))
             {
                 //65535, 32767
-                if (objCZKEM.RegEvent(1, 65535))
+                if (objCZKEM.RegEvent(objCZKEM.MachineNumber, 65535))
                 {
                     // [ Register your events here ]
                     // [ Go through the _IZKEMEvents_Event class for a complete list of events
@@ -66,6 +66,7 @@ namespace AspCore_Conic_Erp_RestApi
                     objCZKEM.OnDisConnected += objCZKEM_OnDisConnected;
                     objCZKEM.OnEnrollFinger += ObjCZKEM_OnEnrollFinger;
                     objCZKEM.OnFinger += ObjCZKEM_OnFinger;
+
                     objCZKEM.OnAttTransactionEx += new _IZKEMEvents_OnAttTransactionExEventHandler(zkemClient_OnAttTransactionEx);
                 }
                 return true;
@@ -103,16 +104,23 @@ namespace AspCore_Conic_Erp_RestApi
         }
         private  void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
         {
-            //  Disconnect();
+            objCZKEM.EnableDevice(objCZKEM.MachineNumber, false);
             DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
             int ID = Convert.ToInt32(EnrollNumber);
             var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
                 MemberLogController MemberLog = new MemberLogController();
-                 MemberLog.RegisterMemberLog(ID, datetime);
-                //device.GetAllLogMembers(3);
-           
-        }
+            string Ip = "";
+            objCZKEM.GetDeviceIP(objCZKEM.MachineNumber, ref Ip);
+                MemberLog.RegisterMemberLog(ID, datetime , Ip);
+            //device.GetAllLogMembers(3);
+            objCZKEM.EnableDevice(objCZKEM.MachineNumber, true);
 
+        }
+        void axCZKEM1_OnVerify(int UserID)
+        {
+       
+            throw new NotImplementedException();
+        }
 
         public bool EnableDevice(int dwMachineNumber, bool bFlag)
         {
@@ -130,8 +138,6 @@ namespace AspCore_Conic_Erp_RestApi
         {
             return GetUserInfo(dwMachineNumber, dwEnrollNumber, ref Name, ref Password, ref Privilege, ref Enabled);
         }
-
-
         public bool GetUserInfoEx(int dwMachineNumber, int dwEnrollNumber, out int VerifyStyle, out byte Reserved)
         {
             return objCZKEM.GetUserInfoEx(dwMachineNumber, dwEnrollNumber, out VerifyStyle, out Reserved);
@@ -255,16 +261,16 @@ namespace AspCore_Conic_Erp_RestApi
 
         public bool StartEnroll(int UserID, int FingerID)
         {
-            return StartEnroll(UserID, FingerID);
+            return objCZKEM.StartEnroll(UserID, FingerID);
         }
 
         public bool StartEnrollEx(string UserID, int FingerID, int Flag)
         {
-            return StartEnrollEx(UserID, FingerID, Flag);
+            return objCZKEM.StartEnrollEx(UserID, FingerID, Flag);
         }
 
         public bool StartIdentify()
-        { return StartIdentify(); }
+        { return objCZKEM.StartIdentify(); }
 
         public void Disconnect()
         {
@@ -274,6 +280,7 @@ namespace AspCore_Conic_Erp_RestApi
             objCZKEM.OnEnrollFinger -= ObjCZKEM_OnEnrollFinger;
             objCZKEM.OnFinger -= ObjCZKEM_OnFinger;
             objCZKEM.OnAttTransactionEx -= new _IZKEMEvents_OnAttTransactionExEventHandler(zkemClient_OnAttTransactionEx);
+            objCZKEM.OnVerify += new _IZKEMEvents_OnVerifyEventHandler(axCZKEM1_OnVerify);
 
             objCZKEM.Disconnect();
         }
@@ -330,7 +337,7 @@ namespace AspCore_Conic_Erp_RestApi
 
         public bool CancelOperation()
         {
-            throw new NotImplementedException();
+            return objCZKEM.CancelOperation();
         }
 
         public bool CaptureImage(bool FullImage, ref int Width, ref int Height, ref byte Image, string ImageFile)
@@ -567,7 +574,7 @@ namespace AspCore_Conic_Erp_RestApi
 
         public bool GetDeviceIP(int dwMachineNumber, ref string IPAddr)
         {
-            throw new NotImplementedException();
+            return objCZKEM.GetDeviceIP(dwMachineNumber, ref IPAddr);
         }
 
 
@@ -655,7 +662,7 @@ namespace AspCore_Conic_Erp_RestApi
         {
             get
             {
-                throw new NotImplementedException();
+                return objCZKEM.MachineNumber;
             }
 
             set
@@ -923,7 +930,8 @@ namespace AspCore_Conic_Erp_RestApi
 
         public bool SetUserFace(int dwMachineNumber, string dwEnrollNumber, int dwFaceIndex, ref byte TmpData, int TmpLength)
         {
-            throw new NotImplementedException();
+            return objCZKEM.SetUserFace(dwMachineNumber, dwEnrollNumber, dwFaceIndex,ref TmpData, TmpLength);
+
         }
 
         public bool SetUserFaceStr(int dwMachineNumber, string dwEnrollNumber, int dwFaceIndex, string TmpData, int TmpLength)
@@ -939,7 +947,7 @@ namespace AspCore_Conic_Erp_RestApi
 
         public bool SetUserInfo(int dwMachineNumber, int dwEnrollNumber, string Name, string Password, int Privilege, bool Enabled)
         {
-            throw new NotImplementedException();
+            return objCZKEM.SetUserInfo(dwMachineNumber, dwEnrollNumber, Name, Password, Privilege, Enabled);
         }
 
         public bool SetUserInfoEx(int dwMachineNumber, int dwEnrollNumber, int VerifyStyle, ref byte Reserved)
@@ -1015,7 +1023,7 @@ namespace AspCore_Conic_Erp_RestApi
 
         public bool SSR_DeleteEnrollData(int dwMachineNumber, string dwEnrollNumber, int dwBackupNumber)
         {
-            throw new NotImplementedException();
+            return objCZKEM.SSR_DeleteEnrollData(dwMachineNumber , dwEnrollNumber , dwBackupNumber);
         }
 
         public bool SSR_DeleteEnrollDataExt(int dwMachineNumber, string dwEnrollNumber, int dwBackupNumber)
@@ -1138,7 +1146,7 @@ namespace AspCore_Conic_Erp_RestApi
 
         public bool SSR_SetUserTmpStr(int dwMachineNumber, string dwEnrollNumber, int dwFingerIndex, string TmpData)
         {
-            throw new NotImplementedException();
+            return objCZKEM.SSR_SetUserTmpStr(dwMachineNumber, dwEnrollNumber, dwFingerIndex, TmpData);
         }
 
         public bool SSR_SetWorkCode(int AWorkCode, string Name)

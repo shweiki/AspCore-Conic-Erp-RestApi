@@ -23,7 +23,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetById(long? Id)
         {
-            var Device = DB.Devices.Where(x => x.Id == Id).Select(x=> new { x.Id, x.Name, x.Feel, x.Status, x.Port, x.Ip, x.Description }).SingleOrDefault();
+            var Device = DB.Devices.Where(x => x.Id == Id).Select(x=> new { x.Id, x.Name, x.Feel, x.Status, x.Port,x.MAC, x.Ip, x.Description }).SingleOrDefault();
 
             return Ok(Device);
         }
@@ -60,6 +60,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Device Device = DB.Devices.Where(x => x.Id == collection.Id).SingleOrDefault();
                 Device.Name = collection.Name;
                 Device.Ip = collection.Ip;
+                Device.MAC = collection.MAC;
                 Device.Port = collection.Port;
                 Device.Feel = collection.Feel;
                 Device.Status = collection.Status;
@@ -157,16 +158,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
 
                 string sUserID = UserId.ToString();
-                int iFingerIndex = 1;
-                int iFlag = 0;
+                int iFingerIndex = 111;
                 int idwErrorCode = 0;
 
-                objZkeeper.CancelOperation();
-                objZkeeper.SSR_DeleteEnrollData((int)DeviceId,sUserID, 0);//If the specified index of user's templates has existed ,delete it first.(SSR_DelUserTmp is also available sometimes)
-                if (objZkeeper.StartEnrollEx(sUserID, iFingerIndex, iFlag))
+               objZkeeper.CancelOperation();
+             //   objZkeeper.SSR_DeleteEnrollData((int)DeviceId,sUserID, 0);//If the specified index of user's templates has existed ,delete it first.(SSR_DelUserTmp is also available sometimes)
+              objZkeeper.RefreshData(objZkeeper.MachineNumber);//the data in the device should be refreshed
+
+                if (objZkeeper.StartEnrollEx(sUserID, iFingerIndex ,0))
                 {
                     iCanSaveTmp = 1;
+
                     objZkeeper.StartIdentify();//After enrolling templates,you should let the device into the 1:N verification condition
+                    objZkeeper.RefreshData(objZkeeper.MachineNumber);//the data in the device should be refreshed
 
                 }
                 else
@@ -183,25 +187,37 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult SetUser(long DeviceId ,  long UserId  )
         {
             if (CheckDeviceHere((int)DeviceId)) {
+                objZkeeper.EnableDevice(objZkeeper.MachineNumber, false);
 
                 var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
- 
-                bool SetUser = objZkeeper.SSR_SetUserInfo((int)DeviceId, member.Id.ToString(), member.Name, "", 0, true);
+                string Name ="";
+                string password ="";
+                int Privilege =0;
+                bool Enable = false;
+                //bool GetUser = objZkeeper.GetUserInfo(objZkeeper.MachineNumber,(int)member.Id,ref  Name, ref password, ref Privilege, ref Enable);
+                byte x = 0;
+
+                bool SetUser = objZkeeper.SSR_SetUserInfo(objZkeeper.MachineNumber, member.Id.ToString(), member.Name, "", 1, true);
                 if (SetUser)
                 {
                     string strface = "";
                     int length = 0;
-                    bool GetUserFace = objZkeeper.GetUserFaceStr((int)DeviceId, member.Id.ToString(), 50, ref strface, ref length);
+                    bool GetUserFace = objZkeeper.GetUserFaceStr(objZkeeper.MachineNumber, member.Id.ToString(), 50, ref strface, ref length);
+                    var memeberface = DB.MemberFaces.Where(f => f.MemberId == member.Id).SingleOrDefault();
+
                     if (GetUserFace)
                     {
-                        var memeberface = DB.MemberFaces.Where(f => f.MemberId == member.Id).SingleOrDefault();
+
                         if (memeberface != null)
                         {
                             memeberface.FaceLength = length;
                             memeberface.FaceStr = strface;
                             memeberface.MemberId = member.Id;
 
-                            bool SetUserFace = objZkeeper.SetUserFaceStr((int)DeviceId, member.Id.ToString(), 50, memeberface.FaceStr, memeberface.FaceLength);
+                            bool SetUserFace = objZkeeper.SetUserFaceStr(objZkeeper.MachineNumber, member.Id.ToString(), 50, strface, length);
+                             SetUserFace = objZkeeper.SSR_SetUserTmpStr(objZkeeper.MachineNumber, member.Id.ToString(), 50, strface);
+                             SetUserFace = objZkeeper.SetUserFace(objZkeeper.MachineNumber, member.Id.ToString(), 0, ref x, length);
+
                         }
                         else
                         {
@@ -211,17 +227,25 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                 FaceStr = strface,
                                 MemberId = member.Id,
                             });
-                            bool SetUserFace = objZkeeper.SetUserFaceStr((int)DeviceId, member.Id.ToString(), 50, strface, length);
+
+                            bool SetUserFace = objZkeeper.SetUserFace(objZkeeper.MachineNumber, member.Id.ToString(), 0, ref x, length);
+                        //    objZkeeper.SetUserFace(objZkeeper.MachineNumber, member.Id.ToString(), 50, strface, length);
                         }
                     }
-                    else {
-                        var memeberface = DB.MemberFaces.Where(f => f.MemberId == member.Id).SingleOrDefault();
+                    else
+                    {
+                        if (memeberface != null) {
+                            bool SetUserFace = objZkeeper.SetUserFace(objZkeeper.MachineNumber,  member.Id.ToString(), 50, ref x, memeberface.FaceLength);
 
-                        bool SetUserFace = objZkeeper.SetUserFaceStr((int)DeviceId, member.Id.ToString(), 50, memeberface.FaceStr, memeberface.FaceLength);
+                        }
 
                     }
+
                 }
+                objZkeeper.RefreshData(objZkeeper.MachineNumber);
                 DB.SaveChanges();
+                objZkeeper.EnableDevice(objZkeeper.MachineNumber, true);
+
                 return Ok(SetUser);
             }
             else
@@ -236,7 +260,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 if (CheckDeviceHere((int)DeviceId))
                 {
-                    ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, (int)DeviceId);
+                    ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, objZkeeper.MachineNumber);
 
                     if (MachineLog != null && MachineLog.Count > 0)
                     {
@@ -294,12 +318,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             isValidIpA = UniversalStatic.PingTheDevice(Device.Ip);
             if (!isValidIpA)
                 Device.Description = "The device at " + Device.Ip + ":" + Device.Port + " did not respond!!";
-            if (isValidIpA && DisconnectDeviceHere(Id))
+            if (isValidIpA)
             {
                 objZkeeper = new ZkemClient(RaiseDeviceEvent);
                 Device.Description = "Is Device Connected : ";
+            
                 IsDeviceConnected = objZkeeper.Connect_Net(Device.Ip, Device.Port);
-                objZkeeper.SetDeviceTime2((int)Device.Id, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+                objZkeeper.SetDeviceTime2(objZkeeper.MachineNumber, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
 
             }
             DB.SaveChanges();
@@ -330,7 +355,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
 
-                bool SetUser = objZkeeper.SSR_SetUserInfo((int)DeviceId, member.Id.ToString(), member.Name, "", 0, Enable);
+                bool SetUser = objZkeeper.SSR_SetUserInfo(objZkeeper.MachineNumber, member.Id.ToString(), member.Name, "", 0, Enable);
                 if (!SetUser)
                return false;                
                 
@@ -375,7 +400,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     {
                         string strface = "";
                         int length = 0;
-                        bool GetUserFace = objZkeeper.GetUserFaceStr((int)DeviceId, M.Id.ToString(), 50, ref strface, ref length);
+                        bool GetUserFace = objZkeeper.GetUserFaceStr(objZkeeper.MachineNumber, M.Id.ToString(), 50, ref strface, ref length);
 
                         if (GetUserFace)
                         {
@@ -405,7 +430,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (CheckDeviceHere((int)DeviceId))
             {
-                ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, 0);
+                ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, objZkeeper.MachineNumber);
                 if (MachineLog != null && MachineLog.Count > 0)
                 {
                 
@@ -461,9 +486,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (CheckDeviceHere((int)DeviceId))
             {
-               bool ClearKeeperData = objZkeeper.ClearKeeperData(0);
-               bool ClearGLog = objZkeeper.ClearGLog(0);
-               bool ClearSLog = objZkeeper.ClearSLog(0);
+               bool ClearKeeperData = objZkeeper.ClearKeeperData(objZkeeper.MachineNumber);
+               bool ClearGLog = objZkeeper.ClearGLog(objZkeeper.MachineNumber);
+                bool ClearSLog = objZkeeper.ClearSLog(objZkeeper.MachineNumber);
+
                 return Ok("ClearKeeperData : " + ClearKeeperData + "-ClearGLog : "+ ClearGLog+ "-ClearSLog : "+ ClearSLog);
 
             }
@@ -476,7 +502,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (CheckDeviceHere((int)DeviceId))
             {
-               bool ClearAdministrators = objZkeeper.ClearAdministrators(0);
+               bool ClearAdministrators = objZkeeper.ClearAdministrators(objZkeeper.MachineNumber);
                 return Ok("ClearAdministrators : " + ClearAdministrators + "");
 
             }

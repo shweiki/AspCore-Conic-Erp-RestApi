@@ -141,7 +141,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
        
             return Ok(MemberLogs);
         }
-        public Boolean RegisterMemberLog(long? Id , DateTime datetime)
+        public Boolean RegisterMemberLog(long? Id , DateTime datetime, string Ip)
         {
             var member = DB.Members.Where(m => m.Id == Id).FirstOrDefault();
             if (member == null) return false;
@@ -150,12 +150,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             if (isLogSaveIt.Count() <= 0 && member != null)
             {
+                var Device =  DB.Devices.Where(x=>x.Ip == Ip).SingleOrDefault();
                 var Log = new MemberLog
                 {
                     Type = "In",
                     MemberId = member.Id,
                     DateTime = datetime,
-                    DeviceId = 3,
+                    DeviceId = Device.Id,
                     Status = 0,
                     Description = "Event Log"
                 };
@@ -164,7 +165,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 DB.SaveChanges();
                 MassageController massage = new MassageController();
                 string OwnerPhone = DB.CompanyInfos.FirstOrDefault().PhoneNumber1;
-                if (OwnerPhone.Length == 10) OwnerPhone = OwnerPhone.Substring(1, 9);
+                if (OwnerPhone != null && OwnerPhone.Length == 10) OwnerPhone = OwnerPhone.Substring(1, 9);
 
                 if (member.PhoneNumber1.Length == 10) member.PhoneNumber1 = member.PhoneNumber1.Substring(1, 9);
 
@@ -259,8 +260,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             else { return false; }
         }
 
-        
-
+        private long GetDeviceId(int machineNumber)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

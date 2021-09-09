@@ -62,7 +62,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("EntryAccounting/GetAccountStatement")]
         public IActionResult GetAccountStatement(long? AccountId, long? MergeAccountId,  DateTime DateFrom, DateTime DateTo)
         {
-            var EntryMovements = DB.EntryMovements.Where(s => s.AccountId == AccountId && (MergeAccountId != null ?  s.AccountId == MergeAccountId : true) && s.Entry.FakeDate >= DateFrom && s.Entry.FakeDate <= DateTo)
+            var EntryMovements = DB.EntryMovements.Where(s =>  (MergeAccountId != null ? s.AccountId == AccountId || s.AccountId == MergeAccountId : s.AccountId == AccountId) && (s.Entry.FakeDate >= DateFrom && s.Entry.FakeDate <= DateTo))
                 .Select(x => new { x, x.Entry }).AsEnumerable()
                         .Select(x => new
                           {
@@ -73,28 +73,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             x.x.EntryId,
                             x.x.Fktable,
                             x.x.TableName,
-                            TotalRow = 0,
+                            TotalRow = new double(),
                             x.Entry.FakeDate,
                             x.Entry.Status,
                             x.Entry.Type,
                             FkDescription = x.x.TableName !=null? GetFkDescription(x.x.TableName , x.x.Fktable) :""
                             }).ToList();
-            var AllTotal = DB.EntryMovements.Where(s => s.AccountId == AccountId && (MergeAccountId != null ? s.AccountId == MergeAccountId : true)).Sum(s => s.Credit) - DB.EntryMovements.Where(s => s.AccountId == AccountId && (MergeAccountId != null ? s.AccountId == MergeAccountId : true)).Sum(s => s.Debit);
+            double AllTotal = DB.EntryMovements.Where(s => (MergeAccountId != null ? s.AccountId == AccountId || s.AccountId == MergeAccountId : s.AccountId == AccountId)).Sum(s => s.Credit) - DB.EntryMovements.Where(s => (MergeAccountId != null ? s.AccountId == AccountId || s.AccountId == MergeAccountId : s.AccountId == AccountId)).Sum(s => s.Debit);
             if (AllTotal != (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit))) {
-                var Balancecarried = AllTotal - (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit));
+                double Balancecarried = AllTotal - (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit));
                 EntryMovements.Add(new 
                 {
                     Id = Convert.ToInt64(0),
                     Debit = Balancecarried < 0 ? Balancecarried : 0,
                     Credit = Balancecarried > 0 ? Balancecarried : 0,
-                    Description = "رصيد مدور",
+                    Description = "رصيد الفترة السابقة",
                     EntryId = Convert.ToInt64(0),
                     Fktable = Convert.ToInt64(0),
                     TableName = "BalanceCarried",
-                    TotalRow = 0,
+                    TotalRow = AllTotal,
                     FakeDate = DateFrom.Date,
                     Status = 0,
-                    Type = "رصيد مدور",
+                    Type = "رصيد الفترة السابقة",
                     FkDescription = ""
                 }) ;
             }
@@ -104,7 +104,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Totals = new
                 {
                     Rows = EntryMovements.Count(),
-                    Totals = EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit),
+                    Totals = AllTotal,
                     Debit = EntryMovements.Sum(s => s.Debit),
                     Credit = EntryMovements.Sum(s => s.Credit),
                 }
