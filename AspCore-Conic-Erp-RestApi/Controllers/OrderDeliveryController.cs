@@ -4,6 +4,9 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -11,6 +14,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class OrderDeliveryController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly ILogger<UserController> _logger;
+
+        public OrderDeliveryController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _logger = logger;
+
+        }
+
         [HttpPost]
         [Route("OrderDelivery/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string? Any)
@@ -40,14 +55,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     Rows = Deliveries.Count()
                 }
-             });
+            });
         }
         [Route("OrderDelivery/GetOrderDelivery")]
         [HttpGet]
         public IActionResult GetOrderDelivery()
 
         {
-            var Orders = DB.OrderDeliveries.Where(x => x.Status == 0 || x.Status == 1 || x.Status == 2).Select(x => new {
+            var Orders = DB.OrderDeliveries.Where(x => x.Status == 0 || x.Status == 1 || x.Status == 2).Select(x => new
+            {
                 x.Id,
                 x.Name,
                 x.PhoneNumber,
@@ -96,7 +112,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == collection.Id).SingleOrDefault();
                 Order.DriverId = collection.DriverId;
                 Order.Status = 1;
-                
+
                 try
                 {
                     DB.SaveChanges();
@@ -110,6 +126,40 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
         }
-    }
 
+        [Route("OrderDelivery/GetDriverOrder")]
+        [HttpGet]
+        public IActionResult GetDriverOrder(string Id, string name)
+
+        {
+
+            var Orders = DB.OrderDeliveries.Where(x => x.Driver.DriverUserId == Id || name == "Developer").Select(x => new
+            {
+                x.Id,
+                x.Name,
+                x.PhoneNumber,
+                x.TotalPill,
+                x.TotalPrice,
+                x.Status,
+                x.Content,
+                x.Description,
+                x.FakeDate,
+                x.Region,
+                x.DeliveryPrice,
+                x.Driver,
+                
+            }).ToList();
+
+            return Ok(Orders);
+
+
+
+
+           
+
+
+           
+        }
+        
+    }
 }
