@@ -235,15 +235,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 x.Id,
                 x.Name,
-                x.PhoneNumber,
-                x.TotalPill,
-                x.TotalPrice,
                 x.Status,
                 x.Content,
-                x.Description,
                 x.FakeDate,
                 x.Region,
-                x.DeliveryPrice,
                 x.Driver,
             }).ToList();
             Deliveries = (Sort == "+id" ? Deliveries.OrderBy(s => s.Id).ToList() : Deliveries.OrderByDescending(s => s.Id).ToList());
@@ -253,9 +248,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Totals = new
                 {
                     Rows = Deliveries.Count(),
-                    TotalDeliveryPrice = Deliveries.Sum(s => s.DeliveryPrice),
-                    TotalPrice = Deliveries.Sum(s => s.TotalPrice),
-                    TotalPill = Deliveries.Sum(s => s.TotalPill),
                 }
             });
         }
