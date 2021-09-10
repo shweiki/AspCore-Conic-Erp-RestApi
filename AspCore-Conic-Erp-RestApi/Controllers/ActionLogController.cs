@@ -35,7 +35,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetLogByObjTable(string TableName, int Id)
         {
-            List<ActionLog> ActionLogs = DB.ActionLogs.ToList(); 
+            List<ActionLog> ActionLogs = new List<ActionLog>() ; 
             switch (TableName)
             {
                 case "InventoryItem":

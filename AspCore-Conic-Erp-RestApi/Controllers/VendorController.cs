@@ -58,7 +58,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Vendor/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
         {
-            var Vendors = DB.Vendors.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+            var Vendors = DB.Vendors.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) : true)
+            && (Status != null ? s.Status == Status : true)).Select(x => new
             {
                 x.Id,
                 x.Name,

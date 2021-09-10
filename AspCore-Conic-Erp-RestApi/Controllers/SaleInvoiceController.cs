@@ -56,7 +56,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }).ToList(),
             }).ToList();
             Invoices =  (Sort == "+id" ? Invoices.OrderBy(s => s.Id).ToList() : Invoices.OrderByDescending(s => s.Id).ToList());
-            return Ok(new {items = Invoices.Skip((Page - 1) * Limit).Take(Limit).ToList(), 
+            return Ok(new
+            {items = Invoices.Skip((Page - 1) * Limit).Take(Limit).ToList(), 
             Totals = new {
             Rows = Invoices.Count(),
             Totals = Invoices.Sum(s => s.Total),

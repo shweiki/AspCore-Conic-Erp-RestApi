@@ -53,16 +53,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 items = Deliveries.Skip((Page - 1) * Limit).Take(Limit).ToList(),
                 Totals = new
                 {
-                    Rows = Deliveries.Count()
+                    Rows = Deliveries.Count(),
+                    TotalDeliveryPrice = Deliveries.Sum(s => s.DeliveryPrice),
+                    TotalPrice = Deliveries.Sum(s => s.TotalPrice),
+                    TotalPill = Deliveries.Sum(s => s.TotalPill),
                 }
             });
         }
         [Route("OrderDelivery/GetOrderDelivery")]
         [HttpGet]
-        public IActionResult GetOrderDelivery()
+        public IActionResult GetOrderDelivery(int Limit, string Sort, int Page, int? Status, string? Any)
 
         {
-            var Orders = DB.OrderDeliveries.Where(x => x.Status == 0 || x.Status == 1 || x.Status == 2).Select(x => new
+            var Orders = DB.OrderDeliveries.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
             {
                 x.Id,
                 x.Name,
@@ -78,8 +81,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Driver,
 
             }).ToList();
+            Orders = (Sort == "+id" ? Orders.OrderBy(s => s.Id).ToList() : Orders.OrderByDescending(s => s.Id).ToList());
 
-            return Ok(Orders);
+            return Ok(new
+            {
+                items = Orders.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Orders.Count(),
+                    TotalDeliveryPrice = Orders.Sum(s => s.DeliveryPrice),
+                    TotalPrice = Orders.Sum(s => s.TotalPrice),
+                    TotalPill = Orders.Sum(s => s.TotalPill),
+                }
+            });
         }
         [Route("OrderDelivery/Create")]
         [HttpPost]
@@ -105,16 +119,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("OrderDelivery/SetDriver")]
         [HttpPost]
-        public IActionResult SetDriver(OrderDelivery collection)
+        public IActionResult SetDriver(long DriverId, long OrderId)
         {
             if (ModelState.IsValid)
             {
-                OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == collection.Id).SingleOrDefault();
-                Order.DriverId = collection.DriverId;
-                Order.Status = 1;
-
                 try
                 {
+                    OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == OrderId).SingleOrDefault();
+                Order.DriverId = DriverId;
+                Order.Status = 1;
+
+               
                     DB.SaveChanges();
                     return Ok(true);
                 }
