@@ -145,7 +145,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                    UserRouter NewRole = new UserRouter()
                    {
                        UserId = NewUser.Id,
-                       Router = "[\"/OrderDelivery/DriverPage\"]",
+                       Router = "[\"/OrderDelivery/DriverPage\",\"/OrderDelivery/DriverDeliveryList\"]",
                        DefulateRedirect = "/",
                  };
                    DB.UserRouter.Add(NewRole);
