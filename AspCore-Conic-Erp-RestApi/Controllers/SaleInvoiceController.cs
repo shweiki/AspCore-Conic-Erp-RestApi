@@ -74,7 +74,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetByAny(string Any, int Status)
         {
             if (Any == null || Any == "") return Ok();
-            var Invoices = DB.SalesInvoices.Where(s => s.Status == Status &&  (s.FakeDate >= DateTime.Today ) && ( s.FakeDate <= DateTime.Today.AddHours(23).AddMinutes(59).AddSeconds(59) ) && (s.Id.ToString().Contains(Any)  || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any) )
+            DateTime StartToday  = DateTime.Today;
+            DateTime EndToday  = StartToday.AddHours(23).AddMinutes(59).AddSeconds(59);
+            var Invoices = DB.SalesInvoices.Where(s => (s.Status == Status ||  (s.FakeDate >= StartToday &&  s.FakeDate <= EndToday)) && (s.Id.ToString().Contains(Any)  || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any) )
             ).Select(x => new
                 {
                     x.Id,

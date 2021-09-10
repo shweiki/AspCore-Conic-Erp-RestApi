@@ -28,11 +28,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PaymentMethod,
                 x.PersonCount,
                 x.HourCount,
+                x.HourPrice,
                 x.Status,
                 x.Type,
                 x.Description,
                 x.PhoneNumber,
-                Total = x.PersonCount * x.HourPrice * x.HourCount
+                Total = x.PersonCount * (x.HourCount * 2) * x.HourPrice - x.Discount
             }).ToList();
             return Ok(new
             {
@@ -43,7 +44,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Totals = visits.Sum(s => s.Total),
                     Cash = visits.Where(i => i.PaymentMethod == "Cash").Sum(s => s.Total),
                     Discount = visits.Sum(s => s.Discount),
-                    Visa = visits.Where(i => i.PaymentMethod == "Visa").Sum(s => s.Total)
+                    Visa = visits.Where(i => i.PaymentMethod == "Visa").Sum(s => s.Total),
+                    Coupon = visits.Where(i => i.PaymentMethod == "Coupon").Sum(s => s.Total)
                 }
             });
         }
@@ -62,12 +64,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.FakeDate,
                 x.PaymentMethod,
                 x.PersonCount,
-                x.HourCount,
+                x.HourCount,         
+                x.HourPrice,
                 x.Status,
                 x.Type,
                 x.Description,
                 x.PhoneNumber,
-                Total = x.PersonCount * x.HourPrice * x.HourCount
+                Total = x.PersonCount * (x.HourCount * 2) * x.HourPrice - x.Discount
             }).ToList();
 
             return Ok(Visits);
@@ -78,7 +81,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetByStatus(DateTime? DateFrom , DateTime? DateTo, int? Status)
         {
             var visits = DB.Visits.Where(s =>(DateFrom !=null ? s.FakeDate >= DateFrom : true ) 
-            && (DateTo != null ?  s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status :true)).Select(x => new
+            || (DateTo != null ?  s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status :true)).Select(x => new
             {
                 x.Id,
                 x.Name,
@@ -88,11 +91,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PaymentMethod,
                 x.PersonCount,
                 x.HourCount,
+                x.HourPrice,
                 x.Status,
                 x.Type,
                 x.Description,
                 x.PhoneNumber,
-                Total = x.PersonCount * x.HourPrice * x.HourCount
+                Total = x.PersonCount * (x.HourCount * 2) * x.HourPrice - x.Discount
             }).ToList();
 
 
@@ -142,6 +146,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     visit.Name = collection.Name;
                     visit.PhoneNumber = collection.PhoneNumber;
                     visit.HourPrice = collection.HourPrice;
+                    visit.HourCount = collection.HourCount;
                     visit.PersonCount = collection.PersonCount;
                     DB.SaveChanges();
 
@@ -193,6 +198,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PaymentMethod,
                 x.PersonCount,
                 x.HourCount,
+                x.HourPrice,
                 x.Status,
                 x.Type,
                 x.Description,
@@ -208,7 +214,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Totals = visits.Sum(s => s.Total),
                     Cash = visits.Where(i => i.PaymentMethod == "Cash").Sum(s => s.Total),
                     Discount = visits.Sum(s => s.Discount),
-                    Visa = visits.Where(i => i.PaymentMethod == "Visa").Sum(s => s.Total)
+                    Visa = visits.Where(i => i.PaymentMethod == "Visa").Sum(s => s.Total),
+                    Coupon = visits.Where(i => i.PaymentMethod == "Coupon").Sum(s => s.Total)
                 }
             });
         }
@@ -225,11 +232,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PaymentMethod,
                 x.PersonCount,
                 x.HourCount,
+                x.HourPrice,
                 x.Status,
                 x.Type,
                 x.Description,
                 x.PhoneNumber,
-                Total = x.PersonCount * x.HourPrice * x.HourCount
+                Total = x.PersonCount * (x.HourCount *2  )* x.HourPrice - x.Discount
 
             }).SingleOrDefault();
 
