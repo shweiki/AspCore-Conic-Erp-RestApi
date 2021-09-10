@@ -144,11 +144,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("OrderDelivery/GetDriverOrder")]
         [HttpGet]
-        public IActionResult GetDriverOrder(string Id, string name)
+        public IActionResult GetDriverOrder(string Id, string name, int Limit, string Sort, int Page, int? Status, string? Any)
 
         {
-
-            var Orders = DB.OrderDeliveries.Where(x => x.Driver.DriverUserId == Id || name == "Developer").Select(x => new
+            var Orders = DB.OrderDeliveries.Where(x =>(x.Driver.DriverUserId == Id || name == "Developer") && (Any != null ? x.Id.ToString().Contains(Any) || x.Name.Contains(Any) : true) && (Status != null ? x.Status == Status : true)).Select(x => new
+           // var Orders = DB.OrderDeliveries.Where(x => x.Driver.DriverUserId == Id || name == "Developer").Select(x => new
             {
                 x.Id,
                 x.Name,
@@ -164,16 +164,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Driver,
                 
             }).ToList();
+            Orders = (Sort == "+id" ? Orders.OrderBy(s => s.Id).ToList() : Orders.OrderByDescending(s => s.Id).ToList());
 
-            return Ok(Orders);
+            return Ok(new
+            {
+                items = Orders.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Orders.Count(),
+                    TotalDeliveryPrice = Orders.Sum(s => s.DeliveryPrice),
+                    TotalPrice = Orders.Sum(s => s.TotalPrice),
+                    TotalPill = Orders.Sum(s => s.TotalPill),
+                }
+            });
 
-
-
-
-           
-
-
-           
         }
         
     }
