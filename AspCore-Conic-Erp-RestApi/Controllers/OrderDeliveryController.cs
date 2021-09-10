@@ -225,6 +225,27 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
         }
+        [Route("OrderDelivery/OrderDone")]
+        [HttpPost]
+        public IActionResult OrderDone(long id)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == id).SingleOrDefault();
+                    Order.Status = 4;
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            return Ok(false);
+        }
         [HttpPost]
         [Route("OrderDelivery/GetByListQByDriver")]
         public IActionResult GetByListQByDriver(string Id, string name, int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string? Any)
