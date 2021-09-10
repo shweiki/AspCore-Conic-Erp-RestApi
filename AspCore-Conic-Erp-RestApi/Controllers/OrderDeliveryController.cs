@@ -179,6 +179,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             });
 
         }
-        
+
+        [Route("OrderDelivery/OrderReceived")]
+        [HttpPost]
+        public IActionResult OrderReceived(long id)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == id).SingleOrDefault();
+                    Order.Status = 2;
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            return Ok(false);
+        }
+
     }
 }
