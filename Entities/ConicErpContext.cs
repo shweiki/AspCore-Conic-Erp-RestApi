@@ -65,7 +65,12 @@ namespace Entities
         public virtual DbSet<Vendor> Vendors { get; set; }
         public virtual DbSet<Report> Reports { get; set; }
         public virtual DbSet<OrderDelivery> OrderDeliveries { get; set; }
-        
+        public virtual DbSet<Employee> Employees { get; set; }
+        public virtual DbSet<EmployeeFingerPrint> EmployeeFingerPrints { get; set; }
+        public virtual DbSet<WorkingHoursLog> WorkingHoursLogs { get; set; }
+        public virtual DbSet<WorkingHoursAdjustment> WorkingHoursAdjustments { get; set; }
+        public virtual DbSet<SalaryPayment> SalaryPayments { get; set; }
+        public virtual DbSet<Adjustment> Adjustments { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
