@@ -57,7 +57,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                 try
                 {
-                    Device Device = DB.Devices.Where(x => x.Id == collection.Id).SingleOrDefault();
+                Device Device = DB.Devices.Where(x => x.Id == collection.Id).SingleOrDefault();
                 Device.Name = collection.Name;
                 Device.Ip = collection.Ip;
                 Device.MAC = collection.MAC;
@@ -187,17 +187,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult SetUser(long DeviceId ,  long UserId  )
         {
             if (CheckDeviceHere((int)DeviceId)) {
-                objZkeeper.EnableDevice(objZkeeper.MachineNumber, false);
+           
+               objZkeeper.EnableDevice(objZkeeper.MachineNumber, false);
 
                 var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
-                string Name ="";
-                string password ="";
-                int Privilege =0;
-                bool Enable = false;
+   
                 //bool GetUser = objZkeeper.GetUserInfo(objZkeeper.MachineNumber,(int)member.Id,ref  Name, ref password, ref Privilege, ref Enable);
-                byte x = 0;
 
-                bool SetUser = objZkeeper.SSR_SetUserInfo(objZkeeper.MachineNumber, member.Id.ToString(), member.Name, "", 1, true);
+                bool SetUser = objZkeeper.SSR_SetUserInfo(objZkeeper.MachineNumber, member.Id.ToString(), member.Name, "", 0, true);
                 if (SetUser)
                 {
                     string strface = "";
@@ -214,9 +211,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             memeberface.FaceStr = strface;
                             memeberface.MemberId = member.Id;
 
-                            bool SetUserFace = objZkeeper.SetUserFaceStr(objZkeeper.MachineNumber, member.Id.ToString(), 50, strface, length);
-                             SetUserFace = objZkeeper.SSR_SetUserTmpStr(objZkeeper.MachineNumber, member.Id.ToString(), 50, strface);
-                             SetUserFace = objZkeeper.SetUserFace(objZkeeper.MachineNumber, member.Id.ToString(), 0, ref x, length);
+                            bool SetUserFace = objZkeeper.SetUserFaceStr(objZkeeper.MachineNumber, member.Id.ToString(), 50, memeberface.FaceStr, memeberface.FaceLength);
+                            // SetUserFace = objZkeeper.SSR_SetUserTmpStr(objZkeeper.MachineNumber, member.Id.ToString(), 50, strface);
+                         //    SetUserFace = objZkeeper.SetUserFace(objZkeeper.MachineNumber, member.Id.ToString(), 0, ref x, length);
 
                         }
                         else
@@ -228,14 +225,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                 MemberId = member.Id,
                             });
 
-                            bool SetUserFace = objZkeeper.SetUserFace(objZkeeper.MachineNumber, member.Id.ToString(), 0, ref x, length);
+                            bool SetUserFace = objZkeeper.SetUserFaceStr(1, member.Id.ToString(), 50, strface, length);
                         //    objZkeeper.SetUserFace(objZkeeper.MachineNumber, member.Id.ToString(), 50, strface, length);
                         }
                     }
                     else
                     {
                         if (memeberface != null) {
-                            bool SetUserFace = objZkeeper.SetUserFace(objZkeeper.MachineNumber,  member.Id.ToString(), 50, ref x, memeberface.FaceLength);
+                            bool SetUserFace = objZkeeper.SetUserFaceStr(1,  member.Id.ToString(), 50, memeberface.FaceStr, memeberface.FaceLength);
 
                         }
 
@@ -374,7 +371,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 DateTime last = DateTime.Today.AddMonths(-3);
                 IList<Member> Members = DB.Members.Where(x=>x.MembershipMovements.Count() != 0 && (x.MembershipMovements != null ? x.MembershipMovements.OrderByDescending(x => x.Id).LastOrDefault().EndDate >= last : false )).ToList();
-
+              
                 foreach (Member M in Members)
                 {
                     SetUser((int)DeviceId, M.Id);
@@ -525,8 +522,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             else
                 return Ok("Device Is Not Connected");
         }
+        [Route("Device/TurnOff")]
+        [HttpGet]
+        public IActionResult TurnOff(long DeviceId)
+        {
+            if (CheckDeviceHere((int)DeviceId))
+            {
 
-    private void RaiseDeviceEvent(object sender, string actionType)
+                if (objZkeeper.PowerOffDevice(0))
+                    return Ok("The device is being PowerOffDevice, Please wait...  true");
+
+                else
+                    return Ok("Operation failed,please try again false");
+            }
+            else
+                return Ok("Device Is Not Connected");
+        }
+
+        private void RaiseDeviceEvent(object sender, string actionType)
         {
             switch (actionType)
             {

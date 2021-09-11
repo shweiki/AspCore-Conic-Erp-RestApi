@@ -67,6 +67,7 @@ namespace AspCore_Conic_Erp_RestApi
                     objCZKEM.OnEnrollFinger += ObjCZKEM_OnEnrollFinger;
                     objCZKEM.OnFinger += ObjCZKEM_OnFinger;
 
+                    objCZKEM.OnVerify += new _IZKEMEvents_OnVerifyEventHandler(zkemClient_OnVerifyEventHandler);
                     objCZKEM.OnAttTransactionEx += new _IZKEMEvents_OnAttTransactionExEventHandler(zkemClient_OnAttTransactionEx);
                 }
                 return true;
@@ -102,9 +103,19 @@ namespace AspCore_Conic_Erp_RestApi
         {
             return objCZKEM.DisableDeviceWithTimeOut(dwMachineNumber, TimeOutSec);
         }
+        
+         private void zkemClient_OnVerifyEventHandler(int UserId)
+        {
+            var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
+            MemberLogController MemberLog = new MemberLogController();
+            string Ip = "";
+            objCZKEM.GetDeviceIP(objCZKEM.MachineNumber, ref Ip);
+            MemberLog.RegisterMemberLog(UserId, DateTime.Now, Ip);
+            //device.GetAllLogMembers(3);
+
+        }
         private  void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
         {
-            objCZKEM.EnableDevice(objCZKEM.MachineNumber, false);
             DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
             int ID = Convert.ToInt32(EnrollNumber);
             var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
@@ -113,7 +124,6 @@ namespace AspCore_Conic_Erp_RestApi
             objCZKEM.GetDeviceIP(objCZKEM.MachineNumber, ref Ip);
                 MemberLog.RegisterMemberLog(ID, datetime , Ip);
             //device.GetAllLogMembers(3);
-            objCZKEM.EnableDevice(objCZKEM.MachineNumber, true);
 
         }
         void axCZKEM1_OnVerify(int UserID)
