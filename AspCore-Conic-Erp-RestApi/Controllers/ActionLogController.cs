@@ -110,6 +110,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 case "Service":
                     ActionLogs = DB.ActionLogs.Where(l => l.ServiceId == Id).ToList();
                     break;
+                case "OrderDelivery":
+                    ActionLogs = DB.ActionLogs.Where(l => l.OrderDeliveryId == Id).ToList();
+                    break;
+                case "Area":
+                    ActionLogs = DB.ActionLogs.Where(l => l.AreaId == Id).ToList();
+                    break;
+                case "Driver":
+                    ActionLogs = DB.ActionLogs.Where(l => l.DriverId == Id).ToList();
+                    break;
             };
        
             return Ok(ActionLogs);

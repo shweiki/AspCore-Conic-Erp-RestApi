@@ -39,7 +39,8 @@ namespace Entities
         public long? PaymentId { get; set; }
         public long? ReceiveId { get; set; }
         public long? OrderDeliveryId { get; set; }
-
+        public long? AreaId { get; set; }
+        public long? DriverId { get; set; }
         public virtual Oprationsy Opration { get; set; }
     }
 }

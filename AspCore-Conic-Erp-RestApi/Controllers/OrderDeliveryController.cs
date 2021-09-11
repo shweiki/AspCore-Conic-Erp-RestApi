@@ -65,7 +65,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetOrderDelivery(int Limit, string Sort, int Page, int? Status, string? Any)
 
         {
-            var Orders = DB.OrderDeliveries.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+            var Orders = DB.OrderDeliveries.Where(s => (s.Status !=4) && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
             {
                 x.Id,
                 x.Name,
@@ -147,7 +147,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetDriverOrder(string Id, string name, int Limit, string Sort, int Page, int? Status, string? Any)
 
         {
-            var Orders = DB.OrderDeliveries.Where(x => (x.Driver.DriverUserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2) && (Any != null ? x.Id.ToString().Contains(Any) || x.Name.Contains(Any) : true) && (Status != null ? x.Status == Status : true)).Select(x => new
+            var Orders = DB.OrderDeliveries.Where(x => (x.Driver.DriverUserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2 || x.Status == 3) && (Any != null ? x.Id.ToString().Contains(Any) || x.Name.Contains(Any) : true) && (Status != null ? x.Status == Status : true)).Select(x => new
             // var Orders = DB.OrderDeliveries.Where(x => x.Driver.DriverUserId == Id || name == "Developer").Select(x => new
             {
                 

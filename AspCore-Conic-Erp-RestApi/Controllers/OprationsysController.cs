@@ -326,11 +326,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     DB.Services.Where(x => x.Id == log.ServiceId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "Area":
-                    DB.Areas.Where(x => x.Id == (int)ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                    log.AreaId = (int)ObjId;
+                    DB.Areas.Where(x => x.Id == log.AreaId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "Driver":
-                    DB.Drivers.Where(x => x.Id == (int)ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                    log.DriverId = (int)ObjId;
+                    DB.Drivers.Where(x => x.Id == log.DriverId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
+                case "OrderDelivery":
+                    log.OrderDeliveryId = (int)ObjId;
+                    DB.OrderDeliveries.Where(x => x.Id == log.OrderDeliveryId).SingleOrDefault().Status = Oprationsys.Status;
+                    break;
+                
             }
             ActionLogController logCon = new ActionLogController();
             if (logCon.Create(log))
