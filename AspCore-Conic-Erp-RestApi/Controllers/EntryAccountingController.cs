@@ -73,7 +73,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             x.x.EntryId,
                             x.x.Fktable,
                             x.x.TableName,
-                            TotalRow = x.x.Credit -x.x.Debit,
+                            TotalRow = x.x.Credit - x.x.Debit,
                             x.Entry.FakeDate,
                             x.Entry.Status,
                             x.Entry.Type,
@@ -81,7 +81,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             }).ToList();
             double AllTotal = DB.EntryMovements.Where(s => (MergeAccountId != null ? s.AccountId == AccountId || s.AccountId == MergeAccountId : s.AccountId == AccountId)).Sum(s => s.Credit) - DB.EntryMovements.Where(s => (MergeAccountId != null ? s.AccountId == AccountId || s.AccountId == MergeAccountId : s.AccountId == AccountId)).Sum(s => s.Debit);
             if (AllTotal != (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit))) {
-                double Balancecarried = AllTotal - (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit));
+                double Balancecarried = AllTotal - (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit)) ;
                 EntryMovements.Add(new 
                 {
                     Id = Convert.ToInt64(0),
