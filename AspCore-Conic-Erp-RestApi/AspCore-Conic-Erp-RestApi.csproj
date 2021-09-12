@@ -9,18 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <COMReference Include="zkemkeeper">
-      <VersionMinor>0</VersionMinor>
-      <VersionMajor>1</VersionMajor>
-      <Guid>fe9ded34-e159-408e-8490-b720a5e632c7</Guid>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>false</Isolated>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="wwwroot\static\fonts\fa-brands-400.f075c50f.woff2" />
     <None Include="wwwroot\static\fonts\fa-regular-400.4a74738e.woff2" />
     <None Include="wwwroot\static\fonts\fa-solid-900.8e1ed89b.woff2" />
