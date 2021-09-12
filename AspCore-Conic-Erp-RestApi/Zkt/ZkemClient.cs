@@ -51,14 +51,45 @@ namespace AspCore_Conic_Erp_RestApi
         {
             return objCZKEM.ClearGLog(dwMachineNumber);
         }
+        public void Disconnect()
+        {
+            // [ Unregister events
+            objCZKEM.OnConnected -= ObjCZKEM_OnConnected;
+            objCZKEM.OnDisConnected -= objCZKEM_OnDisConnected;
+            objCZKEM.OnEnrollFinger -= ObjCZKEM_OnEnrollFinger;
+            objCZKEM.OnFinger -= ObjCZKEM_OnFinger;
 
+
+            objCZKEM.OnFingerFeature -= new _IZKEMEvents_OnFingerFeatureEventHandler(zkemClient_OnFingerFeature);
+            objCZKEM.OnEnrollFingerEx -= new _IZKEMEvents_OnEnrollFingerExEventHandler(zkemClient_OnEnrollFingerEx);
+
+            objCZKEM.OnDeleteTemplate -= new _IZKEMEvents_OnDeleteTemplateEventHandler(zkemClient_OnDeleteTemplate);
+            objCZKEM.OnNewUser -= new _IZKEMEvents_OnNewUserEventHandler(zkemClient_OnNewUser);
+            objCZKEM.OnHIDNum -= new _IZKEMEvents_OnHIDNumEventHandler(zkemClient_OnHIDNum);
+            objCZKEM.OnAlarm -= new _IZKEMEvents_OnAlarmEventHandler(zkemClient_OnAlarm);
+            objCZKEM.OnDoor -= new _IZKEMEvents_OnDoorEventHandler(zkemClient_OnDoor);
+            objCZKEM.OnWriteCard -= new _IZKEMEvents_OnWriteCardEventHandler(zkemClient_OnWriteCard);
+            objCZKEM.OnEmptyCard -= new _IZKEMEvents_OnEmptyCardEventHandler(zkemClient_OnEmptyCard);
+
+
+            objCZKEM.OnVerify -= new _IZKEMEvents_OnVerifyEventHandler(zkemClient_OnVerifyEventHandler);
+            objCZKEM.OnAttTransactionEx -= new _IZKEMEvents_OnAttTransactionExEventHandler(zkemClient_OnAttTransactionEx);
+            objCZKEM.OnAttTransaction -= new _IZKEMEvents_OnAttTransactionEventHandler(zkemClient_OnAttTransaction);
+            objCZKEM.OnAttTransactionEx_New -= new _IZKEMEvents_OnAttTransactionEx_NewEventHandler(zkemClient_OnAttTransactionEx_New);
+            objCZKEM.OnGeneralEvent -= new _IZKEMEvents_OnGeneralEventEventHandler(zkemClient_OnGeneralEvent);
+            objCZKEM.OnKeyPress -= new _IZKEMEvents_OnKeyPressEventHandler(zkemClient_OnKeyPress);
+            objCZKEM.OnEMData -= new _IZKEMEvents_OnEMDataEventHandler(zkemClient_OnEMData);
+
+
+            objCZKEM.Disconnect();
+        }
 
         public bool Connect_Net(string IPAdd, int Port)
         {
             if (objCZKEM.Connect_Net(IPAdd, Port))
             {
                 //65535, 32767
-                if (objCZKEM.RegEvent(objCZKEM.MachineNumber, 65535))
+                if (objCZKEM.RegEvent(1, 65535))
                 {
                     // [ Register your events here ]
                     // [ Go through the _IZKEMEvents_Event class for a complete list of events
@@ -67,19 +98,72 @@ namespace AspCore_Conic_Erp_RestApi
                     objCZKEM.OnEnrollFinger += ObjCZKEM_OnEnrollFinger;
                     objCZKEM.OnFinger += ObjCZKEM_OnFinger;
 
+
+                    objCZKEM.OnFingerFeature += new _IZKEMEvents_OnFingerFeatureEventHandler(zkemClient_OnFingerFeature);
+                    objCZKEM.OnEnrollFingerEx += new _IZKEMEvents_OnEnrollFingerExEventHandler(zkemClient_OnEnrollFingerEx);
+
+                    objCZKEM.OnDeleteTemplate += new _IZKEMEvents_OnDeleteTemplateEventHandler(zkemClient_OnDeleteTemplate);
+                    objCZKEM.OnNewUser += new _IZKEMEvents_OnNewUserEventHandler(zkemClient_OnNewUser);
+                    objCZKEM.OnHIDNum += new _IZKEMEvents_OnHIDNumEventHandler(zkemClient_OnHIDNum);
+                    objCZKEM.OnAlarm += new _IZKEMEvents_OnAlarmEventHandler(zkemClient_OnAlarm);
+                    objCZKEM.OnDoor += new _IZKEMEvents_OnDoorEventHandler(zkemClient_OnDoor);
+                    objCZKEM.OnWriteCard += new _IZKEMEvents_OnWriteCardEventHandler(zkemClient_OnWriteCard);
+                    objCZKEM.OnEmptyCard += new _IZKEMEvents_OnEmptyCardEventHandler(zkemClient_OnEmptyCard);
+
+
                     objCZKEM.OnVerify += new _IZKEMEvents_OnVerifyEventHandler(zkemClient_OnVerifyEventHandler);
                     objCZKEM.OnAttTransactionEx += new _IZKEMEvents_OnAttTransactionExEventHandler(zkemClient_OnAttTransactionEx);
+                    objCZKEM.OnAttTransaction += new _IZKEMEvents_OnAttTransactionEventHandler(zkemClient_OnAttTransaction);
+                    objCZKEM.OnAttTransactionEx_New += new _IZKEMEvents_OnAttTransactionEx_NewEventHandler(zkemClient_OnAttTransactionEx_New);
+                    objCZKEM.OnGeneralEvent += new _IZKEMEvents_OnGeneralEventEventHandler(zkemClient_OnGeneralEvent);
+                    objCZKEM.OnKeyPress += new _IZKEMEvents_OnKeyPressEventHandler(zkemClient_OnKeyPress);
+                    objCZKEM.OnEMData += new _IZKEMEvents_OnEMDataEventHandler(zkemClient_OnEMData);
+
                 }
                 return true;
             }
             return false;
         }
-
+        private void zkemClient_OnEMData(int DataType, int DataLen, ref sbyte DataBuffer)
+        {
+        }  private void zkemClient_OnKeyPress(int Key)
+        {
+        }
+        private void zkemClient_OnGeneralEvent(string DataStr)
+        {
+        } 
+        private void zkemClient_OnFingerFeature(int Score)
+        {
+        }
+        private void zkemClient_OnEnrollFingerEx(string EnrollNumber, int FingerIndex, int ActionResult, int TemplateLength)
+        {
+        }
+        private void zkemClient_OnDeleteTemplate(int EnrollNumber, int FingerIndex)
+        { 
+        }
+        private void zkemClient_OnNewUser(int EnrollNumber)
+        {
+        }
+        private void zkemClient_OnHIDNum(int CardNumber)
+        {
+        }
+        private void zkemClient_OnAlarm(int AlarmType, int EnrollNumber, int Verified)
+        {
+        }
+        private void zkemClient_OnDoor(int EventType)
+        {
+        }  private void zkemClient_OnWriteCard(int EnrollNumber, int ActionResult, int Length)
+        {
+        } private void zkemClient_OnEmptyCard(int ActionResult)
+        {
+        }
         private void ObjCZKEM_OnFinger()
-        { }
+        {
+        }
 
         private void ObjCZKEM_OnEnrollFinger(int EnrollNumber, int FingerIndex, int ActionResult, int TemplateLength)
-        { }
+        {
+        }
 
         private void ObjCZKEM_OnConnected()
         {
@@ -109,11 +193,23 @@ namespace AspCore_Conic_Erp_RestApi
             var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
             MemberLogController MemberLog = new MemberLogController();
             string Ip = "";
-            objCZKEM.GetDeviceIP(objCZKEM.MachineNumber, ref Ip);
+            objCZKEM.GetDeviceIP(1, ref Ip);
             MemberLog.RegisterMemberLog(UserId, DateTime.Now, Ip);
             //device.GetAllLogMembers(3);
 
         }
+        private  void zkemClient_OnAttTransactionEx_New(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, string WorkCode)
+        {
+            DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
+            int ID = Convert.ToInt32(EnrollNumber);
+            var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
+                MemberLogController MemberLog = new MemberLogController();
+            string Ip = "";
+            objCZKEM.GetDeviceIP(1, ref Ip);
+                MemberLog.RegisterMemberLog(ID, datetime , Ip);
+            //device.GetAllLogMembers(3);
+
+        }  
         private  void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
         {
             DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
@@ -121,15 +217,22 @@ namespace AspCore_Conic_Erp_RestApi
             var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
                 MemberLogController MemberLog = new MemberLogController();
             string Ip = "";
-            objCZKEM.GetDeviceIP(objCZKEM.MachineNumber, ref Ip);
+            objCZKEM.GetDeviceIP(1, ref Ip);
                 MemberLog.RegisterMemberLog(ID, datetime , Ip);
             //device.GetAllLogMembers(3);
 
-        }
-        void axCZKEM1_OnVerify(int UserID)
+        }   
+        private  void zkemClient_OnAttTransaction(int EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second)
         {
-       
-            throw new NotImplementedException();
+            DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
+            int ID = Convert.ToInt32(EnrollNumber);
+            var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
+                MemberLogController MemberLog = new MemberLogController();
+            string Ip = "";
+            objCZKEM.GetDeviceIP(1, ref Ip);
+                MemberLog.RegisterMemberLog(ID, datetime , Ip);
+            //device.GetAllLogMembers(3);
+
         }
 
         public bool EnableDevice(int dwMachineNumber, bool bFlag)
@@ -282,18 +385,7 @@ namespace AspCore_Conic_Erp_RestApi
         public bool StartIdentify()
         { return objCZKEM.StartIdentify(); }
 
-        public void Disconnect()
-        {
-            // [ Unregister events
-            objCZKEM.OnConnected -= ObjCZKEM_OnConnected;
-            objCZKEM.OnDisConnected -= objCZKEM_OnDisConnected;
-            objCZKEM.OnEnrollFinger -= ObjCZKEM_OnEnrollFinger;
-            objCZKEM.OnFinger -= ObjCZKEM_OnFinger;
-            objCZKEM.OnAttTransactionEx -= new _IZKEMEvents_OnAttTransactionExEventHandler(zkemClient_OnAttTransactionEx);
-            objCZKEM.OnVerify += new _IZKEMEvents_OnVerifyEventHandler(axCZKEM1_OnVerify);
 
-            objCZKEM.Disconnect();
-        }
 
 
         public bool GetAllUserID(int dwMachineNumber, ref int dwEnrollNumber, ref int dwEMachineNumber, ref int dwBackupNumber, ref int dwMachinePrivilege, ref int dwEnable)
@@ -672,7 +764,7 @@ namespace AspCore_Conic_Erp_RestApi
         {
             get
             {
-                return objCZKEM.MachineNumber;
+                return 1;
             }
 
             set

@@ -163,14 +163,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                objZkeeper.CancelOperation();
              //   objZkeeper.SSR_DeleteEnrollData((int)DeviceId,sUserID, 0);//If the specified index of user's templates has existed ,delete it first.(SSR_DelUserTmp is also available sometimes)
-              objZkeeper.RefreshData(objZkeeper.MachineNumber);//the data in the device should be refreshed
+              objZkeeper.RefreshData(1);//the data in the device should be refreshed
 
                 if (objZkeeper.StartEnrollEx(sUserID, iFingerIndex ,0))
                 {
                     iCanSaveTmp = 1;
 
                     objZkeeper.StartIdentify();//After enrolling templates,you should let the device into the 1:N verification condition
-                    objZkeeper.RefreshData(objZkeeper.MachineNumber);//the data in the device should be refreshed
+                    objZkeeper.RefreshData(1);//the data in the device should be refreshed
 
                 }
                 else
@@ -188,18 +188,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (CheckDeviceHere((int)DeviceId)) {
            
-               objZkeeper.EnableDevice(objZkeeper.MachineNumber, false);
+               objZkeeper.EnableDevice(1, false);
 
                 var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
    
-                //bool GetUser = objZkeeper.GetUserInfo(objZkeeper.MachineNumber,(int)member.Id,ref  Name, ref password, ref Privilege, ref Enable);
+                //bool GetUser = objZkeeper.GetUserInfo(1,(int)member.Id,ref  Name, ref password, ref Privilege, ref Enable);
 
-                bool SetUser = objZkeeper.SSR_SetUserInfo(objZkeeper.MachineNumber, member.Id.ToString(), member.Name, "", 0, true);
+                bool SetUser = objZkeeper.SSR_SetUserInfo(1, member.Id.ToString(), member.Name, "", 0, true);
                 if (SetUser)
                 {
                     string strface = "";
                     int length = 0;
-                    bool GetUserFace = objZkeeper.GetUserFaceStr(objZkeeper.MachineNumber, member.Id.ToString(), 50, ref strface, ref length);
+                    bool GetUserFace = objZkeeper.GetUserFaceStr(1, member.Id.ToString(), 50, ref strface, ref length);
                     var memeberface = DB.MemberFaces.Where(f => f.MemberId == member.Id).SingleOrDefault();
 
                     if (GetUserFace)
@@ -211,9 +211,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             memeberface.FaceStr = strface;
                             memeberface.MemberId = member.Id;
 
-                            bool SetUserFace = objZkeeper.SetUserFaceStr(objZkeeper.MachineNumber, member.Id.ToString(), 50, memeberface.FaceStr, memeberface.FaceLength);
-                            // SetUserFace = objZkeeper.SSR_SetUserTmpStr(objZkeeper.MachineNumber, member.Id.ToString(), 50, strface);
-                         //    SetUserFace = objZkeeper.SetUserFace(objZkeeper.MachineNumber, member.Id.ToString(), 0, ref x, length);
+                            bool SetUserFace = objZkeeper.SetUserFaceStr(1, member.Id.ToString(), 50, memeberface.FaceStr, memeberface.FaceLength);
+                            // SetUserFace = objZkeeper.SSR_SetUserTmpStr(1, member.Id.ToString(), 50, strface);
+                         //    SetUserFace = objZkeeper.SetUserFace(1, member.Id.ToString(), 0, ref x, length);
 
                         }
                         else
@@ -226,7 +226,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             });
 
                             bool SetUserFace = objZkeeper.SetUserFaceStr(1, member.Id.ToString(), 50, strface, length);
-                        //    objZkeeper.SetUserFace(objZkeeper.MachineNumber, member.Id.ToString(), 50, strface, length);
+                        //    objZkeeper.SetUserFace(1, member.Id.ToString(), 50, strface, length);
                         }
                     }
                     else
@@ -239,9 +239,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     }
 
                 }
-                objZkeeper.RefreshData(objZkeeper.MachineNumber);
+                objZkeeper.RefreshData(1);
                 DB.SaveChanges();
-                objZkeeper.EnableDevice(objZkeeper.MachineNumber, true);
+                objZkeeper.EnableDevice(1, true);
 
                 return Ok(SetUser);
             }
@@ -257,7 +257,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 if (CheckDeviceHere((int)DeviceId))
                 {
-                    ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, objZkeeper.MachineNumber);
+                    ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, 1);
 
                     if (MachineLog != null && MachineLog.Count > 0)
                     {
@@ -321,7 +321,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Device.Description = "Is Device Connected : ";
             
                 IsDeviceConnected = objZkeeper.Connect_Net(Device.Ip, Device.Port);
-                objZkeeper.SetDeviceTime2(objZkeeper.MachineNumber, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+                objZkeeper.SetDeviceTime2(1, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
 
             }
             DB.SaveChanges();
@@ -352,7 +352,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
 
-                bool SetUser = objZkeeper.SSR_SetUserInfo(objZkeeper.MachineNumber, member.Id.ToString(), member.Name, "", 0, Enable);
+                bool SetUser = objZkeeper.SSR_SetUserInfo(1, member.Id.ToString(), member.Name, "", 0, Enable);
                 if (!SetUser)
                return false;                
                 
@@ -397,7 +397,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     {
                         string strface = "";
                         int length = 0;
-                        bool GetUserFace = objZkeeper.GetUserFaceStr(objZkeeper.MachineNumber, M.Id.ToString(), 50, ref strface, ref length);
+                        bool GetUserFace = objZkeeper.GetUserFaceStr(1, M.Id.ToString(), 50, ref strface, ref length);
 
                         if (GetUserFace)
                         {
@@ -427,7 +427,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (CheckDeviceHere((int)DeviceId))
             {
-                ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, objZkeeper.MachineNumber);
+                ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, 1);
                 if (MachineLog != null && MachineLog.Count > 0)
                 {
                 
@@ -483,9 +483,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (CheckDeviceHere((int)DeviceId))
             {
-               bool ClearKeeperData = objZkeeper.ClearKeeperData(objZkeeper.MachineNumber);
-               bool ClearGLog = objZkeeper.ClearGLog(objZkeeper.MachineNumber);
-                bool ClearSLog = objZkeeper.ClearSLog(objZkeeper.MachineNumber);
+               bool ClearKeeperData = objZkeeper.ClearKeeperData(1);
+               bool ClearGLog = objZkeeper.ClearGLog(1);
+                bool ClearSLog = objZkeeper.ClearSLog(1);
 
                 return Ok("ClearKeeperData : " + ClearKeeperData + "-ClearGLog : "+ ClearGLog+ "-ClearSLog : "+ ClearSLog);
 
@@ -499,7 +499,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (CheckDeviceHere((int)DeviceId))
             {
-               bool ClearAdministrators = objZkeeper.ClearAdministrators(objZkeeper.MachineNumber);
+               bool ClearAdministrators = objZkeeper.ClearAdministrators(1);
                 return Ok("ClearAdministrators : " + ClearAdministrators + "");
 
             }
