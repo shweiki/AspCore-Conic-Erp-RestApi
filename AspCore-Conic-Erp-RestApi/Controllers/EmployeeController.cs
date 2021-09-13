@@ -138,7 +138,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     x.Id,
                     Name = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
-                  MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
+                    MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
                     x.VisitsUsed,
                     x.Type,
                     x.StartDate,
