@@ -10,6 +10,7 @@ namespace Entities
         public Device()
         {
             MemberLogs = new HashSet<MemberLog>();
+            WorkingHoursLogs = new HashSet<WorkingHoursLog>();
         }
 
         public long Id { get; set; }
@@ -23,5 +24,6 @@ namespace Entities
         public string Description { get; set; }
 
         public virtual ICollection<MemberLog> MemberLogs { get; set; }
+        public virtual ICollection<WorkingHoursLog> WorkingHoursLogs { get; set; }
     }
 }

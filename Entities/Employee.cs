@@ -34,6 +34,6 @@ namespace Entities
         public virtual ICollection<EmployeeFingerPrint> EmployeeFingerPrints { get; set; }
         public virtual ICollection<WorkingHoursLog> WorkingHoursLogs { get; set; }
         public virtual ICollection<SalaryPayment> SalaryPayments { get; set; }
-        
+
     }
 }

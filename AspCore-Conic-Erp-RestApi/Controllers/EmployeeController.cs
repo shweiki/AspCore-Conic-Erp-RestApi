@@ -146,9 +146,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.TotalAmmount,
                     x.Description,
                     x.Status,
-                  x.Member.Vaccine,
+                    x.Member.Vaccine,
                   // lastLog = DB.MemberLogs.Where(ml => ml.MemberId == x.MemberId).LastOrDefault().DateTime,
-                  x.MemberId
+                    x.MemberId
                 }).ToList();
                 return Ok(Members);
             }
@@ -254,7 +254,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetEmployeeById(long? Id)
         {
-            var Members = DB.Employees.Where(m => m.Id == Id).Select(
+            var Employees = DB.Employees.Where(m => m.Id == Id).Select(
                 x => new
                 {
                     x.Id,
@@ -287,7 +287,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     //    MS.Description,
                     //}).FirstOrDefault(),
                 }).SingleOrDefault();
-            return Ok(Members);
+            return Ok(Employees);
         }
         [Route("Employee/FixPhoneNumber")]
         [HttpGet]
