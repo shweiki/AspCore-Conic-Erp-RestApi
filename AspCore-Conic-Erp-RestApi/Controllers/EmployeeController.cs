@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -15,6 +17,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class EmployeeController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
+        private readonly UserManager<IdentityUser> _userManager;
+        public EmployeeController(UserManager<IdentityUser> userManager)
+
+        {
+            _userManager = userManager;
+
+        }
         [Route("Employee/GetReceivablesEmployee")]
         [HttpGet]
         public IActionResult GetReceivablesEmployee()
@@ -184,36 +193,100 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Employees);
         }
 
+        //[Route("Employee/Create")]
+        //[HttpPost]
+        //public IActionResult Create(Employee collection)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            var ParentAccount = DB.Accounts.Where(i => i.Description == "Employee").SingleOrDefault();
+        //            ParentAccount = ParentAccount ??= new Account { Id = 0, ParentId = 0, Code = "0" };
+        //            Account NewAccount = new Account
+        //            {
+        //                Type = "Employee",
+        //                Description = collection.Description,
+        //                Status = 0,
+        //                Code = ParentAccount.Code + '-' + DB.Accounts.Where(i => i.ParentId == ParentAccount.Id).Count() + 1,
+        //                ParentId = ParentAccount.Id
+        //            };
+        //            DB.Accounts.Add(NewAccount);
+        //            DB.SaveChanges();
+        //            collection.AccountId = NewAccount.Id;
+        //            DB.Employees.Add(collection);
+        //            DB.SaveChanges();
+        //            return Ok(collection.Id);
+        //        }
+        //        catch
+        //        {
+        //            //Console.WriteLine(collection);
+        //            return Ok(false);
+        //        }
+        //    }
+        //    return Ok(false);
+        //}
+
         [Route("Employee/Create")]
         [HttpPost]
-        public IActionResult Create(Employee collection)
+        public async Task<ActionResult> Create(Employee collection)
         {
+            var Pass = "123456";
             if (ModelState.IsValid)
             {
-                try
+              
+                var ParentAccount = DB.Accounts.Where(i => i.Description == "Employee").SingleOrDefault();
+                ParentAccount = ParentAccount ??= new Account { Id = 0, ParentId = 0, Code = "0" };
+                Account NewAccount = new Account
                 {
-                    var ParentAccount = DB.Accounts.Where(i => i.Description == "Employee").SingleOrDefault();
-                    ParentAccount = ParentAccount ??= new Account { Id = 0, ParentId = 0, Code = "0" };
-                    Account NewAccount = new Account
-                    {
-                        Type = "Employee",
-                        Description = collection.Description,
-                        Status = 0,
-                        Code = ParentAccount.Code + '-' + DB.Accounts.Where(i => i.ParentId == ParentAccount.Id).Count() + 1,
-                        ParentId = ParentAccount.Id
-                    };
-                    DB.Accounts.Add(NewAccount);
-                    DB.SaveChanges();
-                    collection.AccountId = NewAccount.Id;
-                    DB.Employees.Add(collection);
-                    DB.SaveChanges();
-                    return Ok(collection.Id);
-                }
-                catch
+                    Type = "Employee",
+                    Description = collection.Description,
+                    Status = 0,
+                    Code = ParentAccount.Code + '-' + DB.Accounts.Where(i => i.ParentId == ParentAccount.Id).Count() + 1,
+                    ParentId = ParentAccount.Id
+                };
+                
+                var NewUser = new IdentityUser()
                 {
-                    //Console.WriteLine(collection);
-                    return Ok(false);
-                }
+
+                    Email = collection.Email,
+                    UserName = collection.Name,
+                    PhoneNumber = collection.PhoneNumber1,
+                    PhoneNumberConfirmed = true,
+                    EmailConfirmed = true,
+                };
+                IdentityResult result = await _userManager.CreateAsync(NewUser, Pass);
+
+                var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
+                //if (!result.Succeeded)
+                //{
+                //    return Ok(result);
+                //}
+                Pass = NewUser.PasswordHash;
+                
+               
+
+                SalaryPayment NewSalary = new SalaryPayment()
+                {
+                    
+                    GrossSalary = 0,
+                    NetSalary = 0,
+                    SalaryPeriod = new DateTime()
+
+                };
+                collection.EmployeeUserId = NewUser.Id;
+                DB.Accounts.Add(NewAccount);
+                DB.SaveChanges();
+                collection.AccountId = NewAccount.Id;
+                DB.Employees.Add(collection);
+                DB.SaveChanges();
+                NewSalary.EmployeeId = collection.Id;
+                DB.SalaryPayments.Add(NewSalary);
+                DB.SaveChanges();
+
+
+                return Ok(collection.Id);
+
             }
             return Ok(false);
         }
@@ -270,22 +343,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Type,
                     x.Tag,
                     x.Vaccine,
-                   // MembershipsCount = x.MembershipMovements.Count(),
-                   // HaveFaceOnDevice = x.MemberFaces.Count() > 0 ? true : false,
                     Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg"),
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
                     x.AccountId,
-                    //ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == x.Id && f.Status > 0).Select(MS => new
-                    //{
-                    //    MS.Id,
-                    //    MS.Membership.Name,
-                    //    MS.VisitsUsed,
-                    //    MS.Type,
-                    //    MS.StartDate,
-                    //    MS.EndDate,
-                    //    MS.Description,
-                    //}).FirstOrDefault(),
                 }).SingleOrDefault();
             return Ok(Employees);
         }

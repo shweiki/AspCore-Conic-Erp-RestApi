@@ -16,17 +16,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     {
         private ConicErpContext DB = new ConicErpContext();
 
-        [Route("Salary/Create")]
+        [Route("Salary/Update")]
         [HttpPost]
 
-        public IActionResult Create(SalaryPayment collection)
+        public IActionResult Update(SalaryPayment collection)
        {
             if (ModelState.IsValid)
             {
+                SalaryPayment SalaryPayment = DB.SalaryPayments.Where(x => x.EmployeeId == collection.EmployeeId).SingleOrDefault();
+                SalaryPayment.GrossSalary = collection.GrossSalary;
+                SalaryPayment.NetSalary = collection.NetSalary;
+               
                 try
                 {
                     
-                    DB.SalaryPayments.Add(collection);
                     DB.SaveChanges();
                     return Ok(true);
                 }
@@ -38,6 +41,23 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
 
+        }
+
+        [Route("Salary/GetSalaryById")]
+        [HttpGet]
+        public IActionResult GetSalaryById(long? EmployeeId)
+        {
+            var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == EmployeeId).Select(
+                x => new
+                {
+                    x.Id,
+                    x.EmployeeId,
+                    x.NetSalary,
+                    x.GrossSalary,
+                    x.SalaryPeriod,
+                    
+                }).ToList();
+            return Ok(Salaries);
         }
     }
 
