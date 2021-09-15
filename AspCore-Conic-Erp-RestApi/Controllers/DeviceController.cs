@@ -83,9 +83,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult FeelDevice()
         {
-            var Devices = DB.Devices.Where(x=>x.Feel ==true).ToList();
-            Devices.ForEach(e => CheckDeviceHere((int)e.Id));
-            return Ok(true);
+            try
+            {
+                var Devices = DB.Devices.Where(x => x.Feel == true).ToList();
+
+                Devices.ForEach(e => CheckDeviceHere((int)e.Id));
+                return Ok(true);
+
+            }
+            catch {
+                return Ok(false);
+
+            }
+
         }
         [Route("Device/OpenCashDrawer")]
         [HttpGet]

@@ -30,9 +30,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                   
             return Ok(Cashes);
         }
-        [Route("Cash/GetActiveCash")]
+        [Route("Cash/GetActive")]
         [HttpGet]
-        public IActionResult GetActiveCash()
+        public IActionResult GetActive()
         {
             var Cash = DB.Cashes.Select(x => new { value = x.AccountId, label = x.Name   }).ToList();
             return Ok(Cash);

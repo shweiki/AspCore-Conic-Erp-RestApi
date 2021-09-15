@@ -29,32 +29,35 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("EntryAccounting/GetByListQ")]
         public IActionResult GetByListQ( int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string? Any)
         {
-            var EntryMovements = DB.EntryMovements.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Description.Contains(Any) : true) && (DateFrom != null ? s.Entry.FakeDate >= DateFrom : true)
-            && (DateTo != null ? s.Entry.FakeDate <= DateTo : true) && (Status != null ? s.Entry.Status == Status : true) &&
-            (User != null ? DB.ActionLogs.Where(l => l.EntryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new { x , x.Entry}).AsEnumerable().Select(x => new
+            var EntryAccountings = DB.EntryAccountings.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Description.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+            && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
+            (User != null ? DB.ActionLogs.Where(l => l.EntryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
             {
-                x.x.Id,
-                x.x.Debit,
-                x.x.Credit,
-                x.x.Description,
-                x.x.EntryId,
-                TotalRow=0,
-                FakeDate= 
-                x.Entry.FakeDate,
-                x.Entry.Status,
-                x.Entry.Type,
-                FkDescription = x.x.TableName != null ? GetFkDescription(x.x.TableName, x.x.Fktable) : ""
+                x.Id,
+                EntryMovements =x.EntryMovements.Select(e=> new{
+                            e.Id,
+                            e.Fktable,
+                            e.TableName,
+                            e.AccountId,
+                            Name = e.Account.Vendors.Where(v => v.AccountId == e.AccountId).SingleOrDefault().Name == null ? e.Account.Members.Where(v => v.AccountId == e.AccountId).SingleOrDefault().Name == null ? e.Account.Name : e.Account.Members.Where(v => v.AccountId == e.AccountId).SingleOrDefault().Name : e.Account.Vendors.Where(v => v.AccountId == e.AccountId).SingleOrDefault().Name,
+                            e.Credit,
+                            e.Debit
+                          }),
+                x.Description,
+                x.FakeDate,
+                x.Status,
+                x.Type,
             }).ToList();
-            EntryMovements = (Sort == "+id" ? EntryMovements.OrderBy(s => s.Id).ToList() : EntryMovements.OrderByDescending(s => s.Id).ToList());
+            EntryAccountings = (Sort == "+id" ? EntryAccountings.OrderBy(s => s.Id).ToList() : EntryAccountings.OrderByDescending(s => s.Id).ToList());
             return Ok(new
             {
-                items = EntryMovements.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                items = EntryAccountings.Skip((Page - 1) * Limit).Take(Limit).ToList(),
                 Totals = new
                 {
-                    Rows = EntryMovements.Count(),
-                    Totals = EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit)  ,
-                    Debit = EntryMovements.Sum(s => s.Debit),
-                    Credit = EntryMovements.Sum(s => s.Credit),
+                    Rows = EntryAccountings.Count(),
+                    Totals = EntryAccountings.Sum(s => s.EntryMovements.Sum(s => s.Credit)) -EntryAccountings.Sum(s => s.EntryMovements.Sum(s => s.Debit)),
+                    Debit = EntryAccountings.Sum(s=> s.EntryMovements.Sum(s => s.Debit)),
+                    Credit = EntryAccountings.Sum(s => s.EntryMovements.Sum(s => s.Credit))
                 }
             });
         }
@@ -171,13 +174,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 try
                 {
                    var EntryMovements = DB.EntryMovements.Where(e => e.Fktable == Fktable && e.TableName == TableName).FirstOrDefault();
-                   var  Entry = DB.EntryAccountings.Where(e => e.Id == EntryMovements.EntryId).FirstOrDefault();
-                    Entry.FakeDate = collection.FakeDate;
-                    Entry.Description = collection.Description;
-                    Entry.Status = collection.Status;
-                    Entry.Type = collection.Type;
-                    DB.EntryMovements.RemoveRange(DB.EntryMovements.Where(x => x.EntryId == Entry.Id).ToList());
-                    Entry.EntryMovements = collection.EntryMovements;
+                    if (EntryMovements == null)
+                    {
+                        DB.EntryAccountings.Add(collection);
+                    }
+                    else {
+                        var Entry = DB.EntryAccountings.Where(e => e.Id == EntryMovements.EntryId).FirstOrDefault();
+                        Entry.FakeDate = collection.FakeDate;
+                        Entry.Description = collection.Description;
+                        Entry.Status = collection.Status;
+                        Entry.Type = collection.Type;
+                        DB.EntryMovements.RemoveRange(DB.EntryMovements.Where(x => x.EntryId == Entry.Id).ToList());
+                        Entry.EntryMovements = collection.EntryMovements;
+                    }
+                 
                     DB.SaveChanges();
                     return Ok(true);
                 }
