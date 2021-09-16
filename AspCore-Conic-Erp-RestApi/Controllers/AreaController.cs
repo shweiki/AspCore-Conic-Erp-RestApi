@@ -38,7 +38,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                 value = x.Id,
                 label = x.Adress1,
-
                 price = x.DelievryPrice
             }).ToList();
             return Ok(Areas);

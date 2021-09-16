@@ -12,21 +12,21 @@ using System.Globalization;
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
     [Authorize]
-    public class AdjustmentController : Controller
+    public class WorkingAdjustmentController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
 
-        [Route("Adjustment/Create")]
+        [Route("WorkingAdjustment/Create")]
         [HttpPost]
 
-        public IActionResult Create(Adjustment collection)
+        public IActionResult Create(WorkingHoursAdjustment collection)
        {
             if (ModelState.IsValid)
             {
                 try
                 {
 
-                    DB.Adjustments.Add(collection);
+                    DB.WorkingHoursAdjustments.Add(collection);
                     DB.SaveChanges();
                     return Ok(true);
                 }
@@ -40,27 +40,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         }
 
-        [Route("Adjustment/GetAdjustments")]
+        [Route("WorkingAdjustment/GetWorkingAdjustment")]
         [HttpGet]
-        public IActionResult GetAdjustments()
+        public IActionResult GetWorkingAdjustment()
         {
             var Adjustments = DB.Adjustments.Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.AdjustmentPercentage }).ToList();
 
             return Ok(Adjustments);
-        }
-
-        [Route("Adjustment/GetAdjustmentLabel")]
-        [HttpGet]
-        public IActionResult GetAdjustmentLabel()
-        {
-            var Areas = DB.Adjustments.Select(x => new {
-
-                value = x.Id,
-                label = x.Name,
-            }).ToList();
-            return Ok(Areas);
-
-
         }
 
     }

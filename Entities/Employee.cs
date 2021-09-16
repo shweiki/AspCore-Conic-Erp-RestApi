@@ -29,7 +29,7 @@ namespace Entities
         public string Ssn { get; set; }
         public string Tag { get; set; }
         public string Vaccine { get; set; }
-
+        public string EmployeeUserId { get; set; }
         public virtual Account Account { get; set; }
         public virtual ICollection<EmployeeFingerPrint> EmployeeFingerPrints { get; set; }
         public virtual ICollection<WorkingHoursLog> WorkingHoursLogs { get; set; }
