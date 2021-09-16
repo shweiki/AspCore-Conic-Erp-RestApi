@@ -96,11 +96,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.Description,
                 x.PhoneNumber,
+                TimeOut = x.FakeDate.AddMinutes( x.HourCount * 60),
                 Total = x.PersonCount * (x.HourCount * 2) * x.HourPrice - x.Discount
             }).ToList();
 
-
-            return Ok(visits);
+            return Ok(new
+            {
+                items = visits.ToList(),
+                Totals = new
+                {
+                    Rows = visits.Count(),
+                    TotalPerson = visits.Sum(s => s.PersonCount),
+                   
+                }
+            });
         }
         [HttpPost]
         [Route("Visit/Create")]

@@ -337,7 +337,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     log.OrderDeliveryId = (int)ObjId;
                     DB.OrderDeliveries.Where(x => x.Id == log.OrderDeliveryId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
-                
+                case "Visit":
+                //    log.OrderDeliveryId = (int)ObjId;
+                    DB.Visits.Where(x => x.Id == (int)ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                    break;
+
             }
             ActionLogController logCon = new ActionLogController();
             if (logCon.Create(log))

@@ -10,11 +10,11 @@
 
   <ItemGroup>
     <COMReference Include="zkemkeeper">
+      <WrapperTool>tlbimp</WrapperTool>
       <VersionMinor>0</VersionMinor>
       <VersionMajor>1</VersionMajor>
       <Guid>fe9ded34-e159-408e-8490-b720a5e632c7</Guid>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
       <Isolated>false</Isolated>
       <EmbedInteropTypes>true</EmbedInteropTypes>
     </COMReference>

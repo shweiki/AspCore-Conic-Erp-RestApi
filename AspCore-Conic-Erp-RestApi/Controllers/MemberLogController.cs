@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using System.Data.SqlClient;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -35,9 +36,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMemberLogByStatus(int Status)
         {
-           // DB.MemberLogs.RemoveRange(students);
-
-            var MemberLogs = DB.MemberLogs.Where(x => x.Status == Status && x.DateTime.Date == DateTime.Today).Select(x => new {
+            // Get Log From ZkBio Data base 
+            GetFromZkBio();
+             var MemberLogs = DB.MemberLogs.Where(x => x.Status == Status && x.DateTime.Date == DateTime.Today).Select(x => new {
                 x.Id,
                 x.MemberId,
                 x.Member.Name,
@@ -118,7 +119,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     return Ok(false);
                 }
             
-            return Ok(false);
         }
 
         [Route("MemberLog/GetMemberLogById")]
@@ -140,17 +140,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                    .Select(g => g.Last()).ToList();
        
             return Ok(MemberLogs);
-        }
+        }     
+  
         public Boolean RegisterMemberLog(long? Id , DateTime datetime, string Ip)
         {
             var member = DB.Members.Where(m => m.Id == Id).FirstOrDefault();
             if (member == null) return false;
             var isLogSaveIt = DB.MemberLogs.Where(l => l.MemberId == member.Id).ToList();
             isLogSaveIt = DB.MemberLogs.Where(Ld => Ld.DateTime == datetime).ToList();
+            var Device = DB.Devices.Where(x => x.Ip == Ip).SingleOrDefault();
 
-            if (isLogSaveIt.Count() <= 0 && member != null)
+            if (isLogSaveIt.Count() <= 0 && member != null && Device !=null)
             {
-                var Device =  DB.Devices.Where(x=>x.Ip == Ip).SingleOrDefault();
                 var Log = new MemberLog
                 {
                     Type = "In",
@@ -161,8 +162,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Description = "Event Log"
                 };
 
-                DB.MemberLogs.Add(Log);
-                DB.SaveChanges();
+               Create(Log);
                 MassageController massage = new MassageController();
                 string OwnerPhone = DB.CompanyInfos.FirstOrDefault().PhoneNumber1;
                 if (OwnerPhone != null && OwnerPhone.Length == 10) OwnerPhone = OwnerPhone.Substring(1, 9);
@@ -259,7 +259,57 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else { return false; }
         }
+        public bool GetFromZkBio()
+        {
+            try
+            {
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
 
+                builder.DataSource = "" + Environment.MachineName + "\\SQLEXPRESS";
+                builder.UserID = "sa";
+                builder.Password = "Taha123456++";
+                builder.InitialCatalog = "zkbiotime";
+
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                {
+                    connection.Open();
+
+                    DateTime StartToday = DateTime.Today;
+                    DateTime EndToday = StartToday.AddHours(23).AddMinutes(59).AddSeconds(59);
+
+                    String sql = "SELECT L.punch_time, L.emp_code , T.ip_address FROM zkbiotime.dbo.iclock_transaction as L" +
+                        " INNER JOIN  [zkbiotime].[dbo].[iclock_terminal] as T ON L.terminal_id= T.id" +
+                        " where L.punch_time >='"+
+                        StartToday.ToString() + "' And  L.punch_time <='"
+                        + EndToday.ToString() + "'";
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                if (reader[1].ToString() == "0") continue;
+
+                                DateTime action_time = DateTime.Parse(reader[0].ToString());
+                                action_time = new DateTime(action_time.Year, action_time.Month, action_time.Day, action_time.Hour, action_time.Minute, 0);
+
+                                long objectId = long.Parse(reader[1].ToString());
+                                string Ip = reader[2].ToString();
+                                RegisterMemberLog(objectId, action_time, Ip);
+
+                            }
+                            return true;
+
+                        }
+                    }
+                }
+            }
+            catch (SqlException e)
+            {
+                return false;
+            }
+        }
         private long GetDeviceId(int machineNumber)
         {
             throw new NotImplementedException();

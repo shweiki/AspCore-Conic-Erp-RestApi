@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using NinjaNye.SearchExtensions;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -24,7 +23,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Id,
                 x.Discount,
                 x.Tax,
-                Name = x.Name + x.Vendor.Name == null ?  x.Member.Name : x.Vendor.Name,
+                Name = x.Name + DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
                 x.FakeDate,
                 x.PaymentMethod,
                 x.Status,
@@ -32,7 +31,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.DeliveryPrice,
                 x.Type,
                 x.Description,
-                AccountId = x.Vendor.AccountId == null ? x.Member.AccountId : x.Vendor.AccountId,
+                AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
                 x.VendorId,
                 x.MemberId,
                 x.PhoneNumber,
@@ -82,8 +81,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Id,
                     x.Discount,
                     x.Tax,
-                    Name = x.Name, //+ DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
-                    x.FakeDate,
+                Name = x.Name + DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+                x.FakeDate,
                     x.PaymentMethod,
                     x.Status,
                     x.Region,
@@ -125,7 +124,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                   x.SalesInvoiceId,
                   x.SalesInvoice.Discount,
                   x.Tax,
-                  Name = x.SalesInvoice.Name, //+ DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+                  Name = x.SalesInvoice.Name + DB.Vendors.Where(v => v.Id == x.SalesInvoice.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.SalesInvoice.MemberId).SingleOrDefault().Name,
                   x.SalesInvoice.FakeDate,
                   x.SalesInvoice.PaymentMethod,
                   x.Status,
