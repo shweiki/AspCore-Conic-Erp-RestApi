@@ -81,7 +81,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetByStatus(DateTime? DateFrom , DateTime? DateTo, int? Status)
         {
             var visits = DB.Visits.Where(s =>(DateFrom !=null ? s.FakeDate >= DateFrom : true ) 
-            || (DateTo != null ?  s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status :true)).Select(x => new
+            && (DateTo != null ?  s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status :true)).Select(x => new
             {
                 x.Id,
                 x.Name,
@@ -96,7 +96,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.Description,
                 x.PhoneNumber,
-                TimeOut = x.FakeDate.AddMinutes( x.HourCount * 60),
+                TimeOut = x.FakeDate.AddMinutes(x.HourCount * 60),
                 Total = x.PersonCount * (x.HourCount * 2) * x.HourPrice - x.Discount
             }).ToList();
 

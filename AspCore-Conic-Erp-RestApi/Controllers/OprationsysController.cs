@@ -148,7 +148,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             foreach (long O in ObjsId)
             {
-                this.ChangeStatus(O, Op , Description);
+                ChangeStatus(O, Op , Description);
             }
             return Ok(true);
         }
@@ -339,7 +339,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     break;
                 case "Visit":
                 //    log.OrderDeliveryId = (int)ObjId;
-                    DB.Visits.Where(x => x.Id == (int)ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                    DB.Visits.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
 
             }
