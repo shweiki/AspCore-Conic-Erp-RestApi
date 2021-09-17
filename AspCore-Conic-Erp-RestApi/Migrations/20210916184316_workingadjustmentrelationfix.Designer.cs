@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210916184316_workingadjustmentrelationfix")]
+    partial class workingadjustmentrelationfix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2355,25 +2357,15 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("SalaryPaymentId")
-                        .HasColumnType("bigint");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<double?>("Tax")
                         .HasColumnType("float");
 
-                    b.Property<long?>("WorkingHoursLogId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AdjustmentId");
-
-                    b.HasIndex("SalaryPaymentId");
-
-                    b.HasIndex("WorkingHoursLogId");
 
                     b.ToTable("WorkingHoursAdjustments");
                 });
@@ -3066,19 +3058,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Entities.SalaryPayment", "SalaryPayment")
-                        .WithMany("WorkingHoursAdjustments")
-                        .HasForeignKey("SalaryPaymentId");
-
-                    b.HasOne("Entities.WorkingHoursLog", "WorkingHoursLog")
-                        .WithMany("WorkingHoursAdjusments")
-                        .HasForeignKey("WorkingHoursLogId");
-
                     b.Navigation("Adjustment");
-
-                    b.Navigation("SalaryPayment");
-
-                    b.Navigation("WorkingHoursLog");
                 });
 
             modelBuilder.Entity("Entities.WorkingHoursLog", b =>
@@ -3266,8 +3246,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
             modelBuilder.Entity("Entities.SalaryPayment", b =>
                 {
                     b.Navigation("StaticAdjustments");
-
-                    b.Navigation("WorkingHoursAdjustments");
                 });
 
             modelBuilder.Entity("Entities.SalesInvoice", b =>
@@ -3303,11 +3281,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
             modelBuilder.Entity("Entities.WorkShop", b =>
                 {
                     b.Navigation("InventoryMovements");
-                });
-
-            modelBuilder.Entity("Entities.WorkingHoursLog", b =>
-                {
-                    b.Navigation("WorkingHoursAdjusments");
                 });
 #pragma warning restore 612, 618
         }

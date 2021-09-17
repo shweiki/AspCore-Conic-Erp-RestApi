@@ -14,9 +14,9 @@ namespace Entities
         public double? Tax { get; set; }
         public string Description { get; set; }
         public int Status { get; set; }
-        public long WorkingHoursLogId { get; set; }
-        public int AdjustmentId { get; set; }
-        public string SalaryPaymentId { get; set; }
+        public long? WorkingHoursLogId { get; set; }
+        public long AdjustmentId { get; set; }
+        public long? SalaryPaymentId { get; set; }
 
         public virtual WorkingHoursLog WorkingHoursLog { get; set; }
         public virtual SalaryPayment SalaryPayment { get; set; }

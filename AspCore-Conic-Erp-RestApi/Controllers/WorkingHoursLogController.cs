@@ -99,29 +99,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult Logout(WorkingHoursLog collection)
         {
             var LastStart = DB.WorkingHoursLogs.Where(ml => ml.EmployeeId == collection.EmployeeId)?.ToList()?.LastOrDefault()?.StartDateTime;
-            var WorkingLog = DB.WorkingHoursLogs.Where(x => x.StartDateTime == LastStart)?.ToList()?.LastOrDefault()?.EndDateTime;
+            var WorkingLog = DB.WorkingHoursLogs.Where(x => x.StartDateTime == LastStart )?.ToList()?.LastOrDefault()?.EndDateTime;
             
-            if (WorkingLog != null) {
+            if (WorkingLog == null) {
+
+                WorkingHoursLog WorkingHoursLog = DB.WorkingHoursLogs.Where(x => x.EmployeeId == collection.EmployeeId && x.StartDateTime == LastStart).FirstOrDefault();
+                WorkingHoursLog.EndDateTime = new DateTime(2021, 10, 12, 00,51,00);
+                DB.SaveChanges();
+                return Ok(true);
+
+            }
+
+            else 
+            {
+                
                 DB.WorkingHoursLogs.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
-            }
 
-            else
-            {
-                WorkingHoursLog WorkingHoursLog = DB.WorkingHoursLogs.Where(x => x.EmployeeId == collection.EmployeeId && x.StartDateTime == LastStart).FirstOrDefault();
-                WorkingHoursLog.EndDateTime = collection.EndDateTime;
-            
-            try
-            {
-                DB.SaveChanges();
-                return Ok(true);
-            }
-            catch
-            {
-                //Console.WriteLine(collection);
-                return Ok(false);
-            }
             }
         }
         [HttpGet]
@@ -148,7 +143,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     return Ok(false);
                 }
             
-            return Ok(false);
         }
 
         [Route("EmployeeLog/GetEmployeeLogById")]

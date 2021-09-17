@@ -25,7 +25,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 SalaryPayment SalaryPayment = DB.SalaryPayments.Where(x => x.EmployeeId == collection.EmployeeId).SingleOrDefault();
                 SalaryPayment.GrossSalary = collection.GrossSalary;
-                SalaryPayment.NetSalary = collection.NetSalary;
                
                 try
                 {
@@ -55,10 +54,41 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.NetSalary,
                     x.GrossSalary,
                     x.SalaryPeriod,
-                    
+
                 }).ToList();
             return Ok(Salaries);
         }
+
+        [Route("Salaries/GetSalaryId")]
+        [HttpGet]
+        public IActionResult GetSalaryId(long? EmployeeId)
+        {
+            var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == 3).Select(
+                x => new
+                {
+                    Id = x.Id,
+                }).ToList();
+            return Ok(Salaries);
+
+        }
+
+        [Route("Salary/GetSalaryByIds")]
+        [HttpGet]
+        public IActionResult GetSalaryByIds(long? EmployeeId)
+        {
+            var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == EmployeeId).Select(
+                x => new
+                {
+                    x.Id,
+                    x.EmployeeId,
+                    x.NetSalary,
+                    x.GrossSalary,
+                    x.SalaryPeriod,
+
+                }).ToList();
+            return Ok(Salaries);
+        }
+
     }
 
 

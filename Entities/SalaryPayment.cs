@@ -9,14 +9,18 @@ namespace Entities
         public SalaryPayment()
         {
             WorkingHoursAdjustments = new HashSet<WorkingHoursAdjustment>();
-            
+            StaticAdjustments = new HashSet<StaticAdjustment>();
         }
         public long Id { get; set; }
             public long EmployeeId { get; set; }
             public double GrossSalary { get; set; }
             public double NetSalary { get; set; }
             public DateTime SalaryPeriod { get; set; }
+            public int status { get; set; }
         public virtual Employee Employee { get; set; }
         public virtual ICollection<WorkingHoursAdjustment> WorkingHoursAdjustments { get; set; }
+        public virtual ICollection<StaticAdjustment> StaticAdjustments { get; set; }
+
+        
     }
 }

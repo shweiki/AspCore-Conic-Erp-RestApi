@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210916182442_staticAdjustment")]
+    partial class staticAdjustment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2036,20 +2038,26 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<double>("AdjustmentAmount")
                         .HasColumnType("float");
 
-                    b.Property<long>("AdjustmentId")
+                    b.Property<int>("AdjustmentId")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("AdjustmentId1")
                         .HasColumnType("bigint");
 
                     b.Property<double>("AdjustmentPercentage")
                         .HasColumnType("float");
 
-                    b.Property<long>("SalaryPaymentId")
+                    b.Property<string>("SalaryPaymentId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("SalaryPaymentId1")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AdjustmentId");
+                    b.HasIndex("AdjustmentId1");
 
-                    b.HasIndex("SalaryPaymentId");
+                    b.HasIndex("SalaryPaymentId1");
 
                     b.ToTable("StaticAdjustments");
                 });
@@ -2349,13 +2357,19 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<double>("AdjustmentAmmount")
                         .HasColumnType("float");
 
-                    b.Property<long>("AdjustmentId")
+                    b.Property<int>("AdjustmentId")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("AdjustmentId1")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("SalaryPaymentId")
+                    b.Property<string>("SalaryPaymentId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("SalaryPaymentId1")
                         .HasColumnType("bigint");
 
                     b.Property<int>("Status")
@@ -2364,14 +2378,14 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<double?>("Tax")
                         .HasColumnType("float");
 
-                    b.Property<long?>("WorkingHoursLogId")
+                    b.Property<long>("WorkingHoursLogId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AdjustmentId");
+                    b.HasIndex("AdjustmentId1");
 
-                    b.HasIndex("SalaryPaymentId");
+                    b.HasIndex("SalaryPaymentId1");
 
                     b.HasIndex("WorkingHoursLogId");
 
@@ -2989,15 +3003,11 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                 {
                     b.HasOne("Entities.Adjustment", "Adjustment")
                         .WithMany("StaticAdjustments")
-                        .HasForeignKey("AdjustmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AdjustmentId1");
 
                     b.HasOne("Entities.SalaryPayment", "SalaryPayment")
                         .WithMany("StaticAdjustments")
-                        .HasForeignKey("SalaryPaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SalaryPaymentId1");
 
                     b.Navigation("Adjustment");
 
@@ -3062,17 +3072,17 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                 {
                     b.HasOne("Entities.Adjustment", "Adjustment")
                         .WithMany("WorkingHoursAdjustments")
-                        .HasForeignKey("AdjustmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AdjustmentId1");
 
                     b.HasOne("Entities.SalaryPayment", "SalaryPayment")
                         .WithMany("WorkingHoursAdjustments")
-                        .HasForeignKey("SalaryPaymentId");
+                        .HasForeignKey("SalaryPaymentId1");
 
                     b.HasOne("Entities.WorkingHoursLog", "WorkingHoursLog")
                         .WithMany("WorkingHoursAdjusments")
-                        .HasForeignKey("WorkingHoursLogId");
+                        .HasForeignKey("WorkingHoursLogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Adjustment");
 
