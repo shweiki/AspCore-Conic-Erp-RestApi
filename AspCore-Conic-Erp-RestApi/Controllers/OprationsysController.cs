@@ -222,6 +222,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             log.OprationId = Oprationsys.Id;
             log.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             log.Description = Description;
+            log.TableName = Oprationsys.TableName;
 
             switch (Oprationsys.TableName)
             {
@@ -340,6 +341,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 case "Visit":
                 //    log.OrderDeliveryId = (int)ObjId;
                     DB.Visits.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                    break;
+
+                default:
+                    log.Fktable = ObjId.ToString();                    
                     break;
 
             }

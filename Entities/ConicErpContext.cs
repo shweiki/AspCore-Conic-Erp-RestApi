@@ -1,5 +1,6 @@
 ﻿using System;
 using Entities.Configuration;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -13,10 +14,13 @@ namespace Entities
         public ConicErpContext()
         {
         }
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ConicErpContext(DbContextOptions<ConicErpContext> options)
+        public ConicErpContext(DbContextOptions<ConicErpContext> options, IHttpContextAccessor httpContextAccessor)
             : base(options)
         {
+            _httpContextAccessor = httpContextAccessor;
+
         }
 
         public virtual DbSet<Account> Accounts { get; set; }
@@ -78,6 +82,7 @@ namespace Entities
             {
                  optionsBuilder.UseSqlServer(GetCon());            
             }
+
         }
         public string GetCon() {
             //   return "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Conic_Erp;Integrated Security=True";
@@ -92,7 +97,9 @@ namespace Entities
         }
         public string GetDataBaseName()
         {
-            return "Conic_Erp";
+            var host = _httpContextAccessor;
+
+            return host.ToString();
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

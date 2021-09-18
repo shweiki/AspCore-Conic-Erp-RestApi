@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210918015459_add TableName && Fktable to ActionLog")]
+    partial class addTableNameFktabletoActionLog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -355,6 +357,9 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<double>("AdjustmentAmount")
                         .HasColumnType("float");
 
+                    b.Property<double>("AdjustmentPercentage")
+                        .HasColumnType("float");
+
                     b.Property<bool>("IsStaticAdjustment")
                         .HasColumnType("bit");
 
@@ -362,9 +367,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

@@ -4,18 +4,14 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Entities;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using System.Security.Claims;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
     public class OrderDeliveryController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly ILogger<UserController> _logger;
+
+
         [AllowAnonymous]
         [Route("OrderDelivery/Create")]
         [HttpPost]
@@ -39,20 +35,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             else return Ok(false);
         }
 
-        public OrderDeliveryController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _logger = logger;
-
-        }
-
         [Authorize]
         [HttpPost]
         [Route("OrderDelivery/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
         {
-            var Deliveries = DB.OrderDeliveries.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+               var Deliveries = DB.OrderDeliveries.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
             (User != null ? DB.ActionLogs.Where(l => l.OrderDeliveryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
             {
@@ -222,6 +210,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
+                   // OprationsysController Op = new OprationsysController();
+                  //  Op.ChangeObjStatusByTableName(id, "OrderDelivery", 4, "Order Delivered");
                     OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == id).SingleOrDefault();
                     Order.Status = 3;
                     DB.SaveChanges();
