@@ -16,6 +16,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     {
         private ConicErpContext DB = new ConicErpContext();
 
+        [Route("WorkingHourLog/GetWorkingHourId")]
+        [HttpGet]
+        public IActionResult GetWorkingHourId(long? EmployeeId)
+        {
+            var WorkingHoursLogs = DB.WorkingHoursLogs.Where(m => m.EmployeeId == EmployeeId && m.Status == 0).Select(
+                x => new
+                {
+                     x.Id,
+                   
+                }).ToList().LastOrDefault().Id;
+            return Ok(WorkingHoursLogs);
+
+        }
+
         [Route("EmployeeLog/GetEmployeeLog")]
         [HttpGet]
         public IActionResult GetEmployeeLog()

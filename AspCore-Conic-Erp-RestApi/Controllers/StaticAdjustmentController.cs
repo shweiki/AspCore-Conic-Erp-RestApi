@@ -19,14 +19,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("StaticAdjustment/Create")]
         [HttpPost]
 
-        public IActionResult Create(Adjustment collection)
+        public IActionResult Create(StaticAdjustment collection)
        {
             if (ModelState.IsValid)
             {
                 try
                 {
 
-                    DB.Adjustments.Add(collection);
+                    DB.StaticAdjustments.Add(collection);
                     DB.SaveChanges();
                     return Ok(true);
                 }
@@ -40,11 +40,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         }
 
-        [Route("StaticAdjustment/GetAdjustments")]
+        [Route("StaticAdjustment/GetStaticAdjustments")]
         [HttpGet]
         public IActionResult GetAdjustments()
         {
-            var Adjustments = DB.Adjustments.Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.AdjustmentPercentage }).ToList();
+            var Adjustments = DB.StaticAdjustments.Select(x => new { x.Id, x.AdjustmentAmount, x.AdjustmentPercentage }).ToList();
 
             return Ok(Adjustments);
         }
@@ -53,10 +53,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetAdjustmentLabel()
         {
-            var Areas = DB.Adjustments.Select(x => new {
+            var Areas = DB.StaticAdjustments.Select(x => new {
 
                 value = x.Id,
-                label = x.Name,
             }).ToList();
             return Ok(Areas);
 

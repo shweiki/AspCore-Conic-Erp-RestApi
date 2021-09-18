@@ -75,8 +75,8 @@ namespace AspCore_Conic_Erp_RestApi
             objCZKEM.OnVerify -= new _IZKEMEvents_OnVerifyEventHandler(zkemClient_OnVerifyEventHandler);
             objCZKEM.OnAttTransactionEx -= new _IZKEMEvents_OnAttTransactionExEventHandler(zkemClient_OnAttTransactionEx);
             objCZKEM.OnAttTransaction -= new _IZKEMEvents_OnAttTransactionEventHandler(zkemClient_OnAttTransaction);
-            ///objCZKEM.OnAttTransactionEx_New -= new _IZKEMEvents_OnAttTransactionEx_NewEventHandler(zkemClient_OnAttTransactionEx_New);
-           /// objCZKEM.OnGeneralEvent -= new _IZKEMEvents_OnGeneralEventEventHandler(zkemClient_OnGeneralEvent);
+          //  objCZKEM.OnAttTransactionEx_New -= new _IZKEMEvents_OnAttTransactionEx_NewEventHandler(zkemClient_OnAttTransactionEx_New);
+           // objCZKEM.OnGeneralEvent -= new _IZKEMEvents_OnGeneralEventEventHandler(zkemClient_OnGeneralEvent);
             objCZKEM.OnKeyPress -= new _IZKEMEvents_OnKeyPressEventHandler(zkemClient_OnKeyPress);
             objCZKEM.OnEMData -= new _IZKEMEvents_OnEMDataEventHandler(zkemClient_OnEMData);
 

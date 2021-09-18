@@ -45,7 +45,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetAdjustments()
         {
             var Adjustments = DB.Adjustments
-                .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.AdjustmentPercentage, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
+                .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
 
             return Ok(Adjustments);
         }
@@ -54,7 +54,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetRAdjustments()
         {
             var Adjustments = DB.Adjustments.Where(x => x.IsWorkingHourAdjustment == true )
-                .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.AdjustmentPercentage, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
+                .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
 
             return Ok(Adjustments);
         }
@@ -63,7 +63,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetPAdjustments()
         {
             var Adjustments = DB.Adjustments.Where(x => x.IsStaticAdjustment == true)
-                .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.AdjustmentPercentage, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
+                .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
 
             return Ok(Adjustments);
         }
@@ -76,7 +76,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                 value = x.Id,
                 label = x.Name,
-                amount = x.AdjustmentAmount
+                amount = x.AdjustmentAmount,
+                isstatic = x.IsStaticAdjustment,
+                iswork = x.IsWorkingHourAdjustment,
             }).ToList();
             return Ok(Areas);
 

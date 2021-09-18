@@ -15,7 +15,7 @@ namespace Entities
             public long Id { get; set; }
             public string Name { get; set; }
             public double AdjustmentAmount { get; set; }
-            public double AdjustmentPercentage { get; set; }
+            public string Type { get; set; }
             public bool IsWorkingHourAdjustment { get; set; }
             public bool IsStaticAdjustment { get; set; }
         public virtual ICollection<WorkingHoursAdjustment> WorkingHoursAdjustments { get; set; }

@@ -59,11 +59,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Salaries);
         }
 
-        [Route("Salaries/GetSalaryId")]
+        [Route("Salary/GetSalaryId")]
         [HttpGet]
         public IActionResult GetSalaryId(long? EmployeeId)
         {
-            var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == 3).Select(
+            var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == EmployeeId && m.status == 0).Select(
                 x => new
                 {
                     Id = x.Id,
@@ -72,22 +72,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         }
 
-        [Route("Salary/GetSalaryByIds")]
-        [HttpGet]
-        public IActionResult GetSalaryByIds(long? EmployeeId)
-        {
-            var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == EmployeeId).Select(
-                x => new
-                {
-                    x.Id,
-                    x.EmployeeId,
-                    x.NetSalary,
-                    x.GrossSalary,
-                    x.SalaryPeriod,
-
-                }).ToList();
-            return Ok(Salaries);
-        }
+    
 
     }
 

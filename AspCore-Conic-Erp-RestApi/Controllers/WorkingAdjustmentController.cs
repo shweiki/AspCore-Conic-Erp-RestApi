@@ -44,9 +44,33 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetWorkingAdjustment()
         {
-            var Adjustments = DB.Adjustments.Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.AdjustmentPercentage }).ToList();
+            var Adjustments = DB.WorkingHoursAdjustments.Select(x => new { x.Id,
+                x.AdjustmentAmmount,
+                x.Tax,
+                x.Description,
+               
+            }).ToList();
 
             return Ok(Adjustments);
+        }
+
+        [Route("WorkingAdjustment/GetWorkingAdjustmentBySalaryId")]
+        [HttpGet]
+        public IActionResult GetWorkingAdjustmentBySalaryId(long? SalaryId)
+        {
+            var Salaries = DB.WorkingHoursAdjustments.Where(m => m.SalaryPaymentId == SalaryId).Select(
+                x => new
+                {
+                    x.Id,
+                    x.AdjustmentAmmount,
+                    x.Tax,
+                    x.Description,
+                    Date = x.WorkingHoursLog.StartDateTime,
+                    AdjustmentName = x.Adjustment.Name,
+                    Salary = x.SalaryPayment.GrossSalary,
+
+                }).ToList();
+            return Ok(Salaries);
         }
 
     }
