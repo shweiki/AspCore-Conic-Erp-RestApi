@@ -96,10 +96,10 @@ namespace Entities
             return ""+Environment.MachineName + "\\SQLEXPRESS";
         }
         public string GetDataBaseName()
-        {
-            var host = _httpContextAccessor;
-
-            return host.ToString();
+        {   
+            char[] MyChar = { '\\'};
+            return Environment.CurrentDirectory.TrimStart(MyChar);
+            
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
