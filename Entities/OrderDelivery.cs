@@ -10,6 +10,7 @@ namespace Entities
        
 
         public long Id { get; set; }
+        public string OrderId { get; set; }
         public string Name { get; set; }
         public string PhoneNumber { get; set; }
         public double TotalPill { get; set; }

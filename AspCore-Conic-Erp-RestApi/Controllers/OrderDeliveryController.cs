@@ -10,13 +10,34 @@ using System.Security.Claims;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
-    [Authorize]
     public class OrderDeliveryController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<UserController> _logger;
+        [AllowAnonymous]
+        [Route("OrderDelivery/Create")]
+        [HttpPost]
+        public IActionResult Create(OrderDelivery collection)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // TODO: Add insert logic here
+                    DB.OrderDeliveries.Add(collection);
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            else return Ok(false);
+        }
 
         public OrderDeliveryController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
         {
@@ -26,6 +47,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         }
 
+        [Authorize]
         [HttpPost]
         [Route("OrderDelivery/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
@@ -35,6 +57,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             (User != null ? DB.ActionLogs.Where(l => l.OrderDeliveryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
             {
                 x.Id,
+                x.OrderId,
                 x.Name,
                 x.PhoneNumber,
                 x.TotalPill,
@@ -60,6 +83,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
             });
         }
+
+        [Authorize]
         [Route("OrderDelivery/GetOrderDelivery")]
         [HttpGet]
         public IActionResult GetOrderDelivery(int Limit, string Sort, int Page, int? Status, string? Any)
@@ -68,6 +93,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             var Orders = DB.OrderDeliveries.Where(s => (s.Status !=4) && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
             {
                 x.Id,
+                x.OrderId,
                 x.Name,
                 x.PhoneNumber,
                 x.TotalPill,
@@ -95,28 +121,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
             });
         }
-        [Route("OrderDelivery/Create")]
-        [HttpPost]
-        public IActionResult Create(OrderDelivery collection)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    // TODO: Add insert logic here
-                    DB.OrderDeliveries.Add(collection);
-                    DB.SaveChanges();
-                    return Ok(true);
-                }
-                catch
-                {
-                    //Console.WriteLine(collection);
-                    return Ok(false);
-                }
-            }
-            else return Ok(false);
-        }
 
+        [Authorize]
         [Route("OrderDelivery/SetDriver")]
         [HttpPost]
         public IActionResult SetDriver(long DriverId, long OrderId)
@@ -125,7 +131,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
-                    OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == OrderId).SingleOrDefault();
+                OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == OrderId).SingleOrDefault();
                 Order.DriverId = DriverId;
                 Order.Status = 1;
 
@@ -142,6 +148,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(false);
         }
 
+        [Authorize]
         [Route("OrderDelivery/GetDriverOrder")]
         [HttpGet]
         public IActionResult GetDriverOrder(string Id, string name, int Limit, string Sort, int Page, int? Status, string? Any)
@@ -152,6 +159,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 
                 x.Id,
+                x.OrderId,
                 x.Name,
                 x.PhoneNumber,
                 x.TotalPill,
@@ -182,6 +190,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         }
 
+        [Authorize]
         [Route("OrderDelivery/OrderReceived")]
         [HttpPost]
         public IActionResult OrderReceived(long id)
@@ -203,8 +212,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
         }
-        
-             [Route("OrderDelivery/OrderDelivered")]
+
+        [Authorize]
+        [Route("OrderDelivery/OrderDelivered")]
         [HttpPost]
         public IActionResult OrderDelivered(long id)
         {
@@ -225,6 +235,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
         }
+
+        [Authorize]
         [Route("OrderDelivery/OrderDone")]
         [HttpPost]
         public IActionResult OrderDone(long id)
@@ -246,6 +258,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
         }
+
+        [Authorize]
         [HttpPost]
         [Route("OrderDelivery/GetByListQByDriver")]
         public IActionResult GetByListQByDriver(string Id, string name, int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string? Any)
@@ -255,6 +269,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             (User != null ? DB.ActionLogs.Where(l => l.OrderDeliveryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
             {
                 x.Id,
+                x.OrderId,
                 x.Name,
                 x.Status,
                 x.Content,
