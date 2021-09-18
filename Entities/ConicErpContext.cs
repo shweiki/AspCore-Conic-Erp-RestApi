@@ -92,7 +92,9 @@ namespace Entities
         }
         public string GetDataBaseName()
         {
-            return "Conic_Erp";
+            char[] MyChar = { '\\'};
+            return Environment.CurrentDirectory.TrimStart(MyChar);
+            
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
