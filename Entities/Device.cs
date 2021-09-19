@@ -9,7 +9,7 @@ namespace Entities
     {
         public Device()
         {
-            MemberLogs = new HashSet<MemberLog>();
+            DeviceLogs = new HashSet<DeviceLog>();
             WorkingHoursLogs = new HashSet<WorkingHoursLog>();
         }
 
@@ -23,7 +23,7 @@ namespace Entities
         public DateTime? LastSetDateTime { get; set; }
         public string Description { get; set; }
 
-        public virtual ICollection<MemberLog> MemberLogs { get; set; }
+        public virtual ICollection<DeviceLog> DeviceLogs { get; set; }
         public virtual ICollection<WorkingHoursLog> WorkingHoursLogs { get; set; }
     }
 }

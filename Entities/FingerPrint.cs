@@ -13,5 +13,7 @@ namespace Entities
         public string Type { get; set; }
         public string TableName { get; set; }
         public string Fk { get; set; }
+        public long MemberId { get; set; }
+
     }
 }

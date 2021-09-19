@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -94,7 +92,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.AccountId,
                 x.Tag,
                 x.Vaccine,
-                lastLogByMember= x.MemberLogs.ToList().OrderBy(o=>o.DateTime).LastOrDefault().DateTime.ToString() + ' ',
+                lastLogByMember= DB.DeviceLogs.Where(l=>l.TableName =="Member" && l.Fk == x.Id.ToString()).ToList().OrderBy(o=>o.DateTime).LastOrDefault().DateTime.ToString() + ' ',
                 MembershipsCount = x.MembershipMovements.Count(),
                 TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
                 TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum(),
@@ -265,7 +263,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Tag,
                     x.Vaccine,
                     MembershipsCount = x.MembershipMovements.Count(),
-                    HaveFaceOnDevice = x.MemberFaces.Count() > 0 ? true : false,
+                    HaveFaceOnDevice = DB.FingerPrints.Where(f=>f.Fk == x.Id.ToString() && f.TableName == "Memeber").Count() > 0 ? true : false,
                     Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg"),
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
@@ -319,8 +317,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
 
             }
-            CheckBlackListActionLogMembers();
-
+             CheckBlackListActionLogMembers();
+    
             DB.SaveChanges();
 
             return Ok(true);
@@ -336,7 +334,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 int OStatus = M.Status;
 
-                var LastLog = DB.ActionLogs.Where(x => x.MemberId == M.Id ).OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
+                var LastLog = DB.ActionLogs.Where(x => x.MemberId == M.Id && x.Opration.OprationName== "BlackList").OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
                 if (LastLog != null)
                 {
                     M.Status = DB.Oprationsys.Where(o=>o.Id == LastLog.OprationId).SingleOrDefault().Status;

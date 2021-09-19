@@ -259,7 +259,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("Device/GetUserLog")]
         [HttpGet]
-        public IActionResult GetUserLog(long DeviceId, long UserId)
+        public IActionResult GetUserLog(long DeviceId, string UserId ,string TableName)
         {
             try
             {
@@ -269,26 +269,26 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                     if (MachineLog != null && MachineLog.Count > 0)
                     {
-                        var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
 
-                        foreach (var ML in MachineLog.Where(mlo=> mlo.IndRegID == (int)member.Id).ToList())
+                        foreach (var ML in MachineLog.Where(mlo=> mlo.IndRegID == Convert.ToInt64(UserId) ).ToList())
                         {
                             DateTime datetime = DateTime.Parse(ML.DateTimeRecord);
-                            var isLogSaveIt = DB.MemberLogs.Where(l => l.MemberId == member.Id && l.DateTime == datetime).Count();
+                            var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == UserId && l.TableName==TableName && l.DateTime == datetime).Count();
                             if (isLogSaveIt <= 0)
                             {
-                                MemberLog Log = new MemberLog
+                                DeviceLog Log = new DeviceLog
                                 {
                                     Type = "In",
-                                    MemberId = member.Id,
                                     DateTime = DateTime.Parse(ML.DateTimeRecord),
                                     DeviceId = DeviceId,
                                     Status = 0,
+                                    TableName = TableName,
+                                    Fk = UserId,
                                     Description = ""
                                 };
                                 if (Log.DateTime < DateTime.Today)
                                     Log.Status = -1;
-                                DB.MemberLogs.Add(Log);
+                                DB.DeviceLogs.Add(Log);
                                 DB.SaveChanges();
                             }
 
@@ -380,17 +380,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 if (TableName == "Member") {
                     DateTime last = DateTime.Today.AddMonths(-3);
                      List = DB.Members.Where(x => x.MembershipMovements.Count() != 0 && (x.MembershipMovements != null ? x.MembershipMovements.OrderByDescending(x => x.Id).LastOrDefault().EndDate >= last : false))
-                        .Select(s=> new { s.Id , s.Name})
-                        .ToList();
-
+                        .Select(s=> new { s.Id , s.Name}).ToList();
                 }
                 if (TableName == "Employee")
                 {
                     DateTime last = DateTime.Today.AddMonths(-3);
                     List = DB.Employees.Where(x => x.Status ==0)
-                       .Select(s => new { s.Id, s.Name })
-                       .ToList();
-
+                       .Select(s => new { s.Id, s.Name }).ToList();
                 }
                 foreach (var O in List)
                 {
@@ -401,14 +397,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             else
                 return Ok("Device Is Not Connected");
         }
-        [Route("Device/GetAllFaceMembers")]
+        [Route("Device/GetAllFingerPrints")]
         [HttpGet]
         public IActionResult GetAllFingerPrints(long DeviceId ,string TableName)
         {
             if (CheckDeviceHere((int)DeviceId))
             {
                 var List = new List<UserDevice>();
-                if(TableName == "Memeber")
+                if(TableName == "Member")
                 List = DB.Members?.Select(s => new UserDevice { Id = s.Id.ToString(),Name= s.Name }).ToList();
                 if (TableName == "Employee")
                     List = DB.Employees?.Select(s=> new UserDevice  { Id = s.Id.ToString() , Name = s.Name}).ToList();
@@ -446,9 +442,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 return Ok("Device Is Not Connected");
         }
 
-        [Route("Device/GetAllLogMembers")]
+        [Route("Device/GetAllLog")]
         [HttpGet]
-        public IActionResult GetAllLogMembers(long DeviceId)
+        public IActionResult GetAllLog(long DeviceId ,string TableName)
         {
             if (CheckDeviceHere((int)DeviceId))
             {
@@ -458,34 +454,32 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 
                         foreach (var ML in MachineLog.ToList())
                         {
-                        var member = DB.Members.Where(x => x.Id == ML.IndRegID).SingleOrDefault();
-                        if (member != null)
-                        {
+                   
                             DateTime datetime = DateTime.Parse(ML.DateTimeRecord);
                             datetime = new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour, datetime.Minute, 0);
-                            var isLogSaveIt = DB.MemberLogs.Where(l => l.MemberId == member.Id && l.DateTime == datetime).Count();
+                            var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == ML.IndRegID.ToString() && l.TableName == TableName && l.DateTime == datetime).Count();
                             if (isLogSaveIt <= 0)
                             {
-                                MemberLog Log = new MemberLog
+                                DeviceLog Log = new DeviceLog
                                 {
-                                    Type = "In",
-                                    MemberId = member.Id,
-                                    DateTime = datetime,
+                                   Type = "In",
+                                    DateTime = DateTime.Parse(ML.DateTimeRecord),
                                     DeviceId = DeviceId,
                                     Status = 0,
-                                    Description = "From Device"
+                                    TableName = TableName,
+                                    Fk = ML.IndRegID.ToString(),
+                                    Description = ""
                                 };
                                 if (Log.DateTime < DateTime.Today)
                                     Log.Status = -1;
-                                DB.MemberLogs.Add(Log);
+                                DB.DeviceLogs.Add(Log);
                                 DB.SaveChanges();
                             }
                             else
                             {
                                 continue;
                             }
-                        }
-                        else continue;
+                     
                     }
 
                         DB.SaveChanges();

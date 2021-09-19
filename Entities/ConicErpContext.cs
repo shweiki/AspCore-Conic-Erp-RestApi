@@ -49,7 +49,7 @@ namespace Entities
         public virtual DbSet<Massage> Massages { get; set; }
         public virtual DbSet<Member> Members { get; set; }
         public virtual DbSet<FingerPrint> FingerPrints { get; set; }
-        public virtual DbSet<MemberLog> MemberLogs { get; set; }
+        public virtual DbSet<DeviceLog> DeviceLogs { get; set; }
         public virtual DbSet<Membership> Memberships { get; set; }
         public virtual DbSet<MembershipMovement> MembershipMovements { get; set; }
         public virtual DbSet<MembershipMovementOrder> MembershipMovementOrders { get; set; }
@@ -972,14 +972,13 @@ namespace Entities
                     .HasConstraintName("FK_Member_Account");
             });
 
-            modelBuilder.Entity<MemberLog>(entity =>
+            modelBuilder.Entity<DeviceLog>(entity =>
             {
-                entity.ToTable("MemberLog");
+                entity.ToTable("DeviceLog");
 
-                entity.HasIndex(e => e.DeviceId, "IX_MemberLog_DeviceID");
+                entity.HasIndex(e => e.DeviceId, "IX_DeviceLog_DeviceID");
 
-                entity.HasIndex(e => e.MemberId, "IX_MemberLog_MemberID");
-                entity.HasIndex(e => e.Status, "IX_MemberLog_Status");
+                entity.HasIndex(e => e.Status, "IX_DeviceLog_Status");
 
                 entity.Property(e => e.Id);
 
@@ -989,25 +988,33 @@ namespace Entities
 
                 entity.Property(e => e.DeviceId);
 
-                entity.Property(e => e.MemberId);
 
                 entity.Property(e => e.Type)
                     .IsRequired()
                     ;
 
                 entity.HasOne(d => d.Device)
-                    .WithMany(p => p.MemberLogs)
+                    .WithMany(p => p.DeviceLogs)
                     .HasForeignKey(d => d.DeviceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_MemberLog_Device");
+                    .HasConstraintName("FK_DeviceLog_Device");
 
-                entity.HasOne(d => d.Member)
-                    .WithMany(p => p.MemberLogs)
-                    .HasForeignKey(d => d.MemberId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_MemberLog_Member");
+             
             });
+            modelBuilder.Entity<FingerPrint>(entity =>
+            {
+                entity.ToTable("FingerPrint");
 
+                entity.HasIndex(e => e.MemberId, "IX_FingerPrint_MemberID");
+
+                entity.Property(e => e.Id);
+
+                entity.Property(e => e.Str).IsRequired();
+
+                entity.Property(e => e.MemberId);
+
+           
+            });
             modelBuilder.Entity<Membership>(entity =>
             {
                 entity.ToTable("Membership");

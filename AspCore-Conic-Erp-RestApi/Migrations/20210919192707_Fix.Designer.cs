@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210919192707_Fix")]
+    partial class Fix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -762,6 +764,9 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<string>("Fk")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long>("MemberId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -775,6 +780,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex(new[] { "DeviceId" }, "IX_DeviceLog_DeviceID");
+
+                    b.HasIndex(new[] { "MemberId" }, "IX_DeviceLog_MemberID");
 
                     b.HasIndex(new[] { "Status" }, "IX_DeviceLog_Status");
 

@@ -190,48 +190,33 @@ namespace AspCore_Conic_Erp_RestApi
         
          private void zkemClient_OnVerifyEventHandler(int UserId)
         {
-            var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
-            MemberLogController MemberLog = new MemberLogController();
-            string Ip = "";
-            objCZKEM.GetDeviceIP(1, ref Ip);
-            MemberLog.RegisterMemberLog(UserId, DateTime.Now, Ip);
-            //device.GetAllLogMembers(3);
+           
 
         }
         private  void zkemClient_OnAttTransactionEx_New(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, string WorkCode)
         {
-            DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
-            int ID = Convert.ToInt32(EnrollNumber);
-            var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
-                MemberLogController MemberLog = new MemberLogController();
-            string Ip = "";
-            objCZKEM.GetDeviceIP(1, ref Ip);
-                MemberLog.RegisterMemberLog(ID, datetime , Ip);
-            //device.GetAllLogMembers(3);
+      
 
         }  
         private  void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
         {
             DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
             int ID = Convert.ToInt32(EnrollNumber);
+            string TableName = "";
             var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
-                MemberLogController MemberLog = new MemberLogController();
+            var Employee = DB.Employees.Where(m => m.Id == ID).FirstOrDefault();
+            if (member != null) TableName = "Member";
+            if (Employee != null) TableName = "Employee";
+            DeviceLogController DeviceLog = new DeviceLogController();
             string Ip = "";
             objCZKEM.GetDeviceIP(1, ref Ip);
-                MemberLog.RegisterMemberLog(ID, datetime , Ip);
+            DeviceLog.RegisterLog(EnrollNumber, datetime , Ip , TableName);
             //device.GetAllLogMembers(3);
 
         }   
         private  void zkemClient_OnAttTransaction(int EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second)
         {
-            DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
-            int ID = Convert.ToInt32(EnrollNumber);
-            var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
-                MemberLogController MemberLog = new MemberLogController();
-            string Ip = "";
-            objCZKEM.GetDeviceIP(1, ref Ip);
-                MemberLog.RegisterMemberLog(ID, datetime , Ip);
-            //device.GetAllLogMembers(3);
+
 
         }
 

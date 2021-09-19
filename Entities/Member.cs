@@ -9,7 +9,6 @@ namespace Entities
     {
         public Member()
         {
-            MemberLogs = new HashSet<MemberLog>();
             MembershipMovements = new HashSet<MembershipMovement>();
             Payments = new HashSet<Payment>();
             SalesInvoices = new HashSet<SalesInvoice>();
@@ -30,7 +29,6 @@ namespace Entities
         public string Vaccine { get; set; }
 
         public virtual Account Account { get; set; }
-        public virtual ICollection<MemberLog> MemberLogs { get; set; }
         public virtual ICollection<MembershipMovement> MembershipMovements { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
         public virtual ICollection<SalesInvoice> SalesInvoices { get; set; }
