@@ -97,9 +97,9 @@ namespace Entities
         }
         public string GetDataBaseName()
         {   
-            char[] MyChar = { '\\'};
-            return Environment.CurrentDirectory.TrimStart(MyChar);
-            
+            int lat = Environment.CurrentDirectory.LastIndexOf("\\")+1;
+            string Name = Environment.CurrentDirectory.Substring(lat  ,( Environment.CurrentDirectory.Length - lat));
+            return Name.Replace("-", "").ToUpper();
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
