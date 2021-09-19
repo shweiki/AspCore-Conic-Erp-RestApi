@@ -193,39 +193,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Employees);
         }
 
-        //[Route("Employee/Create")]
-        //[HttpPost]
-        //public IActionResult Create(Employee collection)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            var ParentAccount = DB.Accounts.Where(i => i.Description == "Employee").SingleOrDefault();
-        //            ParentAccount = ParentAccount ??= new Account { Id = 0, ParentId = 0, Code = "0" };
-        //            Account NewAccount = new Account
-        //            {
-        //                Type = "Employee",
-        //                Description = collection.Description,
-        //                Status = 0,
-        //                Code = ParentAccount.Code + '-' + DB.Accounts.Where(i => i.ParentId == ParentAccount.Id).Count() + 1,
-        //                ParentId = ParentAccount.Id
-        //            };
-        //            DB.Accounts.Add(NewAccount);
-        //            DB.SaveChanges();
-        //            collection.AccountId = NewAccount.Id;
-        //            DB.Employees.Add(collection);
-        //            DB.SaveChanges();
-        //            return Ok(collection.Id);
-        //        }
-        //        catch
-        //        {
-        //            //Console.WriteLine(collection);
-        //            return Ok(false);
-        //        }
-        //    }
-        //    return Ok(false);
-        //}
+
 
         [Route("Employee/Create")]
         [HttpPost]
@@ -258,10 +226,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 IdentityResult result = await _userManager.CreateAsync(NewUser, Pass);
 
                 var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
-                //if (!result.Succeeded)
-                //{
-                //    return Ok(result);
-                //}
+              
                 Pass = NewUser.PasswordHash;
                 
                

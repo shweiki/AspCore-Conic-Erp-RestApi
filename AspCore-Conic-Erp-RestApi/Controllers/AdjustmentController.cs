@@ -44,44 +44,85 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetAdjustments()
         {
-            var Adjustments = DB.Adjustments
-                .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
+            try
+            {
+                var Adjustments = DB.Adjustments
+                    .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
 
-            return Ok(Adjustments);
-        }
+                return Ok(Adjustments);
+            }
+            catch
+            {
+                //Console.WriteLine(collection);
+                return Ok(false);
+            }
+        
+            return Ok(false);
+    }
         [Route("Adjustment/GetRAdjustments")]
         [HttpGet]
         public IActionResult GetRAdjustments()
         {
-            var Adjustments = DB.Adjustments.Where(x => x.IsWorkingHourAdjustment == true )
-                .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
+            try
+            {
+                var Adjustments = DB.Adjustments.Where(x => x.IsWorkingHourAdjustment == true)
+                    .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
 
-            return Ok(Adjustments);
+                return Ok(Adjustments);
+            }
+            catch
+            {
+                //Console.WriteLine(collection);
+                return Ok(false);
+            }
+
+            return Ok(false);
         }
         [Route("Adjustment/GetPAdjustments")]
         [HttpGet]
         public IActionResult GetPAdjustments()
         {
-            var Adjustments = DB.Adjustments.Where(x => x.IsStaticAdjustment == true)
-                .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
+            try
+            {
+                var Adjustments = DB.Adjustments.Where(x => x.IsStaticAdjustment == true)
+                    .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
 
-            return Ok(Adjustments);
+                return Ok(Adjustments);
+            }
+
+            catch
+            {
+                //Console.WriteLine(collection);
+                return Ok(false);
+            }
+
+            return Ok(false);
         }
 
         [Route("Adjustment/GetAdjustmentLabel")]
         [HttpGet]
         public IActionResult GetAdjustmentLabel()
         {
-            var Areas = DB.Adjustments.Select(x => new {
+            try
+            {
+                var Areas = DB.Adjustments.Select(x => new
+                {
 
-                value = x.Id,
-                label = x.Name,
-                amount = x.AdjustmentAmount,
-                isstatic = x.IsStaticAdjustment,
-                iswork = x.IsWorkingHourAdjustment,
-            }).ToList();
-            return Ok(Areas);
+                    value = x.Id,
+                    label = x.Name,
+                    amount = x.AdjustmentAmount,
+                    isstatic = x.IsStaticAdjustment,
+                    iswork = x.IsWorkingHourAdjustment,
+                }).ToList();
+                return Ok(Areas);
+            }
+            catch
+            {
+                //Console.WriteLine(collection);
+                return Ok(false);
+            }
 
+            return Ok(false);
 
         }
 

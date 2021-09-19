@@ -44,33 +44,57 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetWorkingAdjustment()
         {
-            var Adjustments = DB.WorkingHoursAdjustments.Select(x => new { x.Id,
-                x.AdjustmentAmmount,
-                x.Tax,
-                x.Description,
-               
-            }).ToList();
-
-            return Ok(Adjustments);
-        }
-
-        [Route("WorkingAdjustment/GetWorkingAdjustmentBySalaryId")]
-        [HttpGet]
-        public IActionResult GetWorkingAdjustmentBySalaryId(long? SalaryId)
-        {
-            var Salaries = DB.WorkingHoursAdjustments.Where(m => m.SalaryPaymentId == SalaryId).Select(
-                x => new
+            try
+            {
+                var Adjustments = DB.WorkingHoursAdjustments.Select(x => new
                 {
                     x.Id,
                     x.AdjustmentAmmount,
                     x.Tax,
                     x.Description,
-                    Date = x.WorkingHoursLog.StartDateTime,
-                    AdjustmentName = x.Adjustment.Name,
-                    Salary = x.SalaryPayment.GrossSalary,
 
                 }).ToList();
-            return Ok(Salaries);
+
+                return Ok(Adjustments);
+            }
+            catch
+            {
+                //Console.WriteLine(collection);
+                return Ok(false);
+            }
+
+            return Ok(false);
+        }
+
+        [Route("WorkingAdjustment/GetWorkingAdjustmentBySalaryId")]
+        [HttpGet]
+        public IActionResult GetWorkingAdjustmentBySalaryId(long? SalId)
+        {
+            try
+            {
+                var Adjustments = DB.WorkingHoursAdjustments.Where(m => m.SalaryPaymentId == SalId && m.Status == 0).Select(
+                    x => new
+                    {
+                        x.Id,
+                        x.AdjustmentAmmount,
+                        x.Tax,
+                        x.Description,
+                        StartDate = x.WorkingHoursLog.StartDateTime,
+                        EndDate = x.WorkingHoursLog.EndDateTime,
+                        AdjustmentName = x.Adjustment.Name,
+                        Salary = x.SalaryPayment.GrossSalary,
+
+
+                    }).ToList();
+                return Ok(Adjustments);
+            }
+            catch
+            {
+                //Console.WriteLine(collection);
+                return Ok(false);
+            }
+
+            return Ok(false);
         }
 
     }

@@ -54,10 +54,29 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.NetSalary,
                     x.GrossSalary,
                     x.SalaryPeriod,
-
+                    x.status,
                 }).ToList();
             return Ok(Salaries);
         }
+        [Route("Salary/GetLastSalaryById")]
+        [HttpGet]
+        public IActionResult GetLastSalaryById(long? Id)
+        {
+            var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == Id && m.status == 0).Select(
+                x => new
+                {
+                    x.Id,
+                    x.EmployeeId,
+                    x.NetSalary,
+                    x.GrossSalary,
+                    x.SalaryPeriod,
+                    x.status,
+                    Name= x.Employee.Name,
+                    EmpId = x.Employee.Id,
+                }).SingleOrDefault();
+            return Ok(Salaries);
+        }
+
 
         [Route("Salary/GetSalaryId")]
         [HttpGet]
@@ -67,7 +86,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x => new
                 {
                     Id = x.Id,
-                }).ToList();
+                }).ToList().FirstOrDefault().Id;
             return Ok(Salaries);
 
         }
