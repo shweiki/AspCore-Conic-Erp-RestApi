@@ -48,7 +48,7 @@ namespace Entities
         public virtual DbSet<ItemMuo> ItemMuos { get; set; }
         public virtual DbSet<Massage> Massages { get; set; }
         public virtual DbSet<Member> Members { get; set; }
-        public virtual DbSet<MemberFace> MemberFaces { get; set; }
+        public virtual DbSet<FingerPrint> FingerPrints { get; set; }
         public virtual DbSet<MemberLog> MemberLogs { get; set; }
         public virtual DbSet<Membership> Memberships { get; set; }
         public virtual DbSet<MembershipMovement> MembershipMovements { get; set; }
@@ -970,25 +970,6 @@ namespace Entities
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Member_Account");
-            });
-
-            modelBuilder.Entity<MemberFace>(entity =>
-            {
-                entity.ToTable("MemberFace");
-
-                entity.HasIndex(e => e.MemberId, "IX_MemberFace_MemberID");
-
-                entity.Property(e => e.Id);
-
-                entity.Property(e => e.FaceStr).IsRequired();
-
-                entity.Property(e => e.MemberId);
-
-                entity.HasOne(d => d.Member)
-                    .WithMany(p => p.MemberFaces)
-                    .HasForeignKey(d => d.MemberId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_MemberFace_Member");
             });
 
             modelBuilder.Entity<MemberLog>(entity =>

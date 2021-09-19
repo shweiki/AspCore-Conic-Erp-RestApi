@@ -162,25 +162,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("Device/StartEnrollUser")]
         [HttpGet]
-        public IActionResult StartEnrollUser(long DeviceId, long UserId)
+        public IActionResult StartEnrollUser(long DeviceId, string UserId)
         {
             if (CheckDeviceHere((int)DeviceId))
             {
 
-                string sUserID = UserId.ToString();
                 int iFingerIndex = 111;
                 int idwErrorCode = 0;
 
                objZkeeper.CancelOperation();
              //   objZkeeper.SSR_DeleteEnrollData((int)DeviceId,sUserID, 0);//If the specified index of user's templates has existed ,delete it first.(SSR_DelUserTmp is also available sometimes)
-              objZkeeper.RefreshData(1);//the data in the device should be refreshed
+         //     objZkeeper.RefreshData(1);//the data in the device should be refreshed
 
-                if (objZkeeper.StartEnrollEx(sUserID, iFingerIndex ,0))
+                if (objZkeeper.StartEnrollEx(UserId, iFingerIndex ,0))
                 {
                     iCanSaveTmp = 1;
 
                     objZkeeper.StartIdentify();//After enrolling templates,you should let the device into the 1:N verification condition
-                    objZkeeper.RefreshData(1);//the data in the device should be refreshed
+           //         objZkeeper.RefreshData(1);//the data in the device should be refreshed
 
                 }
                 else
@@ -194,60 +193,59 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("Device/SetUser")]
         [HttpGet]
-        public IActionResult SetUser(long DeviceId ,  long UserId  )
+        public IActionResult SetUser(long DeviceId ,  string UserId , string Name , string TableName)
         {
             if (CheckDeviceHere((int)DeviceId)) {
            
                objZkeeper.EnableDevice(1, false);
-
-                var member = DB.Members.Where(m => m.Id == UserId).FirstOrDefault();
    
                 //bool GetUser = objZkeeper.GetUserInfo(1,(int)member.Id,ref  Name, ref password, ref Privilege, ref Enable);
 
-                bool SetUser = objZkeeper.SSR_SetUserInfo(1, member.Id.ToString(), member.Name, "", 0, true);
+                bool SetUser = objZkeeper.SSR_SetUserInfo(1, UserId, Name, "", 0, true);
                 if (SetUser)
                 {
                     string strface = "";
                     int length = 0;
-                    bool GetUserFace = objZkeeper.GetUserFaceStr(1, member.Id.ToString(), 50, ref strface, ref length);
-                    var memeberface = DB.MemberFaces.Where(f => f.MemberId == member.Id).SingleOrDefault();
+                    bool GetUserFace = objZkeeper.GetUserFaceStr(1, UserId, 50, ref strface, ref length);
+                    var FingerPrint = DB.FingerPrints.Where(f => f.Fk == UserId && f.TableName == TableName).SingleOrDefault();
 
                     if (GetUserFace)
                     {
 
-                        if (memeberface != null)
+                        if (FingerPrint != null)
                         {
-                            memeberface.FaceLength = length;
-                            memeberface.FaceStr = strface;
-                            memeberface.MemberId = member.Id;
+                            FingerPrint.Length = length;
+                            FingerPrint.Str = strface;
+                            FingerPrint.Fk =UserId;
+                            FingerPrint.TableName =TableName;
+                            FingerPrint.Type ="Face";
 
-                            bool SetUserFace = objZkeeper.SetUserFaceStr(1, member.Id.ToString(), 50, memeberface.FaceStr, memeberface.FaceLength);
+                            bool SetUserFace = objZkeeper.SetUserFaceStr(1, UserId, 50, strface, length);
                             // SetUserFace = objZkeeper.SSR_SetUserTmpStr(1, member.Id.ToString(), 50, strface);
                          //    SetUserFace = objZkeeper.SetUserFace(1, member.Id.ToString(), 0, ref x, length);
 
                         }
                         else
                         {
-                            DB.MemberFaces.Add(new MemberFace
+                            DB.FingerPrints.Add(new FingerPrint
                             {
-                                FaceLength = length,
-                                FaceStr = strface,
-                                MemberId = member.Id,
-                            });
+                               Length = length,
+                                Str = strface,
+                                Fk = UserId,
+                            TableName = TableName,
+                            Type = "Face"
+                        });
 
-                            bool SetUserFace = objZkeeper.SetUserFaceStr(1, member.Id.ToString(), 50, strface, length);
+                            bool SetUserFace = objZkeeper.SetUserFaceStr(1, UserId, 50, strface, length);
                         //    objZkeeper.SetUserFace(1, member.Id.ToString(), 50, strface, length);
                         }
                     }
                     else
                     {
-                        if (memeberface != null) {
-                            bool SetUserFace = objZkeeper.SetUserFaceStr(1,  member.Id.ToString(), 50, memeberface.FaceStr, memeberface.FaceLength);
-
+                        if (FingerPrint != null) {
+                            bool SetUserFace = objZkeeper.SetUserFaceStr(1,  UserId, 50, FingerPrint.Str, FingerPrint.Length);
                         }
-
                     }
-
                 }
                 objZkeeper.RefreshData(1);
                 DB.SaveChanges();
@@ -364,60 +362,77 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                 bool SetUser = objZkeeper.SSR_SetUserInfo(1, member.Id.ToString(), member.Name, "", 0, Enable);
                 if (!SetUser)
-               return false;                
-                
-                return true;
+               return false;
 
+                return true;
             }
             else
                 return false;
 
         }
-        [Route("Device/SetAllMembers")]
+        [Route("Device/SetAll")]
         [HttpGet]
-        public IActionResult SetAllMembers(long DeviceId)
+        public IActionResult SetAll(long DeviceId ,string TableName)
         {
             if (CheckDeviceHere((int)DeviceId))
             {
-                DateTime last = DateTime.Today.AddMonths(-3);
-                IList<Member> Members = DB.Members.Where(x=>x.MembershipMovements.Count() != 0 && (x.MembershipMovements != null ? x.MembershipMovements.OrderByDescending(x => x.Id).LastOrDefault().EndDate >= last : false )).ToList();
-              
-                foreach (Member M in Members)
+                dynamic List = new List<dynamic>();
+                if (TableName == "Member") {
+                    DateTime last = DateTime.Today.AddMonths(-3);
+                     List = DB.Members.Where(x => x.MembershipMovements.Count() != 0 && (x.MembershipMovements != null ? x.MembershipMovements.OrderByDescending(x => x.Id).LastOrDefault().EndDate >= last : false))
+                        .Select(s=> new { s.Id , s.Name})
+                        .ToList();
+
+                }
+                if (TableName == "Employee")
                 {
-                    SetUser((int)DeviceId, M.Id);
+                    DateTime last = DateTime.Today.AddMonths(-3);
+                    List = DB.Employees.Where(x => x.Status ==0)
+                       .Select(s => new { s.Id, s.Name })
+                       .ToList();
+
+                }
+                foreach (var O in List)
+                {
+                    SetUser((int)DeviceId, O.Id , O.Name , TableName);
                 }
                 return Ok(true);
-
             }
             else
                 return Ok("Device Is Not Connected");
         }
         [Route("Device/GetAllFaceMembers")]
         [HttpGet]
-        public IActionResult GetAllFaceMembers(long DeviceId)
+        public IActionResult GetAllFingerPrints(long DeviceId ,string TableName)
         {
             if (CheckDeviceHere((int)DeviceId))
             {
-                IList<Member> Members = DB.Members?.ToList();
-                foreach (Member M in Members)
-                {
+                var List = new List<UserDevice>();
+                if(TableName == "Memeber")
+                List = DB.Members?.Select(s => new UserDevice { Id = s.Id.ToString(),Name= s.Name }).ToList();
+                if (TableName == "Employee")
+                    List = DB.Employees?.Select(s=> new UserDevice  { Id = s.Id.ToString() , Name = s.Name}).ToList();
 
-                    var memeberface = DB.MemberFaces.Where(f => f.MemberId == M.Id).SingleOrDefault();
-                    if (memeberface == null)
+                foreach (var O in List)
+                {
+                   
+                    var FingerPrint = DB.FingerPrints.Where(f => f.Fk == O.Id && f.TableName == TableName).SingleOrDefault();
+                    if (FingerPrint == null)
                     {
                         string strface = "";
                         int length = 0;
-                        bool GetUserFace = objZkeeper.GetUserFaceStr(1, M.Id.ToString(), 50, ref strface, ref length);
+                        bool GetUserFace = objZkeeper.GetUserFaceStr(1, O.Id, 50, ref strface, ref length);
 
                         if (GetUserFace)
                         {
-                            DB.MemberFaces.Add(new MemberFace
+                            DB.FingerPrints.Add(new FingerPrint
                             {
-                                FaceLength = length,
-                                FaceStr = strface,
-                                MemberId = M.Id,
+                                Length = length,
+                                Str = strface,
+                                Fk = O.Id,
+                                TableName = TableName,
+                                Type = "Face"
                             });
-
                         }
                     }
                     else {
@@ -548,7 +563,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             else
                 return Ok("Device Is Not Connected");
         }
+         public class UserDevice
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
 
+        }
         private void RaiseDeviceEvent(object sender, string actionType)
         {
             switch (actionType)
