@@ -11,11 +11,21 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
-    [Authorize]
 
     public class FileDataController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
+
+        [AllowAnonymous]
+        [Route("Files/Upload")]
+        [HttpPost]
+        public IActionResult Upload(string filex)
+        {
+
+            return Ok(true);
+        }
+
+        [Authorize]
         [Route("Files/GetFileByObjId")]
         [HttpGet]
         public IActionResult GetFileByObjId(string TableName , long ObjId )
