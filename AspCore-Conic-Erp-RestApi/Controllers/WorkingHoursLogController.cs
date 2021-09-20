@@ -44,7 +44,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetEmployeeMounthLog(long? EmpId, int Limit, string Sort, int Page, DateTime? DateFrom, DateTime? DateTo, int? Status)
         {
-
                 var Logs = DB.WorkingHoursLogs.Where(x=> x.EmployeeId == EmpId && x.Status == Status && 
                 ((DateFrom != null ? x.StartDateTime >= DateFrom : true) || (DateFrom != null ? x.EndDateTime >= DateFrom : true)) && 
                 ((DateFrom != null ?  x.StartDateTime <= DateTo : true) || (DateFrom != null ? x.EndDateTime <= DateTo : true))).Select
