@@ -27,7 +27,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [HttpPost]
         [Route("EntryAccounting/GetByListQ")]
-        public IActionResult GetByListQ( int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string? Any)
+        public IActionResult GetByListQ( int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
         {
             var EntryAccountings = DB.EntryAccountings.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Description.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&

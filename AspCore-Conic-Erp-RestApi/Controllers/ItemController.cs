@@ -22,7 +22,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [HttpPost]
         [Route("Item/GetByListQ")]
-        public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string? Any)
+        public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
         {
             var Items = DB.Items.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Category.Contains(Any) || s.Barcode.Contains(Any) : true) && (Status != null ? s.Status == Status : true))
               .Select(x=>new   {
@@ -69,7 +69,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [HttpGet]
         [Route("Item/CheckItemIsExist")]
-        public IActionResult CheckItemIsExist(string? Name, string? BarCode)
+        public IActionResult CheckItemIsExist(string Name, string BarCode)
         {
             var Items = DB.Items.Where(m => (BarCode != null ? m.Barcode.ToLower() == BarCode.ToLower() : false)
              ||(Name != null ? m.Name.ToLower()== Name.ToLower() : false)).ToList();
@@ -102,7 +102,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [HttpPost]
         [Route("Item/GetLowOrder")]
-        public IActionResult GetLowOrder(int Limit, string Sort, int Page, int? Status, string? Any)
+        public IActionResult GetLowOrder(int Limit, string Sort, int Page, int? Status, string Any)
         {
             var Items = DB.Items.Where(s => (s.InventoryMovements != null ?
             s.InventoryMovements.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty) - s.InventoryMovements.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty) < s.LowOrder
@@ -140,7 +140,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("Item/GetEXP")]
         [HttpPost]
-        public IActionResult GetEXP(DateTime? DateFrom, DateTime? DateTo, int Limit, string Sort, int Page, int? Status, string? Any)
+        public IActionResult GetEXP(DateTime? DateFrom, DateTime? DateTo, int Limit, string Sort, int Page, int? Status, string Any)
         {
             var Items = DB.InventoryMovements.Where(s => (DateTo != null ? s.EXP <= DateTo : true)&& (DateFrom != null ? s.EXP >= DateFrom : true))
             .Select(x => new {
@@ -279,7 +279,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [HttpGet]
         [Route("Item/GetItemByBarcode")]
-        public IActionResult GetItemByBarcode(string? BarCode )
+        public IActionResult GetItemByBarcode(string BarCode )
         {
             var Item = DB.Items.Where(x=>x.Barcode == BarCode).Select(x=> new 
                         {

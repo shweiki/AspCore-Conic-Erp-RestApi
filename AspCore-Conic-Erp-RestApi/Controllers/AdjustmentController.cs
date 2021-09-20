@@ -57,7 +57,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 return Ok(false);
             }
         
-            return Ok(false);
     }
         [Route("Adjustment/GetRAdjustments")]
         [HttpGet]
@@ -75,8 +74,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 //Console.WriteLine(collection);
                 return Ok(false);
             }
-
-            return Ok(false);
         }
         [Route("Adjustment/GetPAdjustments")]
         [HttpGet]
@@ -95,8 +92,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 //Console.WriteLine(collection);
                 return Ok(false);
             }
-
-            return Ok(false);
         }
 
         [Route("Adjustment/GetAdjustmentLabel")]
@@ -121,9 +116,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 //Console.WriteLine(collection);
                 return Ok(false);
             }
-
-            return Ok(false);
-
         }
 
     }

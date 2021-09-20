@@ -14,7 +14,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private ConicErpContext DB = new ConicErpContext();
         [HttpPost]
         [Route("Payment/GetByListQ")]
-        public IActionResult GetByListQ(int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string? Any)
+        public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
         {
             var Invoices = DB.Payments.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&

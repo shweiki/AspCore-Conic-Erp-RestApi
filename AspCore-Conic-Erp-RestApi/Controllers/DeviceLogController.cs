@@ -150,7 +150,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("DeviceLog/GetDeviceLogById")]
         [HttpGet]
-        public IActionResult GetDeviceLogByUserId(string? UserId , string TableName)
+        public IActionResult GetDeviceLogByUserId(string UserId , string TableName)
         {
             var DeviceLogs = DB.DeviceLogs.Where(x => x.Fk == UserId && x.TableName == TableName).Select(x => new {
                 x.Status,
@@ -167,7 +167,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(DeviceLogs);
         }     
   
-        public Boolean RegisterLog(string? Id , DateTime datetime, string Ip , string TableName)
+        public Boolean RegisterLog(string Id , DateTime datetime, string Ip , string TableName)
         {
         
             var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == Id).ToList();
@@ -333,6 +333,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             catch (SqlException e)
             {
+                Console.WriteLine(e);
             }
         }
         private long GetDeviceId(int machineNumber)

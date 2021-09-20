@@ -7,9 +7,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "MemberFace");
-
+         
             migrationBuilder.DropTable(
                 name: "MemberLog");
 
@@ -88,27 +86,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                 name: "FingerPrint");
 
 
-            migrationBuilder.CreateTable(
-                name: "MemberFace",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FaceLength = table.Column<int>(type: "int", nullable: false),
-                    FaceStr = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MemberId = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MemberFace", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_MemberFace_Member",
-                        column: x => x.MemberId,
-                        principalTable: "Member",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
+      
+        
             migrationBuilder.CreateTable(
                 name: "MemberLog",
                 columns: table => new
@@ -139,10 +118,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_MemberFace_MemberID",
-                table: "MemberFace",
-                column: "MemberId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MemberLog_DeviceID",

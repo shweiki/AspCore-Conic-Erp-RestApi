@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    [Migration("20210920060056_StaticType")]
-    partial class StaticType
+    [Migration("20210920091558_Some")]
+    partial class Some
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -745,6 +745,44 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.ToTable("Device");
                 });
 
+            modelBuilder.Entity("Entities.DeviceLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("DeviceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Fk")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TableName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "DeviceId" }, "IX_DeviceLog_DeviceID");
+
+                    b.HasIndex(new[] { "Status" }, "IX_DeviceLog_Status");
+
+                    b.ToTable("DeviceLog");
+                });
+
             modelBuilder.Entity("Entities.Discount", b =>
                 {
                     b.Property<int>("Id")
@@ -1034,7 +1072,11 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Length")
                         .HasColumnType("int");
 
+                    b.Property<long>("MemberId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Str")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TableName")
@@ -1045,7 +1087,9 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FingerPrints");
+                    b.HasIndex(new[] { "MemberId" }, "IX_FingerPrint_MemberID");
+
+                    b.ToTable("FingerPrint");
                 });
 
             modelBuilder.Entity("Entities.InventoryItem", b =>
@@ -1340,43 +1384,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.HasIndex(new[] { "AccountId" }, "IX_Member_AccountID");
 
                     b.ToTable("Member");
-                });
-
-            modelBuilder.Entity("Entities.MemberLog", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("DeviceId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("MemberId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex(new[] { "DeviceId" }, "IX_MemberLog_DeviceID");
-
-                    b.HasIndex(new[] { "MemberId" }, "IX_MemberLog_MemberID");
-
-                    b.HasIndex(new[] { "Status" }, "IX_MemberLog_Status");
-
-                    b.ToTable("MemberLog");
                 });
 
             modelBuilder.Entity("Entities.Membership", b =>
@@ -2718,6 +2725,17 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Navigation("Vendor");
                 });
 
+            modelBuilder.Entity("Entities.DeviceLog", b =>
+                {
+                    b.HasOne("Entities.Device", "Device")
+                        .WithMany("DeviceLogs")
+                        .HasForeignKey("DeviceId")
+                        .HasConstraintName("FK_DeviceLog_Device")
+                        .IsRequired();
+
+                    b.Navigation("Device");
+                });
+
             modelBuilder.Entity("Entities.Employee", b =>
                 {
                     b.HasOne("Entities.Account", "Account")
@@ -2845,25 +2863,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .IsRequired();
 
                     b.Navigation("Account");
-                });
-
-            modelBuilder.Entity("Entities.MemberLog", b =>
-                {
-                    b.HasOne("Entities.Device", "Device")
-                        .WithMany("MemberLogs")
-                        .HasForeignKey("DeviceId")
-                        .HasConstraintName("FK_MemberLog_Device")
-                        .IsRequired();
-
-                    b.HasOne("Entities.Member", "Member")
-                        .WithMany("MemberLogs")
-                        .HasForeignKey("MemberId")
-                        .HasConstraintName("FK_MemberLog_Member")
-                        .IsRequired();
-
-                    b.Navigation("Device");
-
-                    b.Navigation("Member");
                 });
 
             modelBuilder.Entity("Entities.MembershipMovement", b =>
@@ -3184,7 +3183,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
             modelBuilder.Entity("Entities.Device", b =>
                 {
-                    b.Navigation("MemberLogs");
+                    b.Navigation("DeviceLogs");
 
                     b.Navigation("WorkingHoursLogs");
                 });
@@ -3223,8 +3222,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
             modelBuilder.Entity("Entities.Member", b =>
                 {
-                    b.Navigation("MemberLogs");
-
                     b.Navigation("MembershipMovements");
 
                     b.Navigation("Payments");

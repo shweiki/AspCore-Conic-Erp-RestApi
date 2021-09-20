@@ -97,10 +97,10 @@ namespace Entities
         }
         public string GetDataBaseName()
         {
-            return "Conic_Erp";
-            //int lat = Environment.CurrentDirectory.LastIndexOf("\\")+1;
-            //string Name = Environment.CurrentDirectory.Substring(lat  ,( Environment.CurrentDirectory.Length - lat));
-            //return Name.Replace("-", "").ToUpper();
+            //return "Conic_Erp";
+            int lat = Environment.CurrentDirectory.LastIndexOf("\\")+1;
+            string Name = Environment.CurrentDirectory.Substring(lat  ,( Environment.CurrentDirectory.Length - lat));
+            return Name.Replace("-", "").ToUpper();
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

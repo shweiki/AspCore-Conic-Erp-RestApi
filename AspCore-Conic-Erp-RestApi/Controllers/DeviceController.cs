@@ -130,7 +130,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [HttpGet]
         [Route("Device/DirectlyPrint")]
-        public IActionResult DirectlyPrint(string? PrinterName ,string? Ip ,string? PortName )
+        public IActionResult DirectlyPrint(string PrinterName ,string Ip ,string PortName )
         {
             Printer printer = new Printer(PrinterName);
             printer.Append("يسشيس)");

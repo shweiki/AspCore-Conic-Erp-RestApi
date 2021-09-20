@@ -296,7 +296,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [HttpPost]
         [Route("SaleInvoice/GetSaleInvoiceByListId")]
-        public IActionResult GetSaleInvoiceByListId(string? listid)
+        public IActionResult GetSaleInvoiceByListId(string listid)
         {
             List<long> list = listid.Split(',').Select(long.Parse).ToList();
             var Invoices = DB.SalesInvoices.Where(s => list.Contains(s.Id)).Select(x => new

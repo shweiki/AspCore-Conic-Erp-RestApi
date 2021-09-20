@@ -158,8 +158,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 //Console.WriteLine(collection);
                 return Ok(false);
             }
-
-            return Ok(false);
         }
        
     }

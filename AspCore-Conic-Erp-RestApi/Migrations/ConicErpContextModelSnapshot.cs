@@ -2058,11 +2058,14 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<long>("AdjustmentId")
                         .HasColumnType("bigint");
 
-                    b.Property<double>("AdjustmentPercentage")
-                        .HasColumnType("float");
-
                     b.Property<long>("SalaryPaymentId")
                         .HasColumnType("bigint");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

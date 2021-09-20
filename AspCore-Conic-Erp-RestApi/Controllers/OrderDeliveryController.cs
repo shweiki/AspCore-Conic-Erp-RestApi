@@ -38,7 +38,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Authorize]
         [HttpPost]
         [Route("OrderDelivery/GetByListQ")]
-        public IActionResult GetByListQ(int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
+        public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
         {
                var Deliveries = DB.OrderDeliveries.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
@@ -75,7 +75,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Authorize]
         [Route("OrderDelivery/GetOrderDelivery")]
         [HttpGet]
-        public IActionResult GetOrderDelivery(int Limit, string Sort, int Page, int? Status, string? Any)
+        public IActionResult GetOrderDelivery(int Limit, string Sort, int Page, int? Status, string Any)
 
         {
             var Orders = DB.OrderDeliveries.Where(s => (s.Status !=4) && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
@@ -139,7 +139,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Authorize]
         [Route("OrderDelivery/GetDriverOrder")]
         [HttpGet]
-        public IActionResult GetDriverOrder(string Id, string name, int Limit, string Sort, int Page, int? Status, string? Any)
+        public IActionResult GetDriverOrder(string Id, string name, int Limit, string Sort, int Page, int? Status, string Any)
 
         {
             var Orders = DB.OrderDeliveries.Where(x => (x.Driver.DriverUserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2 || x.Status == 3) && (Any != null ? x.Id.ToString().Contains(Any) || x.Name.Contains(Any) : true) && (Status != null ? x.Status == Status : true)).Select(x => new
@@ -252,7 +252,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Authorize]
         [HttpPost]
         [Route("OrderDelivery/GetByListQByDriver")]
-        public IActionResult GetByListQByDriver(string Id, string name, int Limit, string Sort, int Page, string? User, DateTime? DateFrom, DateTime? DateTo, int? Status, string? Any)
+        public IActionResult GetByListQByDriver(string Id, string name, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
         {
             var Deliveries = DB.OrderDeliveries.Where(s => (s.Driver.DriverUserId == Id || name == "Developer") && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
             && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
