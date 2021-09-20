@@ -27,7 +27,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x => new
                     {
                         x.Id,
-
+                       
                     })?.ToList()?.LastOrDefault()?.Id;
                
                 return Ok(WorkingHoursLogs);
@@ -42,30 +42,43 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("WorkingHourLog/GetEmployeeMounthLog")]
         [HttpGet]
-        public IActionResult GetEmployeeMounthLog(long? EmpId)
+        public IActionResult GetEmployeeMounthLog(long? EmpId, int Limit, string Sort, int Page, DateTime? DateFrom, DateTime? DateTo, int? Status)
         {
-           
-            try
-            {
-                var Logs = DB.WorkingHoursLogs.Where(x=> x.EmployeeId == EmpId && x.Status == 0 ).Select
+
+                var Logs = DB.WorkingHoursLogs.Where(x=> x.EmployeeId == EmpId && x.Status == Status && 
+                ((DateFrom != null ? x.StartDateTime >= DateFrom : true) || (DateFrom != null ? x.EndDateTime >= DateFrom : true)) && 
+                ((DateFrom != null ?  x.StartDateTime <= DateTo : true) || (DateFrom != null ? x.EndDateTime <= DateTo : true))).Select
                     (x => new {
                         x.Id, 
                         x.StartDateTime, 
                         x.EndDateTime,
                         x.Description,
                         DeviceName =x.Device.Name,
-                        WorkTime = x.EndDateTime-x.StartDateTime,
+                        WorkTime = (x.EndDateTime-x.StartDateTime).GetValueOrDefault().TotalHours
+
                     }).ToList();
+            Logs = (Sort == "+id" ? Logs.OrderBy(s => s.Id).ToList() : Logs.OrderByDescending(s => s.Id).ToList());
 
-                return Ok(Logs);
-            }
-            catch
-            {
+            return Ok(
+                new
+                {
+                    totals = Logs.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                    Totals = new
+                    {
+                        Rows = Logs.Count(),
+                        Totals = Logs.Sum(s => s.WorkTime),
+                        OverTime =(Logs.Sum(s => s.WorkTime)-8),
+                      
+                    }
+
+                });
+            
+
                 //Console.WriteLine(collection);
-                return Ok(false);
-            }
+             
+            
 
-            return Ok(false);
+            
         }
    
    
