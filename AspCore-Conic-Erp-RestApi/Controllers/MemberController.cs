@@ -337,7 +337,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 var LastLog = DB.ActionLogs.Where(x => x.MemberId == M.Id && x.Opration.OprationName== "BlackList").OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
                 if (LastLog != null)
                 {
-                    M.Status = DB.Oprationsys.Where(o=>o.Id == LastLog.OprationId).SingleOrDefault().Status;
+                    M.Status = DB.ActionLogs.Where(x => x.MemberId == M.Id).OrderBy(o => o.PostingDateTime).ToList().LastOrDefault().Opration.Status;
                 }
                 DB.SaveChanges();
             }
