@@ -92,7 +92,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.AccountId,
                 x.Tag,
                 x.Vaccine,
-                lastLogByMember= DB.DeviceLogs.Where(l=>l.TableName =="Member" && l.Fk == x.Id.ToString()).ToList().OrderBy(o=>o.DateTime).LastOrDefault().DateTime.ToString() + ' ',
+               // lastLogByMember= DB.DeviceLogs.Where(l=> l.TableName =="Member" && l.Fk == x.Id.ToString()).ToList().OrderBy(o=>o.DateTime).LastOrDefault().DateTime.ToString() + ' ',
                 MembershipsCount = x.MembershipMovements.Count(),
                 TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
                 TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum(),
