@@ -35,10 +35,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("DeviceLog/GetByStatus")]
         [HttpGet]
-        public IActionResult GetByStatus(int Status ,string TableName)
+        public IActionResult GetByStatus(int Status ,string TableName ,int Limit, string Sort, int Page, string Any)
         {
             // Get Log From ZkBio Data base 
-            var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName).AsEnumerable().Select(x => new {
+            var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any != null ? x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any) : true)).AsEnumerable().Select(x => new {
                 x.Id,
                 x.DateTime,
                 x.Description,
@@ -46,11 +46,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.TableName,
                 User = GetFkData(x.Fk, x.TableName)
             }).ToList();
+
+            DeviceLogs = (Sort == "+id" ? DeviceLogs.OrderBy(s => s.Id).ToList() : DeviceLogs.OrderByDescending(s => s.Id).ToList());
+
             DeviceLogs = DeviceLogs.GroupBy(a => new {  a.DateTime }).Select(g => g.Last()).ToList();
+
             var StartLast = DB.DeviceLogs.OrderBy(o => o.DateTime).LastOrDefault();
             DateTime StartToday = StartLast == null ? DateTime.Today : StartLast.DateTime;
-            GetFromZkBio(StartToday);
-            return Ok(DeviceLogs);
+            GetFromZkBio(StartToday , TableName);
+            return Ok(DeviceLogs.Skip((Page - 1) * Limit).Take(Limit).ToList());
         }
 
             public dynamic GetFkData(string Fktable , string TableName)
@@ -170,7 +174,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public Boolean RegisterLog(string Id , DateTime datetime, string Ip , string TableName)
         {
         
-            var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == Id).ToList();
+            var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == Id && l.TableName == TableName).ToList();
             isLogSaveIt = DB.DeviceLogs.Where(Ld => Ld.DateTime == datetime).ToList();
             var Device = DB.Devices.Where(x => x.Ip == Ip).SingleOrDefault();
 
@@ -287,7 +291,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else { return false; }
         }
-        public  void GetFromZkBio(DateTime StartLast)
+        public  void GetFromZkBio(DateTime StartLast ,string TableName)
         {
             try
             {
@@ -323,7 +327,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                                 string objectId = reader[1].ToString();
                                 string Ip = reader[2].ToString();
-                                RegisterLog(objectId, action_time, Ip , "Member");
+                                RegisterLog(objectId, action_time, Ip , TableName);
 
                             }
 
