@@ -263,7 +263,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Tag,
                     x.Vaccine,
                     MembershipsCount = x.MembershipMovements.Count(),
-                    HaveFaceOnDevice = DB.FingerPrints.Where(f=>f.Fk == x.Id.ToString() && f.TableName == "Memeber").Count() > 0 ? true : false,
+                    HaveFaceOnDevice = DB.FingerPrints.Where(f=>f.Fk == x.Id.ToString() && f.TableName == "Member").Count() > 0 ? true : false,
                     Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg"),
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
@@ -317,7 +317,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
 
             }
-             CheckBlackListActionLogMembers();
+        //     CheckBlackListActionLogMembers();
     
             DB.SaveChanges();
 
@@ -334,7 +334,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 int OStatus = M.Status;
 
-                var LastLog = DB.ActionLogs.Where(x => x.MemberId == M.Id && x.Opration.OprationName== "BlackList").OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
+                var LastLog = DB.ActionLogs.Where(x => x.MemberId == M.Id && x.Opration.TableName =="Member" && x.Opration.Status == -2)?.OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
                 if (LastLog != null)
                 {
                     M.Status = DB.ActionLogs.Where(x => x.MemberId == M.Id).OrderBy(o => o.PostingDateTime).ToList().LastOrDefault().Opration.Status;
