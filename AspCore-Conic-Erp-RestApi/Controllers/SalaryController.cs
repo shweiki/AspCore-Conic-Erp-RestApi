@@ -23,7 +23,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
        {
             if (ModelState.IsValid)
             {
-                SalaryPayment SalaryPayment = DB.SalaryPayments.Where(x => x.EmployeeId == collection.EmployeeId && x.status == 0).SingleOrDefault();
+                SalaryPayment SalaryPayment = DB.SalaryPayments.Where(x => x.Id == collection.Id ).SingleOrDefault();
                 SalaryPayment.GrossSalary = collection.GrossSalary;
                
                 try

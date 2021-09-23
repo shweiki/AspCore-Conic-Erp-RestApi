@@ -57,6 +57,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                  x.Id,
                  x.AdjustmentAmount,
+                 x.Description,
                 AdjustmentName = x.Adjustment.Name,
             }).ToList();
             return Ok(Static);

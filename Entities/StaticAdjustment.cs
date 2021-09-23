@@ -9,7 +9,7 @@ namespace Entities
         
         public long Id { get; set; }
         public double AdjustmentAmount { get; set; }
-        public string Type { get; set; }
+        public string Description { get; set; }
         public long AdjustmentId { get; set; }
         public long SalaryPaymentId { get; set; }
         public int Status { get; set; }

@@ -29,8 +29,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         x.Id,
                        
                     })?.ToList()?.LastOrDefault()?.Id;
-               
-                return Ok(WorkingHoursLogs);
+                if (WorkingHoursLogs != null)
+                {
+                    return Ok(WorkingHoursLogs);
+                }
+                return Ok(false);
             }
 
             catch
