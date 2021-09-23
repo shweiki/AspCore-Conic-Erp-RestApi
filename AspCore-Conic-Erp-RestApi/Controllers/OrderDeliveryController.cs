@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Entities;
+using System.Collections;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -34,6 +35,35 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
+        public int ppt = 0;
+        [AllowAnonymous]
+        [Route("OrderDelivery/CreateWithDriver")]
+        [HttpPost]
+        public IActionResult CreateWithDriver(OrderDelivery collection)
+        {
+            var DriverList = DB.Drivers.Where(x => x.Status == 0)
+                      .Select(s => new { s.Id }).ToArray();
+
+            var lastOrder = DB.OrderDeliveries.ToList().OrderByDescending(t => t.Id).Take(2).ToArray();
+            if ((DriverList[ppt].Id != lastOrder[0].DriverId && DriverList[ppt].Id != lastOrder[1].DriverId) || ppt == DriverList.Length)
+            {
+                collection.Status = 1;
+                collection.DriverId = DriverList[ppt].Id;
+                DB.OrderDeliveries.Add(collection);
+                DB.SaveChanges();
+                return Ok(true);
+
+            }
+            else
+            {
+                ppt += 1;
+                CreateWithDriver(collection);
+                return Ok(true);
+            }
+            
+        }
+       
+   
 
         [Authorize]
         [HttpPost]
