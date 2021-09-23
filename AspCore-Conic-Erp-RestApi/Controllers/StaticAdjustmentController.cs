@@ -58,11 +58,22 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                  x.Id,
                  x.AdjustmentAmount,
                  x.Description,
+                 AdjustmentName = x.Adjustment.Name,
+            }).ToList();
+            return Ok(Static);
+        }
+        [Route("StaticAdjustment/GetStaticAdjustmentsListQ")]
+        [HttpGet]
+        public IActionResult GetStaticAdjustmentsListQ(long? Id)
+        {
+            var Static = DB.StaticAdjustments.Where(x => x.SalaryPaymentId == Id).Select(x => new {
+
+                x.Id,
+                x.AdjustmentAmount,
+                x.Description,
                 AdjustmentName = x.Adjustment.Name,
             }).ToList();
             return Ok(Static);
-
-
         }
 
     }

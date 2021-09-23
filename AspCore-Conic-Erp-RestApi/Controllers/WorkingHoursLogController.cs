@@ -56,7 +56,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         x.EndDateTime,
                         x.Description,
                         DeviceName =x.Device.Name,
-                        WorkTime = (x.EndDateTime-x.StartDateTime).GetValueOrDefault().TotalHours
+                        WorkTime = (x.EndDateTime-x.StartDateTime).GetValueOrDefault().TotalHours,
+                        WH = DB.SalaryPayments.Where(f=> f.EmployeeId == x.EmployeeId).Select(f=> f.WorkingHours).FirstOrDefault(),
 
                     }).ToList();
             Logs = (Sort == "+id" ? Logs.OrderBy(s => s.Id).ToList() : Logs.OrderByDescending(s => s.Id).ToList());
@@ -69,7 +70,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     {
                         Rows = Logs.Count(),
                         Totals = Logs.Sum(s => s.WorkTime),
-                        OverTime =(Logs.Sum(s => s.WorkTime)-8),
+                        OverTime =(Logs.Sum(s => s.WorkTime)-(Logs.Sum(s => s.WH))),
                       
                     }
 

@@ -24,19 +24,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             if (ModelState.IsValid)
             {
                 SalaryPayment SalaryPayment = DB.SalaryPayments.Where(x => x.Id == collection.Id ).SingleOrDefault();
-                SalaryPayment.GrossSalary = collection.GrossSalary;
-               
-                try
-                {
-                    
+                if (collection.GrossSalary > 0) { 
+                    SalaryPayment.WorkingHours = collection.WorkingHours;
+                    SalaryPayment.GrossSalary = collection.GrossSalary;
                     DB.SaveChanges();
                     return Ok(true);
                 }
-                catch
-                {
-                    //Console.WriteLine(collection);
-                    return Ok(false);
+                else { 
+                    SalaryPayment.WorkingHours = collection.WorkingHours;
+                    DB.SaveChanges();
+                    return Ok(true);
                 }
+
             }
             return Ok(false);
 
@@ -53,8 +52,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.EmployeeId,
                     x.NetSalary,
                     x.GrossSalary,
-                    x.SalaryPeriod,
-                    x.status,
+                    x.SalaryFrom,
+                    x.SalaryTo,
+                    x.Status,
                 }).ToList();
             return Ok(Salaries);
         }
@@ -69,8 +69,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Id,
                     x.NetSalary,
                     x.GrossSalary,
-                    x.SalaryPeriod,
-                    x.status,
+                    x.SalaryFrom,
+                    x.SalaryTo,
+                    x.Status,
                     EmpId= x.EmployeeId,
                     Name = x.Employee.Name
                 }).SingleOrDefault();
@@ -81,7 +82,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetLastSalaryById(long? Id)
         {
-            var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == Id && m.status == 0).Select(
+            var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == Id && m.Status == 0).Select(
                 x => new
                 {
                   Id= x.Id,
@@ -95,7 +96,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetSalaryId(long? EmployeeId)
         {
-            var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == EmployeeId && m.status == 0).Select(
+            var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == EmployeeId && m.Status == 0).Select(
                 x => new
                 {
                     Id = x.Id,

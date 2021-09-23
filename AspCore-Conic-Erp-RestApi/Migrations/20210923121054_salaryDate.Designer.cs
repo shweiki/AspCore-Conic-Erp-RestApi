@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210923121054_salaryDate")]
+    partial class salaryDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -943,6 +945,26 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.ToTable("Employees");
                 });
 
+            modelBuilder.Entity("Entities.EmployeeFingerPrint", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FingerPrint")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("EmployeeFingerPrints");
+                });
+
             modelBuilder.Entity("Entities.EntryAccounting", b =>
                 {
                     b.Property<long>("Id")
@@ -1050,6 +1072,9 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Property<int>("Length")
                         .HasColumnType("int");
 
+                    b.Property<long>("MemberId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Str")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1061,6 +1086,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex(new[] { "MemberId" }, "IX_FingerPrint_MemberID");
 
                     b.ToTable("FingerPrint");
                 });
@@ -2726,6 +2753,17 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Navigation("Account");
                 });
 
+            modelBuilder.Entity("Entities.EmployeeFingerPrint", b =>
+                {
+                    b.HasOne("Entities.Employee", "Employee")
+                        .WithMany("EmployeeFingerPrints")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("Entities.EntryMovement", b =>
                 {
                     b.HasOne("Entities.Account", "Account")
@@ -3158,6 +3196,8 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
             modelBuilder.Entity("Entities.Employee", b =>
                 {
+                    b.Navigation("EmployeeFingerPrints");
+
                     b.Navigation("SalaryPayments");
 
                     b.Navigation("WorkingHoursLogs");

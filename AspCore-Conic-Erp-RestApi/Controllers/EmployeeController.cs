@@ -236,7 +236,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     
                     GrossSalary = 0,
                     NetSalary = 0,
-                    SalaryPeriod = new DateTime()
+                    SalaryFrom = new DateTime(),
+                    SalaryTo = new DateTime()
 
                 };
                 collection.EmployeeUserId = NewUser.Id;

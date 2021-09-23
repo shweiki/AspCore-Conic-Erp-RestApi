@@ -15,8 +15,10 @@ namespace Entities
             public long EmployeeId { get; set; }
             public double GrossSalary { get; set; }
             public double NetSalary { get; set; }
-            public DateTime SalaryPeriod { get; set; }
-            public int status { get; set; }
+            public DateTime SalaryFrom { get; set; }
+            public DateTime SalaryTo { get; set; }
+            public int Status { get; set; }
+            public int WorkingHours { get; set; }
         public virtual Employee Employee { get; set; }
         public virtual ICollection<WorkingHoursAdjustment> WorkingHoursAdjustments { get; set; }
         public virtual ICollection<StaticAdjustment> StaticAdjustments { get; set; }
