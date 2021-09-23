@@ -97,7 +97,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult CheckDeviceLog()
         {
-            foreach (DeviceLog ML in DB.DeviceLogs.Where(x => x.Status >= 0).ToList()) {
+            foreach (DeviceLog ML in DB.DeviceLogs.Where(x => x.Status >= 0 && x.TableName =="Member").ToList()) {
 
                 if (DateTime.Today > ML.DateTime) {
                     ML.Status = -1;
@@ -340,10 +340,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Console.WriteLine(e);
             }
         }
-        private long GetDeviceId(int machineNumber)
-        {
-            throw new NotImplementedException();
-        }
+  
     }
 
 }

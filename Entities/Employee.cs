@@ -9,7 +9,6 @@ namespace Entities
     {
         public Employee()
         {
-            EmployeeFingerPrints = new HashSet<EmployeeFingerPrint>();
             WorkingHoursLogs = new HashSet<WorkingHoursLog>();
             SalaryPayments = new HashSet<SalaryPayment>();
             
@@ -31,7 +30,6 @@ namespace Entities
         public string Vaccine { get; set; }
         public string EmployeeUserId { get; set; }
         public virtual Account Account { get; set; }
-        public virtual ICollection<EmployeeFingerPrint> EmployeeFingerPrints { get; set; }
         public virtual ICollection<WorkingHoursLog> WorkingHoursLogs { get; set; }
         public virtual ICollection<SalaryPayment> SalaryPayments { get; set; }
 

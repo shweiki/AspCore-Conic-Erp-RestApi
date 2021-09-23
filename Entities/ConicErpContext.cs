@@ -70,7 +70,6 @@ namespace Entities
         public virtual DbSet<Report> Reports { get; set; }
         public virtual DbSet<OrderDelivery> OrderDeliveries { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
-        public virtual DbSet<EmployeeFingerPrint> EmployeeFingerPrints { get; set; }
         public virtual DbSet<WorkingHoursLog> WorkingHoursLogs { get; set; }
         public virtual DbSet<WorkingHoursAdjustment> WorkingHoursAdjustments { get; set; }
         public virtual DbSet<SalaryPayment> SalaryPayments { get; set; }
@@ -1006,13 +1005,11 @@ namespace Entities
             {
                 entity.ToTable("FingerPrint");
 
-                entity.HasIndex(e => e.MemberId, "IX_FingerPrint_MemberID");
 
                 entity.Property(e => e.Id);
 
                 entity.Property(e => e.Str).IsRequired();
 
-                entity.Property(e => e.MemberId);
 
            
             });
