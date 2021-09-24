@@ -47,7 +47,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             try
             {
                 var Adjustments = DB.Adjustments
-                    .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
+                    .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsStaticAdjustment }).ToList();
 
                 return Ok(Adjustments);
             }
@@ -64,8 +64,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             try
             {
-                var Adjustments = DB.Adjustments.Where(x => x.IsWorkingHourAdjustment == true)
-                    .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
+                var Adjustments = DB.Adjustments
+                    .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsStaticAdjustment }).ToList();
 
                 return Ok(Adjustments);
             }
@@ -82,7 +82,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             try
             {
                 var Adjustments = DB.Adjustments.Where(x => x.IsStaticAdjustment == true)
-                    .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsWorkingHourAdjustment, x.IsStaticAdjustment }).ToList();
+                    .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsStaticAdjustment }).ToList();
 
                 return Ok(Adjustments);
             }
@@ -100,16 +100,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             try
             {
-                var Areas = DB.Adjustments.Select(x => new
+                var Adjustments = DB.Adjustments.Select(x => new
                 {
-
                     value = x.Id,
                     label = x.Name,
                     amount = x.AdjustmentAmount,
-                    isstatic = x.IsStaticAdjustment,
-                    iswork = x.IsWorkingHourAdjustment,
+                    type = x.Type,
                 }).ToList();
-                return Ok(Areas);
+                return Ok(Adjustments);
             }
             catch
             {

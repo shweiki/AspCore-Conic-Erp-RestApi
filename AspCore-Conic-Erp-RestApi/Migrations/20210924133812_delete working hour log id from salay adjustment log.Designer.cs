@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20210924133812_delete working hour log id from salay adjustment log")]
+    partial class deleteworkinghourlogidfromsalayadjustmentlog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2339,6 +2341,40 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.ToTable("WorkShops");
                 });
 
+            modelBuilder.Entity("Entities.WorkingHoursLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("DeviceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("EndDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("StartDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeviceId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("WorkingHoursLogs");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -2953,6 +2989,21 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.Navigation("Vendor");
                 });
 
+            modelBuilder.Entity("Entities.WorkingHoursLog", b =>
+                {
+                    b.HasOne("Entities.Device", null)
+                        .WithMany("WorkingHoursLogs")
+                        .HasForeignKey("DeviceId");
+
+                    b.HasOne("Entities.Employee", "Employee")
+                        .WithMany("WorkingHoursLogs")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -3030,11 +3081,15 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
             modelBuilder.Entity("Entities.Device", b =>
                 {
                     b.Navigation("DeviceLogs");
+
+                    b.Navigation("WorkingHoursLogs");
                 });
 
             modelBuilder.Entity("Entities.Employee", b =>
                 {
                     b.Navigation("SalaryPayments");
+
+                    b.Navigation("WorkingHoursLogs");
                 });
 
             modelBuilder.Entity("Entities.EntryAccounting", b =>

@@ -12,21 +12,20 @@ using System.Globalization;
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
     [Authorize]
-    public class WorkingAdjustmentController : Controller
+    public class SalaryAdjustmentLogController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
 
-        [Route("WorkingAdjustment/Create")]
+        [Route("SalaryAdjustmentLog/Create")]
         [HttpPost]
 
-        public IActionResult Create(WorkingHoursAdjustment collection)
+        public IActionResult Create(SalaryAdjustmentLog collection)
        {
             if (ModelState.IsValid)
             {
                 try
                 {
-
-                    DB.WorkingHoursAdjustments.Add(collection);
+                    DB.SalaryAdjustmentLogs.Add(collection);
                     DB.SaveChanges();
                     return Ok(true);
                 }
@@ -40,21 +39,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         }
 
-        [Route("WorkingAdjustment/GetWorkingAdjustment")]
+        [Route("SalaryAdjustmentLog/GetSalaryAdjustmentLog")]
         [HttpGet]
-        public IActionResult GetWorkingAdjustment()
+        public IActionResult GetSalaryAdjustmentLog()
         {
             try
             {
-                var Adjustments = DB.WorkingHoursAdjustments.Select(x => new
+                var Adjustments = DB.SalaryAdjustmentLogs.Select(x => new
                 {
                     x.Id,
                     x.AdjustmentAmmount,
-                    x.Tax,
                     x.Description,
-
                 }).ToList();
-
                 return Ok(Adjustments);
             }
             catch
@@ -64,21 +60,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
         }
 
-        [Route("WorkingAdjustment/GetWorkingAdjustmentBySalaryId")]
+        [Route("SalaryAdjustmentLog/GetSalaryAdjustmentLogBySalaryId")]
         [HttpGet]
-        public IActionResult GetWorkingAdjustmentBySalaryId(long? SalId)
+        public IActionResult GetSalaryAdjustmentLogBySalaryId(long? SalId)
         {
             try
             {
-                var Adjustments = DB.WorkingHoursAdjustments.Where(m => m.SalaryPaymentId == SalId && m.Status == 0).Select(
+                var Adjustments = DB.SalaryAdjustmentLogs.Where(m => m.SalaryPaymentId == SalId && m.Status == 0).Select(
                     x => new
                     {
                         x.Id,
                         x.AdjustmentAmmount,
-                        x.Tax,
                         x.Description,
-                        StartDate = x.WorkingHoursLog.StartDateTime,
-                        EndDate = x.WorkingHoursLog.EndDateTime,
+                    //    StartDate = x.WorkingHoursLog.StartDateTime,
+                    //    EndDate = x.WorkingHoursLog.EndDateTime,
                         AdjustmentName = x.Adjustment.Name,
                         Salary = x.SalaryPayment.GrossSalary,
 
@@ -94,12 +89,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
 
         [HttpPost]
-        [Route("WorkingAdjustment/GetByListQ")]
+        [Route("SalaryAdjustmentLog/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page,  DateTime? DateFrom, DateTime? DateTo, int? Status)
         {
-            var Adjustments = DB.WorkingHoursAdjustments.Where(s =>
-           ((DateFrom != null ? s.WorkingHoursLog.StartDateTime >= DateFrom : true) || (DateFrom != null ? s.WorkingHoursLog.EndDateTime >= DateFrom : true)) &&
-                ((DateFrom != null ? s.WorkingHoursLog.StartDateTime <= DateTo : true) || (DateFrom != null ? s.WorkingHoursLog.EndDateTime <= DateTo : true)) &&
+            var Adjustments = DB.SalaryAdjustmentLogs.Where(s =>
             ( s.Status == Status)).Select(x => new
             {
                 x.Id,
@@ -108,14 +101,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Description,
                 x.SalaryPaymentId,
                 x.Status,
-                x.Tax,
                 AdjustmentName = x.Adjustment.Name,
-                StartDate = x.WorkingHoursLog.StartDateTime,
-                EndDate = x.WorkingHoursLog.EndDateTime,
-                x.WorkingHoursLogId,
+              //  StartDate = x.WorkingHoursLog.StartDateTime,
+              //  EndDate = x.WorkingHoursLog.EndDateTime,
                 x.Adjustment,
                 x.SalaryPayment,
-                x.WorkingHoursLog,
                
             }).ToList();
             Adjustments = (Sort == "+id" ? Adjustments.OrderBy(s => s.Id).ToList() : Adjustments.OrderByDescending(s => s.Id).ToList());

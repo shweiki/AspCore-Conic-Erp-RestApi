@@ -10,7 +10,6 @@ namespace Entities
         public Device()
         {
             DeviceLogs = new HashSet<DeviceLog>();
-            WorkingHoursLogs = new HashSet<WorkingHoursLog>();
         }
 
         public long Id { get; set; }
@@ -24,6 +23,5 @@ namespace Entities
         public string Description { get; set; }
 
         public virtual ICollection<DeviceLog> DeviceLogs { get; set; }
-        public virtual ICollection<WorkingHoursLog> WorkingHoursLogs { get; set; }
     }
 }

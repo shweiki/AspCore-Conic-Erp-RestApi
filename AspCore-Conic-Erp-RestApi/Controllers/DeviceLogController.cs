@@ -61,7 +61,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                      ConicErpContext DBx = new ConicErpContext();
 
-        dynamic Object;
+                  dynamic Object;
                 switch (TableName)
                 {
                     case "Member":
@@ -87,7 +87,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         Object = DBx.Employees.Where(x => x.Id == Convert.ToInt32(Fktable)).SingleOrDefault();
                         break;
                             default: Object = null; break;
-
                         }
 
                return Object;
@@ -152,11 +151,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             
         }
 
-        [Route("DeviceLog/GetDeviceLogById")]
+        [Route("DeviceLog/GetLogByUserId")]
         [HttpGet]
-        public IActionResult GetDeviceLogByUserId(string UserId , string TableName)
+        public IActionResult GetLogByUserId(string UserId , string TableName, DateTime? DateFrom, DateTime? DateTo)
         {
-            var DeviceLogs = DB.DeviceLogs.Where(x => x.Fk == UserId && x.TableName == TableName).Select(x => new {
+            var DeviceLogs = DB.DeviceLogs.Where(x => x.Fk == UserId && x.TableName == TableName && x.DateTime >= DateFrom && x.DateTime<=DateTo).Select(x => new {
                 x.Status,
                 x.Type,
                 x.DateTime,
@@ -190,7 +189,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     TableName = TableName,
                     Fk = Id.ToString(),
                 };
-
                Create(Log);
                 /*
                  MassageController massage = new MassageController();

@@ -8,17 +8,14 @@ namespace Entities
     {
         public Adjustment()
         {
-            WorkingHoursAdjustments = new HashSet<WorkingHoursAdjustment>();
-            StaticAdjustments = new HashSet<StaticAdjustment>();
+            SalaryAdjustmentLogs = new HashSet<SalaryAdjustmentLog>();
         }
 
             public long Id { get; set; }
             public string Name { get; set; }
             public double AdjustmentAmount { get; set; }
             public string Type { get; set; }
-            public bool IsWorkingHourAdjustment { get; set; }
             public bool IsStaticAdjustment { get; set; }
-        public virtual ICollection<WorkingHoursAdjustment> WorkingHoursAdjustments { get; set; }
-        public virtual ICollection<StaticAdjustment> StaticAdjustments { get; set; }
+        public virtual ICollection<SalaryAdjustmentLog> SalaryAdjustmentLogs { get; set; }
     }
 }
