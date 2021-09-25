@@ -38,6 +38,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetByStatus(int Status ,string TableName ,int Limit, string Sort, int Page, string Any)
         {
             // Get Log From ZkBio Data base 
+
+            var StartLast = DB.DeviceLogs.OrderBy(o => o.DateTime).LastOrDefault();
+            DateTime StartToday = StartLast == null ? DateTime.Today : StartLast.DateTime.AddMinutes(-5);
+            GetFromZkBio(StartToday, TableName);
+
             var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any != null ? x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any) : true)).AsEnumerable().Select(x => new {
                 x.Id,
                 x.DateTime,
@@ -51,9 +56,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             DeviceLogs = DeviceLogs.GroupBy(a => new {  a.DateTime }).Select(g => g.Last()).ToList();
 
-            var StartLast = DB.DeviceLogs.OrderBy(o => o.DateTime).LastOrDefault();
-            DateTime StartToday = StartLast == null ? DateTime.Today : StartLast.DateTime.AddMinutes(-5);
-            GetFromZkBio(StartToday , TableName);
+       
             return Ok(DeviceLogs.Skip((Page - 1) * Limit).Take(Limit).ToList());
         }
 
@@ -148,7 +151,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     //Console.WriteLine(collection);
                     return Ok(false);
                 }
-            
         }
 
         [Route("DeviceLog/GetLogByUserId")]

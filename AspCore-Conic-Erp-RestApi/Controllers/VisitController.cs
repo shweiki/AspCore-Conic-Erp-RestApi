@@ -72,7 +72,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PhoneNumber,
                 Total = x.PersonCount * (x.HourCount * 2) * x.HourPrice - x.Discount
             }).ToList();
-
             return Ok(Visits);
         }
        
@@ -99,7 +98,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 TimeOut = x.FakeDate.AddMinutes(x.HourCount * 60),
                 Total = x.PersonCount * (x.HourCount * 2) * x.HourPrice - x.Discount
             }).ToList();
-
             return Ok(new
             {
                 items = visits.ToList(),
@@ -107,7 +105,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     Rows = visits.Count(),
                     TotalPerson = visits.Sum(s => s.PersonCount),
-                   
                 }
             });
         }
@@ -212,7 +209,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.Description,
                 x.PhoneNumber,
-                Total = x.PersonCount * x.HourPrice * x.HourCount
+                TimeOut = x.FakeDate.AddMinutes(x.HourCount * 60),
+                Total = x.PersonCount * (x.HourCount * 2) * x.HourPrice - x.Discount
             }).ToList();
             return Ok(new
             {
@@ -246,6 +244,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.Description,
                 x.PhoneNumber,
+                TimeOut = x.FakeDate.AddMinutes(x.HourCount * 60),
                 Total = x.PersonCount * (x.HourCount *2  )* x.HourPrice - x.Discount
 
             }).SingleOrDefault();
