@@ -52,7 +52,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             DeviceLogs = DeviceLogs.GroupBy(a => new {  a.DateTime }).Select(g => g.Last()).ToList();
 
             var StartLast = DB.DeviceLogs.OrderBy(o => o.DateTime).LastOrDefault();
-            DateTime StartToday = StartLast == null ? DateTime.Today : StartLast.DateTime;
+            DateTime StartToday = StartLast == null ? DateTime.Today : StartLast.DateTime.AddMinutes(-5);
             GetFromZkBio(StartToday , TableName);
             return Ok(DeviceLogs.Skip((Page - 1) * Limit).Take(Limit).ToList());
         }
@@ -172,11 +172,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
   
         public Boolean RegisterLog(string Id , DateTime datetime, string Ip , string TableName)
         {
-        
             var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == Id && l.TableName == TableName).ToList();
             isLogSaveIt = DB.DeviceLogs.Where(Ld => Ld.DateTime == datetime).ToList();
             var Device = DB.Devices.Where(x => x.Ip == Ip).SingleOrDefault();
-
             if (isLogSaveIt.Count() <= 0 && Device !=null)
             {
                 var Log = new DeviceLog

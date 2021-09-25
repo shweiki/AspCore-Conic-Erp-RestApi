@@ -80,6 +80,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.SalaryTo,
                     x.Status,
                     x.EmployeeId,
+                    x.WorkingHours,
                     x.Employee.Name,
                     SalaryAdjustmentLogs =  x.SalaryAdjustmentLogs.Select(s=>new { 
                     s.Id,
