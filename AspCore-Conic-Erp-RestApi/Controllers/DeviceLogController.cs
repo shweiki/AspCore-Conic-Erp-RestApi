@@ -40,7 +40,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             // Get Log From ZkBio Data base 
 
             var StartLast = DB.DeviceLogs.OrderBy(o => o.DateTime).LastOrDefault();
-            DateTime StartToday = StartLast == null ? DateTime.Today : StartLast.DateTime.AddMinutes(-5);
+            DateTime StartToday = StartLast == null ? DateTime.Today : StartLast.DateTime.AddMinutes(-15);
             GetFromZkBio(StartToday, TableName);
 
             var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any != null ? x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any) : true)).AsEnumerable().Select(x => new {
