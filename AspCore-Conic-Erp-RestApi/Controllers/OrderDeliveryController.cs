@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Entities;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -41,26 +42,25 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpPost]
         public IActionResult CreateWithDriver(OrderDelivery collection)
         {
-            var DriverList = DB.Drivers.Where(x => x.Status == 0)
-                      .Select(s => new { s.Id }).ToArray();
+            List<long> OrderD = new List<long>();
+            var DriverList = DB.Drivers.Where(x => x.IsActive == 1)
+                      .Select(s => new { s.Id }).ToList();
 
-            var lastOrder = DB.OrderDeliveries.ToList().OrderByDescending(t => t.Id).Take(2).ToArray();
-            if ((DriverList[ppt].Id != lastOrder[0].DriverId && DriverList[ppt].Id != lastOrder[1].DriverId) || ppt == DriverList.Length)
-            {
-                collection.Status = 1;
-                collection.DriverId = DriverList[ppt].Id;
-                DB.OrderDeliveries.Add(collection);
-                DB.SaveChanges();
-                return Ok(true);
+             foreach (var d in DriverList) {
+               var LastDriverOrders = DB.OrderDeliveries.Where(x => x.DriverId == d.Id).ToList().LastOrDefault().OrderId;
+                OrderD.Add(LastDriverOrders);
+            }
+            OrderD.Sort();
+            var smallest = OrderD[0];
+            Console.WriteLine(OrderD);
 
-            }
-            else
-            {
-                ppt += 1;
-                CreateWithDriver(collection);
-                return Ok(true);
-            }
-            
+            var lastOrderDriverId = DB.OrderDeliveries.Where(x => x.OrderId == smallest).ToList().SingleOrDefault().DriverId;
+            collection.Status = 1;
+            collection.DriverId = lastOrderDriverId;
+            DB.OrderDeliveries.Add(collection);
+            DB.SaveChanges();
+            return Ok(true);
+        
         }
        
    

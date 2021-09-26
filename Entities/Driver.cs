@@ -23,6 +23,7 @@ namespace Entities
         public string Tag { get; set; }
         public string Pass { get; set; }
         public string DriverUserId { get; set; }
+        public int IsActive { get; set; }
 
 
     }

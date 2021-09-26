@@ -104,9 +104,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PhoneNumber1,
                 x.PhoneNumber2,
                 x.Status,
-                x.Type,
                 x.Company,
-                x.Tag,
+                x.DateofBirth,
+                x.Email,
+                x.DriverUserId,
+                x.Description,
+        
                 // Avatar = Url.Content("~/Images/Driver/" + x.Id + ".jpeg").ToString(),
             }).ToList();
 
@@ -175,8 +178,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Driver.Company = collection.Company;
                 Driver.Description = collection.Description;
                 Driver.Status = collection.Status;
-                Driver.Type = collection.Type;
-                Driver.Tag = collection.Tag;
                 try
                 {
                     DB.SaveChanges();
@@ -213,6 +214,35 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }).SingleOrDefault();
             return Ok(Drivers);
         }
+        [Route("Driver/GetDriverInfo")]
+        [HttpGet]
+        public IActionResult GetDriverInfo(string UserId, string name)
+        {
+            if (name != "Developer") {
+                var Drivers = DB.Drivers.Where(m => m.DriverUserId == UserId).Select(
+                    x => new
+                    {
+                        x.Id,
+                        x.Name,
+                        x.Ssn,
+                        x.PhoneNumber1,
+                        x.PhoneNumber2,
+                        x.Status,
+                        x.Company,
+                        x.DateofBirth,
+                        x.Email,
+                        x.DriverUserId,
+                        x.Description,
+                        x.IsActive,
+
+                    }).SingleOrDefault();
+                return Ok(Drivers);
+            }
+            
+            else {
+                Driver driver = new Driver();
+                return Ok(driver); }
+        }
         [Route("Driver/FixPhoneNumber")]
         [HttpGet]
         public IActionResult FixPhoneNumber()
@@ -240,6 +270,44 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Drivers);
 
 
+        }
+        [Route("Driver/DriverActivation")]
+        [HttpGet]
+        public IActionResult DriverActivation(long Id)
+        {
+            var Drivers = DB.Drivers.Where(x => x.Id == Id).SingleOrDefault();
+            Drivers.IsActive = 1;
+            
+            try
+            {
+                DB.SaveChanges();
+                return Ok(true);
+            }
+            catch
+            {
+                //Console.WriteLine(collection);
+                return Ok(false);
+            }
+           
+        }
+        [Route("Driver/DriverDeActivation")]
+        [HttpGet]
+        public IActionResult DriverDeActivation(long Id)
+        {
+            var Drivers = DB.Drivers.Where(x => x.Id == Id).SingleOrDefault();
+            Drivers.IsActive = 0;
+
+            try
+            {
+                DB.SaveChanges();
+                return Ok(true);
+            }
+            catch
+            {
+                //Console.WriteLine(collection);
+                return Ok(false);
+            }
+           
         }
 
 
