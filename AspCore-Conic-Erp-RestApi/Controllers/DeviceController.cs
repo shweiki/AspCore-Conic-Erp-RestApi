@@ -384,7 +384,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
                 if (TableName == "Employee")
                 {
-                    DateTime last = DateTime.Today.AddMonths(-3);
                     List = DB.Employees.Where(x => x.Status ==0)
                        .Select(s => new { s.Id, s.Name }).ToList();
                 }
