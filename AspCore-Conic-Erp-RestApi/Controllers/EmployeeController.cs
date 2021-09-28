@@ -184,20 +184,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum()
                 // Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg").ToString(),
             }).ToList();
-
             return Ok(Employees);
         }
-
-
-
         [Route("Employee/Create")]
         [HttpPost]
         public async Task<ActionResult> Create(Employee collection)
         {
-            var Pass = "123456";
             if (ModelState.IsValid)
             {
-              
+                var Pass = "123456";
                 var ParentAccount = DB.Accounts.Where(i => i.Description == "Employee").SingleOrDefault();
                 ParentAccount = ParentAccount ??= new Account { Id = 0, ParentId = 0, Code = "0" };
                 Account NewAccount = new Account
@@ -223,31 +218,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
               
                 Pass = NewUser.PasswordHash;
-                
-               
 
-                SalaryPayment NewSalary = new SalaryPayment()
-                {
-                    
-                    GrossSalary = 0,
-                    NetSalary = 0,
-                    SalaryFrom = new DateTime(),
-                    SalaryTo = new DateTime()
-
-                };
                 collection.EmployeeUserId = NewUser.Id;
                 DB.Accounts.Add(NewAccount);
                 DB.SaveChanges();
                 collection.AccountId = NewAccount.Id;
                 DB.Employees.Add(collection);
                 DB.SaveChanges();
-                NewSalary.EmployeeId = collection.Id;
-                DB.SalaryPayments.Add(NewSalary);
-                DB.SaveChanges();
-
-
                 return Ok(collection.Id);
-
             }
             return Ok(false);
         }
@@ -304,7 +282,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Type,
                     x.Tag,
                     x.Vaccine,
-                    Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg"),
+                    Avatar = Url.Content("~/Images/Employee/" + x.Id + ".jpeg"),
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
                     x.AccountId,

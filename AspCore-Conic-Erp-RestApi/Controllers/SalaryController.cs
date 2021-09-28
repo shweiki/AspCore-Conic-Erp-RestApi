@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Web;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -15,11 +9,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class SalaryController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
-
-        [Route("Salary/Update")]
+        [Route("Salary/Edit")]
         [HttpPost]
-
-        public IActionResult Update(SalaryPayment collection)
+        public IActionResult Edit(SalaryPayment collection)
        {
             if (ModelState.IsValid)
             {
@@ -37,11 +29,25 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         return Ok(true);
                
                 } catch { return Ok(false); }
-             
-
             }
             return Ok(false);
+        }
+        [Route("Salary/Create")]
+        [HttpPost]
+        public IActionResult Create(SalaryPayment collection)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    DB.SalaryPayments.Add(collection);
+                    DB.SaveChanges();
+                    return Ok(true);
 
+                }
+                catch { return Ok(false); }
+            }
+            return Ok(false);
         }
         [Route("Salary/GetSalaryByEmployeeId")]
         [HttpGet]
@@ -102,13 +108,21 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetLastSalaryById(long? Id)
         {
-            var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == Id && m.Status == 0).Select(
+            var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == Id).Select(
                 x => new
                 {
-                  Id= x.Id,
-                  
-                }).SingleOrDefault();
-            return Ok(Salaries.Id);
+                    x.Id,
+                    x.NetSalary,
+                    x.GrossSalary,
+                    SalaryFrom = x.SalaryFrom.AddMonths(1),
+                    SalaryTo = x.SalaryTo.AddMonths(1),
+                    x.Status,
+                    x.EmployeeId,
+                    x.WorkingHours,
+                    x.Employee.Name,
+                    x.Employee.JobTitle,
+                 }).ToList().LastOrDefault();
+            return Ok(Salaries);
         }
         [Route("Salary/GetSalaryId")]
         [HttpGet]

@@ -54,7 +54,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (ModelState.IsValid)
             {
-
                 try
                 {
                 Device Device = DB.Devices.Where(x => x.Id == collection.Id).SingleOrDefault();
@@ -65,9 +64,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Device.Feel = collection.Feel;
                 Device.Status = collection.Status;
                 Device.LastSetDateTime = collection.LastSetDateTime;
-                Device.Description = collection.Description;
-             
-                    DB.SaveChanges();
+                    Device.Description = collection.Description;
+                DB.SaveChanges();
                     return Ok(true);
                 }
                 catch
@@ -78,7 +76,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
         }
-        
         [Route("Device/FeelDevice")]
         [HttpGet]
         public IActionResult FeelDevice()
@@ -86,16 +83,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             try
             {
                 var Devices = DB.Devices.Where(x => x.Feel == true).ToList();
-
                 Devices.ForEach(e => CheckDeviceHere((int)e.Id));
                 return Ok(true);
-
             }
             catch {
                 return Ok(false);
-
             }
-
         }
         [Route("Device/OpenCashDrawer")]
         [HttpGet]
@@ -126,8 +119,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
-
-
         [HttpGet]
         [Route("Device/DirectlyPrint")]
         public IActionResult DirectlyPrint(string PrinterName ,string Ip ,string PortName )
@@ -139,19 +130,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             printer.PrintDocument();
             return Ok(true);
         }
-
-
         [Route("Device/GetDevice")]
         [HttpGet]
         public IActionResult GetDevice()
         {
             var Device = DB.Devices.Select(d => new { d.Id, d.Name , d.Feel, d.Status, d.Port ,d.Ip , d.Description }).ToList();
-                        
             return Ok(Device);
         }
-
         [HttpGet]
-
         [Route("Device/CheckDevice")]
         public IActionResult CheckDevice(int Id)
         {
@@ -186,10 +172,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     objZkeeper.GetLastError(ref idwErrorCode);
                     startenroll_retult = false;
-
                 }
-                objZkeeper.Disconnect();
-
                 return Ok(startenroll_retult);
             }
             else
