@@ -18,9 +18,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("SalaryAdjustmentLog/Create")]
         [HttpPost]
-
         public IActionResult Create(SalaryAdjustmentLog collection)
-       {
+        {
             if (ModelState.IsValid)
             {
                 try
@@ -38,7 +37,50 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(false);
 
         }
-
+        [Route("SalaryAdjustmentLog/Edit")]
+        [HttpPost]
+        public IActionResult Edit(SalaryAdjustmentLog collection)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    SalaryAdjustmentLog SalaryAdjustmentLog = DB.SalaryAdjustmentLogs.Where(x => x.Id == collection.Id).SingleOrDefault();
+                    SalaryAdjustmentLog.SalaryPaymentId = collection.SalaryPaymentId;
+                    SalaryAdjustmentLog.Status = collection.Status;
+                    SalaryAdjustmentLog.AdjustmentAmmount = collection.AdjustmentAmmount;
+                    SalaryAdjustmentLog.AdjustmentId = collection.AdjustmentId;
+                    SalaryAdjustmentLog.Description = collection.Description;
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            return Ok(false);
+        }
+        [Route("SalaryAdjustmentLog/Delete")]
+        [HttpPost]
+        public IActionResult Delete(long Id)
+        {
+        
+                try
+                {
+                    SalaryAdjustmentLog SalaryAdjustmentLog = DB.SalaryAdjustmentLogs.Where(x => x.Id == Id).SingleOrDefault();
+      
+                    DB.SalaryAdjustmentLogs.Remove(SalaryAdjustmentLog);
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+        }
         [Route("SalaryAdjustmentLog/GetSalaryAdjustmentLog")]
         [HttpGet]
         public IActionResult GetSalaryAdjustmentLog()
@@ -59,7 +101,31 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 return Ok(false);
             }
         }
-
+        [Route("SalaryAdjustmentLog/GetById")]
+        [HttpGet]
+        public IActionResult GetById(long? Id)
+        {
+            try
+            {
+                var Adjustments = DB.SalaryAdjustmentLogs.Where(m => m.Id == Id).Select(x => new{
+                        x.Id,
+                        x.AdjustmentAmmount,
+                        x.Description,
+                        x.SalaryPaymentId,
+                        x.AdjustmentId,
+                        x.SalaryPayment.Employee.Name,
+                        x.SalaryPayment.GrossSalary,
+                        x.SalaryPayment.WorkingHours,
+                        x.SalaryPayment.EmployeeId,
+                    }).SingleOrDefault();
+                return Ok(Adjustments);
+            }
+            catch
+            {
+                //Console.WriteLine(collection);
+                return Ok(false);
+            }
+        }
         [Route("SalaryAdjustmentLog/GetSalaryAdjustmentLogBySalaryId")]
         [HttpGet]
         public IActionResult GetSalaryAdjustmentLogBySalaryId(long? SalId)

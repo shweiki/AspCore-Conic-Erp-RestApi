@@ -26,6 +26,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                       
             return Ok(DeviceLogs);
         }
+        [Route("DeviceLog/GetById")]
+        [HttpGet]
+        public IActionResult GetById(long Id)
+        {
+
+            return Ok(DB.DeviceLogs.Where(ml => ml.Id == Id).SingleOrDefault());
+        }
         [Route("DeviceLog/GetlastLogByUserId")]
         [HttpGet]
         public IActionResult GetlastLogByUserId(string UserId , string TableName)
@@ -118,6 +125,35 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
           
                     DB.DeviceLogs.Add(collection);
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            return Ok(false);
+        }
+        [Route("DeviceLog/Edit")]
+        [HttpPost]
+        public IActionResult Edit(DeviceLog collection)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    DeviceLog DeviceLog = DB.DeviceLogs.Where(x => x.Id == collection.Id).SingleOrDefault();
+                DeviceLog.DeviceId = collection.DeviceId;
+                DeviceLog.Fk = collection.Fk;
+                DeviceLog.TableName = collection.TableName;
+                DeviceLog.DateTime = collection.DateTime;
+                DeviceLog.Type = collection.Type;
+                DeviceLog.Description = collection.Description;
+                DeviceLog.Status = collection.Status;
+             
+              
                     DB.SaveChanges();
                     return Ok(true);
                 }

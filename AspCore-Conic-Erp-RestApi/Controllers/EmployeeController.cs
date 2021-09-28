@@ -140,26 +140,21 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             try
             {
-
-                var membershiplist = DB.ActionLogs.Where(l => l.MembershipMovementId != null && l.PostingDateTime >= DateTime.Today).Select(x => x.MembershipMovementId).ToList();
-
-              var Members = DB.MembershipMovements.Where(x => membershiplist.Contains(x.Id)).ToList().Select(x => new
+              var Employee = DB.Employees.Where(x => x.Status == 0).Select(x => new
                 {
-                    x.Id,
-                    Name = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
-                    MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
-                    x.VisitsUsed,
-                    x.Type,
-                    x.StartDate,
-                    x.EndDate,
-                    x.TotalAmmount,
-                    x.Description,
-                    x.Status,
-                    x.Member.Vaccine,
-                  // lastLog = DB.MemberLogs.Where(ml => ml.MemberId == x.MemberId).LastOrDefault().DateTime,
-                    x.MemberId
-                }).ToList();
-                return Ok(Members);
+                  x.Id,
+                  x.Name,
+                  x.Ssn,
+                  x.PhoneNumber1,
+                  x.PhoneNumber2,
+                  x.Status,
+                  x.Type,
+                  x.AccountId,
+                  x.Tag,
+                  x.Vaccine,
+                  x.JobTitle,
+              }).ToList();
+                return Ok(Employee);
             }
             catch
             {

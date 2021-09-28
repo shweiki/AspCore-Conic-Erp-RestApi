@@ -155,8 +155,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Device/CheckDevice")]
         public IActionResult CheckDevice(int Id)
         {
-            if (CheckDeviceHere(Id))
-                return Ok(true);
+            if (CheckDeviceHere(Id))return Ok(true);
             else return Ok(false);
 
         }
@@ -169,7 +168,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                 int iFingerIndex = 111;
                 int idwErrorCode = 0;
-
+                bool startenroll_retult = false;
                objZkeeper.CancelOperation();
              //   objZkeeper.SSR_DeleteEnrollData((int)DeviceId,sUserID, 0);//If the specified index of user's templates has existed ,delete it first.(SSR_DelUserTmp is also available sometimes)
          //     objZkeeper.RefreshData(1);//the data in the device should be refreshed
@@ -179,14 +178,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     iCanSaveTmp = 1;
 
                     objZkeeper.StartIdentify();//After enrolling templates,you should let the device into the 1:N verification condition
-           //         objZkeeper.RefreshData(1);//the data in the device should be refreshed
+                    objZkeeper.RefreshData(1);//the data in the device should be refreshed
+                    startenroll_retult = true;
 
                 }
                 else
                 {
                     objZkeeper.GetLastError(ref idwErrorCode);
+                    startenroll_retult = false;
+
                 }
-                return Ok(iCanSaveTmp ==1? true: false);
+                objZkeeper.Disconnect();
+
+                return Ok(startenroll_retult);
             }
             else
                 return Ok("Device Is Not Connected");
@@ -223,7 +227,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             bool SetUserFace = objZkeeper.SetUserFaceStr(1, UserId, 50, strface, length);
                             // SetUserFace = objZkeeper.SSR_SetUserTmpStr(1, member.Id.ToString(), 50, strface);
                          //    SetUserFace = objZkeeper.SetUserFace(1, member.Id.ToString(), 0, ref x, length);
-
                         }
                         else
                         {
@@ -235,7 +238,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             TableName = TableName,
                             Type = "Face"
                         });
-
                             bool SetUserFace = objZkeeper.SetUserFaceStr(1, UserId, 50, strface, length);
                         //    objZkeeper.SetUserFace(1, member.Id.ToString(), 50, strface, length);
                         }
@@ -250,11 +252,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 objZkeeper.RefreshData(1);
                 DB.SaveChanges();
                 objZkeeper.EnableDevice(1, true);
+                objZkeeper.Disconnect();
 
                 return Ok(SetUser);
             }
-            else
-                return Ok("Device Is Not Connected");
+            else return Ok("Device Is Not Connected");
         }
 
         [Route("Device/GetUserLog")]
@@ -266,10 +268,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 if (CheckDeviceHere((int)DeviceId))
                 {
                     ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, 1);
-
                     if (MachineLog != null && MachineLog.Count > 0)
                     {
-
                         foreach (var ML in MachineLog.Where(mlo=> mlo.IndRegID == Convert.ToInt64(UserId) ).ToList())
                         {
                             DateTime datetime = DateTime.Parse(ML.DateTimeRecord);
@@ -291,33 +291,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                 DB.DeviceLogs.Add(Log);
                                 DB.SaveChanges();
                             }
-
                         }
+                        objZkeeper.Disconnect();
                         return Ok(true);
-
                     }
                     else
                     {
+                        objZkeeper.Disconnect();
                         return Ok("There Don't Have Log ");
-
                     }
                 }
-                else {
-                    return Ok("Device Is Not Connected");
-                }
+                else return Ok("Device Is Not Connected");
             }
             catch
             {
                 return NotFound();
             }
-            
-        }
+         }
         public bool CheckDeviceHere(int Id)
         {
             var Device = DB.Devices.Where(x => x.Id == Id).SingleOrDefault();
             bool IsDeviceConnected = false;
             bool isValidIpA = UniversalStatic.ValidateIP(Device.Ip);
-
             if (!isValidIpA)
                 Device.Description = "The Device IP is invalid !!";
             isValidIpA = UniversalStatic.PingTheDevice(Device.Ip);
@@ -327,10 +322,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 objZkeeper = new ZkemClient(RaiseDeviceEvent);
                 Device.Description = "Is Device Connected : ";
-            
                 IsDeviceConnected = objZkeeper.Connect_Net(Device.Ip, Device.Port);
                 objZkeeper.SetDeviceTime2(1, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-
             }
             DB.SaveChanges();
             return IsDeviceConnected;
@@ -348,7 +341,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             if (isValidIpA)
             {
                 objZkeeper = new ZkemClient(RaiseDeviceEvent);
-                Device.Description = "Is Device Connected  ";
+                Device.Description = "Device Is Not Connected";
                  objZkeeper.Disconnect();
             }
             DB.SaveChanges();
@@ -391,6 +384,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     SetUser((int)DeviceId, O.Id , O.Name , TableName);
                 }
+                objZkeeper.Disconnect();
+
                 return Ok(true);
             }
             else
@@ -435,6 +430,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     }
                     DB.SaveChanges();
                 }
+                objZkeeper.Disconnect();
+
                 return Ok(true);
             }
             else
@@ -450,10 +447,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, 1);
                 if (MachineLog != null && MachineLog.Count > 0)
                 {
-                
                         foreach (var ML in MachineLog.ToList())
                         {
-                   
                             DateTime datetime = DateTime.Parse(ML.DateTimeRecord);
                             datetime = new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour, datetime.Minute, 0);
                             var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == ML.IndRegID.ToString() && l.TableName == TableName && l.DateTime == datetime).Count();
@@ -478,18 +473,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             {
                                 continue;
                             }
-                     
                     }
-
-                        DB.SaveChanges();
-
+                    DB.SaveChanges();
                     objZkeeper.ClearGLog(0);
-                return Ok(true);
+                    objZkeeper.Disconnect();
+                    return Ok(true);
                 }
                 else
                 {
+                    objZkeeper.Disconnect();
                     return Ok("There Don't Have Log ");
-
                 }
             }
             else
@@ -504,6 +497,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                bool ClearKeeperData = objZkeeper.ClearKeeperData(1);
                bool ClearGLog = objZkeeper.ClearGLog(1);
                 bool ClearSLog = objZkeeper.ClearSLog(1);
+                objZkeeper.Disconnect();
 
                 return Ok("ClearKeeperData : " + ClearKeeperData + "-ClearGLog : "+ ClearGLog+ "-ClearSLog : "+ ClearSLog);
 
@@ -518,6 +512,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             if (CheckDeviceHere((int)DeviceId))
             {
                bool ClearAdministrators = objZkeeper.ClearAdministrators(1);
+                objZkeeper.Disconnect();
+
                 return Ok("ClearAdministrators : " + ClearAdministrators + "");
 
             }

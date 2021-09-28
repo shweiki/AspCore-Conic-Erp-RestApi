@@ -26,19 +26,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 try
                 {
                     SalaryPayment SalaryPayment = DB.SalaryPayments.Where(x => x.Id == collection.Id).SingleOrDefault();
-                    if (collection.GrossSalary > 0)
-                    {
+                        SalaryPayment.SalaryFrom = collection.SalaryFrom;
+                        SalaryPayment.SalaryTo = collection.SalaryTo;
                         SalaryPayment.WorkingHours = collection.WorkingHours;
                         SalaryPayment.GrossSalary = collection.GrossSalary;
+                        SalaryPayment.NetSalary = collection.NetSalary;
+                        SalaryPayment.Status = collection.Status;
+                        SalaryPayment.EmployeeId = collection.EmployeeId;
                         DB.SaveChanges();
                         return Ok(true);
-                    }
-                    else
-                    {
-                        SalaryPayment.WorkingHours = collection.WorkingHours;
-                        DB.SaveChanges();
-                        return Ok(true);
-                    }
+               
                 } catch { return Ok(false); }
              
 
@@ -46,7 +43,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(false);
 
         }
-
         [Route("Salary/GetSalaryByEmployeeId")]
         [HttpGet]
         public IActionResult GetSalaryByEmployeeId(long? EmployeeId)
@@ -55,13 +51,22 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x => new
                 {
                     x.Id,
-                    x.EmployeeId,
                     x.NetSalary,
                     x.GrossSalary,
-                    x.WorkingHours,
                     x.SalaryFrom,
                     x.SalaryTo,
                     x.Status,
+                    x.EmployeeId,
+                    x.WorkingHours,
+                    x.Employee.Name,
+                    x.Employee.JobTitle,
+                    SalaryAdjustmentLogs = x.SalaryAdjustmentLogs.Select(s => new {
+                        s.Id,
+                        s.Adjustment.Name,
+                        s.AdjustmentAmmount,
+                        s.Description,
+                        s.Status
+                    }).ToList()
                 }).ToList();
             return Ok(Salaries);
         }
@@ -82,6 +87,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.EmployeeId,
                     x.WorkingHours,
                     x.Employee.Name,
+                    x.Employee.JobTitle,
                     SalaryAdjustmentLogs =  x.SalaryAdjustmentLogs.Select(s=>new { 
                     s.Id,
                     s.Adjustment.Name,
@@ -92,7 +98,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }).SingleOrDefault();
             return Ok(Salaries);
         }
-
         [Route("Salary/GetLastSalaryById")]
         [HttpGet]
         public IActionResult GetLastSalaryById(long? Id)
@@ -105,8 +110,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }).SingleOrDefault();
             return Ok(Salaries.Id);
         }
-
-
         [Route("Salary/GetSalaryId")]
         [HttpGet]
         public IActionResult GetSalaryId(long? EmployeeId)
@@ -119,10 +122,5 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Salaries);
 
         }
-
-    
-
     }
-
-
 }
