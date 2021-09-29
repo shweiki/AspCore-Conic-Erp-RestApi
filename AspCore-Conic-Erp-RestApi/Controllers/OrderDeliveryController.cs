@@ -45,7 +45,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             List<long> OrderD = new List<long>();
             var DriverList = DB.Drivers.Where(x => x.IsActive == 1)
                       .Select(s => new { s.Id }).ToList();
-
+            if (DriverList.Count > 0) { 
              foreach (var d in DriverList) {
                var LastDriverOrders = DB.OrderDeliveries.Where(x => x.DriverId == d.Id).ToList().LastOrDefault().OrderId;
                 OrderD.Add(LastDriverOrders);
@@ -62,8 +62,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(true);
         
         }
-       
-   
+            else
+            {
+                return Ok(false);
+            }
+        }
 
         [Authorize]
         [HttpPost]
