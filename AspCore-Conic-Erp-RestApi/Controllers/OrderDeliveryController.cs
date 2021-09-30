@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Entities;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -215,18 +216,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpPost]
         public IActionResult OrderReceived(long id)
         {
+            
+           
+
             if (ModelState.IsValid)
             {
                 try
                 {
                     OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == id).SingleOrDefault();
-                    Order.Status = 2;
-                    DB.SaveChanges();
-                    return Ok(true);
+                    int Status = 2;
+                    string Description = "Received";
+                    if (ChangeStatus( Order, Description, Status ))
+                    {
+                        return Ok(true);
+                    }
+                    else return NotFound();
                 }
                 catch
                 {
-                    //Console.WriteLine(collection);
                     return Ok(false);
                 }
             }
@@ -242,12 +249,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
-                   // OprationsysController Op = new OprationsysController();
-                  //  Op.ChangeObjStatusByTableName(id, "OrderDelivery", 4, "Order Delivered");
                     OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == id).SingleOrDefault();
-                    Order.Status = 3;
-                    DB.SaveChanges();
-                    return Ok(true);
+                    int Status = 3;
+                    string Description = "Delivered";
+                    if (ChangeStatus(Order, Description, Status))
+                    {
+                        return Ok(true);
+                    }
+                    else return NotFound();
                 }
                 catch
                 {
@@ -268,9 +277,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 try
                 {
                     OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == id).SingleOrDefault();
-                    Order.Status = 4;
-                    DB.SaveChanges();
-                    return Ok(true);
+                    int Status = 4;
+                    string Description = "Done";
+                    if (ChangeStatus(Order, Description, Status))
+                    {
+                        return Ok(true);
+                    }
+                    else return NotFound();
                 }
                 catch
                 {
@@ -308,6 +321,32 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Rows = Deliveries.Count(),
                 }
             });
+        }
+
+
+       
+        public Boolean ChangeStatus( OrderDelivery Order, string Description, int Status)
+        {
+            ActionLog log = new ActionLog();
+            log.PostingDateTime = DateTime.Now;
+            log.OprationId = (int)Order.Id;
+            log.DriverId = Order.DriverId;
+            log.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            log.Description = Description;
+            log.Fktable = "Driver";
+            log.TableName = "OrderDelivery";
+            log.OrderDeliveryId = (int)Order.Id;
+            DB.OrderDeliveries.Where(x => x.Id == log.OrderDeliveryId).SingleOrDefault().Status = Status;
+                
+            
+            ActionLogController logCon = new ActionLogController();
+            if (logCon.Create(log))
+            {
+                DB.SaveChanges();
+                return true;
+            }
+            return false;
+
         }
     }
 }
