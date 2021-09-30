@@ -43,6 +43,23 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(false);
         }
+        [Route("Files/GetFilesByObjId")]
+        [HttpGet]
+        public IActionResult GetFilesByObjId(string TableName, long ObjId)
+        {
+
+            var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new {
+                x.Id,
+                x.File,
+                x.FileType
+
+            }).ToList();
+
+            if (file != null)
+                return Ok(file);
+
+            return Ok(false);
+        }
         [Route("Files/Create")]
         [HttpPost]
         public IActionResult Create(FileDatum filex)
