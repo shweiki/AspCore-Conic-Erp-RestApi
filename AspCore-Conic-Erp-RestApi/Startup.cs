@@ -29,6 +29,7 @@ namespace AspCore_Conic_Erp_RestApi
                 options.UseSqlServer(
                    DB.GetCon(),
                          options => options.MigrationsAssembly("AspCore-Conic-Erp-RestApi")));
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.Configure<IdentityOptions>(options =>
             {

@@ -10,7 +10,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class MenuItemController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
+        private readonly IUnitOfWork UW;
 
+        public MenuItemController(IUnitOfWork unitOfWork)
+        {
+            UW = unitOfWork;
+        }
         [Route("MenuItem/GetMenuItem")]
         [HttpGet]
         public IActionResult GetMenuItem()
@@ -31,6 +36,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetActiveMenuItem()
         {
+            
             var MenuItems = DB.MenuItems.Where(x => x.Status == 0).Select(x => new { value = x.Name, label = x.Name }).ToList();
             return Ok(MenuItems);
         }

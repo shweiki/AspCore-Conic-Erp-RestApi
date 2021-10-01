@@ -10,26 +10,32 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class BankController : Controller
     {
         private ConicErpContext DB = new ConicErpContext();
+        private readonly IUnitOfWork UW;
 
+        public BankController(IUnitOfWork unitOfWork)
+        {
+            UW = unitOfWork;
+        }
         // GET: Banks
         [Route("Bank/Get")]
         [HttpGet]
         public IActionResult Get()
         {
-            var Banks = DB.Banks.Select(x => new {
-                x.Id,
-                x.Iban,
-                x.AccountId,
-                x.Name,
-                x.Description,
-                x.AccountNumber,
-                x.AccountType,
-                x.BranchName,
-                x.Currency,
-                x.Status
-            }).ToList();
+            return Ok(UW.Banks.Get());
+            //var Banks = DB.Banks.Select(x => new {
+            //    x.Id,
+            //    x.Iban,
+            //    x.AccountId,
+            //    x.Name,
+            //    x.Description,
+            //    x.AccountNumber,
+            //    x.AccountType,
+            //    x.BranchName,
+            //    x.Currency,
+            //    x.Status
+            //}).ToList();
 
-            return Ok(Banks);
+            //return Ok(Banks);
         }
         [Route("Bank/GetActive")]
         [HttpGet]
@@ -61,9 +67,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     // TODO: Add insert logic here
                     collection.Status = 0;
                     collection.AccountId = NewAccount.Id;
-                    DB.Banks.Add(collection);
-                    DB.SaveChanges();
-                 
+                    UW.Banks.Create(collection);
+                    UW.Complete();
+                    //DB.Banks.Add(collection);
+                    //DB.SaveChanges();
+
 
                 }
                 catch
