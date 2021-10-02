@@ -8,6 +8,7 @@ namespace Entities
     public partial class FileDatum
     {
         public long Id { get; set; }
+        public string Type { get; set; }
         public string FileType { get; set; }
         public string File { get; set; }
         public int Status { get; set; }

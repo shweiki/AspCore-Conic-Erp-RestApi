@@ -26,6 +26,39 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
 
         [Authorize]
+        [Route("Files/GetProfilePictureByObjId")]
+        [HttpGet]
+        public IActionResult GetProfilePictureByObjId(string TableName, long ObjId)
+        {
+
+            var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId && i.Type == "ProfilePicture").Select(x => new {
+                x.Id,
+                x.Type,
+                x.File,
+                x.FileType
+            }).SingleOrDefault();
+
+            if (file != null)
+                return Ok(file);
+
+            return Ok(false);
+        }
+        [Route("Files/SetTypeByObjId")]
+        [HttpPost]
+        public IActionResult SetTypeByObjId(long Id ,string type)
+        {
+
+            var file = DB.FileData.Where(i => i.Id == Id).SingleOrDefault();
+
+            if (file != null)
+            {
+                file.Type = type;
+                DB.SaveChanges();
+                return Ok(true);
+            }
+
+            return Ok(false);
+        }
         [Route("Files/GetFileByObjId")]
         [HttpGet]
         public IActionResult GetFileByObjId(string TableName , long ObjId )
@@ -33,9 +66,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new {
                 x.Id,
+                x.Type,
                 x.File,
                 x.FileType
-
             }).ToList().LastOrDefault();
     
           if(file != null)
@@ -50,9 +83,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new {
                 x.Id,
+                x.Type,
                 x.File,
                 x.FileType
-
             }).ToList();
 
             if (file != null)

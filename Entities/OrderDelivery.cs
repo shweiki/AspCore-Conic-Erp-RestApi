@@ -21,7 +21,7 @@ namespace Entities
         public DateTime FakeDate { get; set; }
         public string Region { get; set; }
         public double DeliveryPrice { get; set; }
-        public long? DriverId { get; set; }
+        public long DriverId { get; set; }
         
 
         public virtual Driver Driver { get; set; }
