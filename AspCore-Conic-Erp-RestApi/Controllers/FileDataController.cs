@@ -36,7 +36,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Type,
                 x.File,
                 x.FileType
-            }).SingleOrDefault();
+            }).FirstOrDefault();
 
             if (file != null)
                 return Ok(file);

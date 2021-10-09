@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using System.Data.SqlClient;
-using System.Threading;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -46,9 +41,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             // Get Log From ZkBio Data base 
 
-            var StartLast = DB.DeviceLogs.OrderBy(o => o.DateTime).LastOrDefault();
-            DateTime StartToday = StartLast == null ? DateTime.Today : StartLast.DateTime.AddMinutes(-15);
-            GetFromZkBio(StartToday, TableName);
+            GetFromZkBio(TableName);
 
             var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any != null ? x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any) : true)).AsEnumerable().Select(x => new {
                 x.Id,
@@ -144,18 +137,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
-                    DeviceLog DeviceLog = DB.DeviceLogs.Where(x => x.Id == collection.Id).SingleOrDefault();
+                DeviceLog DeviceLog = DB.DeviceLogs.Where(x => x.Id == collection.Id).SingleOrDefault();
                 DeviceLog.DeviceId = collection.DeviceId;
                 DeviceLog.Fk = collection.Fk;
                 DeviceLog.TableName = collection.TableName;
                 DeviceLog.DateTime = collection.DateTime;
                 DeviceLog.Type = collection.Type;
                 DeviceLog.Description = collection.Description;
-                DeviceLog.Status = collection.Status;
-             
-              
-                    DB.SaveChanges();
-                    return Ok(true);
+                DeviceLog.Status = collection.Status;              
+                DB.SaveChanges();
+                return Ok(true);
+                
                 }
                 catch
                 {
@@ -325,35 +317,34 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else { return false; }
         }
-        public  void GetFromZkBio(DateTime StartLast ,string TableName)
+        public  void GetFromZkBio(string TableName)
         {
             try
             {
                 SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-
+                
                 builder.DataSource = "" + Environment.MachineName + "\\SQLEXPRESS";
                 builder.UserID = "sa";
                 builder.Password = "Taha123456++";
                 builder.InitialCatalog = "zkbiotime";
+                builder.MultipleActiveResultSets = true;
 
                 using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
                 {
                     connection.Open();
 
-                    DateTime EndToday = DateTime.Today.AddHours(23).AddMinutes(59).AddSeconds(59);
-
-                    String sql = "SELECT L.punch_time, L.emp_code , T.ip_address FROM zkbiotime.dbo.iclock_transaction as L" +
+                    String sql = "SELECT  L.punch_time, L.emp_code , T.ip_address  ,L.id FROM zkbiotime.dbo.iclock_transaction as L" +
                         " INNER JOIN  [zkbiotime].[dbo].[iclock_terminal] as T ON L.terminal_id= T.id" +
-                        " where L.punch_time >='"+
-                        StartLast.ToString("yyyy-MM-dd HH:mm:ss.fff") + "' And  L.punch_time <='"
-                        + EndToday.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'";
+                        " where L.reserved Is null";
 
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            while (reader.Read())
-                            {
+                            if (reader.HasRows)
+                            { 
+                                while (reader.Read())
+                                {
                                 if (reader[1].ToString() == "0") continue;
 
                                 DateTime action_time = DateTime.Parse(reader[0].ToString());
@@ -363,8 +354,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                 string Ip = reader[2].ToString();
                                 RegisterLog(objectId, action_time, Ip , TableName);
 
+                                UpdateFromZkBioReserved(reader[3].ToString());
+                                
+                                }
                             }
-
                         }
                     }
                 }
@@ -374,7 +367,39 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Console.WriteLine(e);
             }
         }
-  
+        public void UpdateFromZkBioReserved(string id)
+        {
+            try
+            {
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+
+                builder.DataSource = "" + Environment.MachineName + "\\SQLEXPRESS";
+                builder.UserID = "sa";
+                builder.Password = "Taha123456++";
+                builder.InitialCatalog = "zkbiotime";
+                builder.MultipleActiveResultSets = true;
+
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                {
+                    connection.Open();
+
+                    String sql = "update [zkbiotime].[dbo].[iclock_transaction] set reserved = 'true' where id = " + id + "";
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.ExecuteNonQuery();
+
+                    }
+                    connection.Close();
+
+                }
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
     }
 
 }

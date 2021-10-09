@@ -112,7 +112,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="161.46437.65" />
+    <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="161.46521.71" />
     <PackageReference Include="NinjaNye.SearchExtensions" Version="3.0.1" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
@@ -125,6 +125,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EmailService\EmailService.csproj" />
     <ProjectReference Include="..\Entities\Entities.csproj" />
   </ItemGroup>
 
