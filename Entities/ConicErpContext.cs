@@ -83,7 +83,7 @@ namespace Entities
         }
         public string GetCon() {
             //   return "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Conic_Erp;Integrated Security=True";
-           return "Data Source="+GetServerName()+";Initial Catalog="+GetDataBaseName()+ ";Integrated Security=True;timeout=1000000";
+           return "Data Source="+GetServerName()+";Initial Catalog="+GetDataBaseName()+ ";Integrated Security=True; MultipleActiveResultSets=true; timeout=1000000";
           //  return "Data Source=tcp:aspcore-conic-erp-restapidbserver.database.windows.net,1433;Initial Catalog=AspCore-Conic-Erp-RestApi_db;User Id=taha;Password=()=>{Allah}";
         
         }
@@ -148,7 +148,7 @@ namespace Entities
                 },new {
                     Id = "f4c8a1a5-0530-41a3-9ae1-99d51857de42", //  Guid.NewGuid(),
                     ConcurrencyStamp = "4a1971c9-71fd-41d8-8cad-35176671d26a",
-                    Name = "Admin",
+                    Name = "admin",
                     NormalizedName = "ADMIN"
              
             });

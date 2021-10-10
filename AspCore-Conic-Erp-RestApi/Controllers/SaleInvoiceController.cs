@@ -35,7 +35,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.VendorId,
                 x.MemberId,
                 x.PhoneNumber,
-                x.Vendor,
+              //  x.Vendor,
                 TotalCost = x.InventoryMovements.Sum(s => s.Items.CostPrice * s.Qty),
                 Total = x.InventoryMovements.Sum(s=>s.SellingPrice *s.Qty) - x.Discount,
            //     ActionLogs = DB.ActionLogs.Where(l=>l.SalesInvoiceId == x.Id).ToList(),
