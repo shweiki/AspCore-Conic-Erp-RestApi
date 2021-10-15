@@ -8,7 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-
+using EmailService;
+using Microsoft.AspNetCore.Http.Features;
+using System;
 
 namespace AspCore_Conic_Erp_RestApi
 {
@@ -24,6 +26,20 @@ namespace AspCore_Conic_Erp_RestApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            int lat = Environment.CurrentDirectory.LastIndexOf("\\") + 1;
+            string Name = Environment.CurrentDirectory.Substring(lat, (Environment.CurrentDirectory.Length - lat));
+            Name = Name.Replace("-", "").ToUpper();
+            var emailConfig = Configuration
+                .GetSection(Name+"EmailConfiguration")
+                .Get<EmailConfiguration>();
+            services.AddSingleton(emailConfig);
+            services.AddScoped<IEmailSender, EmailSender>();
+            services.Configure<FormOptions>(o => {
+                o.ValueLengthLimit = int.MaxValue;
+                o.MultipartBodyLengthLimit = int.MaxValue;
+                o.MemoryBufferThreshold = int.MaxValue;
+            });
+
             ConicErpContext DB = new ConicErpContext();
             services.AddDbContext<ConicErpContext>(options =>
                 options.UseSqlServer(

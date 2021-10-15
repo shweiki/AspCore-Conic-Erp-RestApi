@@ -200,8 +200,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(DeviceLogs);
         }     
   
-        public Boolean RegisterLog(string Id , DateTime datetime, string Ip , string TableName)
+        public Boolean RegisterLog(string Id , DateTime datetime, string Ip )
         {
+            long ID = Convert.ToInt32(Id);
+            string TableName = "";
+            var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
+            var Employee = DB.Employees.Where(m => m.Id == ID).FirstOrDefault();
+            if (member != null) TableName = "Member";
+            if (Employee != null) TableName = "Employee";
+
             var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == Id && l.TableName == TableName).ToList();
             isLogSaveIt = DB.DeviceLogs.Where(Ld => Ld.DateTime == datetime).ToList();
             var Device = DB.Devices.Where(x => x.Ip == Ip).SingleOrDefault();
@@ -352,7 +359,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                                 string objectId = reader[1].ToString();
                                 string Ip = reader[2].ToString();
-                                RegisterLog(objectId, action_time, Ip , TableName);
+                                RegisterLog(objectId, action_time, Ip );
 
                                 UpdateFromZkBioReserved(reader[3].ToString());
                                 
