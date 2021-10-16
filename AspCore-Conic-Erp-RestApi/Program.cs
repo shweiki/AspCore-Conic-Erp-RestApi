@@ -20,7 +20,7 @@ namespace AspCore_Conic_Erp_RestApi
      
             RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"Control Panel\International", true);
             rk.SetValue("sTimeFormat", "dd-MM-yyyy");*/
-            OpenBrowser();
+        //    OpenBrowser();
           CreateHostBuilder(args).Build().MigrateDatabase().Run();
           // CreateHostBuilder(args).Build().Run();
 
