@@ -24,15 +24,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
+     
                     // TODO: Add insert logic here
                     DB.OrderDeliveries.Add(collection);
                     DB.SaveChanges();
                     return Ok(true);
                 }
-                catch
+                catch (InvalidCastException e)
                 {
                     //Console.WriteLine(collection);
-                    return Ok(false);
+                    return Ok(e);
                 }
             }
             else return Ok(false);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 #nullable disable
 
@@ -21,8 +22,7 @@ namespace Entities
         public DateTime FakeDate { get; set; }
         public string Region { get; set; }
         public double DeliveryPrice { get; set; }
-        public long DriverId { get; set; }
-        
+        public Nullable<long> DriverId { get; set; }
 
         public virtual Driver Driver { get; set; }
 
