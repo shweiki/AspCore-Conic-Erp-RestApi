@@ -224,8 +224,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         public string GetFkDescription(string TableName, long Fktable)
         {
-                     ConicErpContext DBx = new ConicErpContext();
-
+        ConicErpContext DBx = new ConicErpContext();
         var Object = "";
             switch (TableName)
             {
@@ -253,10 +252,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 case "Cheque":
                     Object = DBx.Cheques.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                     break;
-             
             }
-
-
             return Object;
         }
 

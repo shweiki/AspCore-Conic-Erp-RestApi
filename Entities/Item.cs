@@ -18,6 +18,7 @@ namespace Entities
         public long Id { get; set; }
         public string Name { get; set; }
         public string Type { get; set; }
+        public bool TakeBon { get; set; }
         public double? CostPrice { get; set; }
         public double? SellingPrice { get; set; }
         public double? OtherPrice { get; set; }
@@ -25,10 +26,11 @@ namespace Entities
         public double? Tax { get; set; }
         public double? Rate { get; set; }
         public string Barcode { get; set; }
+        public string SN { get; set; }
+        public string Address { get; set; }
         public string Category { get; set; }
         public string Description { get; set; }
         public string Ingredients { get; set; }
-     
         public int Status { get; set; }
         public bool IsPrime { get; set; }
 

@@ -201,56 +201,72 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [HttpGet]
         [Route("Item/GetItemMove")]
-        public IActionResult GetItemMove(long ItemId, DateTime DateFrom, DateTime DateTo)
+        public IActionResult GetItemMove(long? ItemId, long? MergeItemId, DateTime DateFrom, DateTime DateTo)
         {
-            var SalesInvoiceMove = DB.InventoryMovements.Where(i => i.SalesInvoiceId != null && i.ItemsId == ItemId && i.SalesInvoice.FakeDate >= DateFrom && i.SalesInvoice.FakeDate <= DateTo).Select(x => new
-            {
-                x.Id,
-                x.SellingPrice,
-                x.Qty,
-                x.Status,
-                x.Tax,
-                x.TypeMove,
-                Name = DB.SalesInvoices.Where(S=>S.VendorId == x.SalesInvoice.VendorId).SingleOrDefault().Name + " " + DB.SalesInvoices.Where(S => S.MemberId == x.SalesInvoice.MemberId).SingleOrDefault().Name,
-                x.SalesInvoice.FakeDate,
-                x.Description,
-                x.SalesInvoiceId,
-                x.ItemsId,
-                Type = "مبيعات"
-            }).ToList();
-
-            var PurchaseInvoiceMove = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId != null && i.ItemsId == ItemId && i.PurchaseInvoice.FakeDate >= DateFrom && i.PurchaseInvoice.FakeDate <= DateTo).Select(x => new
-            {
-                x.Id,
-                x.SellingPrice,
-                x.Qty,
-                x.Status,
-                x.Tax,
-                x.TypeMove,
-                Name = DB.PurchaseInvoices.Where(S => S.VendorId == x.PurchaseInvoice.VendorId).SingleOrDefault().Name + " ",
-                x.PurchaseInvoice.FakeDate,
-                x.Description,
-                x.PurchaseInvoiceId,
-                Type = "مشتريات",
-                x.ItemsId
-            }).ToList();
-
-            var OrderInventoryMove = DB.InventoryMovements.Where(i => i.OrderInventoryId != null && i.ItemsId == ItemId && i.OrderInventory.FakeDate >= DateFrom && i.OrderInventory.FakeDate <= DateTo).Select(x => new {
-                x.Id,
-                x.SellingPrice,
-                x.Qty,
-                x.Status,
-                x.Tax,
-                x.TypeMove,
-                Name =  "سند " +x.OrderInventory.OrderType,
-                x.OrderInventory.FakeDate,
-                x.Description,
-                x.OrderInventoryId,
-                Type = "سند مخزون",
-                x.ItemsId
-            }).ToList();
-
-            return Ok(new { OrderInventoryMove, PurchaseInvoiceMove, SalesInvoiceMove });
+            var Movements = DB.InventoryMovements.Where(s => (MergeItemId != null ? s.ItemsId == ItemId || s.ItemsId == MergeItemId : s.ItemsId == ItemId)
+                 &&( (s.SalesInvoice.FakeDate >= DateFrom && s.SalesInvoice.FakeDate <= DateTo)
+                 || (s.PurchaseInvoice.FakeDate >= DateFrom && s.PurchaseInvoice.FakeDate <= DateTo)
+                 || (s.OrderInventory.FakeDate >= DateFrom && s.OrderInventory.FakeDate <= DateTo)
+                 || (s.WorkShop.FakeDate >= DateFrom && s.WorkShop.FakeDate <= DateTo)))
+                                .Select(x => new { x,x.SalesInvoice ,x.OrderInventory ,x.PurchaseInvoice,x.WorkShop }).AsEnumerable()
+                            .Select(x => new
+                            {
+                                x.x.Id,
+                                In =  x.x.TypeMove == "In" ? x.x.Qty : 0,
+                                Out = x.x.TypeMove == "Out" ? x.x.Qty : 0,
+                                x.x.ItemsId,
+                                x.x.TypeMove,
+                                x.x.Description,
+                                x.x.Qty,
+                                x.x.SellingPrice,
+                                x.x.Status,
+                            //   x.SalesInvoice,
+                            //   x.OrderInventory,
+                            //   x.PurchaseInvoice,
+                            //   x.WorkShop,
+                               FakeDate = x.SalesInvoice?.FakeDate +""+ x.OrderInventory?.FakeDate+""+ x.PurchaseInvoice?.FakeDate+""+ x.WorkShop?.FakeDate,
+                                TotalRow = 0,
+                              //  FkDescription = GetFkDescription(x.SalesInvoiceId || x.OrderInventoryId||x.PurchaseInvoiceId||x.WorkShopId,)
+                            }).ToList();
+                double AllTotal = DB.InventoryMovements.Where(s => (MergeItemId != null ? s.ItemsId == ItemId || s.ItemsId == MergeItemId : s.ItemsId == ItemId)).Where(x => x.TypeMove == "In").Sum(s => s.Qty) -
+                DB.InventoryMovements.Where(s => (MergeItemId != null ? s.ItemsId == ItemId || s.ItemsId == MergeItemId : s.ItemsId == ItemId)).Where(x=>x.TypeMove=="Out").Sum(s => s.Qty);
+                if (AllTotal != (Movements.Sum(s => s.In) - Movements.Sum(s => s.Out)))
+                {
+                    double Balancecarried = AllTotal - (Movements.Sum(s => s.In) - Movements.Sum(s => s.Out));
+                var p = new 
+                {
+                    Id = Convert.ToInt64(0),
+                    In = Balancecarried < 0 ? Balancecarried : 0,
+                    Out = Balancecarried > 0 ? Balancecarried : 0,
+                    ItemsId = Convert.ToInt64(0),
+                    TypeMove = Balancecarried < 0 ? "Out" : "In",
+                    Description = "رصيد الفترة السابقة",
+                    Qty = Balancecarried,
+                    SellingPrice = Convert.ToDouble(0.0),
+                    Status = 0,
+                    //SalesInvoice=new SalesInvoice(),
+                    //OrderInventory= new OrderInventory(),
+                    //PurchaseInvoice=new PurchaseInvoice(),
+                    //WorkShop= new WorkShop(),
+                    FakeDate = DateFrom.ToString(),
+                    TotalRow = 0,
+                    //  Type = "رصيد الفترة السابقة",
+                    // FkDescription = ""
+                };
+                Movements.Add(p);
+                }
+                return Ok(new
+                {
+                    items = Movements,//.OrderBy(s => s.FakeDate).ToList(),
+                    Totals = new
+                    {
+                        Rows = Movements.Count(),
+                    //    Totals = Movements.Sum(s=>s.Qty),
+                        In = Movements.Sum(s => s.In),
+                        Out = Movements.Sum(s => s.Out),
+                        Totals = Movements.Sum(s => s.In) - Movements.Sum(s => s.Out),
+                    }
+                });
         }
         [HttpGet]
         [Route("Item/GetItemById")]
@@ -356,7 +372,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
         }
-
+        [Route("Item/EditIngredient")]
+        [HttpPost]
+        public IActionResult EditIngredient(long ItemId, string Ingredient)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Item item = DB.Items.Where(x => x.Id == ItemId).SingleOrDefault();
+                    item.Ingredients = Ingredient;
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            return Ok(false);
+        }
+        
         [Route("Item/CalculateInventoryItemQty")]
         [HttpPost]
         public IActionResult CalculateInventoryItemQty(long Id)
@@ -387,13 +424,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(InventoryItemsExp);
         }
         
-       [HttpGet]
-
+        [HttpGet]
         [Route("Item/CalculateCostPrice")]
         public  IActionResult CalculateCostPrice()
         {
             DB.InventoryMovements.Where(i=> i.PurchaseInvoiceId != null).ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
-
             DB.SaveChanges();
             return Ok(true);
         }
