@@ -11,7 +11,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class ReceiveController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public ReceiveController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [HttpPost]
         [Route("Receive/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)

@@ -12,7 +12,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 {
     public class OrderDeliveryController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public OrderDeliveryController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
 
 
         [AllowAnonymous]
@@ -338,15 +342,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             log.TableName = "OrderDelivery";
             log.OrderDeliveryId = (int)Order.Id;
             DB.OrderDeliveries.Where(x => x.Id == log.OrderDeliveryId).SingleOrDefault().Status = Status;
-                
+
+
+            // ActionLogController logCon = new ActionLogController(ConicErpContext Db);
+            DB.ActionLogs.Add(log);
             
-            ActionLogController logCon = new ActionLogController();
-            if (logCon.Create(log))
-            {
                 DB.SaveChanges();
                 return true;
-            }
-            return false;
+        
 
         }
     }

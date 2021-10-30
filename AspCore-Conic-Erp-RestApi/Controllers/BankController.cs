@@ -9,12 +9,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class BankController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
-        private readonly IUnitOfWork UW;
+        private ConicErpContext DB;
+              private readonly IUnitOfWork UW;
 
-        public BankController(IUnitOfWork unitOfWork)
+        public BankController(ConicErpContext dbcontext,IUnitOfWork unitOfWork)
         {
             UW = unitOfWork;
+            DB = dbcontext;
+
         }
         // GET: Banks
         [Route("Bank/Get")]

@@ -18,12 +18,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<UserController> _logger;
-        private ConicErpContext DB = new ConicErpContext();
-        public OprationsysController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
+                private ConicErpContext DB;
+
+        public OprationsysController(ConicErpContext dbcontext,UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+                        DB = dbcontext;
+
 
         }
         [Route("Oprationsys/GetOpration")]
@@ -348,12 +351,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     break;
 
             }
-            ActionLogController logCon = new ActionLogController();
-            if (logCon.Create(log))
-            {
+            
+                DB.ActionLogs.Add(log);
                 DB.SaveChanges();
                 return true;
-            }
+          
             return false;
 
         }

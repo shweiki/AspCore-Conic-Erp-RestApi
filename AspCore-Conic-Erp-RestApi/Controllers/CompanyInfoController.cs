@@ -13,8 +13,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
     public class CompanyInfoController : Controller
     {
-       private ConicErpContext DB = new ConicErpContext();
-
+        private ConicErpContext DB;
+        public CompanyInfoController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [Route("CompanyInfo/EditCompanyInfo")]
         [HttpPost]
         public IActionResult EditCompanyInfo(CompanyInfo collection)

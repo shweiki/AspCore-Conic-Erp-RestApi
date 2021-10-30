@@ -18,13 +18,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<UserController> _logger;
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
 
-        public UserController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
+
+        public UserController(ConicErpContext dbcontext,UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            DB = dbcontext;
 
         }
 

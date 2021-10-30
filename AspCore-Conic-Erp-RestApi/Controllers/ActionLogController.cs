@@ -12,8 +12,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class ActionLogController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
-        public Boolean Create(ActionLog LogOpratio)
+        private ConicErpContext DB;
+        public ActionLogController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }        public Boolean Create(ActionLog LogOpratio)
         {
             LogOpratio.PostingDateTime = DateTime.Now;
             try

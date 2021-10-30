@@ -18,12 +18,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class DriverController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
-        private readonly UserManager<IdentityUser> _userManager;
-        public DriverController(UserManager<IdentityUser> userManager)
+        private ConicErpContext DB;
+             private readonly UserManager<IdentityUser> _userManager;
+        public DriverController(ConicErpContext dbcontext,UserManager<IdentityUser> userManager)
 
         {
             _userManager = userManager;
+            DB = dbcontext;
 
         }
 

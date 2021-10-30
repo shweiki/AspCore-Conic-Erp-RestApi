@@ -14,7 +14,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class SalaryAdjustmentLogController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public SalaryAdjustmentLogController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
 
         [Route("SalaryAdjustmentLog/Create")]
         [HttpPost]

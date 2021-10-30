@@ -9,11 +9,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class CashesController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
-        private readonly IUnitOfWork UW;
+        private ConicErpContext DB;
+            private readonly IUnitOfWork UW;
 
-        public CashesController(IUnitOfWork unitOfWork)
+        public CashesController(ConicErpContext dbcontext,IUnitOfWork unitOfWork)
         {
+            DB = dbcontext;
+
             UW = unitOfWork;
         }
         // GET: Cashes

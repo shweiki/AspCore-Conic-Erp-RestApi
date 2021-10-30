@@ -16,12 +16,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class EmployeeController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
-        private readonly UserManager<IdentityUser> _userManager;
-        public EmployeeController(UserManager<IdentityUser> userManager)
+        private ConicErpContext DB;
+       private readonly UserManager<IdentityUser> _userManager;
+        public EmployeeController(ConicErpContext dbcontext,UserManager<IdentityUser> userManager)
 
         {
             _userManager = userManager;
+            DB = dbcontext;
 
         }
         [Route("Employee/GetReceivablesEmployee")]

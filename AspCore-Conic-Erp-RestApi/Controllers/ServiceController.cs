@@ -10,7 +10,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class ServiceController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public ServiceController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [Route("Service/GetService")]
         [HttpGet]
         public IActionResult GetService()

@@ -8,7 +8,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class SalaryController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public SalaryController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [Route("Salary/Edit")]
         [HttpPost]
         public IActionResult Edit(SalaryPayment collection)

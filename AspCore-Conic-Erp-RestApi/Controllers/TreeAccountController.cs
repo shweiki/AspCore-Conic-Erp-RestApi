@@ -11,7 +11,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class TreeAccountController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public TreeAccountController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [Route("Account/GetAccount")]
         [HttpGet]
         public IActionResult GetAccount()

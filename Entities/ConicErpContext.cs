@@ -14,13 +14,10 @@ namespace Entities
         public ConicErpContext()
         {
         }
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ConicErpContext(DbContextOptions<ConicErpContext> options, IHttpContextAccessor httpContextAccessor)
+        public ConicErpContext(DbContextOptions<ConicErpContext> options)
             : base(options)
         {
-            _httpContextAccessor = httpContextAccessor;
-
         }
 
         public virtual DbSet<Account> Accounts { get; set; }
@@ -73,7 +70,7 @@ namespace Entities
         public virtual DbSet<SalaryAdjustmentLog> SalaryAdjustmentLogs { get; set; }
         public virtual DbSet<SalaryPayment> SalaryPayments { get; set; }
         public virtual DbSet<Adjustment> Adjustments { get; set; }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    /*  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
@@ -98,7 +95,7 @@ namespace Entities
             int lat = Environment.CurrentDirectory.LastIndexOf("\\")+1;
             string Name = Environment.CurrentDirectory.Substring(lat  ,( Environment.CurrentDirectory.Length - lat));
             return Name.Replace("-", "").ToUpper();
-        }
+        }*/
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.UseCollation("Arabic_CI_AI");

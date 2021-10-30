@@ -11,7 +11,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
     public class StockInventoryController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public StockInventoryController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [Route("StockInventory/GetStockInventory")]
         [HttpGet]
         public IActionResult GetStockInventory(DateTime DateFrom, DateTime DateTo)

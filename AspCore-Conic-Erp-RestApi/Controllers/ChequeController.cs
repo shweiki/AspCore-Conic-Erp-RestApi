@@ -13,8 +13,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class ChequeController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
-        [Route("Cheques/GetCheques")]
+        private ConicErpContext DB;
+        public ChequeController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }        [Route("Cheques/GetCheques")]
         [HttpGet]
         public IActionResult GetCheque()
         {

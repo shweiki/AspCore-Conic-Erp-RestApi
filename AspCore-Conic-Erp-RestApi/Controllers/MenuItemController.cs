@@ -9,13 +9,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class MenuItemController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
-        private readonly IUnitOfWork UW;
+                private ConicErpContext DB;
+                        private readonly IUnitOfWork UW;
 
-        public MenuItemController(IUnitOfWork unitOfWork)
+        public MenuItemController(ConicErpContext dbcontext,IUnitOfWork unitOfWork)
         {
-            UW = unitOfWork;
+            DB = dbcontext;
+                        UW = unitOfWork;
+
         }
+
         [Route("MenuItem/GetMenuItem")]
         [HttpGet]
         public IActionResult GetMenuItem()

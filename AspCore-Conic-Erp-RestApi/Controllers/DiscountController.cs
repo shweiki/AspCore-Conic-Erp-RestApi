@@ -10,8 +10,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class DiscountController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
-        [Route("Discount/GetDiscount")]
+        private ConicErpContext DB;
+        public DiscountController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }        [Route("Discount/GetDiscount")]
         [HttpGet]
         public IActionResult GetDiscount()
         {

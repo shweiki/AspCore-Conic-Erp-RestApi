@@ -13,7 +13,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 {
     public class SettingController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+        private ConicErpContext DB;
+        public SettingController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
+
         [Route("Setting/GetSetting")]
         [HttpGet]
         public IActionResult GetSetting()

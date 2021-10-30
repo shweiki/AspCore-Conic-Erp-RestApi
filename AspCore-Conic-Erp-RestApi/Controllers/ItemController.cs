@@ -11,7 +11,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class ItemController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public ItemController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [HttpGet]
         [Route("Item/GetItem")]
         public IActionResult GetItem()

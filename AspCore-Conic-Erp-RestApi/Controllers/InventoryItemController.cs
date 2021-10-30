@@ -10,7 +10,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class InventoryItemController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public InventoryItemController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
 
         [Route("InventoryItem/Create")]
         [HttpPost]

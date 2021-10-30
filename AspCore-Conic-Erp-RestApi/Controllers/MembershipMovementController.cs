@@ -10,7 +10,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class MembershipMovementController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public MembershipMovementController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
 
         [Route("MembershipMovement/Create")]
         [HttpPost]

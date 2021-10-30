@@ -18,16 +18,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class BackupRestoreController : Controller
     {
-        public BackupRestoreController(IConfiguration configuration)
+        public BackupRestoreController(IConfiguration configuration ,ConicErpContext dbcontext)
         {
             Configuration = configuration;
+                        DB = dbcontext;
+
         }
 
         public IConfiguration Configuration { get; }
-
-
-        private ConicErpContext DB = new ConicErpContext();
-        private string BackUpPath = "C:\\BackUp\\";
+        private ConicErpContext DB;
+             private string BackUpPath = "C:\\BackUp\\";
 
         [Route("BackupRestore/GetBackup")]
         [HttpGet]
@@ -40,15 +40,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult Backup()
         {
-
+            int lat = Environment.CurrentDirectory.LastIndexOf("\\") + 1;
+            string Name = Environment.CurrentDirectory.Substring(lat, (Environment.CurrentDirectory.Length - lat));
+            Name = Name.Replace("-", "").ToUpper();
             DateTime DateTime = DateTime.Now;
-            ServerConnection serverConnection = new ServerConnection(DB.GetServerName());
+            ServerConnection serverConnection = new ServerConnection(Configuration.GetConnectionString(Name));
             Server server = new Server(serverConnection);
             Backup backup = new Backup();
             backup.Action = BackupActionType.Database;
             backup.BackupSetDescription = "AdventureWorks - full backup";
             backup.BackupSetName = "AdventureWorks backup";
-            backup.Database = DB.GetDataBaseName();
+            backup.Database = serverConnection.DatabaseName;
             if (!Directory.Exists(BackUpPath))
             {
                 Directory.CreateDirectory(BackUpPath);
@@ -59,7 +61,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             backup.Incremental = false;
             backup.LogTruncation = BackupTruncateLogType.Truncate;
             backup.SqlBackup(server);
-            BackUp backup1 = new BackUp { Name = name, BackUpPath = BackUpPath, DateTime = DateTime, UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value , DataBaseName = DB.GetDataBaseName() };
+            BackUp backup1 = new BackUp { Name = name, BackUpPath = BackUpPath, DateTime = DateTime, UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value , DataBaseName = serverConnection.DatabaseName };
             DB.BackUps.Add(backup1);
             DB.SaveChanges();
             return Ok(true);
@@ -70,13 +72,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult Restore(string DirectoryBak)
         {
-
-                ServerConnection serverConnection = new ServerConnection(DB.GetServerName());
-                Server dbServer = new Server(serverConnection);
+            int lat = Environment.CurrentDirectory.LastIndexOf("\\") + 1;
+            string Name = Environment.CurrentDirectory.Substring(lat, (Environment.CurrentDirectory.Length - lat));
+            Name = Name.Replace("-", "").ToUpper();
+            ServerConnection serverConnection = new ServerConnection(Configuration.GetConnectionString(Name));
+            Server dbServer = new Server(serverConnection);
 
                 Restore _Restore = new Restore()
                 {
-                    Database = DB.GetDataBaseName(),
+                    Database = serverConnection.DatabaseName,
                     Action = RestoreActionType.Database,
                     ReplaceDatabase = true,
                     NoRecovery = false
@@ -90,12 +94,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 BackupDeviceItem source = new BackupDeviceItem(DirectoryBak, DeviceType.File);
                 _Restore.Devices.Add(source);
-                CloseAllConnection("USE master alter database " + DB.GetDataBaseName() + " set offline with rollback immediate");
+                CloseAllConnection("USE master alter database " + serverConnection.DatabaseName + " set offline with rollback immediate");
 
                 //   _Restore.PercentComplete += DB_Restore_PersentComplete;
                 //      _Restore.Complete += DB_Restore_Complete;
                 _Restore.SqlRestore(dbServer);
-                CloseAllConnection("USE master alter database " + DB.GetDataBaseName() + " set online");
+                CloseAllConnection("USE master alter database " + serverConnection.DatabaseName + " set online");
 
                 return Ok(true);
             }
@@ -109,9 +113,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         // function to close any opend database connections
         private void CloseAllConnection(string commandSql)
         {
+            int lat = Environment.CurrentDirectory.LastIndexOf("\\") + 1;
+            string Name = Environment.CurrentDirectory.Substring(lat, (Environment.CurrentDirectory.Length - lat));
+            Name = Name.Replace("-", "").ToUpper();
+
             // split script on GO command
             IEnumerable<string> commandStrings = Regex.Split(commandSql, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-            SqlConnection _connection = new SqlConnection(DB.GetCon());
+            SqlConnection _connection = new SqlConnection(Configuration.GetConnectionString(Name));
             _connection.Open();
             foreach (string commandString in commandStrings)
             {

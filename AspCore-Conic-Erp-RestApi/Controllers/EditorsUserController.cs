@@ -9,8 +9,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class EditorsUserController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
-
+        private ConicErpContext DB;
+        public EditorsUserController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         // GET: EditorsUsers
         [Route("EditorsUser/Get")]
         [HttpGet]

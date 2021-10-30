@@ -18,7 +18,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private ZkemClient objZkeeper;
         private int iCanSaveTmp = 0;
 
-        private ConicErpContext DB = new ConicErpContext();
+        private ConicErpContext DB;
+        public DeviceController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [Route("Device/GetById")]
         [HttpGet]
         public IActionResult GetById(long? Id)

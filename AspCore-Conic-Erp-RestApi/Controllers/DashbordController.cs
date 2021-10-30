@@ -14,8 +14,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class DashbordController : Controller
     {
 
-        private ConicErpContext DB = new ConicErpContext();
-        [Route("Dashbord/GetTotal")]
+        private ConicErpContext DB;
+        public DashbordController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }        [Route("Dashbord/GetTotal")]
         [HttpGet]
         public IActionResult GetTotal()
         {

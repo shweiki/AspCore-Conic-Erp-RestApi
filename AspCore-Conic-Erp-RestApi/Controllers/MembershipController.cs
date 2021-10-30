@@ -8,7 +8,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class MembershipController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public MembershipController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
 
         [Route("Membership/GetMembership")]
         [HttpGet]

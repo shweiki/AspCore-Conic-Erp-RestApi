@@ -11,7 +11,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class DeviceLogController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+        private ConicErpContext DB;
+        public DeviceLogController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
+
 
         [Route("DeviceLog/GetDeviceLog")]
         [HttpGet]

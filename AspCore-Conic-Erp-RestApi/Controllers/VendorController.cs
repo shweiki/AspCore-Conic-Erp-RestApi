@@ -10,7 +10,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class VendorController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public VendorController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [Route("Vendor/GetVendor")]
         [HttpGet]
         public IActionResult GetVendor()

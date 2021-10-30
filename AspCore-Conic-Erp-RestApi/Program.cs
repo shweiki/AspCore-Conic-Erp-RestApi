@@ -22,7 +22,7 @@ namespace AspCore_Conic_Erp_RestApi
             rk.SetValue("sTimeFormat", "dd-MM-yyyy");*/
            OpenBrowser();
           CreateHostBuilder(args).Build().MigrateDatabase().Run();
-          // CreateHostBuilder(args).Build().Run();
+         //  CreateHostBuilder(args).Build().Run();
 
          
         }

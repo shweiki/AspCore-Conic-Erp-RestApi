@@ -11,7 +11,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
     public class OrderInventoryController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public OrderInventoryController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
 
         [HttpPost]
         [Route("OrderInventory/GetByListQ")]

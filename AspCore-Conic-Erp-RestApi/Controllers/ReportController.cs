@@ -9,7 +9,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class ReportController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public ReportController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
 
         [HttpPost]
         [Route("Report/GetByListQ")]

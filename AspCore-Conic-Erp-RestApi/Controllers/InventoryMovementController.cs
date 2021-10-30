@@ -12,7 +12,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
     public class InventoryMovementController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public InventoryMovementController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         public Boolean Create(IList<InventoryMovement> RepoMoves)
         {
             if (RepoMoves != null)

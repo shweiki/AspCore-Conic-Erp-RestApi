@@ -17,7 +17,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
     public class MassageController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public MassageController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [Route("Massage/GetMassageObjId")]
         [HttpGet]
         public IActionResult GetMassageObjId(string TableName , long ObjId )

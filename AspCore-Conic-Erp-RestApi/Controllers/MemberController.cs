@@ -12,7 +12,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class MemberController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public MemberController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [Route("Member/GetReceivablesMember")]
         [HttpGet]
         public IActionResult GetReceivablesMember()

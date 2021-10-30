@@ -11,7 +11,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
     public class MembershipMovementOrderController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public MembershipMovementOrderController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [Route("MembershipMovementOrder/GetMembershipMovementOrderByMemberShipId")]
         [HttpGet]
         public IActionResult GetMembershipMovementOrderByMemberShipId(long? MemberShipId)

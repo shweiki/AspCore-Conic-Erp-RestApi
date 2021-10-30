@@ -17,13 +17,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     {
 
         private RoleManager<IdentityRole> _roleManager;
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+ 
 
-
-        public RoleController( RoleManager<IdentityRole> roleManager)
+        public RoleController( ConicErpContext dbcontext, RoleManager<IdentityRole> roleManager)
         {
   
             _roleManager = roleManager;
+            DB = dbcontext;
 
         }
 

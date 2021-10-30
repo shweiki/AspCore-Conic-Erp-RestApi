@@ -9,8 +9,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class AreaController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
-
+        private ConicErpContext DB;
+        public AreaController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
        
         [Route("Area/GetAreas")]
         [HttpGet]

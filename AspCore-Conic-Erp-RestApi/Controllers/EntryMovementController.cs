@@ -10,8 +10,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class EntryMovementController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
-        [Route("EntryMovement/Create")]
+        private ConicErpContext DB;
+        public EntryMovementController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }        [Route("EntryMovement/Create")]
         [HttpPost]
         public IActionResult Create(IList<EntryMovement> EntryMoves)
         {

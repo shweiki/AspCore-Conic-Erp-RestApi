@@ -10,7 +10,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     
     public class OriginItemController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public OriginItemController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [Route("OriginItem/GetOriginItem")]
         [HttpGet]
         public IActionResult GetOriginItem()

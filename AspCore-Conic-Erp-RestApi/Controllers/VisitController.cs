@@ -12,7 +12,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class VisitController : Controller
     {
-        private ConicErpContext DB = new ConicErpContext();
+                private ConicErpContext DB;
+        public VisitController(ConicErpContext dbcontext)
+        {
+            DB = dbcontext;
+        }
         [HttpPost]
         [Route("Visit/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any ,string Type)

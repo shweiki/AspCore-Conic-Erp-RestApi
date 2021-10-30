@@ -201,8 +201,8 @@ namespace AspCore_Conic_Erp_RestApi
         private  void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
         {
             DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
-      
-            DeviceLogController DeviceLog = new DeviceLogController();
+
+            DeviceLogController DeviceLog = new DeviceLogController(DB);
             string Ip = "";
             objCZKEM.GetDeviceIP(1, ref Ip);
             DeviceLog.RegisterLog(EnrollNumber, datetime , Ip );
