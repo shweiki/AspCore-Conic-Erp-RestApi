@@ -29,7 +29,9 @@ namespace AspCore_Conic_Erp_RestApi
             int lat = Environment.CurrentDirectory.LastIndexOf("\\") + 1;
             string Name = Environment.CurrentDirectory.Substring(lat, (Environment.CurrentDirectory.Length - lat));
             Name = Name.Replace("-", "").ToUpper();
+            
             var emailConfig = Configuration.GetSection("EmailConfiguration:" + Name + "").Get<EmailConfiguration>();
+           if(emailConfig ==null) emailConfig = Configuration.GetSection("EmailConfiguration:Default").Get<EmailConfiguration>();
             services.AddSingleton(emailConfig);
             services.AddScoped<IEmailSender, EmailSender>();
             services.Configure<FormOptions>(o => {
@@ -37,10 +39,13 @@ namespace AspCore_Conic_Erp_RestApi
                 o.MultipartBodyLengthLimit = int.MaxValue;
                 o.MemoryBufferThreshold = int.MaxValue;
             });
+            var ConnectionString = Configuration.GetConnectionString(Name);
+            if (ConnectionString == null)
+                ConnectionString = Configuration.GetConnectionString("Default");
 
             services.AddDbContext<ConicErpContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString(Name)
+                options.UseSqlServer(ConnectionString
                    , options => options.MigrationsAssembly("AspCore-Conic-Erp-RestApi")
                     );
             });

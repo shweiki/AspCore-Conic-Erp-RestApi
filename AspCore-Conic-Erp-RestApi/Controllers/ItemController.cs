@@ -20,7 +20,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Item/GetItem")]
         public IActionResult GetItem()
         {
-            var Items = DB.Items.Select(x => new { x.Id, x.Name, x.Barcode, x.SellingPrice, x.OtherPrice ,x.CostPrice }).ToList();
+            var Items = DB.Items.Select(x => new { x.Id, x.Name,x.Address , x.Model ,x.Type,x.SN, x.Barcode, x.SellingPrice, x.OtherPrice ,x.CostPrice }).ToList();
 
             return Ok(Items);
         }
@@ -40,6 +40,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.IsPrime,
                 x.Rate,
+                x.SN,
+                x.Type,
+                x.Address,
+                x.Model,
                 x.Barcode,
                 x.Category,
                 x.Description,
@@ -66,17 +70,23 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (Any == null) return NotFound();
            Any =  Any.ToLower();
-            var Items = DB.Items.Search(x => x.Name, x =>x.Barcode , x=> x.Id.ToString() ,x=>x.Category ).Containing(Any)
-                .Select(x => new { x.Id, x.Name, x.Barcode, x.SellingPrice, x.OtherPrice, x.CostPrice, x.Category }).ToList();
+            var Items = DB.Items.Search(x => x.Name, x =>x.Barcode , x=> x.Id.ToString() ,x=>x.Category ,x=>x.Address , x => x.Model, x => x.SN, x => x.Type).Containing(Any)
+                .Select(x => new { x.Id, x.Name,
+                    x.SN,
+                    x.Type,
+                    x.Address,
+                    x.Model,
+                    x.Barcode, x.SellingPrice, x.OtherPrice, x.CostPrice, x.Category }).ToList();
 
             return Ok(Items);
         }
         [HttpGet]
         [Route("Item/CheckItemIsExist")]
-        public IActionResult CheckItemIsExist(string Name, string BarCode)
+        public IActionResult CheckItemIsExist(string Name, string BarCode ,string Sn)
         {
             var Items = DB.Items.Where(m => (BarCode != null ? m.Barcode.ToLower() == BarCode.ToLower() : false)
-             ||(Name != null ? m.Name.ToLower()== Name.ToLower() : false)).ToList();
+             ||(Name != null ? m.Name.ToLower()== Name.ToLower() : false)
+             || (Sn != null ? m.SN.ToLower() == Sn.ToLower() : false)).ToList();
 
             return Ok(Items.Count() > 0 ? true : false);
         }
@@ -94,6 +104,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Tax,
                 x.IsPrime,
                 x.Rate,
+                x.SN,
+                x.Type,
+                x.Address,
+                x.Model,
                 x.Barcode,
                 x.Category,
                 x.Description,
@@ -123,7 +137,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
           x.IsPrime,
           x.Rate,
           x.Barcode,
-          x.Category,
+            x.SN,
+            x.Type,
+            x.Address,
+            x.Model,
+            x.Category,
           x.Description,
           x.Ingredients,
           TotalIn = x.InventoryMovements.Where(x => x.TypeMove == "In").Sum(s => s.Qty),
@@ -194,6 +212,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Tax,
                 x.IsPrime,
                 x.Rate,
+                x.SN,
+                x.Type,
+                x.Address,
+                x.Model,
                 x.Barcode,
                 x.Description,
                 x.Category,
@@ -278,21 +300,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             var Item = DB.Items.Where(x=>x.Id == Id).Select(x=> new 
                         {
-                            x.Id,
-                            x.Name,
-                            x.CostPrice,
-                            x.SellingPrice,
-                            x.OtherPrice,
-                            x.LowOrder,
-                            x.Tax,
-                            x.Rate,
-                            x.Barcode,
-                            x.Description,
-                            x.IsPrime,
-                            x.Status,
-                            x.Category,
-                            x.Ingredients,
-
+                x.Id,
+                x.Name,
+                x.CostPrice,
+                x.SellingPrice,
+                x.OtherPrice,
+                x.LowOrder,
+                x.Tax,
+                x.Rate,
+                x.SN,
+                x.Type,
+                x.Address,
+                x.Model,
+                x.Barcode,
+                x.Description,
+                x.IsPrime,
+                x.Status,
+                x.Category,
+                x.Ingredients,
                 //  InventoryQty = CalculateInventoryItemQty(x.Id)
             }).SingleOrDefault();
             return Ok(Item);
@@ -350,6 +375,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (ModelState.IsValid)
             {
+                try
+                {
                 Item item = DB.Items.Where(x => x.Id == collection.Id).SingleOrDefault();
                 item.Name = collection.Name;
                 item.CostPrice = collection.CostPrice;
@@ -357,16 +384,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 item.OtherPrice = collection.OtherPrice;
                 item.LowOrder = collection.LowOrder;
                 item.Tax = collection.Tax;
+                item.Type = collection.Type;
+                item.SN = collection.SN;
+                item.Address = collection.Address;
+                item.Model = collection.Model;
                 item.Barcode = collection.Barcode;
                 item.IsPrime = collection.IsPrime;
                 item.Description = collection.Description;
                 item.Category = collection.Category;
                 item.Ingredients = collection.Ingredients;
-
-                try
-                {
-                    DB.SaveChanges();
-                    return Ok(true);
+                DB.SaveChanges();
+                return Ok(true);
                 }
                 catch
                 {
@@ -419,12 +447,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetInventoryItemEXP(long Id)
         {
             var InventoryItemsExp = from x in DB.InventoryMovements.Where(i => i.ItemsId == Id && i.Status == 0).ToList()
-                                    group x by x.EXP into g
-                                    select new
-                                    {
-                                        Exp = g.Key,
-                                    };
-
+                        group x by x.EXP into g
+                        select new
+                        {
+                            Exp = g.Key,
+                        };
             return Ok(InventoryItemsExp);
         }
         

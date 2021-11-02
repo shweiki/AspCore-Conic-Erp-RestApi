@@ -15,6 +15,7 @@ namespace Entities
 
         public long Id { get; set; }
         public string Name { get; set; }
+        public string LatinName { get; set; }
         public DateTime? DateofBirth { get; set; }
         public string Email { get; set; }
         public string PhoneNumber1 { get; set; }

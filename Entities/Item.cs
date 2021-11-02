@@ -27,6 +27,7 @@ namespace Entities
         public double? Rate { get; set; }
         public string Barcode { get; set; }
         public string SN { get; set; }
+        public string Model { get; set; }
         public string Address { get; set; }
         public string Category { get; set; }
         public string Description { get; set; }

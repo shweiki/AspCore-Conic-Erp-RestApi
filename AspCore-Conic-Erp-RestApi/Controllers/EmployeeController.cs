@@ -33,6 +33,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 x.Id,
                 x.Name,
+                x.LatinName,
                 x.Ssn,
                 x.PhoneNumber1,
                 x.PhoneNumber2,
@@ -56,6 +57,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 x.Id,
                 x.Name,
+                x.LatinName,
                 x.Ssn,
                 x.PhoneNumber1,
                 x.PhoneNumber2,
@@ -98,6 +100,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 x.Id,
                 x.Name,
+                x.LatinName,
                 x.Ssn,
                 x.PhoneNumber1,
                 x.PhoneNumber2,
@@ -145,6 +148,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                   x.Id,
                   x.Name,
+                  x.LatinName,
                   x.Ssn,
                   x.PhoneNumber1,
                   x.PhoneNumber2,
@@ -172,6 +176,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 x.Id,
                 x.Name,
+                x.LatinName,
                 x.Ssn,
                 x.PhoneNumber1,
                 x.PhoneNumber2,
@@ -239,6 +244,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 Employee Employee = DB.Employees.Where(x => x.Id == collection.Id).SingleOrDefault();
                 Employee.Name = collection.Name;
+                Employee.LatinName = collection.LatinName;
                 Employee.Ssn = collection.Ssn;
                 Employee.Email = collection.Email;
                 Employee.PhoneNumber1 = collection.PhoneNumber1;
@@ -272,6 +278,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     x.Id,
                     x.Name,
+                    x.LatinName,
                     x.Ssn,
                     x.DateofBirth,
                     x.Email,

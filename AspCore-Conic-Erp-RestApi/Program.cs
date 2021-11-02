@@ -32,7 +32,7 @@ namespace AspCore_Conic_Erp_RestApi
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                }).UseWindowsService();
         public static void OpenBrowser()
         {
 
