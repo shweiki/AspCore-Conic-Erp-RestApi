@@ -16,8 +16,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             DB = dbcontext;
         }
-
-
         [Route("DeviceLog/GetDeviceLog")]
         [HttpGet]
         public IActionResult GetDeviceLog()
@@ -37,8 +35,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetlastLogByUserId(string UserId , string TableName)
         {
-
-            return Ok(DB.DeviceLogs.Where(ml => ml.Fk == UserId && ml.TableName == TableName)?.ToList()?.LastOrDefault()?.DateTime);
+            var L = DB.DeviceLogs.Where(ml => ml.Fk == UserId && ml.TableName == TableName)?.ToList()?.LastOrDefault()?.DateTime;
+            if (L != null)
+                return Ok(L);
+            else
+                return Ok();
         }
         [Route("DeviceLog/GetByStatus")]
         [HttpGet]
@@ -48,7 +49,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             GetFromZkBio(TableName);
 
-            var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any != null ? x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any) : true)).AsEnumerable().Select(x => new {
+            var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any != null ? x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any) : true))
+                .AsEnumerable().Select(x => new {
                 x.Id,
                 x.DateTime,
                 x.Description,
@@ -67,18 +69,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             public dynamic GetFkData(string Fktable , string TableName)
             {
-                     ConicErpContext DBx = new ConicErpContext();
 
                   dynamic Object;
                 switch (TableName)
                 {
                     case "Member":
-                        Object = DBx.Members.Where(x => x.Id == Convert.ToInt32(Fktable)).Select(x=> new  {
+                        Object = DB.Members.Where(x => x.Id == Convert.ToInt32(Fktable)).Select(x=> new  {
                             x.Id,
                             x.Name,
                             x.Description,
                             x.Status,
-                            Style = DBx.Oprationsys.Where(o => o.Status == x.Status && o.TableName == "Member").Select(o => new {
+                            Style = DB.Oprationsys.Where(o => o.Status == x.Status && o.TableName == "Member").Select(o => new {
                                 o.Color,
                                 o.ClassName,
                                 o.IconClass
@@ -92,7 +93,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             }).SingleOrDefault();
                         break;
                     case "Employee":
-                        Object = DBx.Employees.Where(x => x.Id == Convert.ToInt32(Fktable)).SingleOrDefault();
+                        Object = DB.Employees.Where(x => x.Id == Convert.ToInt32(Fktable)).SingleOrDefault();
                         break;
                             default: Object = null; break;
                         }

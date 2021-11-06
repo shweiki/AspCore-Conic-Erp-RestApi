@@ -18,7 +18,7 @@ namespace Entities
         public long Id { get; set; }
         public string Name { get; set; }
         public string Type { get; set; }
-        public bool TakeBon { get; set; }
+        public bool TakeBon { get; set; } // for Bill Of Entery
         public double? CostPrice { get; set; }
         public double? SellingPrice { get; set; }
         public double? OtherPrice { get; set; }

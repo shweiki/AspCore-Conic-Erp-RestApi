@@ -56,8 +56,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetCompanyInfo()
         {
-                var companyInfo = DB.CompanyInfos.Where(x => x.Id == 1).SingleOrDefault();
-                return Ok(companyInfo);
+            var companyInfo = DB.CompanyInfos.Where(x => x.Id == 1).SingleOrDefault();
+                if(companyInfo == null)
+                    return Ok();
+                else
+                    return Ok(companyInfo);
+
         }
     }
 }

@@ -11,7 +11,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class ItemController : Controller
     {
-                private ConicErpContext DB;
+          private ConicErpContext DB;
         public ItemController(ConicErpContext dbcontext)
         {
             DB = dbcontext;
@@ -234,7 +234,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                  || (s.PurchaseInvoice.FakeDate >= DateFrom && s.PurchaseInvoice.FakeDate <= DateTo)
                  || (s.OrderInventory.FakeDate >= DateFrom && s.OrderInventory.FakeDate <= DateTo)
                  || (s.WorkShop.FakeDate >= DateFrom && s.WorkShop.FakeDate <= DateTo)))
-                                .Select(x => new { x,x.SalesInvoice ,x.OrderInventory ,x.PurchaseInvoice,x.WorkShop }).AsEnumerable()
+                                .Select(x => new { x }).AsEnumerable()
                             .Select(x => new
                             {
                                 x.x.Id,
@@ -246,13 +246,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                 x.x.Qty,
                                 x.x.SellingPrice,
                                 x.x.Status,
-                            //   x.SalesInvoice,
-                            //   x.OrderInventory,
-                            //   x.PurchaseInvoice,
-                            //   x.WorkShop,
-                               FakeDate = x.SalesInvoice?.FakeDate +""+ x.OrderInventory?.FakeDate+""+ x.PurchaseInvoice?.FakeDate+""+ x.WorkShop?.FakeDate,
+                               // FakeDate = x.SalesInvoice?.FakeDate +""+ x.OrderInventory?.FakeDate+""+ x.PurchaseInvoice?.FakeDate+""+ x.WorkShop?.FakeDate,
                                 TotalRow = 0,
-                              //  FkDescription = GetFkDescription(x.SalesInvoiceId || x.OrderInventoryId||x.PurchaseInvoiceId||x.WorkShopId,)
+                                FkObject = GetFkObject(x.x)
                             }).ToList();
                 double AllTotal = DB.InventoryMovements.Where(s => (MergeItemId != null ? s.ItemsId == ItemId || s.ItemsId == MergeItemId : s.ItemsId == ItemId)).Where(x => x.TypeMove == "In").Sum(s => s.Qty) -
                 DB.InventoryMovements.Where(s => (MergeItemId != null ? s.ItemsId == ItemId || s.ItemsId == MergeItemId : s.ItemsId == ItemId)).Where(x=>x.TypeMove=="Out").Sum(s => s.Qty);
@@ -270,14 +266,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Qty = Balancecarried,
                     SellingPrice = Convert.ToDouble(0.0),
                     Status = 0,
-                    //SalesInvoice=new SalesInvoice(),
-                    //OrderInventory= new OrderInventory(),
-                    //PurchaseInvoice=new PurchaseInvoice(),
-                    //WorkShop= new WorkShop(),
-                    FakeDate = DateFrom.ToString(),
                     TotalRow = 0,
-                    //  Type = "رصيد الفترة السابقة",
-                    // FkDescription = ""
+                    FkObject = GetFkObject(new InventoryMovement())
                 };
                 Movements.Add(p);
                 }
@@ -462,6 +452,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             DB.InventoryMovements.Where(i=> i.PurchaseInvoiceId != null).ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
             DB.SaveChanges();
             return Ok(true);
+        }
+        
+       public dynamic GetFkObject(InventoryMovement OX)
+        {
+            dynamic Object = null;
+            if (OX.SalesInvoiceId != null)
+            
+                Object = DB.SalesInvoices.Where(x => x.Id == OX.SalesInvoiceId).Select(s => new { s.Id, s.FakeDate,s.Description, Type = "SalesInvoice" }).SingleOrDefault();
+            
+            if (OX.PurchaseInvoiceId != null)
+            
+                Object = DB.PurchaseInvoices.Where(x => x.Id == OX.PurchaseInvoiceId).Select(s => new { s.Id, s.FakeDate, s.Description, Type = "PurchaseInvoice" }).SingleOrDefault();
+            
+            if (OX.OrderInventoryId != null)
+            
+                Object = DB.OrderInventories.Where(x => x.Id == OX.OrderInventoryId).Select(s=> new { s.Id, s.FakeDate, s.Description, Type = "OrderInventory" }).SingleOrDefault();
+            
+            if (OX.WorkShopId != null)
+            
+                Object = DB.WorkShops.Where(x => x.Id == OX.WorkShopId).Select(s => new { s.Id, s.FakeDate, s.Description, Type = "WorkShop" }).SingleOrDefault();
+            
+            return Object;
         }
     }
 

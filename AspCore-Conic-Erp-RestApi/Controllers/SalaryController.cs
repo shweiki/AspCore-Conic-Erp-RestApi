@@ -126,7 +126,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Employee.Name,
                     x.Employee.JobTitle,
                  }).ToList().LastOrDefault();
-            return Ok(Salaries);
+            if(Salaries !=null) return Ok(Salaries);
+           else return Ok();
         }
         [Route("Salary/GetSalaryId")]
         [HttpGet]

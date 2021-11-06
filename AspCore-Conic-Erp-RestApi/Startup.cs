@@ -80,6 +80,8 @@ namespace AspCore_Conic_Erp_RestApi
              options.SerializerSettings.ContractResolver = new DefaultContractResolver();
              //   options.SerializerSettings.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
              options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
             });
           
         }

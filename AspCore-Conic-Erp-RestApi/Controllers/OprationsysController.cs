@@ -356,7 +356,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 DB.SaveChanges();
                 return true;
           
-            return false;
+         //   return false;
 
         }
 

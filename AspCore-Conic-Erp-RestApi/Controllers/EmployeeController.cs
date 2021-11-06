@@ -291,6 +291,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Tag,
                     x.Vaccine,
                     Avatar = Url.Content("~/Images/Employee/" + x.Id + ".jpeg"),
+                    HaveFaceOnDevice = DB.FingerPrints.Where(f => f.Fk == x.Id.ToString() && f.TableName == "Employee").Count() > 0 ? true : false,
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
                     x.AccountId,
