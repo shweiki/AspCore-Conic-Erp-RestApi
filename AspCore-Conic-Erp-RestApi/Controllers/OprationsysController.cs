@@ -351,8 +351,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     break;
 
             }
-            
-                DB.ActionLogs.Add(log);
+            log.Fktable = ObjId.ToString();
+            DB.ActionLogs.Add(log);
                 DB.SaveChanges();
                 return true;
           

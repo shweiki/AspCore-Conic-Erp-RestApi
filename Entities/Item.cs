@@ -29,7 +29,8 @@ namespace Entities
         public string SN { get; set; }
         public string Model { get; set; }
         public string Address { get; set; }
-        public string Category { get; set; }
+        public string MenuItem { get; set; }
+        public string UnitItem { get; set; }
         public string Description { get; set; }
         public string Ingredients { get; set; }
         public int Status { get; set; }

@@ -339,10 +339,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 int OStatus = M.Status;
 
-                var LastLog = DB.ActionLogs.Where(x => x.MemberId == M.Id && x.Opration.TableName =="Member" && x.Opration.Status == -2)?.OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
+                var LastLog = DB.ActionLogs.Where(x => x.MemberId == M.Id && x.Opration.TableName =="Member" )?.OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
                 if (LastLog != null)
                 {
-                    M.Status = DB.ActionLogs.Where(x => x.MemberId == M.Id).OrderBy(o => o.PostingDateTime).ToList().LastOrDefault().Opration.Status;
+                    M.Status = DB.Oprationsys.Where(x => x.Id == LastLog.OprationId).SingleOrDefault().Status;
                 }
                 DB.SaveChanges();
             }

@@ -32,7 +32,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetActiveUnitItem()
         {
-            var UnitItems = DB.UnitItems.Where(i=>i.Status==0).Select(x => new { value = x.Id, label = x.Name }).ToList();
+            var UnitItems = DB.UnitItems.Where(i=>i.Status==0).Select(x => new { value = x.Name, label = x.Name }).ToList();
 
             return Ok(UnitItems);
         }
@@ -46,7 +46,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     DB.UnitItems.Add(collection);
                     DB.SaveChanges();
-                    return Ok(true);
+                    return Ok(collection);
 
                 }
                 catch

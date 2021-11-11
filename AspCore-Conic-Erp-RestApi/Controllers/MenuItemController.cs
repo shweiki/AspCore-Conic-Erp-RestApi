@@ -55,7 +55,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     DB.MenuItems.Add(collection);
                     DB.SaveChanges();
-                    return Ok(true);
+                    return Ok(collection);
 
                 }
                 catch

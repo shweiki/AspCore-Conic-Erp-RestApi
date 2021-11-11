@@ -14,7 +14,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
     public class FileDataController : Controller
     {
-                private ConicErpContext DB;
+        private ConicErpContext DB;
         public FileDataController(ConicErpContext dbcontext)
         {
             DB = dbcontext;

@@ -20,7 +20,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Item/GetItem")]
         public IActionResult GetItem()
         {
-            var Items = DB.Items.Select(x => new { x.Id, x.Name,x.Address , x.Model ,x.Type,x.SN, x.Barcode, x.SellingPrice, x.OtherPrice ,x.CostPrice }).ToList();
+            var Items = DB.Items.Select(x => new { x.Id, x.Name,x.Address , x.Model ,x.Type,x.SN, x.Barcode, x.SellingPrice, x.OtherPrice ,x.CostPrice , x.TakeBon }).ToList();
 
             return Ok(Items);
         }
@@ -28,7 +28,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Item/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
         {
-            var Items = DB.Items.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Category.Contains(Any) || s.Barcode.Contains(Any) : true) && (Status != null ? s.Status == Status : true))
+            var Items = DB.Items.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.MenuItem.Contains(Any) || s.Barcode.Contains(Any) : true) && (Status != null ? s.Status == Status : true))
               .Select(x=>new   {
                 x.Id,
                 x.Name,
@@ -45,9 +45,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Address,
                 x.Model,
                 x.Barcode,
-                x.Category,
+                x.UnitItem,
                 x.Description,
                 x.Ingredients,
+                x.TakeBon,
                 TotalIn =  DB.InventoryMovements.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty),
                 TotalOut = DB.InventoryMovements.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty),
               }).ToList();
@@ -70,13 +71,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (Any == null) return NotFound();
            Any =  Any.ToLower();
-            var Items = DB.Items.Search(x => x.Name, x =>x.Barcode , x=> x.Id.ToString() ,x=>x.Category ,x=>x.Address , x => x.Model, x => x.SN, x => x.Type).Containing(Any)
+            var Items = DB.Items.Search(x => x.Name, x =>x.Barcode , x=> x.Id.ToString() ,x=>x.MenuItem, x=>x.Address , x => x.Model, x => x.SN, x => x.Type).Containing(Any)
                 .Select(x => new { x.Id, x.Name,
                     x.SN,
                     x.Type,
                     x.Address,
                     x.Model,
-                    x.Barcode, x.SellingPrice, x.OtherPrice, x.CostPrice, x.Category }).ToList();
+                    x.Barcode, x.SellingPrice, x.OtherPrice, x.CostPrice, x.MenuItem }).ToList();
 
             return Ok(Items);
         }
@@ -109,9 +110,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Address,
                 x.Model,
                 x.Barcode,
-                x.Category,
+                x.UnitItem,
                 x.Description,
                 x.Ingredients,
+                x.TakeBon,
              //   InventoryQty = CalculateInventoryItemQty(x.Id),
             }).ToList();
                          
@@ -124,7 +126,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             var Items = DB.Items.Where(s => (s.InventoryMovements != null ?
             s.InventoryMovements.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty) - s.InventoryMovements.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty) < s.LowOrder
-            : false) && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Category.Contains(Any) || s.Barcode.Contains(Any) : true) && (Status != null ? s.Status == Status : true))
+            : false) && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.MenuItem.Contains(Any) || s.Barcode.Contains(Any) : true) && (Status != null ? s.Status == Status : true))
              .Select(x => new {
           x.Id,
           x.Name,
@@ -141,9 +143,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             x.Type,
             x.Address,
             x.Model,
-            x.Category,
+            x.MenuItem,
+            x.UnitItem,
           x.Description,
           x.Ingredients,
+          x.TakeBon,
           TotalIn = x.InventoryMovements.Where(x => x.TypeMove == "In").Sum(s => s.Qty),
           TotalOut = x.InventoryMovements.Where(x => x.TypeMove == "Out").Sum(s => s.Qty),
         }).ToList();
@@ -177,9 +181,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Items.IsPrime,
                 x.Items.Rate,
                 x.Items.Barcode,
-                x.Items.Category,
+                x.Items.MenuItem,
+                x.Items.UnitItem,
                 x.Description,
                 x.Items.Ingredients,
+                x.Items.TakeBon,
                 TotalIn = x.Items.InventoryMovements.Where(x => x.TypeMove == "In").Sum(s=>s.Qty),
                 TotalOut = x.Items.InventoryMovements.Where(x => x.TypeMove == "Out").Sum(s => s.Qty),
             }).ToList();
@@ -218,8 +224,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Model,
                 x.Barcode,
                 x.Description,
-                x.Category,
+                x.MenuItem,
+                x.UnitItem,
                 x.Ingredients,
+                x.TakeBon,
                 // InventoryQty = CalculateInventoryItemQty(x.Id),
             }).ToList();
 
@@ -306,8 +314,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Description,
                 x.IsPrime,
                 x.Status,
-                x.Category,
+                x.MenuItem,
+                x.UnitItem,
                 x.Ingredients,
+                x.TakeBon,
                 //  InventoryQty = CalculateInventoryItemQty(x.Id)
             }).SingleOrDefault();
             return Ok(Item);
@@ -330,8 +340,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             x.Description,
                             x.IsPrime,
                             x.Status,
-                            x.Category,
+                            x.MenuItem,
+                            x.UnitItem,
                             x.Ingredients,
+                            x.TakeBon,
                 //  InventoryQty = CalculateInventoryItemQty(x.Id)
             }).FirstOrDefault();
             if(Item != null)
@@ -381,8 +393,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 item.Barcode = collection.Barcode;
                 item.IsPrime = collection.IsPrime;
                 item.Description = collection.Description;
-                item.Category = collection.Category;
+                item.MenuItem = collection.MenuItem;
+                item.UnitItem = collection.UnitItem;
                 item.Ingredients = collection.Ingredients;
+                item.TakeBon = collection.TakeBon;
                 DB.SaveChanges();
                 return Ok(true);
                 }
@@ -415,7 +429,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(false);
         }
-        
+        [Route("Item/EditTakeBon")]
+        [HttpPost]
+        public IActionResult EditTakeBon(long ItemId, bool TakeBon)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Item item = DB.Items.Where(x => x.Id == ItemId).SingleOrDefault();
+                    item.TakeBon = TakeBon;
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            return Ok(false);
+        }
+
         [Route("Item/CalculateInventoryItemQty")]
         [HttpPost]
         public IActionResult CalculateInventoryItemQty(long Id)
