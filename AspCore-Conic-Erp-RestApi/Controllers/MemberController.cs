@@ -320,10 +320,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 if (ActiveMemberShip == null) {
                     M.Status = -1;
                 }
-
+                if (OStatus == -2) M.Status = -2;
             }
-        //     CheckBlackListActionLogMembers();
-    
+            //     CheckBlackListActionLogMembers();
+
             DB.SaveChanges();
 
             return Ok(true);
