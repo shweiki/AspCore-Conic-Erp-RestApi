@@ -17,7 +17,6 @@ namespace Entities
         public string AccountInvoiceNumber { get; set; }
         public DateTime? FakeDate { get; set; }
         public string PaymentMethod { get; set; }
-        public DateTime InvoicePurchaseDate { get; set; }
         public string Description { get; set; }
         public int Status { get; set; }
         public long PurchaseInvoiceId { get; set; }
