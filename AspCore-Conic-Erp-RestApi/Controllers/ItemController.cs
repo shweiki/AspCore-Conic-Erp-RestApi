@@ -255,7 +255,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                 x.x.SellingPrice,
                                 x.x.Status,
                                // FakeDate = x.SalesInvoice?.FakeDate +""+ x.OrderInventory?.FakeDate+""+ x.PurchaseInvoice?.FakeDate+""+ x.WorkShop?.FakeDate,
-                                TotalRow = 0,
+                                TotalRow = (x.x.TypeMove == "In" ? x.x.Qty : 0) - (x.x.TypeMove == "Out" ? x.x.Qty : 0),
                                 FkObject = GetFkObject(x.x)
                             }).ToList();
                 double AllTotal = DB.InventoryMovements.Where(s => (MergeItemId != null ? s.ItemsId == ItemId || s.ItemsId == MergeItemId : s.ItemsId == ItemId)).Where(x => x.TypeMove == "In").Sum(s => s.Qty) -
@@ -274,7 +274,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Qty = Balancecarried,
                     SellingPrice = Convert.ToDouble(0.0),
                     Status = 0,
-                    TotalRow = 0,
+                    TotalRow = Convert.ToDouble(0.0),
                     FkObject = GetFkObject(new InventoryMovement())
                 };
                 Movements.Add(p);

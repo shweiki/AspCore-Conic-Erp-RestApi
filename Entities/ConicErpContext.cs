@@ -57,6 +57,7 @@ namespace Entities
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<Receive> Receives { get; set; }
         public virtual DbSet<PurchaseInvoice> PurchaseInvoices { get; set; }
+        public virtual DbSet<BillOfEntery> BillOfEnterys { get; set; }
         public virtual DbSet<WorkShop> WorkShops { get; set; }
         public virtual DbSet<SalesInvoice> SalesInvoices { get; set; }
         public virtual DbSet<Service> Services { get; set; }

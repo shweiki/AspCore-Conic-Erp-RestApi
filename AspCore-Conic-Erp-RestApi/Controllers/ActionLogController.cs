@@ -16,11 +16,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public ActionLogController(ConicErpContext dbcontext)
         {
             DB = dbcontext;
-        }        public Boolean Create(ActionLog LogOpratio)
+        }
+        public Boolean Create(ActionLog LogOpratio)
         {
-            LogOpratio.PostingDateTime = DateTime.Now;
             try
             {
+               LogOpratio.PostingDateTime = DateTime.Now;
+
                 // TODO: Add insert logic here
                 DB.ActionLogs.Add(LogOpratio);
                 DB.SaveChanges();

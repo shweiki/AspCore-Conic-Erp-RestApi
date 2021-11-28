@@ -11,7 +11,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class PaymentController : Controller
     {
-                private ConicErpContext DB;
+        private ConicErpContext DB;
         public PaymentController(ConicErpContext dbcontext)
         {
             DB = dbcontext;
