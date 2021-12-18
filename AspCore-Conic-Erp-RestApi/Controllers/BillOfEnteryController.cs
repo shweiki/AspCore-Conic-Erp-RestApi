@@ -34,13 +34,27 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     imx.Id,
                     imx.ItemsId,
-                    imx.Items.Name,
+                    imx.Items,
                     imx.TypeMove,
                     imx.InventoryItemId,
                     imx.Qty,
                     imx.EXP,
                     imx.SellingPrice,
-                    imx.Description
+                    imx.Description,
+                    SalesItemMovements = DB.InventoryMovements.Where(m => m.SalesInvoiceId != null && m.ItemsId == imx.ItemsId).Select(isx => new
+                    {
+                        isx.Id,
+                        isx.ItemsId,
+                        //imx.Items,
+                        isx.SalesInvoice,
+                        VendorName= isx.SalesInvoice.Vendor.Name,
+                        isx.TypeMove,
+                        isx.InventoryItemId,
+                        isx.Qty,
+                        isx.EXP,
+                        isx.SellingPrice,
+                        isx.Description
+                    }).ToList(),
                 }).ToList(),
             }).ToList();
             Invoices = (Sort == "+id" ? Invoices.OrderBy(s => s.Id).ToList() : Invoices.OrderByDescending(s => s.Id).ToList());
@@ -126,15 +140,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     imx.Id,
                     imx.ItemsId,
-                    imx.Items.Name,
+                    imx.Items,
                     imx.TypeMove,
                     imx.InventoryItemId,
                     imx.Qty,
                     imx.EXP,
                     imx.SellingPrice,
+                    SalesItemMovements = DB.InventoryMovements.Where(m => m.SalesInvoiceId != null && m.ItemsId == imx.ItemsId).Select(imx => new
+                    {
+                        imx.Id,
+                        imx.ItemsId,
+                        //imx.Items,
+                        imx.SalesInvoice,
+                        imx.TypeMove,
+                        imx.InventoryItemId,
+                        imx.Qty,
+                        imx.EXP,
+                        imx.SellingPrice,
+                        imx.Description
+                    }).ToList(),
                     imx.Description
                 }).ToList()
-
+                               
             }).SingleOrDefault();
 
 
