@@ -252,11 +252,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             try
             {
+                List<DeviceLog> DeviceLogs = new List<DeviceLog>();
                 if (CheckDeviceHere((int)DeviceId))
                 {
                     ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, 1);
                     if (MachineLog != null && MachineLog.Count > 0)
                     {
+
                         foreach (var ML in MachineLog.Where(mlo=> mlo.IndRegID == Convert.ToInt64(UserId) ).ToList())
                         {
                             DateTime datetime = DateTime.Parse(ML.DateTimeRecord);
@@ -277,10 +279,22 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                     Log.Status = -1;
                                 DB.DeviceLogs.Add(Log);
                                 DB.SaveChanges();
+                                DeviceLogs.Add(Log);
+
                             }
                         }
                         objZkeeper.Disconnect();
-                        return Ok(true);
+                        return Ok(DeviceLogs.Select(x => new {
+                            x.Status,
+                            x.Type,
+                            x.DateTime,
+                            x.Device.Name,
+                            x.DeviceId,
+                            x.Description,
+                            x.Id,
+                            x.Fk,
+                            x.TableName
+                        }).ToList());
                     }
                     else
                     {
@@ -462,9 +476,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             }
                     }
                     DB.SaveChanges();
-                    objZkeeper.ClearGLog(0);
+                   // objZkeeper.ClearGLog(0);
                     objZkeeper.Disconnect();
-                    return Ok(true);
+                    return Ok(MachineLog.ToList());
                 }
                 else
                 {

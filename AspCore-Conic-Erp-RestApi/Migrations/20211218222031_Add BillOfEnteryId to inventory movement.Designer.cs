@@ -4,14 +4,16 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20211218222031_Add BillOfEnteryId to inventory movement")]
+    partial class AddBillOfEnteryIdtoinventorymovement
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -293,9 +295,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<long?>("OrderInventoryId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("OrderRestaurantId")
                         .HasColumnType("bigint");
 
                     b.Property<int?>("OriginId")
@@ -1717,53 +1716,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                     b.ToTable("OrderInventory");
                 });
 
-            modelBuilder.Entity("Entities.OrderRestaurant", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("FakeDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("OrderId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TableNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("TotalPill")
-                        .HasColumnType("float");
-
-                    b.Property<double>("TotalPrice")
-                        .HasColumnType("float");
-
-                    b.Property<long?>("VendorId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VendorId");
-
-                    b.ToTable("OrderRestaurants");
-                });
-
             modelBuilder.Entity("Entities.OriginItem", b =>
                 {
                     b.Property<int>("Id")
@@ -2309,9 +2261,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("Pass")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PhoneNumber1")
                         .HasMaxLength(13)
                         .IsUnicode(false)
@@ -2336,9 +2285,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasMaxLength(255)
                         .IsUnicode(false)
                         .HasColumnType("varchar(255)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -2922,15 +2868,6 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
                         .HasForeignKey("VendorId");
 
                     b.Navigation("Driver");
-                });
-
-            modelBuilder.Entity("Entities.OrderRestaurant", b =>
-                {
-                    b.HasOne("Entities.Vendor", "Vendor")
-                        .WithMany()
-                        .HasForeignKey("VendorId");
-
-                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("Entities.Payment", b =>

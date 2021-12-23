@@ -20,6 +20,7 @@ namespace Entities
         public long? PurchaseInvoiceId { get; set; }
         public long? OrderInventoryId { get; set; }
         public long? WorkShopId { get; set; }
+        public long? BillOfEnteryId { get; set; }
 
         // public DateTime MFG { get; set; }
         public DateTime EXP { get; set; }
@@ -31,5 +32,6 @@ namespace Entities
         public virtual OrderInventory OrderInventory { get; set; }
         public virtual PurchaseInvoice PurchaseInvoice { get; set; }
         public virtual SalesInvoice SalesInvoice { get; set; }
+        public virtual BillOfEntery BillOfEntery { get; set; }
     }
 }

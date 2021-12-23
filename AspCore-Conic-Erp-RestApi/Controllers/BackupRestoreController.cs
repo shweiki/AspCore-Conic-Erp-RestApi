@@ -75,7 +75,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             int lat = Environment.CurrentDirectory.LastIndexOf("\\") + 1;
             string Name = Environment.CurrentDirectory.Substring(lat, (Environment.CurrentDirectory.Length - lat));
             Name = Name.Replace("-", "").ToUpper();
-            ServerConnection serverConnection = new ServerConnection(Configuration.GetConnectionString(Name));
+            var ConnectionString = Configuration.GetConnectionString(Name);
+            if (ConnectionString == null)
+                ConnectionString = Configuration.GetConnectionString("Default");
+            ServerConnection serverConnection = new ServerConnection(Configuration.GetConnectionString(ConnectionString));
             Server dbServer = new Server(serverConnection);
 
                 Restore _Restore = new Restore()

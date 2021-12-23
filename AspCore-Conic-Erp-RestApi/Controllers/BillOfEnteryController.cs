@@ -34,13 +34,49 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     imx.Id,
                     imx.ItemsId,
-                    imx.Items.Name,
+                    imx.Items,
                     imx.TypeMove,
                     imx.InventoryItemId,
                     imx.Qty,
+                    Total = imx.Qty,
                     imx.EXP,
                     imx.SellingPrice,
-                    imx.Description
+                    imx.Description,
+                    BillOfEnteryItemMovements = DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Select(ibex => new
+                    {
+                        ibex.Id,
+                        ibex.ItemsId,
+                        //imx.Items,
+                        ibex.SalesInvoiceId,
+                        SalesInvoiceFakeDate = ibex.SalesInvoice.FakeDate,
+                        VendorName = ibex.SalesInvoice.Vendor.Name,
+                        ibex.TypeMove,
+                        ibex.InventoryItemId,
+                        ibex.Qty,
+                        Total = imx.Qty - ibex.Qty,
+                        ibex.EXP,
+                        ibex.SellingPrice,
+                        ibex.Description,
+                        ibex.BillOfEnteryId
+                    }).ToList(),
+                    SalesItemMovements =  DB.InventoryMovements.Where(m =>  m.BillOfEnteryId == null && m.SalesInvoiceId != null && m.ItemsId == imx.ItemsId).Select(isx => new
+                    {
+                        isx.Id,
+                        isx.ItemsId,
+                        //imx.Items,
+                        isx.SalesInvoiceId,
+                        SalesInvoiceFakeDate = isx.SalesInvoice.FakeDate,
+                        VendorName= isx.SalesInvoice.Vendor.Name,
+                        isx.TypeMove,
+                        isx.InventoryItemId,
+                        isx.Qty,
+                        Total = imx.Qty - isx.Qty,
+                        isx.EXP,
+                        isx.SellingPrice,
+                        isx.Description,
+                        isx.BillOfEnteryId,
+                       RootBillOfEnteryId = x.Id
+                    }).ToList(),
                 }).ToList(),
             }).ToList();
             Invoices = (Sort == "+id" ? Invoices.OrderBy(s => s.Id).ToList() : Invoices.OrderByDescending(s => s.Id).ToList());
@@ -126,21 +162,54 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     imx.Id,
                     imx.ItemsId,
-                    imx.Items.Name,
+                    imx.Items,
                     imx.TypeMove,
                     imx.InventoryItemId,
                     imx.Qty,
                     imx.EXP,
                     imx.SellingPrice,
+                    SalesItemMovements = DB.InventoryMovements.Where(m => m.SalesInvoiceId != null && m.ItemsId == imx.ItemsId).Select(imx => new
+                    {
+                        imx.Id,
+                        imx.ItemsId,
+                        //imx.Items,
+                        imx.SalesInvoice,
+                        imx.TypeMove,
+                        imx.InventoryItemId,
+                        imx.Qty,
+                        imx.EXP,
+                        imx.SellingPrice,
+                        imx.Description
+                    }).ToList(),
                     imx.Description
                 }).ToList()
-
+                               
             }).SingleOrDefault();
 
 
             return Ok(Invoices);
         }
-
+        [HttpPost]
+        [Route("BillOfEntery/PinBillOfEntery")]
+        public IActionResult PinBillOfEntery(long InventoryMovementsId, long? BillOfEnteryId ,bool Pin)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    InventoryMovement Movement = DB.InventoryMovements.Where(x => x.Id == InventoryMovementsId).SingleOrDefault();
+                    Movement.BillOfEnteryId = Pin == true ?  BillOfEnteryId : null;
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            else return Ok(false);
+        }
 
     }
 }
