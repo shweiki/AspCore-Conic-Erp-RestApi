@@ -4,16 +4,21 @@ using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
 using System;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
     [Authorize]
     public class VendorController : Controller
     {
-                private ConicErpContext DB;
-        public VendorController(ConicErpContext dbcontext)
+        private ConicErpContext DB;
+        private readonly UserManager<IdentityUser> _userManager;
+        public VendorController(ConicErpContext dbcontext, UserManager<IdentityUser> userManager)
         {
             DB = dbcontext;
+            _userManager = userManager;
+
         }
         [Route("Vendor/GetVendor")]
         [HttpGet]
@@ -196,6 +201,50 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             var Vendor = DB.Vendors.Where(x => x.Status == 0).Select(x => new { value = x.Id, label = x.Name }).ToList();
             return Ok(Vendor);
+        }
+
+        [Route("Vendor/CreateWithUser")]
+        [HttpPost]
+        public async Task<ActionResult> CreateWithUser(Vendor collection)
+        {
+            if (ModelState.IsValid)
+            {
+
+                var NewUser = new IdentityUser()
+                {
+
+                    Email = collection.Email,
+                    UserName = collection.Name,
+                    PhoneNumber = collection.PhoneNumber1,
+                    PhoneNumberConfirmed = true,
+                    EmailConfirmed = true,
+                };
+                IdentityResult result = await _userManager.CreateAsync(NewUser, collection.Pass);
+
+                var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
+                if (!result.Succeeded)
+                {
+                    return Ok(result);
+                }
+                collection.Pass = NewUser.PasswordHash;
+                collection.UserId = NewUser.Id;
+                DB.Vendors.Add(collection);
+                DB.SaveChanges();
+
+                UserRouter NewRole = new UserRouter()
+                {
+                    UserId = NewUser.Id,
+                    Router = "[\"/OrderDelivery/DriverPage\",\"/OrderDelivery/DriverDeliveryList\"]",
+                    DefulateRedirect = "/",
+                };
+                DB.UserRouter.Add(NewRole);
+                DB.SaveChanges();
+
+
+                return Ok(collection);
+
+            }
+            return Ok(false);
         }
 
     }

@@ -31,6 +31,8 @@ namespace Entities
         public string Type { get; set; }
         public long AccountId { get; set; }
         public long? AreaId { get; set; }
+        public string? UserId { get; set; }
+        public string Pass { get; set; }
         public virtual Account Account { get; set; }
         public virtual Area Area { get; set; }
         public virtual ICollection<Cheque> Cheques { get; set; }

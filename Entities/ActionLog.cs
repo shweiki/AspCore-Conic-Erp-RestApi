@@ -43,6 +43,7 @@ namespace Entities
         public long? OrderDeliveryId { get; set; }
         public long? AreaId { get; set; }
         public long? DriverId { get; set; }
+        public long? OrderRestaurantId { get; set; }
         public virtual Oprationsy Opration { get; set; }
     }
 }

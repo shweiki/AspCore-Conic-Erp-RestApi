@@ -71,6 +71,7 @@ namespace Entities
         public virtual DbSet<SalaryAdjustmentLog> SalaryAdjustmentLogs { get; set; }
         public virtual DbSet<SalaryPayment> SalaryPayments { get; set; }
         public virtual DbSet<Adjustment> Adjustments { get; set; }
+        public virtual DbSet<OrderRestaurant> OrderRestaurants { get; set; }
     /*  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
