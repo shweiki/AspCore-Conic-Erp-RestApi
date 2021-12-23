@@ -247,5 +247,63 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(false);
         }
 
+
+        [Route("Vendor/CreateCustomer")]
+        [HttpPost]
+        public async Task<ActionResult> CreateCustomer(Vendor collection)
+        {
+            if (ModelState.IsValid)
+            {
+                var ParentAccount = DB.Accounts.Where(i => i.Description == "Vendor").SingleOrDefault();
+                ParentAccount = ParentAccount ??= new Account { Id = 0, ParentId = 0, Code = "0" };
+                Account NewAccount = new Account
+                {
+                    Type = "Vendor",
+                    Description = collection.Description,
+                    Status = 0,
+                    Code = ParentAccount.Code + '-' + DB.Accounts.Where(i => i.ParentId == ParentAccount.Id).Count() + 1,
+                    ParentId = ParentAccount.Id
+                };
+                DB.Accounts.Add(NewAccount);
+                DB.SaveChanges();
+                var NewUser = new IdentityUser()
+                {
+
+                    Email = collection.Email,
+                    UserName = collection.Name,
+                    PhoneNumber = collection.PhoneNumber1,
+                    PhoneNumberConfirmed = true,
+                    EmailConfirmed = true,
+                };
+                IdentityResult result = await _userManager.CreateAsync(NewUser, collection.Pass);
+
+                var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
+                if (!result.Succeeded)
+                {
+                    return Ok(result);
+                }
+                collection.Pass = NewUser.PasswordHash;
+                collection.UserId = NewUser.Id;
+                collection.AccountId = NewAccount.Id;
+                DB.Vendors.Add(collection);
+                DB.SaveChanges();
+
+                UserRouter NewRole = new UserRouter()
+                {
+                    UserId = NewUser.Id,
+                    Router = "[\"/OrderRestaurant/CustomerPage\",\"/OrderRestaurant/CustomerOrderList\"]",
+                    DefulateRedirect = "/",
+                };
+                DB.UserRouter.Add(NewRole);
+                DB.SaveChanges();
+
+
+                return Ok(collection);
+
+            }
+            return Ok(false);
+        }
+
+
     }
 }

@@ -22,13 +22,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [AllowAnonymous]
         [Route("OrderResaurant/Create")]
         [HttpPost]
-        public IActionResult Create(OrderRestaurant collection)
+        public IActionResult Create(OrderRestaurant collection, string UserId)
         {
             if (ModelState.IsValid)
             {
+                var vendor = DB.Vendors.Where(x => x.UserId == UserId).FirstOrDefault();
+
                 try
                 {
-     
+                    collection.VendorId = vendor.Id;
+                    collection.Name = vendor.Name;
+                    collection.PhoneNumber = vendor.PhoneNumber1;
                     // TODO: Add insert logic here
                     DB.OrderRestaurants.Add(collection);
                     DB.SaveChanges();
@@ -42,38 +46,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else return Ok(false);
         }
-        public int ppt = 0;
-        [AllowAnonymous]
-        [Route("OrderResaurant/Create")]
-        [HttpPost]
-        public IActionResult CreateWithDriver(OrderRestaurant collection)
-        {
-            List<long> OrderD = new List<long>();
-            var DriverList = DB.Drivers.Where(x => x.IsActive == 1)
-                      .Select(s => new { s.Id }).ToList();
-            if (DriverList.Count > 0) { 
-             foreach (var d in DriverList) {
-               var LastDriverOrders = DB.OrderRestaurants.Where(x => x.VendorId == d.Id).ToList().LastOrDefault().OrderId;
-                OrderD.Add(LastDriverOrders);
-            }
-            OrderD.Sort();
-            var smallest = OrderD[0];
-            Console.WriteLine(OrderD);
-
-            var lastOrderDriverId = DB.OrderRestaurants.Where(x => x.OrderId == smallest).ToList().SingleOrDefault().VendorId;
-            collection.Status = 1;
-            collection.VendorId = lastOrderDriverId;
-            DB.OrderRestaurants.Add(collection);
-            DB.SaveChanges();
-            return Ok(true);
-        
-        }
-            else
-            {
-                return Ok(false);
-            }
-        }
-
+ 
         [Authorize]
         [HttpPost]
         [Route("OrderRestaurant/GetByListQ")]
@@ -148,19 +121,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Authorize]
         [Route("OrderRestaurant/OrderOnTable")]
         [HttpPost]
-        public IActionResult OrderOnTable(long DriverId, long OrderId)
+        public IActionResult OrderOnTable(long OrderId)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == OrderId).SingleOrDefault();
-                Order.VendorId = DriverId;
-                Order.Status = 1;
-
-               
-                    DB.SaveChanges();
-                    return Ok(true);
+                    OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == OrderId).SingleOrDefault();
+                    int Status = 1;
+                    string Description = "Delivered";
+                    if (ChangeStatus(Order, Description, Status))
+                    {
+                        return Ok(true);
+                    }
+                    else return NotFound();
                 }
                 catch
                 {
@@ -172,9 +146,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
 
         [Authorize]
-        [Route("OrderRestaurant/GetVendorOrder")]
+        [Route("OrderRestaurant/GetCustomerOrder")]
         [HttpGet]
-        public IActionResult GetVendorrOrder(string Id, string name, int Limit, string Sort, int Page, int? Status, string Any)
+        public IActionResult GetCustomerOrder(string Id, string name, int Limit, string Sort, int Page, int? Status, string Any)
 
         {
             var Orders = DB.OrderRestaurants.Where(x => (x.Vendor.UserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2 || x.Status == 3) && (Any != null ? x.Id.ToString().Contains(Any) || x.Name.Contains(Any) : true) && (Status != null ? x.Status == Status : true)).Select(x => new
@@ -332,9 +306,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
            // log.DriverId = Order.DriverId;
             log.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             log.Description = Description;
-            log.Fktable = "Driver";
-            log.TableName = "OrderDelivery";
-            log.OrderDeliveryId = (int)Order.Id;
+            log.Fktable = "{Vendor";
+            log.TableName = "OrederRestaurant";
+            log.OrderRestaurantId = (int)Order.Id;
             DB.OrderRestaurants.Where(x => x.Id == log.OrderRestaurantId).SingleOrDefault().Status = Status;
 
 
