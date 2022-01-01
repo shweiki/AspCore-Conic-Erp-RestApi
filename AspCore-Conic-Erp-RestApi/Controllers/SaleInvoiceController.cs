@@ -223,10 +223,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 try
                 {
                     // TODO: Add insert logic here
-                  // collection.FakeDate = collection.FakeDate.ToLocalTime();
+                    // collection.FakeDate = collection.FakeDate.ToLocalTime();
+                    var Vendors = DB.Vendors.Where(m => m.UserId == collection.Description)
+               .Select(x => new { x.Id, x.Name, x.PhoneNumber1 }).ToList().SingleOrDefault();
+                    collection.Name = Vendors.Name;
+                    collection.VendorId = Vendors.Id;
+                    collection.PhoneNumber = Vendors.PhoneNumber1;
                     DB.SalesInvoices.Add(collection);
                     DB.SaveChanges();
-                    return Ok(collection.Id);
+                    return Ok(new { Id = collection.Id, Name = collection.Name, PhoneNumber = collection.PhoneNumber });
 
                 }
                 catch

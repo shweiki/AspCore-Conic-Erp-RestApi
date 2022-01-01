@@ -22,17 +22,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [AllowAnonymous]
         [Route("OrderResaurant/Create")]
         [HttpPost]
-        public IActionResult Create(OrderRestaurant collection, string UserId)
+        public IActionResult Create(OrderRestaurant collection)
         {
             if (ModelState.IsValid)
             {
-                var vendor = DB.Vendors.Where(x => x.UserId == UserId).FirstOrDefault();
+                
 
                 try
                 {
-                    collection.VendorId = vendor.Id;
-                    collection.Name = vendor.Name;
-                    collection.PhoneNumber = vendor.PhoneNumber1;
                     // TODO: Add insert logic here
                     DB.OrderRestaurants.Add(collection);
                     DB.SaveChanges();
@@ -88,7 +85,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetOrderRestaurant(int Limit, string Sort, int Page, int? Status, string Any)
 
         {
-            var Orders = DB.OrderRestaurants.Where(s => (s.Status !=4) && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+            var Orders = DB.OrderRestaurants.Where(s =>  (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
             {
                 x.Id,
                 x.OrderId,
@@ -151,7 +148,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetCustomerOrder(string Id, string name, int Limit, string Sort, int Page, int? Status, string Any)
 
         {
-            var Orders = DB.OrderRestaurants.Where(x => (x.Vendor.UserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2 || x.Status == 3) && (Any != null ? x.Id.ToString().Contains(Any) || x.Name.Contains(Any) : true) && (Status != null ? x.Status == Status : true)).Select(x => new
+            var Orders = DB.OrderRestaurants.Where(x => (x.Vendor.UserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2 || x.Status == 3 || x.Status == 4) && (Any != null ? x.Id.ToString().Contains(Any) || x.Name.Contains(Any) : true) && (Status != null ? x.Status == Status : true)).Select(x => new
             // var Orders = DB.OrderRestaurants.Where(x => x.Driver.DriverUserId == Id || name == "Developer").Select(x => new
             {
                 x.Id,
@@ -224,7 +221,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == id).SingleOrDefault();
                     int Status = 3;
-                    string Description = "Delivered";
+                    string Description = "Checkout";
                     if (ChangeStatus(Order, Description, Status))
                     {
                         return Ok(true);

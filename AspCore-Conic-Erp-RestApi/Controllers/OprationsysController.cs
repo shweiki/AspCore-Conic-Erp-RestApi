@@ -345,7 +345,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 //    log.OrderDeliveryId = (int)ObjId;
                     DB.Visits.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
-
+                case "OrderRestaurant":
+                    log.OrderDeliveryId = (int)ObjId;
+                    DB.OrderRestaurants.Where(x => x.Id == log.OrderRestaurantId).SingleOrDefault().Status = Oprationsys.Status;
+                    break;
                 default:
                     log.Fktable = ObjId.ToString();                    
                     break;

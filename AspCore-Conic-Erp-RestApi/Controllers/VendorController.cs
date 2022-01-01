@@ -291,7 +291,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 UserRouter NewRole = new UserRouter()
                 {
                     UserId = NewUser.Id,
-                    Router = "[\"/OrderRestaurant/CustomerPage\",\"/OrderRestaurant/CustomerOrderList\"]",
+                    Router = "[\"/OrderRestaurant/CustomerPage\",\"/OrderRestaurant/CustomerOrderList\",\"/Sales/CustomerPOS\"]",
                     DefulateRedirect = "/",
                 };
                 DB.UserRouter.Add(NewRole);
@@ -302,6 +302,34 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             }
             return Ok(false);
+        }
+        [Route("Vendor/GetVendorByUserId")]
+        [HttpGet]
+        public IActionResult GetVendorByUserId(string? Id)
+        {
+           
+            var Vendors = DB.Vendors.Where(m => m.UserId == Id)
+                .Select(x => new { x.Id, x.Name, x.PhoneNumber1 }).ToList();
+
+            return Ok(Vendors);
+
+            //if (ModelState.IsValid)
+            //{
+            //    try
+            //    {
+            //        var vendors = DB.Vendors.Where(m => m.UserId == Id)
+            //            .Select(x => new {
+            //                x.Id
+            //            }).SingleOrDefault();
+            //        return Ok(vendors);
+            //    }
+            //    catch
+            //    {
+            //        //Console.WriteLine(collection);
+            //        return Ok(false);
+            //    }
+            //}
+            //return Ok(true);
         }
 
 
