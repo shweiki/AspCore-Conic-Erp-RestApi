@@ -34,14 +34,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     imx.Id,
                     imx.ItemsId,
-                    imx.Items,
+                    imx.Items.Name,
+                    imx.Items.Barcode,
                     imx.TypeMove,
                     imx.InventoryItemId,
                     imx.Qty,
-                    Total = imx.Qty,
+                    Total = DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Sum(s=>s.Qty),
                     imx.EXP,
                     imx.SellingPrice,
                     imx.Description,
+                    Status = DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Sum(s => s.Qty) - imx.Qty ==0 ? "مغلق" :"مفتوح",
                     BillOfEnteryItemMovements = DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Select(ibex => new
                     {
                         ibex.Id,
@@ -53,13 +55,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         ibex.TypeMove,
                         ibex.InventoryItemId,
                         ibex.Qty,
-                        Total = imx.Qty - ibex.Qty,
+                        Total = Math.Abs(DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null && m.Id <= ibex.Id).Sum(s => s.Qty) - imx.Qty) ,
                         ibex.EXP,
                         ibex.SellingPrice,
                         ibex.Description,
                         ibex.BillOfEnteryId
+                        
                     }).ToList(),
-                    SalesItemMovements =  DB.InventoryMovements.Where(m =>  m.BillOfEnteryId == null && m.SalesInvoiceId != null && m.ItemsId == imx.ItemsId).Select(isx => new
+                    SalesItemMovements = DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Sum(s => s.Qty) - imx.Qty !=0 ?  DB.InventoryMovements.Where(m =>  m.BillOfEnteryId == null && m.SalesInvoiceId != null && m.ItemsId == imx.ItemsId).Select(isx => new
                     {
                         isx.Id,
                         isx.ItemsId,
@@ -76,7 +79,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         isx.Description,
                         isx.BillOfEnteryId,
                        RootBillOfEnteryId = x.Id
-                    }).ToList(),
+                    }).ToList(): null,
                 }).ToList(),
             }).ToList();
             Invoices = (Sort == "+id" ? Invoices.OrderBy(s => s.Id).ToList() : Invoices.OrderByDescending(s => s.Id).ToList());
