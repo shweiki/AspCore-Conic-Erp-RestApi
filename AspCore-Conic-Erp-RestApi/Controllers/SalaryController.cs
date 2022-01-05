@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -65,6 +66,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.GrossSalary,
                     x.SalaryFrom,
                     x.SalaryTo,
+                    DaysCount = 30,//(new DateTime(x.SalaryTo.Year, x.SalaryTo.Month, x.SalaryTo.Day) - new DateTime(x.SalaryFrom.Year, x.SalaryFrom.Month, x.SalaryFrom.Day)).Days + 1,
                     x.Status,
                     x.EmployeeId,
                     x.WorkingHours,
@@ -98,6 +100,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.WorkingHours,
                     x.Employee.Name,
                     x.Employee.JobTitle,
+                    DaysCount = 30,//(new DateTime(x.SalaryTo.Year, x.SalaryTo.Month, x.SalaryTo.Day) - new DateTime(x.SalaryFrom.Year, x.SalaryFrom.Month, x.SalaryFrom.Day)).Days + 1,
                     SalaryAdjustmentLogs =  x.SalaryAdjustmentLogs.Select(s=>new { 
                     s.Id,
                     s.Adjustment.Name,
@@ -120,6 +123,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.GrossSalary,
                     SalaryFrom = x.SalaryFrom.AddMonths(1),
                     SalaryTo = x.SalaryTo.AddMonths(1),
+                    DaysCount =30,// (new DateTime(x.SalaryTo.Year, x.SalaryTo.Month, x.SalaryTo.Day) - new DateTime(x.SalaryFrom.Year, x.SalaryFrom.Month, x.SalaryFrom.Day)).Days + 1,
                     x.Status,
                     x.EmployeeId,
                     x.WorkingHours,
