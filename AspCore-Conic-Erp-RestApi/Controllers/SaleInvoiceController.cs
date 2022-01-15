@@ -224,11 +224,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                     // TODO: Add insert logic here
                     // collection.FakeDate = collection.FakeDate.ToLocalTime();
-                    var Vendors = DB.Vendors.Where(m => m.UserId == collection.Description)
-               .Select(x => new { x.Id, x.Name, x.PhoneNumber1 }).ToList().SingleOrDefault();
-                    collection.Name = Vendors.Name;
-                    collection.VendorId = Vendors.Id;
-                    collection.PhoneNumber = Vendors.PhoneNumber1;
+                    var Vendor = DB.Vendors.Where(m => m.Id == collection.VendorId).SingleOrDefault();
+                  //  collection.Name = Vendor.Name;
+                    collection.PhoneNumber = collection.PhoneNumber == null || collection.PhoneNumber == "" ? Vendor.PhoneNumber1 : collection.PhoneNumber;
                     DB.SalesInvoices.Add(collection);
                     DB.SaveChanges();
                     return Ok(new { Id = collection.Id, Name = collection.Name, PhoneNumber = collection.PhoneNumber });
@@ -388,7 +386,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     m.SellingPrice,
                     m.Description,
                     m.EXP,
-                    Total = m.SellingPrice * m.Qty,
+               
                 }).ToList()
             }).SingleOrDefault();
 

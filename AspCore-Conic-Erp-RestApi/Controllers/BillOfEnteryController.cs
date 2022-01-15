@@ -62,27 +62,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         ibex.BillOfEnteryId
                         
                     }).ToList(),
-                    SalesItemMovements = DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Sum(s => s.Qty) - imx.Qty !=0 ?  DB.InventoryMovements.Where(m =>  m.BillOfEnteryId == null && m.SalesInvoiceId != null && m.ItemsId == imx.ItemsId).Select(isx => new
-                    {
-                        isx.Id,
-                        isx.ItemsId,
-                        //imx.Items,
-                        isx.SalesInvoiceId,
-                        SalesInvoiceFakeDate = isx.SalesInvoice.FakeDate,
-                        VendorName= isx.SalesInvoice.Vendor.Name,
-                        isx.TypeMove,
-                        isx.InventoryItemId,
-                        isx.Qty,
-                        Total = imx.Qty - isx.Qty,
-                        isx.EXP,
-                        isx.SellingPrice,
-                        isx.Description,
-                        isx.BillOfEnteryId,
-                       RootBillOfEnteryId = x.Id
-                    }).ToList(): null,
+            
                 }).ToList(),
             }).ToList();
-            Invoices = (Sort == "+id" ? Invoices.OrderBy(s => s.Id).ToList() : Invoices.OrderByDescending(s => s.Id).ToList());
+            Invoices = (Sort == "+id" ? Invoices.OrderBy(o => o.FakeDate).ToList() : Invoices.OrderByDescending(o => o.FakeDate).ToList());
             return Ok(new
             {
                 items = Invoices.Skip((Page - 1) * Limit).Take(Limit).ToList(),
@@ -91,6 +74,88 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     Rows = Invoices.Count(),
                 }
             });
+        }
+        [HttpGet]
+        [Route("BillOfEntery/CalBillOfEntery")]
+        public IActionResult CalBillOfEntery()
+        {
+            DB.InventoryMovements.ToList().ForEach(x => x.BillOfEnteryId = null);
+            DB.SaveChanges();
+
+            var BillOfEnterys = DB.BillOfEnterys.OrderBy(o=>o.FakeDate).Select(x => new
+            {
+                x.Id,
+                x.BonId,
+                x.ItemsIds,
+                x.FakeDate,
+                x.Description,
+                x.Status,
+                x.PurchaseInvoiceId,
+                //  Logs = DB.ActionLogs.Where(l => l.BillOfEnteryId == x.Id).ToList(),
+                InventoryMovements = DB.InventoryMovements.Where(m=>m.PurchaseInvoiceId == x.PurchaseInvoiceId && m.Items.TakeBon == true).Select(imx => new
+                {
+                    imx.Id,
+                    imx.ItemsId,
+                    imx.Items.Name,
+                    imx.Items.Barcode,
+                    imx.TypeMove,
+                    imx.InventoryItemId,
+                    imx.Qty,
+                    // Total = DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Sum(s=>s.Qty),
+                    imx.EXP,
+                    imx.SellingPrice,
+                    imx.Description,
+                }).ToList()
+            }).ToList();
+            foreach (var boe in BillOfEnterys) {
+                int HowWillBeClose = boe.InventoryMovements.Count(); // when be 0 mean all item is close 
+                foreach (var boei in boe.InventoryMovements) {
+                    double QtyBillEnteryItem = boei.Qty;
+                    var SaleItemMove = DB.InventoryMovements.Where(x => x.SalesInvoice != null && x.ItemsId == boei.ItemsId && x.BillOfEnteryId ==null ).OrderBy(o => o.SalesInvoice.FakeDate).ToList();
+                    foreach (var SIM in SaleItemMove) {
+
+                        if (SIM.Qty <= QtyBillEnteryItem) {
+                            QtyBillEnteryItem -= SIM.Qty;
+                            SIM.BillOfEnteryId = boe.Id;
+                            DB.SaveChanges();
+                            //    SaleItemMove.Remove(SIM);
+                            if (QtyBillEnteryItem == 0) {  break; } else continue;
+                        }
+                        if (SIM.Qty > QtyBillEnteryItem ){
+                            double ModQty = SIM.Qty - QtyBillEnteryItem;
+                            QtyBillEnteryItem -= QtyBillEnteryItem; // mean zero
+                            SIM.Qty -= ModQty;
+                            SIM.BillOfEnteryId = boe.Id;
+                            DB.InventoryMovements.Add(new InventoryMovement
+                            {
+                                ItemsId = SIM.ItemsId,
+                                TypeMove = SIM.TypeMove,
+                                Qty = ModQty,
+                                SellingPrice = SIM.SellingPrice,
+                                Tax = SIM.Tax,
+                                Description = "تجزئة للبيان الجمركي",
+                                Status = SIM.Status,
+                                InventoryItemId = SIM.InventoryItemId,
+                                SalesInvoiceId = SIM.SalesInvoiceId,
+                                PurchaseInvoiceId = SIM.PurchaseInvoiceId,
+                                OrderInventoryId = SIM.OrderInventoryId,
+                                WorkShopId = SIM.WorkShopId,
+                                BillOfEnteryId = null,
+                                EXP = SIM.EXP
+                            });
+                            DB.SaveChanges(); 
+                            break;
+                        }
+                    }
+                    if (DB.InventoryMovements.Where(m => m.BillOfEnteryId == boe.Id && m.ItemsId == boei.ItemsId && m.SalesInvoiceId != null).Sum(s => s.Qty) - boei.Qty == 0)
+                        HowWillBeClose -= 1;
+            }
+                if (HowWillBeClose == 0)
+                    DB.BillOfEnterys.Find(boe.Id).Status =1; // Bon Is Close
+                DB.SaveChanges();
+
+            }
+            return Ok(true);
         }
 
 
@@ -190,6 +255,22 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }).SingleOrDefault();
 
 
+            return Ok(Invoices);
+        }   
+        [Route("BillOfEntery/GetBillOfEnteryByPurchaseId")]
+        [HttpGet]
+        public IActionResult GetBillOfEnteryByPurchaseId(long? Id)
+        {
+            var Invoices = DB.BillOfEnterys.Where(i => i.PurchaseInvoiceId == Id).Select(x => new
+            {
+                x.Id,
+                x.BonId,
+                x.ItemsIds,
+                x.FakeDate,
+                x.Description,
+                x.Status,
+                x.PurchaseInvoiceId,        
+            }).SingleOrDefault();
             return Ok(Invoices);
         }
         [HttpPost]
