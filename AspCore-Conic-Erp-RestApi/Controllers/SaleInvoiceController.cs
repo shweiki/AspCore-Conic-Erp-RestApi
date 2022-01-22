@@ -38,6 +38,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Description,
                 AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
                 x.VendorId,
+                x.Vendor,
                 x.MemberId,
                 x.PhoneNumber,
               //  x.Vendor,

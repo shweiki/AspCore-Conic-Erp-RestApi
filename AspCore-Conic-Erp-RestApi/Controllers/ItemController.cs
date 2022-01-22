@@ -77,7 +77,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Type,
                     x.Address,
                     x.Model,
-                    x.Barcode, x.SellingPrice, x.OtherPrice, x.CostPrice, x.MenuItem }).ToList();
+                    x.Barcode, x.SellingPrice, x.OtherPrice, x.CostPrice, x.MenuItem,
+                    TotalIn = DB.InventoryMovements.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty),
+                    TotalOut = DB.InventoryMovements.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty)
+                }).ToList();
 
             return Ok(Items);
         }
@@ -344,6 +347,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             x.UnitItem,
                             x.Ingredients,
                             x.TakeBon,
+                TotalIn = DB.InventoryMovements.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty),
+                TotalOut = DB.InventoryMovements.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty)
                 //  InventoryQty = CalculateInventoryItemQty(x.Id)
             }).FirstOrDefault();
             if(Item != null)

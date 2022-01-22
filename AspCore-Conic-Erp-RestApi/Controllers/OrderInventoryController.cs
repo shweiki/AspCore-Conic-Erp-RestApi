@@ -11,7 +11,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
     public class OrderInventoryController : Controller
     {
-                private ConicErpContext DB;
+        private ConicErpContext DB;
         public OrderInventoryController(ConicErpContext dbcontext)
         {
             DB = dbcontext;
