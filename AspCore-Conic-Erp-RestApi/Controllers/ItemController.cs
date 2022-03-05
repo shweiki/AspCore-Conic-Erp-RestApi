@@ -46,6 +46,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Model,
                 x.Barcode,
                 x.UnitItem,
+                x.MenuItem,
                 x.Description,
                 x.Ingredients,
                 x.TakeBon,
@@ -117,7 +118,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Description,
                 x.Ingredients,
                 x.TakeBon,
-             //   InventoryQty = CalculateInventoryItemQty(x.Id),
+                x.MenuItem,
+                //   InventoryQty = CalculateInventoryItemQty(x.Id),
             }).ToList();
                          
           
