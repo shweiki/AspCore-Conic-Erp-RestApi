@@ -43,8 +43,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             int lat = Environment.CurrentDirectory.LastIndexOf("\\") + 1;
             string Name = Environment.CurrentDirectory.Substring(lat, (Environment.CurrentDirectory.Length - lat));
             Name = Name.Replace("-", "").ToUpper();
-            DateTime DateTime = DateTime.Now;
-            ServerConnection serverConnection = new ServerConnection(Configuration.GetConnectionString(Name));
+            var ConnectionString = Configuration.GetConnectionString(Name);
+            if (ConnectionString == null)
+                Name = "Default";
+            DateTime DateTime = DateTime.Now; 
+            ServerConnection serverConnection = new ServerConnection(new SqlConnection(Configuration.GetConnectionString(Name)));
             Server server = new Server(serverConnection);
             Backup backup = new Backup();
             backup.Action = BackupActionType.Database;
@@ -55,7 +58,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 Directory.CreateDirectory(BackUpPath);
             }
-            string name = BackUpPath + DB.Settings.Where(x => x.Name == "title").SingleOrDefault().Value + "-" + DateTime.ToString("dd-MM-yyyy HH-mm-ss") + ".bak";
+            string name = BackUpPath + serverConnection.DatabaseName + "-" + DateTime.ToString("dd-MM-yyyy HH-mm-ss") + ".bak";
             BackupDeviceItem deviceItem = new BackupDeviceItem(name, DeviceType.File);
             backup.Devices.Add(deviceItem);
             backup.Incremental = false;
@@ -77,8 +80,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             Name = Name.Replace("-", "").ToUpper();
             var ConnectionString = Configuration.GetConnectionString(Name);
             if (ConnectionString == null)
-                ConnectionString = Configuration.GetConnectionString("Default");
-            ServerConnection serverConnection = new ServerConnection(Configuration.GetConnectionString(ConnectionString));
+                Name = "Default";
+            ServerConnection serverConnection = new ServerConnection(new SqlConnection(Configuration.GetConnectionString(Name)));
             Server dbServer = new Server(serverConnection);
 
                 Restore _Restore = new Restore()
