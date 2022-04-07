@@ -47,7 +47,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             // Get Log From ZkBio Data base 
 
-            GetFromZkBio(TableName);
+           // GetFromZkBio(TableName); for v5l speed ztk
 
             var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any != null ? x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any) : true))
                 .AsEnumerable().Select(x => new {
