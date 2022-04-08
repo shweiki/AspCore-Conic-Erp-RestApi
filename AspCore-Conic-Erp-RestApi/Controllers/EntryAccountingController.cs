@@ -227,33 +227,32 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         public string GetFkDescription(string TableName, long Fktable)
         {
-        ConicErpContext DBx = new ConicErpContext();
         var Object = "";
             switch (TableName)
             {
                 case "CashPool":
-                    Object = DBx.CashPools.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    Object = DB.CashPools.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                     break;
                 case "SaleInvoice":
-                    Object= DBx.SalesInvoices.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    Object= DB.SalesInvoices.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                     break;
                 case "PurchaseInvoice":
-                    Object= DBx.PurchaseInvoices.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    Object= DB.PurchaseInvoices.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                     break;
                 case "EntryAccounting":
-                    Object= DBx.EntryAccountings.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    Object= DB.EntryAccountings.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                     break;
                 case "Payment":
-                    Object = DBx.Payments.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    Object = DB.Payments.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                     break;
                 case "Receive":
-                    Object = DBx.Receives.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    Object = DB.Receives.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                     break;
                 case "MembershipMovement":
-                    Object = DBx.MembershipMovements.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    Object = DB.MembershipMovements.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                     break;
                 case "Cheque":
-                    Object = DBx.Cheques.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                    Object = DB.Cheques.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                     break;
             }
             return Object;
