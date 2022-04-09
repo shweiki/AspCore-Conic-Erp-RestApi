@@ -7,6 +7,7 @@ using Entities;
 using System.IO.Ports;
 using System.Text;
 using ESC_POS_USB_NET.Printer;
+using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -441,7 +442,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [Route("Device/GetAllLog")]
         [HttpGet]
-        public IActionResult GetAllLog(long DeviceId ,string TableName)
+        public async Task<IActionResult> GetAllLog(long DeviceId ,string TableName , bool WithClear = false)
         {
             if (CheckDeviceHere((int)DeviceId))
             {
@@ -476,7 +477,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             }
                     }
                     DB.SaveChanges();
-                   // objZkeeper.ClearGLog(0);
+                   if(WithClear) objZkeeper.ClearGLog(0);
                     objZkeeper.Disconnect();
                     return Ok(MachineLog.ToList());
                 }

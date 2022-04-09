@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
@@ -43,12 +44,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("DeviceLog/GetByStatus")]
         [HttpGet]
-        public IActionResult GetByStatus(int Status ,string TableName ,int Limit, string Sort, int Page, string Any)
+        public async Task<IActionResult> GetByStatus(int Status ,string TableName ,int Limit, string Sort, int Page, string Any)
         {
             // Get Log From ZkBio Data base 
 
-           // GetFromZkBio(TableName); for v5l speed ztk
+            // GetFromZkBio(TableName); for v5l speed ztk
+            DeviceController DeviceLog = new DeviceController(DB);
+            foreach (var D in DB.Devices.ToList()) {
+                await DeviceLog.GetAllLog(D.Id, "Member");
+                await DeviceLog.GetAllLog(D.Id, "Employee", true);
+            }
 
+            
             var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any != null ? x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any) : true))
                 .AsEnumerable().Select(x => new {
                 x.Id,
@@ -204,14 +211,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }).ToList();
             
             return Ok(DeviceLogs);
-        }     
-  
-        public Boolean RegisterLog(string Id , DateTime datetime, string Ip )
+        }
+
+        public async Task<ActionResult> RegisterLog(string Id , DateTime datetime, string Ip )
         {
             long ID = Convert.ToInt32(Id);
             string TableName = "";
-            var member = DB.Members.Where(m => m.Id == ID).FirstOrDefault();
-            var Employee = DB.Employees.Where(m => m.Id == ID).FirstOrDefault();
+            var member =  DB.Members.Where(m=>m.Id == ID).SingleOrDefault();
+            var Employee =  DB.Employees.Where(m=>m.Id == ID).SingleOrDefault();
             if (member != null) TableName = "Member";
             if (Employee != null) TableName = "Employee";
 
@@ -230,7 +237,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     TableName = TableName,
                     Fk = Id.ToString(),
                 };
-               Create(Log);
+                DB.DeviceLogs.Add(Log);
+                await DB.SaveChangesAsync();
+
                 /*
                  MassageController massage = new MassageController();
                  string OwnerPhone = DB.CompanyInfos.FirstOrDefault().PhoneNumber1;
@@ -325,10 +334,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                  }
                                 massage.CheckMassages();
  */
-                DB.SaveChanges();
-                return true;
+                return Ok();
             }
-            else { return false; }
+            else { return NotFound(); }
         }
         public  void GetFromZkBio(string TableName)
         {
@@ -365,7 +373,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                                 string objectId = reader[1].ToString();
                                 string Ip = reader[2].ToString();
-                                RegisterLog(objectId, action_time, Ip );
+                                    _ = RegisterLog(objectId, action_time, Ip);
 
                                 UpdateFromZkBioReserved(reader[3].ToString());
                                 

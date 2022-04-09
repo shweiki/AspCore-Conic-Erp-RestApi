@@ -305,7 +305,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("Vendor/GetVendorByUserId")]
         [HttpGet]
-        public IActionResult GetVendorByUserId(string? Id)
+        public IActionResult GetVendorByUserId(String Id)
         {
            
             var Vendors = DB.Vendors.Where(m => m.UserId == Id)

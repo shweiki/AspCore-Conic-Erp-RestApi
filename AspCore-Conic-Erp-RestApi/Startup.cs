@@ -11,25 +11,28 @@ using Newtonsoft.Json.Serialization;
 using EmailService;
 using Microsoft.AspNetCore.Http.Features;
 using System;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace AspCore_Conic_Erp_RestApi
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
+    
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
+        { 
+
             int lat = Environment.CurrentDirectory.LastIndexOf("\\") + 1;
             string Name = Environment.CurrentDirectory.Substring(lat, (Environment.CurrentDirectory.Length - lat));
             Name = Name.Replace("-", "").ToUpper();
-            
+
             var emailConfig = Configuration.GetSection("EmailConfiguration:" + Name + "").Get<EmailConfiguration>();
            if(emailConfig ==null) emailConfig = Configuration.GetSection("EmailConfiguration:Default").Get<EmailConfiguration>();
             services.AddSingleton(emailConfig);
@@ -45,10 +48,11 @@ namespace AspCore_Conic_Erp_RestApi
 
             services.AddDbContext<ConicErpContext>(options =>
             {
-                options.UseSqlServer(ConnectionString
-                   , options => options.MigrationsAssembly("AspCore-Conic-Erp-RestApi")
+
+                options.UseSqlServer(ConnectionString, options => options.MigrationsAssembly("AspCore-Conic-Erp-RestApi")//.EnableRetryOnFailure()
+
                     );
-            });
+            }).BuildServiceProvider();
          
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddDatabaseDeveloperPageExceptionFilter();

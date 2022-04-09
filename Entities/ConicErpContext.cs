@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
 
 #nullable disable
 
@@ -14,11 +15,15 @@ namespace Entities
         public ConicErpContext()
         {
         }
+        public IConfiguration Configuration { get; }
 
-        public ConicErpContext(DbContextOptions<ConicErpContext> options)
+        public ConicErpContext(DbContextOptions<ConicErpContext> options , IConfiguration configuration)
             : base(options)
         {
+            Configuration = configuration;
+
         }
+
 
         public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<Setting> Settings { get; set; }
@@ -72,32 +77,36 @@ namespace Entities
         public virtual DbSet<SalaryPayment> SalaryPayments { get; set; }
         public virtual DbSet<Adjustment> Adjustments { get; set; }
         public virtual DbSet<OrderRestaurant> OrderRestaurants { get; set; }
-    /*  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                 optionsBuilder.UseSqlServer(GetCon());            
-            }
 
-        }
-        public string GetCon() {
-            //   return "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Conic_Erp;Integrated Security=True";
-           return "Data Source="+GetServerName()+";Initial Catalog="+GetDataBaseName()+ ";Integrated Security=True; MultipleActiveResultSets=true; timeout=1000000";
-          //  return "Data Source=tcp:aspcore-conic-erp-restapidbserver.database.windows.net,1433;Initial Catalog=AspCore-Conic-Erp-RestApi_db;User Id=taha;Password=()=>{Allah}";
-        
-        }
-        public string GetServerName()
-        {
-        //    return "(localdb)\\mssqllocaldb";
-            return ""+Environment.MachineName + "\\SQLEXPRESS";
-        }
-        public string GetDataBaseName()
-        {
-            //return "Conic_Erp";
-            int lat = Environment.CurrentDirectory.LastIndexOf("\\")+1;
-            string Name = Environment.CurrentDirectory.Substring(lat  ,( Environment.CurrentDirectory.Length - lat));
-            return Name.Replace("-", "").ToUpper();
-        }*/
+     
+         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            {
+                if (!optionsBuilder.IsConfigured)
+                {
+
+                    optionsBuilder.UseSqlServer(GetCon());            
+                }
+
+            }
+       
+          public string GetCon() {
+              //   return "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Conic_Erp;Integrated Security=True";
+             return "Data Source="+GetServerName()+";Initial Catalog="+GetDataBaseName()+ ";Integrated Security=True; MultipleActiveResultSets=true; timeout=1000000";
+            //  return "Data Source=tcp:aspcore-conic-erp-restapidbserver.database.windows.net,1433;Initial Catalog=AspCore-Conic-Erp-RestApi_db;User Id=taha;Password=()=>{Allah}";
+
+          }
+          public string GetServerName()
+          {
+          //    return "(localdb)\\mssqllocaldb";
+              return ""+Environment.MachineName + "\\SQLEXPRESS";
+          }
+          public string GetDataBaseName()
+          {
+              //return "Conic_Erp";
+              int lat = Environment.CurrentDirectory.LastIndexOf("\\")+1;
+              string Name = Environment.CurrentDirectory.Substring(lat  ,( Environment.CurrentDirectory.Length - lat));
+              return Name.Replace("-", "").ToUpper();
+          }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.UseCollation("Arabic_CI_AI");

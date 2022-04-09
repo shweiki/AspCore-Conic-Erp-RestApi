@@ -14,11 +14,11 @@ namespace AspCore_Conic_Erp_RestApi
     public class ZkemClient 
     {
         Action<object, string> RaiseDeviceEvent;
+        private ConicErpContext DB = new ConicErpContext();
 
-        public ZkemClient(Action<object, string> RaiseDeviceEvent)
+        public ZkemClient(Action<object, string> RaiseDeviceEvent )
         { this.RaiseDeviceEvent = RaiseDeviceEvent; }
 
-        private ConicErpContext DB= new ConicErpContext();
         CZKEM objCZKEM = new CZKEM();
 
         #region 'What we will be using'
@@ -72,7 +72,7 @@ namespace AspCore_Conic_Erp_RestApi
 
             objCZKEM.OnVerify -= new _IZKEMEvents_OnVerifyEventHandler(zkemClient_OnVerifyEventHandler);
             objCZKEM.OnAttTransactionEx -= new _IZKEMEvents_OnAttTransactionExEventHandler(zkemClient_OnAttTransactionEx);
-            objCZKEM.OnAttTransaction -= new _IZKEMEvents_OnAttTransactionEventHandler(zkemClient_OnAttTransaction);
+           // objCZKEM.OnAttTransaction -= new _IZKEMEvents_OnAttTransactionEventHandler(zkemClient_OnAttTransaction);
           //  objCZKEM.OnAttTransactionEx_New -= new _IZKEMEvents_OnAttTransactionEx_NewEventHandler(zkemClient_OnAttTransactionEx_New);
            // objCZKEM.OnGeneralEvent -= new _IZKEMEvents_OnGeneralEventEventHandler(zkemClient_OnGeneralEvent);
             objCZKEM.OnKeyPress -= new _IZKEMEvents_OnKeyPressEventHandler(zkemClient_OnKeyPress);
@@ -195,50 +195,38 @@ namespace AspCore_Conic_Erp_RestApi
         {
       
 
-        }  
+        }
+
         private  void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
         {
+            string Ip = "";
+            objCZKEM.GetDeviceIP(1, ref Ip);
 
-            if (Year !=2000 ) {        
+            if (Year != 2000)
+            {
 
-        DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
+                DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
                 DeviceLogController DeviceLog = new DeviceLogController(DB);
-                string Ip = "";
-                objCZKEM.GetDeviceIP(1, ref Ip);
-                DeviceLog.RegisterLog(EnrollNumber, datetime, Ip);
+                _ = DeviceLog.RegisterLog(EnrollNumber, datetime, Ip);
             }
-         
+            else
+            { 
+                //var Device = DB.Devices.Where(x => x.Ip == Ip).SingleOrDefault();
+
+                DeviceController DeviceLog = new DeviceController(DB);
+                DeviceLog.GetAllLog(1, "Member");
+                DeviceLog.GetAllLog(1, "Employee");
+
+                objCZKEM.ClearGLog(0);
+                //objZkeeper.Disconnect();
+            }
+
             //device.GetAllLogMembers(3);
 
         }   
         private  void zkemClient_OnAttTransaction(int EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second)
         {
-            string Ip = "";
-            int machineNumber = 1;
-            string dwEnrollNumber1 = "";
-            int dwVerifyMode = 0;
-            int dwInOutMode = 0;
-            int dwYear = 0;
-            int dwMonth = 0;
-            int dwDay = 0;
-            int dwHour = 0;
-            int dwMinute = 0;
-            int dwSecond = 0;
-            int dwWorkCode = 0;
-
-            objCZKEM.ReadAllGLogData(machineNumber);
-            objCZKEM.GetDeviceIP(1, ref Ip);
-
-            while (objCZKEM.SSR_GetGeneralLogData(machineNumber, out dwEnrollNumber1, out dwVerifyMode, out dwInOutMode, out dwYear, out dwMonth, out dwDay, out dwHour, out dwMinute, out dwSecond, ref dwWorkCode))
-            {
-
-                DateTime datetime = new DateTime(dwYear, dwMonth, dwDay, dwHour, dwMinute, 0);
-                DeviceLogController DeviceLog = new DeviceLogController(DB);
-                DeviceLog.RegisterLog(dwEnrollNumber1, datetime, Ip);
-            }
-                objCZKEM.ClearGLog(0);
-                //objZkeeper.Disconnect();
-            }
+        }
 
         
 
