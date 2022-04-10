@@ -15,7 +15,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public CashPoolController(ConicErpContext dbcontext)
         {
             DB = dbcontext;
-        }        [HttpPost]
+        }       
+        [HttpPost]
         [Route("CashPool/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any ,string Type)
         {

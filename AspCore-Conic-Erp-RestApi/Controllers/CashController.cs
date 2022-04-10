@@ -10,26 +10,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     public class CashesController : Controller
     {
         private ConicErpContext DB;
-            private readonly IUnitOfWork UW;
 
-        public CashesController(ConicErpContext dbcontext,IUnitOfWork unitOfWork)
+        public CashesController(ConicErpContext dbcontext)
         {
             DB = dbcontext;
 
-            UW = unitOfWork;
         }
         // GET: Cashes
         [Route("Cash/GetCash")]
         [HttpGet]
         public IActionResult GetCashes()
         {
-            return Ok(UW.Cashes.Get());
+            return Ok(DB.Cashes.ToList());
         }
         [Route("Cash/GetActive")]
         [HttpGet]
         public IActionResult GetActive()
         {
-            var Cash = UW.Cashes.GetActive(
+            var Cash = DB.Cashes.Where(
                 x => x.Status != -1 ).Select(x => new { value = x.AccountId, label = x.Name }).ToList();
             return Ok(Cash);
         }
@@ -83,10 +81,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     // TODO: Add insert logic here
                     collection.Status = 0;
                     collection.AccountId = NewAccount.Id;
-                    UW.Cashes.Create(collection);
-                    UW.Complete();
-                    //DB.Cashes.Add(collection);
-                    //DB.SaveChanges();
+                    DB.Cashes.Add(collection);
+                    DB.SaveChanges();
                 }
                 catch
                 {
