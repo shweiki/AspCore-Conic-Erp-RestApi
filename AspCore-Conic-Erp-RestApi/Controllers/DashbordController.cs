@@ -24,10 +24,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             string MsgCredit = "0";
 
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
             WebRequest request = WebRequest.Create(
               "http://josmsservice.com/smsonline/GetBalance.cfm?AccName=highfit&AccPass=D7!cT5!SgU0");
-     
-            if(request.ContentLength > 0) { 
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
+
+            if (request.ContentLength > 0) { 
                 request.Credentials = CredentialCache.DefaultCredentials;
                 WebResponse response = request.GetResponse();
                 string responseFromServer;

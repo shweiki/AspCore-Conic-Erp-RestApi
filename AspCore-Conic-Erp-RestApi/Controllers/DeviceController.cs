@@ -325,7 +325,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 objZkeeper = new ZkemClient(RaiseDeviceEvent);
                 Device.Description = "Is Device Connected : ";
                 IsDeviceConnected = objZkeeper.Connect_Net(Device.Ip, Device.Port);
-                objZkeeper.SetDeviceTime2(1, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+              //  objZkeeper.SetDeviceTime2(1, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
             }
             DB.SaveChanges();
             return IsDeviceConnected;
@@ -439,19 +439,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             else
                 return Ok("Device Is Not Connected");
         }
-
-        [Route("Device/GetAllLog")]
+        
         [HttpGet]
-        public async Task<IActionResult> GetAllLog(long DeviceId ,string TableName , bool WithClear = false)
+        [Route("Device/GetAllLog")]
+        public IActionResult GetAllLog(long DeviceId ,string TableName , bool WithClear = false)
         {
-            if (CheckDeviceHere((int)DeviceId))
+            bool d = CheckDeviceHere((int)DeviceId);
+            if ( d)
             {
                 ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, 1);
                 if (MachineLog != null && MachineLog.Count > 0)
                 {
                         foreach (var ML in MachineLog.ToList())
                         {
-                            DateTime datetime = DateTime.Parse(ML.DateTimeRecord);
+                        var member = DB.Members.Where(m => m.Id == ML.IndRegID).SingleOrDefault();
+                        var Employee = DB.Employees.Where(m => m.Id == ML.IndRegID).SingleOrDefault();
+                        if (member != null) TableName = "Member";
+                        if (Employee != null) TableName = "Employee";
+                        DateTime datetime = DateTime.Parse(ML.DateTimeRecord);
                             datetime = new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour, datetime.Minute, 0);
                             var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == ML.IndRegID.ToString() && l.TableName == TableName && l.DateTime == datetime).Count();
                             if (isLogSaveIt <= 0)
@@ -476,7 +481,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                                 continue;
                             }
                     }
-                    DB.SaveChanges();
+                     DB.SaveChanges();
                    if(WithClear) objZkeeper.ClearGLog(0);
                     objZkeeper.Disconnect();
                     return Ok(MachineLog.ToList());

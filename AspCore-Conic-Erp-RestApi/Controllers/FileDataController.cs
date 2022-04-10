@@ -137,7 +137,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 System.IO.File.Delete(SourcePath);
             }
             var image = new Bitmap(LoadImageFromBase64String(Base64String));
+#pragma warning disable CA1416 // Validate platform compatibility
             image.Save(SourcePath, ImageFormat.Bmp);
+#pragma warning restore CA1416 // Validate platform compatibility
             return (true);
         }
 

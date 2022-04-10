@@ -102,7 +102,7 @@ namespace Entities
           }
           public string GetDataBaseName()
           {
-              //return "Conic_Erp";
+              //return "SHAMEYALZEEN";
               int lat = Environment.CurrentDirectory.LastIndexOf("\\")+1;
               string Name = Environment.CurrentDirectory.Substring(lat  ,( Environment.CurrentDirectory.Length - lat));
               return Name.Replace("-", "").ToUpper();

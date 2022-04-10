@@ -11,7 +11,9 @@ using Newtonsoft.Json.Serialization;
 using EmailService;
 using Microsoft.AspNetCore.Http.Features;
 using System;
-using static Org.BouncyCastle.Math.EC.ECCurve;
+using Microsoft.AspNetCore.Http;
+using Entities.Repositories;
+using Entities.Interfaces;
 
 namespace AspCore_Conic_Erp_RestApi
 {
@@ -27,7 +29,8 @@ namespace AspCore_Conic_Erp_RestApi
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        { 
+        {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             int lat = Environment.CurrentDirectory.LastIndexOf("\\") + 1;
             string Name = Environment.CurrentDirectory.Substring(lat, (Environment.CurrentDirectory.Length - lat));
@@ -37,6 +40,7 @@ namespace AspCore_Conic_Erp_RestApi
            if(emailConfig ==null) emailConfig = Configuration.GetSection("EmailConfiguration:Default").Get<EmailConfiguration>();
             services.AddSingleton(emailConfig);
             services.AddScoped<IEmailSender, EmailSender>();
+            services.AddScoped<ConicErpContext>();
             services.Configure<FormOptions>(o => {
                 o.ValueLengthLimit = int.MaxValue;
                 o.MultipartBodyLengthLimit = int.MaxValue;
@@ -45,14 +49,17 @@ namespace AspCore_Conic_Erp_RestApi
             var ConnectionString = Configuration.GetConnectionString(Name);
             if (ConnectionString == null)
                 ConnectionString = Configuration.GetConnectionString("Default");
+         //   services.AddScoped<Entities.Interfaces.IBaseRepository, BaseRepository>();
 
             services.AddDbContext<ConicErpContext>(options =>
             {
 
-                options.UseSqlServer(ConnectionString, options => options.MigrationsAssembly("AspCore-Conic-Erp-RestApi")//.EnableRetryOnFailure()
-
-                    );
-            }).BuildServiceProvider();
+                options.UseSqlServer(ConnectionString,
+                sqlServerOptionsAction: options =>
+                {
+                    options.MigrationsAssembly("AspCore-Conic-Erp-RestApi");
+                });
+            });
          
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddDatabaseDeveloperPageExceptionFilter();

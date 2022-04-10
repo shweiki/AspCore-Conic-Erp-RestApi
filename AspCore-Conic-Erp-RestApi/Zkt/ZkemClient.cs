@@ -8,16 +8,19 @@ using System.Linq;
 using  AspCore_Conic_Erp_RestApi.Controllers;
 using System.Xml.Schema;
 using System.Threading;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi
 {
     public class ZkemClient 
     {
         Action<object, string> RaiseDeviceEvent;
-        private ConicErpContext DB = new ConicErpContext();
 
-        public ZkemClient(Action<object, string> RaiseDeviceEvent )
-        { this.RaiseDeviceEvent = RaiseDeviceEvent; }
+        public ZkemClient(Action<object, string> RaiseDeviceEvent)
+        {
+            this.RaiseDeviceEvent = RaiseDeviceEvent;
+        }
 
         CZKEM objCZKEM = new CZKEM();
 
@@ -197,8 +200,8 @@ namespace AspCore_Conic_Erp_RestApi
 
         }
 
-        private  void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
-        {
+        private void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
+        {/*
             string Ip = "";
             objCZKEM.GetDeviceIP(1, ref Ip);
 
@@ -206,24 +209,95 @@ namespace AspCore_Conic_Erp_RestApi
             {
 
                 DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
-                DeviceLogController DeviceLog = new DeviceLogController(DB);
-                _ = DeviceLog.RegisterLog(EnrollNumber, datetime, Ip);
+              //  DeviceLogController DeviceLog = new DeviceLogController();
+               // _ =  DeviceLog.RegisterLog(EnrollNumber, datetime, Ip);
             }
             else
-            { 
-                //var Device = DB.Devices.Where(x => x.Ip == Ip).SingleOrDefault();
+            {
+                int machineNumber = 1;
+                string dwEnrollNumber1 = "";
+                int dwVerifyMode = 0;
+                int dwInOutMode = 0;
+                int dwYear = 0;
+                int dwMonth = 0;
+                int dwDay = 0;
+                int dwHour = 0;
+                int dwMinute = 0;
+                int dwSecond = 0;
+                int dwWorkCode = 0;
 
-                DeviceController DeviceLog = new DeviceController(DB);
-                DeviceLog.GetAllLog(1, "Member");
-                DeviceLog.GetAllLog(1, "Employee");
+                objCZKEM.ReadAllGLogData(machineNumber);
 
+                while (objCZKEM.SSR_GetGeneralLogData(machineNumber, out dwEnrollNumber1, out dwVerifyMode, out dwInOutMode, out dwYear, out dwMonth, out dwDay, out dwHour, out dwMinute, out dwSecond, ref dwWorkCode))
+                {
+                    long ID = Convert.ToInt32(dwEnrollNumber1);
+
+                    var member = OnGet(ID);
+
+                    DateTime datetime = new DateTime(dwYear, dwMonth, dwDay, dwHour, dwMinute, 0);
+
+                    _ = RLog(dwEnrollNumber1, datetime, Ip);
+                }
                 objCZKEM.ClearGLog(0);
+
                 //objZkeeper.Disconnect();
             }
 
             //device.GetAllLogMembers(3);
 
-        }   
+        }
+        public async Task<bool> OnGet(long id)
+        {
+           await Task.Run(() => { // or ThreadPool.QueueUserWorkItem(async _ => {
+                using (ConicErpContext DB = new ConicErpContext())
+                {
+                    Member Book = DB.Members.Where(m => m.Id == id).SingleOrDefault();
+                    return true;
+                }
+            });
+            return true;
+            */
+        }
+        public async Task<IActionResult> RLog(string Id, DateTime datetime, string Ip)
+        {
+            long ID = Convert.ToInt32(Id);
+            string TableName = ""; using (var DB = new ConicErpContext())
+            {
+                var member = DB.Members.Where(m => m.Id == ID).SingleOrDefault();
+                var Employee = DB.Employees.Where(m => m.Id == ID).SingleOrDefault();
+                if (member != null) TableName = "Member";
+                if (Employee != null) TableName = "Employee";
+
+                var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == Id && l.TableName == TableName).ToList();
+                isLogSaveIt = DB.DeviceLogs.Where(Ld => Ld.DateTime == datetime).ToList();
+                var Device = DB.Devices.Where(x => x.Ip == Ip).SingleOrDefault();
+                if (isLogSaveIt.Count() <= 0 && Device != null)
+                {
+                    var Log = new DeviceLog
+                    {
+                        Type = "In",
+                        DateTime = datetime,
+                        DeviceId = Device.Id,
+                        Status = 0,
+                        Description = "Event Log",
+                        TableName = TableName,
+                        Fk = Id.ToString(),
+                    };
+                    DB.DeviceLogs.Add(Log);
+                    await DB.SaveChangesAsync();
+                    return Ok();
+
+                }
+            }
+            return Ok();
+
+        }
+
+        private IActionResult Ok()
+        {
+            throw new NotImplementedException();
+        }
+
         private  void zkemClient_OnAttTransaction(int EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second)
         {
         }

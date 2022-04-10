@@ -18,6 +18,10 @@ namespace Entities.Repositories
             _context = context;
         }
 
+        public BaseRepository()
+        {
+        }
+
         public IEnumerable<T> Get()
         {
             return _context.Set<T>().ToList();

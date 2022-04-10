@@ -7,12 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
+
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
     [Authorize]
-    public class DeviceLogController : Controller
+    public class DeviceLogController : ControllerBase
     {
-        private ConicErpContext DB;
+        private readonly ConicErpContext DB;
+
         public DeviceLogController(ConicErpContext dbcontext)
         {
             DB = dbcontext;
@@ -44,18 +46,25 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("DeviceLog/GetByStatus")]
         [HttpGet]
-        public async Task<IActionResult> GetByStatus(int Status ,string TableName ,int Limit, string Sort, int Page, string Any)
+        public IActionResult GetByStatus(int Status ,string TableName ,int Limit, string Sort, int Page, string Any)
         {
             // Get Log From ZkBio Data base 
 
             // GetFromZkBio(TableName); for v5l speed ztk
-            DeviceController DeviceLog = new DeviceController(DB);
-            foreach (var D in DB.Devices.ToList()) {
-                await DeviceLog.GetAllLog(D.Id, "Member");
-                await DeviceLog.GetAllLog(D.Id, "Employee", true);
-            }
+      
+                 DeviceController Device = new DeviceController(DB);
 
-            
+                 foreach (var D in DB.Devices.ToList())
+                    {
+                            Device.GetAllLog(D.Id, "Member");
+                            Device.GetAllLog(D.Id, "Employee", true);
+                    }
+
+                  //  DeviceLog.GetAllLog(D.Id, "Member");
+                    //     DeviceLog.GetAllLog(D.Id, "Employee", true);
+                
+          
+
             var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any != null ? x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any) : true))
                 .AsEnumerable().Select(x => new {
                 x.Id,
