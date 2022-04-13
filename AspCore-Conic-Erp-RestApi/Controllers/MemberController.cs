@@ -84,7 +84,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Member/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page,int? Status, string Any)
         {
-            var Members = DB.Members.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true)
+            var Members = DB.Members.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.ToLower().Contains(Any) || s.Ssn.Contains(Any) || s.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.Tag.Contains(Any) : true)
             && (Status != null ? s.Status == Status : true)).Select(x => new
             {
                 x.Id,
@@ -250,9 +250,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("Member/GetMemberById")]
         [HttpGet]
-        public IActionResult GetMemberById(long? Id)
+        public  IActionResult GetMemberById(long? Id)
         {
-            var Members = DB.Members.Where(m => m.Id == Id).Select(
+            MembershipMovementController MSC = new MembershipMovementController(DB);
+            foreach (var MS in DB.MembershipMovements.Where(m => m.MemberId == Id).ToList())
+            {
+                MSC.ScanMembershipMovementById(MS.Id);
+
+            }
+            var Member = DB.Members.Where(m => m.Id == Id).Select(
                 x => new
                 {
                     x.Id,
@@ -284,7 +290,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         MS.Description,
                     }).FirstOrDefault(),
                 }).SingleOrDefault();
-            return Ok(Members);
+            return Ok(Member);
         }
         [Route("Member/FixPhoneNumber")]
         [HttpGet]
@@ -306,25 +312,31 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult CheckMembers()
         {
            var Members = DB.Members?.ToList();
-        
+
             foreach (var M in Members)
             {
-                int OStatus = M.Status;
+                var MembershipMovements = DB.MembershipMovements.Where(m=> m.MemberId == M.Id).ToList();
 
-               if (DB.MembershipMovements.Where(x=>x.MemberId == M.Id).Count() <= 0)
-               {
-                   M.Status = -1;
-               }
-
-                var ActiveMemberShip = M.MembershipMovements.Where(m => m.Status == 1).SingleOrDefault();
-                if (ActiveMemberShip == null) {
+                if (MembershipMovements.Count() <= 0)
+                {
                     M.Status = -1;
                 }
-                if (OStatus == -2) M.Status = -2;
+                else
+                {
+                    MembershipMovementController MSC = new MembershipMovementController(DB);
+                    foreach (var MS in MembershipMovements)
+                    {
+                        MSC.ScanMembershipMovementById(MS.Id);
+
+                    }
+
+
+
+                }
+
+                DB.SaveChanges();
             }
             //     CheckBlackListActionLogMembers();
-
-            DB.SaveChanges();
 
             return Ok(true);
         }

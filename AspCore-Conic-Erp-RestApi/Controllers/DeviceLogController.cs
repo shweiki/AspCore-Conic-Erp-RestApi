@@ -77,7 +77,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             DeviceLogs = (Sort == "+id" ? DeviceLogs.OrderBy(s => s.Id).ToList() : DeviceLogs.OrderByDescending(s => s.Id).ToList());
 
-            DeviceLogs = DeviceLogs.GroupBy(a => new {  a.DateTime }).Select(g => g.Last()).ToList();
+            DeviceLogs = DeviceLogs.GroupBy(a => new {a.Fk,  a.DateTime }).Select(g => g.Last()).ToList();
 
        
             return Ok(DeviceLogs.Skip((Page - 1) * Limit).Take(Limit).ToList());

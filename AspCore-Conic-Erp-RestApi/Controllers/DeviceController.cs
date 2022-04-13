@@ -310,10 +310,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 return NotFound();
             }
          }
-        public bool CheckDeviceHere(int Id)
+        public bool CheckDeviceHere(int? Id)
         {
-            var Device = DB.Devices.Where(x => x.Id == Id).SingleOrDefault();
             bool IsDeviceConnected = false;
+
+            var Device = DB.Devices.Where(x => x.Id == Id).SingleOrDefault();
+            if(Device ==null) return IsDeviceConnected;
+
             bool isValidIpA = UniversalStatic.ValidateIP(Device.Ip);
             if (!isValidIpA)
                 Device.Description = "The Device IP is invalid !!";

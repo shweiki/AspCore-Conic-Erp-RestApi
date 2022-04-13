@@ -179,6 +179,108 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             return Ok(true);
         }
+ 
+        public bool ScanMembershipMovementById(long ID)
+        {
+            MembershipMovement MS = DB.MembershipMovements.Where(x => x.Id == ID).SingleOrDefault();
+
+                var member = DB.Members.Where(x => x.Id == MS.MemberId).SingleOrDefault();
+                int OStatus = member.Status;
+
+                if ((DateTime.Now >= MS.StartDate && DateTime.Now <= MS.EndDate))
+                {
+
+                    MS.Status = 1;
+                    member.Status = 0;
+                    var HowManyDaysLeft = (MS.EndDate - DateTime.Now).TotalDays;
+                    if (HowManyDaysLeft == 3)
+                    {
+                        Massage msg = new Massage();
+                        msg.Body = "عزيزي " + member.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + MS.EndDate + " وشكرا";
+                        msg.Status = 0;
+                        msg.TableName = "Member";
+                        msg.Fktable = member.Id;
+                        msg.PhoneNumber = member.PhoneNumber1;
+                        msg.SendDate = DateTime.Now;
+                        msg.Type = "رسالة تذكير";
+                        DB.Massages.Add(msg);
+                    }
+
+                }
+                else
+                {
+
+                    if (MS.StartDate > DateTime.Now)
+                    {// معلق
+                        MS.Status = -2;
+                    }
+                    else
+                    {
+
+                        MS.Status = -1;
+                        member.Status = -1;
+                    }
+                }
+
+                foreach (MembershipMovementOrder MSO in DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id && (x.Status == 1 || x.Status == 2)).ToList())
+                {
+                    if (MSO.Status == 2)
+                    {
+                        MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
+                        MSO.Status = -2;
+                        continue;
+                    }
+                    if ((DateTime.Now >= MSO.StartDate && DateTime.Now <= MSO.EndDate))
+                    {
+                        if (MSO.Type == "Freeze")
+                        {
+                            MS.Status = 2;
+                            member.Status = 1;
+                        }
+                        if (MSO.Type == "Extra")
+                        {
+                            MS.Status = 3;
+                            member.Status = 2;
+
+                        }
+                    }
+                    else
+                    {
+                        if (MSO.Type == "Extra")
+                        {
+                            MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
+                            MSO.Status = -3;
+                        }
+                        if (DateTime.Now > MSO.EndDate)
+                        {
+
+                            MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
+                            MSO.Status = -3;
+                        }
+
+                    }
+                    if ((MS.EndDate > DateTime.Now))
+                    {
+
+
+                        MS.Status = 1;
+                        member.Status = 1;
+
+                    }
+                    if (MS == null)
+                    {
+                        member.Status = -1;
+                    }
+
+               
+                DB.SaveChanges();
+
+            }
+            if (OStatus == -2) member.Status = -2;
+            DB.SaveChanges();
+
+            return true;
+        }
 
         [Route("MembershipMovement/GetMembershipMovementByMemberId")]
         [HttpGet]
