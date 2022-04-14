@@ -39,6 +39,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok(Accounts);
 
         }
+        [HttpGet]
+
+        [Route("Account/CheckIsExist")]
+        public IActionResult CheckIsExist(string Name, string Type)
+        {
+            var Account = DB.Accounts.Where(m => m.Name == Name || m.Type == Type).ToList();
+
+            return Ok(Account.Count() > 0 ? true : false);
+        }
+
         [Route("Account/GetTreeAccount")]
         [HttpGet]
         public IActionResult GetTreeAccount()
@@ -70,7 +80,28 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
               }).ToList();
             return Ok(ActiveAccounts);
         }
-
+        [HttpPost]
+        [Route("Account/EditParent")]
+        public IActionResult EditParent(long ID, long ParentId)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Account account = DB.Accounts.Where(x => x.Id == ID).SingleOrDefault();
+   
+                    account.ParentId = ParentId;
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            else return Ok(false);
+        }
         [HttpGet]
         [Route("Account/GetAccountByAny")]
         public IActionResult GetAccountByAny(string Any)
@@ -100,6 +131,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Status,
                 x.Type,
                 x.Description,
+                x.ParentId,
                 TotalDebit = x.EntryMovements.Select(d => d.Debit).Sum(),
                 TotalCredit = x.EntryMovements.Select(c => c.Credit).Sum(),
             }).ToList();
@@ -116,26 +148,29 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
             });
         }
-        
-       [Route("Account/GetInComeAccounts")]
+
         [HttpGet]
+        [Route("Account/GetInComeAccounts")]
         public IActionResult GetInComeAccounts()
         {
             var InComeAccounts = DB.Accounts.Where(i =>  i.Type == "InCome").Select(x => new
             {
                 value = x.Id,
+                Code = x.Code,
                 label = x.Name
             }).ToList();
                                  
             return Ok(InComeAccounts);
         }
-        [Route("Account/GetMainAccount")]
+
         [HttpGet]
+        [Route("Account/GetMainAccount")]
         public IActionResult GetMainAccount()
         {
             var InComeAccounts = DB.Accounts.Where(i =>  i.Type == "Main").Select(x => new
             {
                 value = x.Id,
+                Code = x.Code,
                 label = x.Name
             }).ToList();
 

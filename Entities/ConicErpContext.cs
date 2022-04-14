@@ -84,7 +84,7 @@ namespace Entities
                 if (!optionsBuilder.IsConfigured)
                 {
 
-                    optionsBuilder.UseSqlServer(GetCon());            
+                   // optionsBuilder.UseSqlServer(GetCon());            
                 }
 
             }
