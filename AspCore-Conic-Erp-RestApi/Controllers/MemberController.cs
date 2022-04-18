@@ -315,6 +315,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             foreach (var M in Members)
             {
+                int OStatus = M.Status;
+
                 var MembershipMovements = DB.MembershipMovements.Where(m=> m.MemberId == M.Id).ToList();
 
                 if (MembershipMovements.Count() <= 0)
@@ -333,10 +335,11 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
 
                 }
+                if (OStatus == -2) M.Status = -2;
 
                 DB.SaveChanges();
             }
-            //     CheckBlackListActionLogMembers();
+              //CheckBlackListActionLogMembers();
 
             return Ok(true);
         }

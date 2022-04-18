@@ -81,7 +81,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
          
             foreach (MembershipMovement MS in MembershipMovements)
             {
-              
+                double TotalMembershipMovementOrders = DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id && (x.Status == -2 || x.Status == -3)).Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
                 var member = DB.Members.Where(x => x.Id == MS.MemberId).SingleOrDefault();
                 int OStatus = member.Status;
                 if (MS.Status == 0) continue;
@@ -95,7 +95,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     if (HowManyDaysLeft == 3)
                     {
                         Massage msg = new Massage();
-                        msg.Body = "عزيزي " + member.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + MS.EndDate + " وشكرا";
+                        msg.Body = "عزيزي " + member.Name + " يسعدنا ان تكون متواجد دائماَ معنا , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + MS.EndDate + " وشكرا";
                         msg.Status = 0;
                         msg.TableName = "Member";
                         msg.Fktable = member.Id;
@@ -186,11 +186,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                 var member = DB.Members.Where(x => x.Id == MS.MemberId).SingleOrDefault();
                 int OStatus = member.Status;
-
-                if ((DateTime.Now >= MS.StartDate && DateTime.Now <= MS.EndDate))
+            double TotalMembershipMovementOrders = DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id && (x.Status == -2 || x.Status == -3)).ToList().Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
+            int MembershipNumberDays = DB.Memberships.Where(m => m.Id == MS.MembershipId).FirstOrDefault().NumberDays;
+            MS.EndDate = MS.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders);
+            if ((DateTime.Now >= MS.StartDate && DateTime.Now <= MS.EndDate))
                 {
-
-                    MS.Status = 1;
+              
+                MS.Status = 1;
                     member.Status = 0;
                     var HowManyDaysLeft = (MS.EndDate - DateTime.Now).TotalDays;
                     if (HowManyDaysLeft == 3)
@@ -313,6 +315,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     MSO.EndDate,
                     MSO.Status,
                     MSO.Description,
+                    MSO.EditorName,
+
                 }).ToList(),
             }).ToList();
                                     

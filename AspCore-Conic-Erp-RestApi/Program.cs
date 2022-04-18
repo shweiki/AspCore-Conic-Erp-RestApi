@@ -1,10 +1,6 @@
 using Entities;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Win32;
-using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -20,7 +16,7 @@ namespace AspCore_Conic_Erp_RestApi
      
             RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"Control Panel\International", true);
             rk.SetValue("sTimeFormat", "dd-MM-yyyy");*/
-           OpenBrowser();
+         //  OpenBrowser();
           CreateHostBuilder(args).Build().MigrateDatabase().Run();
          //  CreateHostBuilder(args).Build().Run();
 
