@@ -429,9 +429,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("SaleInvoice/GetSaleInvoiceByMemberId")]
         [HttpGet]
-        public IActionResult GetSaleInvoiceByMemberId(long? Id)
+        public IActionResult GetSaleInvoiceByMemberId(long? Id ,bool IsService )
         {
-            var Invoices = DB.SalesInvoices.Where(f => f.MemberId !=null && f.MemberId == Id && f.IsPrime == true).Select(x => new
+            var Invoices = DB.SalesInvoices.Where(f => f.MemberId !=null && f.MemberId == Id && (IsService == true ?f.IsPrime == true:true)).Select(x => new
             {
                 x.Id,
                 Name =  x.Vendor.Name + x.Member.Name,

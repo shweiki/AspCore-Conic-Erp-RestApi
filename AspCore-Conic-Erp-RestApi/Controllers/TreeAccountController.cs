@@ -44,7 +44,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Account/CheckIsExist")]
         public IActionResult CheckIsExist(string Name, string Type)
         {
-            var Account = DB.Accounts.Where(m => m.Name == Name || m.Type == Type).ToList();
+            var Account = DB.Accounts.Where(m => m.Name == Name && m.Type == Type).ToList();
 
             return Ok(Account.Count() > 0 ? true : false);
         }
@@ -167,7 +167,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Account/GetMainAccount")]
         public IActionResult GetMainAccount()
         {
-            var InComeAccounts = DB.Accounts.Where(i =>  i.Type == "Main").Select(x => new
+            var InComeAccounts = DB.Accounts.Where(i =>  i.Type == "Tree-Main").Select(x => new
             {
                 value = x.Id,
                 Code = x.Code,
