@@ -28,7 +28,7 @@ namespace Entities
         public string Tag { get; set; }
         public string Vaccine { get; set; }
 
-        public virtual Account Account { get; set; }
+        public virtual TreeAccount Account { get; set; }
         public virtual ICollection<MembershipMovement> MembershipMovements { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
         public virtual ICollection<SalesInvoice> SalesInvoices { get; set; }

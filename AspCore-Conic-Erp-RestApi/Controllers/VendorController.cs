@@ -111,17 +111,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
-                    var ParentAccount = collection.Type == "Customer" ? DB.Accounts.Where(i => i.Description == "Customer").SingleOrDefault() : DB.Accounts.Where(i => i.Description == "Supplier").SingleOrDefault() ;
-                    ParentAccount = ParentAccount ??= new Account { Id = 0, ParentId = 0, Code = "0" };
-                    Account NewAccount = new Account
+                   TreeAccount NewAccount = new TreeAccount
                     {
                         Type = "Vendor",
                         Description = collection.Description,
                         Status = 0,
-                        Code = ParentAccount.Code +'-'+ DB.Accounts.Where(i=>i.ParentId == ParentAccount.Id).Count()+1,
-                        ParentId =  ParentAccount.Id 
+                        Code ="",
+                        ParentId = DB.TreeAccounts.Where(x => x.Type == collection.Type + "s-Main").SingleOrDefault().Code
                     };
-                    DB.Accounts.Add(NewAccount);
+                    DB.TreeAccounts.Add(NewAccount);
                     DB.SaveChanges();
                     collection.Status = 0;
                     collection.AccountId = NewAccount.Id;
@@ -254,17 +252,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (ModelState.IsValid)
             {
-                var ParentAccount = DB.Accounts.Where(i => i.Description == "Vendor").SingleOrDefault();
-                ParentAccount = ParentAccount ??= new Account { Id = 0, ParentId = 0, Code = "0" };
-                Account NewAccount = new Account
+             
+                TreeAccount NewAccount = new TreeAccount
                 {
                     Type = "Vendor",
                     Description = collection.Description,
                     Status = 0,
-                    Code = ParentAccount.Code + '-' + DB.Accounts.Where(i => i.ParentId == ParentAccount.Id).Count() + 1,
-                    ParentId = ParentAccount.Id
+                    Code ="",
+                    ParentId = DB.TreeAccounts.Where(x => x.Type == "Customers-Main").SingleOrDefault().Code
                 };
-                DB.Accounts.Add(NewAccount);
+                DB.TreeAccounts.Add(NewAccount);
                 DB.SaveChanges();
                 var NewUser = new IdentityUser()
                 {

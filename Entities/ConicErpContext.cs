@@ -25,7 +25,7 @@ namespace Entities
         }
 
 
-        public virtual DbSet<Account> Accounts { get; set; }
+        public virtual DbSet<TreeAccount> TreeAccounts { get; set; }
         public virtual DbSet<Setting> Settings { get; set; }
         public virtual DbSet<UserRouter> UserRouter { get; set; }
         public virtual DbSet<ActionLog> ActionLogs { get; set; }

@@ -16,6 +16,6 @@ namespace Entities
         public string Btcash { get; set; }
         public long? AccountId { get; set; }
 
-        public virtual Account Account { get; set; }
+        public virtual TreeAccount Account { get; set; }
     }
 }

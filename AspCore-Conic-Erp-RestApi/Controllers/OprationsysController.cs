@@ -283,7 +283,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     break;
                 case "Account":
                     log.AccountId = ObjId;
-                    DB.Accounts.Where(x => x.Id == log.AccountId).SingleOrDefault().Status = Oprationsys.Status;
+                    DB.TreeAccounts.Where(x => x.Id == log.AccountId).SingleOrDefault().Status = Oprationsys.Status;
                     break;
                 case "EntryAccounting":
                     log.EntryId = ObjId;

@@ -14,7 +14,7 @@ namespace Entities
         private readonly ConicErpContext DB;
 
 
-        public IBaseRepository<Account> Accounts { get; private set; }
+        public IBaseRepository<TreeAccount> TreeAccounts { get; private set; }
         public IBaseRepository<Setting>     Settings { get; private set; }
         public IBaseRepository<UserRouter>   UserRouter { get; private set; }
         public IBaseRepository<ActionLog> ActionLogs { get; private set; }
@@ -72,7 +72,7 @@ namespace Entities
             DB = DBcontext;
 
 
-            Accounts = new BaseRepository<Account>();
+            TreeAccounts = new BaseRepository<TreeAccount>();
             Settings = new BaseRepository<Setting>();
             UserRouter = new BaseRepository<UserRouter>();
             ActionLogs = new BaseRepository<ActionLog>();

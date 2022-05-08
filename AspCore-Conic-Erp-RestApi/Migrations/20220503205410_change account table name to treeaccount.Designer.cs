@@ -4,6 +4,7 @@ using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AspCore_Conic_Erp_RestApi.Migrations
 {
     [DbContext(typeof(ConicErpContext))]
-    partial class ConicErpContextModelSnapshot : ModelSnapshot
+    [Migration("20220503205410_change account table name to treeaccount")]
+    partial class changeaccounttablenametotreeaccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,7 +171,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Adjustments", (string)null);
+                    b.ToTable("Adjustments");
                 });
 
             modelBuilder.Entity("Entities.Area", b =>
@@ -197,7 +199,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Areas", (string)null);
+                    b.ToTable("Areas");
                 });
 
             modelBuilder.Entity("Entities.BackUp", b =>
@@ -313,7 +315,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BillOfEnterys", (string)null);
+                    b.ToTable("BillOfEnterys");
                 });
 
             modelBuilder.Entity("Entities.Cash", b =>
@@ -420,7 +422,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CashPools", (string)null);
+                    b.ToTable("CashPools");
                 });
 
             modelBuilder.Entity("Entities.Cheque", b =>
@@ -712,7 +714,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Drivers", (string)null);
+                    b.ToTable("Drivers");
                 });
 
             modelBuilder.Entity("Entities.EditorsUser", b =>
@@ -790,7 +792,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasIndex("AccountId");
 
-                    b.ToTable("Employees", (string)null);
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("Entities.EntryAccounting", b =>
@@ -1518,7 +1520,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasIndex("VendorId");
 
-                    b.ToTable("OrderDeliveries", (string)null);
+                    b.ToTable("OrderDeliveries");
                 });
 
             modelBuilder.Entity("Entities.OrderInventory", b =>
@@ -1593,7 +1595,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasIndex("VendorId");
 
-                    b.ToTable("OrderRestaurants", (string)null);
+                    b.ToTable("OrderRestaurants");
                 });
 
             modelBuilder.Entity("Entities.OriginItem", b =>
@@ -1770,7 +1772,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasIndex("VendorId");
 
-                    b.ToTable("Receives", (string)null);
+                    b.ToTable("Receives");
                 });
 
             modelBuilder.Entity("Entities.Report", b =>
@@ -1801,7 +1803,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Reports", (string)null);
+                    b.ToTable("Reports");
                 });
 
             modelBuilder.Entity("Entities.SalaryAdjustmentLog", b =>
@@ -1833,7 +1835,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasIndex("SalaryPaymentId");
 
-                    b.ToTable("SalaryAdjustmentLogs", (string)null);
+                    b.ToTable("SalaryAdjustmentLogs");
                 });
 
             modelBuilder.Entity("Entities.SalaryPayment", b =>
@@ -1869,7 +1871,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("SalaryPayments", (string)null);
+                    b.ToTable("SalaryPayments");
                 });
 
             modelBuilder.Entity("Entities.SalesInvoice", b =>
@@ -2005,7 +2007,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Settings", (string)null);
+                    b.ToTable("Settings");
                 });
 
             modelBuilder.Entity("Entities.StockMovement", b =>
@@ -2153,7 +2155,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserRouter", (string)null);
+                    b.ToTable("UserRouter");
                 });
 
             modelBuilder.Entity("Entities.Vendor", b =>
@@ -2294,7 +2296,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Visits", (string)null);
+                    b.ToTable("Visits");
                 });
 
             modelBuilder.Entity("Entities.WorkShop", b =>
@@ -2342,7 +2344,7 @@ namespace AspCore_Conic_Erp_RestApi.Migrations
 
                     b.HasIndex("VendorId");
 
-                    b.ToTable("WorkShops", (string)null);
+                    b.ToTable("WorkShops");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

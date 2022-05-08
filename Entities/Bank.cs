@@ -19,6 +19,6 @@ namespace Entities
         public bool IsPrime { get; set; }
         public string Description { get; set; }
 
-        public virtual Account Account { get; set; }
+        public virtual TreeAccount Account { get; set; }
     }
 }

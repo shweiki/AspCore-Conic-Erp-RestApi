@@ -68,15 +68,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
-                    Account NewAccount = new Account
+                    TreeAccount NewAccount = new TreeAccount
                     {
                         Type = "Cash",
                         Name = collection.Name,
                         Description = collection.Description,
                         Status = 0,
-                        Code = ""
+                        Code = "",
+                        ParentId = DB.TreeAccounts.Where(x => x.Type == "Cashes-Main").SingleOrDefault().Code
+
                     };
-                    DB.Accounts.Add(NewAccount);
+                    DB.TreeAccounts.Add(NewAccount);
                     DB.SaveChanges();
                     // TODO: Add insert logic here
                     collection.Status = 0;

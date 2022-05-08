@@ -33,7 +33,7 @@ namespace Entities
         public long? AreaId { get; set; }
         public string UserId { get; set; }
         public string Pass { get; set; }
-        public virtual Account Account { get; set; }
+        public virtual TreeAccount Account { get; set; }
         public virtual Area Area { get; set; }
         public virtual ICollection<Cheque> Cheques { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }

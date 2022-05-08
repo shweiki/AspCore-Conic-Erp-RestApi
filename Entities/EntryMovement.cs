@@ -15,7 +15,7 @@ namespace Entities
         public long EntryId { get; set; }
         public string TableName { get; set; }
         public long Fktable { get; set; }
-        public virtual Account Account { get; set; }
+        public virtual TreeAccount Account { get; set; }
         public virtual EntryAccounting Entry { get; set; }
     }
 }

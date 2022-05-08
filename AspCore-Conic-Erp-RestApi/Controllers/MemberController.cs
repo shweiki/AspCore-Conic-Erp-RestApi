@@ -191,17 +191,17 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 try
                 {
-                    var ParentAccount = DB.Accounts.Where(i => i.Description == "Member").SingleOrDefault();
-                    ParentAccount = ParentAccount ??= new Account { Id = 0, ParentId = 0, Code = "0" };
-                    Account NewAccount = new Account
+
+                    TreeAccount NewAccount = new TreeAccount
                     {
                         Type = "Member",
                         Description = collection.Description,
                         Status = 0,
-                        Code = ParentAccount.Code + '-' + DB.Accounts.Where(i => i.ParentId == ParentAccount.Id).Count() + 1,
-                        ParentId = ParentAccount.Id
+                        Code ="",
+                        ParentId = DB.TreeAccounts.Where(x => x.Type == "Members-Main").SingleOrDefault().Code
+
                     };
-                    DB.Accounts.Add(NewAccount);
+                    DB.TreeAccounts.Add(NewAccount);
                     DB.SaveChanges();
                     collection.AccountId = NewAccount.Id;
                     DB.Members.Add(collection);

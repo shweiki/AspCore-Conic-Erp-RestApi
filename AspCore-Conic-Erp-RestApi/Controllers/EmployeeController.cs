@@ -199,15 +199,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             if (ModelState.IsValid)
             {
                 var Pass = "123456";
-                var ParentAccount = DB.Accounts.Where(i => i.Description == "Employee").SingleOrDefault();
-                ParentAccount = ParentAccount ??= new Account { Id = 0, ParentId = 0, Code = "0" };
-                Account NewAccount = new Account
+
+                TreeAccount NewAccount = new TreeAccount
                 {
                     Type = "Employee",
                     Description = collection.Description,
                     Status = 0,
-                    Code = ParentAccount.Code + '-' + DB.Accounts.Where(i => i.ParentId == ParentAccount.Id).Count() + 1,
-                    ParentId = ParentAccount.Id
+                    Code = "",
+                    ParentId = DB.TreeAccounts.Where(x => x.Type == "Employees-Main").SingleOrDefault().Code
                 };
                 
                 var NewUser = new IdentityUser()
@@ -226,7 +225,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Pass = NewUser.PasswordHash;
 
                 collection.EmployeeUserId = NewUser.Id;
-                DB.Accounts.Add(NewAccount);
+                DB.TreeAccounts.Add(NewAccount);
                 DB.SaveChanges();
                 collection.AccountId = NewAccount.Id;
                 DB.Employees.Add(collection);

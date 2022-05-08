@@ -22,7 +22,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             var Accounts = new
             {
-                Accounts =  DB.Accounts.Where(i=>i.Status == 0).Select(x=>new
+                Accounts =  DB.TreeAccounts.Where(i=>i.Status == 0).Select(x=>new
                 {
                     x.Id,
                     x.Description,
@@ -44,7 +44,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Account/CheckIsExist")]
         public IActionResult CheckIsExist(string Name, string Type)
         {
-            var Account = DB.Accounts.Where(m => m.Name == Name && m.Type == Type).ToList();
+            var Account = DB.TreeAccounts.Where(m => m.Name == Name && m.Type == Type).ToList();
 
             return Ok(Account.Count() > 0 ? true : false);
         }
@@ -54,12 +54,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetTreeAccount()
         {
 
-            var Accounts = DB.Accounts.Select(x => new
+            var Accounts = DB.TreeAccounts.Select(x => new
             {
                 x.Id,
                 x.Description,
                 x.Status,
-                x.Code,
+                Code = x.Code ==  null ? "" : x.Code, 
                 Name = x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Name : x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name ,
                 x.ParentId,
                 TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
@@ -75,20 +75,20 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetActiveAccounts()
         {
-            var ActiveAccounts = DB.Accounts.Where(x => x.Status == 0).Select(x => new { value = x.Id ,
+            var ActiveAccounts = DB.TreeAccounts.Where(x => x.Status == 0).Select(x => new { value = x.Id ,
                 label = (x.Members.Where(m=>m.AccountId == x.Id).FirstOrDefault().Name !=null ? x.Members.Where(m => m.AccountId == x.Id).FirstOrDefault().Name : x.Vendors.Where(m => m.AccountId == x.Id).FirstOrDefault().Name )+ " - " + x.Name,
               }).ToList();
             return Ok(ActiveAccounts);
         }
         [HttpPost]
         [Route("Account/EditParent")]
-        public IActionResult EditParent(long ID, long ParentId)
+        public IActionResult EditParent(long ID, string ParentId)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    Account account = DB.Accounts.Where(x => x.Id == ID).SingleOrDefault();
+                    TreeAccount account = DB.TreeAccounts.Where(x => x.Id == ID).SingleOrDefault();
    
                     account.ParentId = ParentId;
                     DB.SaveChanges();
@@ -108,7 +108,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             if (Any == null) return NotFound();
             Any = Any.ToLower();
-            var Accounts = DB.Accounts.Where(a=> a.Type != "Main").Search(x => x.Name, x => x.Code, x => x.Id.ToString(), x => x.Type , x =>x.Vendors.Where(v=>v.AccountId==x.Id).SingleOrDefault().Name , x => x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name).Containing(Any)
+            var Accounts = DB.TreeAccounts.Where(a=> !a.Type.Contains("Main")).Search(x => x.Name, x => x.Code, x => x.Id.ToString(), x => x.Type , x =>x.Vendors.Where(v=>v.AccountId==x.Id).SingleOrDefault().Name , x => x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name).Containing(Any)
                 .Select(x => new { 
                     x.Id,
                     Name = x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Name : x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
@@ -123,7 +123,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Account/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
         {
-            var Accounts = DB.Accounts.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+            var Accounts = DB.TreeAccounts.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
             {
                 x.Id,
                 Name = x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Name : x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
@@ -153,7 +153,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Account/GetInComeAccounts")]
         public IActionResult GetInComeAccounts()
         {
-            var InComeAccounts = DB.Accounts.Where(i =>  i.Type == "InCome").Select(x => new
+            var InComeAccounts = DB.TreeAccounts.Where(i =>  i.Type == "InCome").Select(x => new
             {
                 value = x.Id,
                 Code = x.Code,
@@ -167,7 +167,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Account/GetMainAccount")]
         public IActionResult GetMainAccount()
         {
-            var InComeAccounts = DB.Accounts.Where(i =>  i.Type == "Tree-Main").Select(x => new
+            var InComeAccounts = DB.TreeAccounts.Where(i =>  i.Type.Contains("Main")).Select(x => new
             {
                 value = x.Id,
                 Code = x.Code,
@@ -180,7 +180,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Account/GetPayables")]
         public IActionResult GetPayables(int Limit, string Sort, int Page,bool WithZero ,string Any)
         {
-            var Accounts = DB.Accounts.Where(f => (Any != null ? f.Id.ToString().Contains(Any):true)&&(f.EntryMovements.Select(d => d.Credit).Sum() - f.EntryMovements.Select(d => d.Debit).Sum()) < 0).Select(x => new
+            var Accounts = DB.TreeAccounts.Where(f => (Any != null ? f.Id.ToString().Contains(Any):true)&&(f.EntryMovements.Select(d => d.Credit).Sum() - f.EntryMovements.Select(d => d.Debit).Sum()) < 0).Select(x => new
             {
                 x.Id,
                 x.Description,
@@ -210,7 +210,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Account/GetReceivables")]
         public IActionResult GetReceivables(int Limit, string Sort, int Page, bool WithZero, string Any)
         {
-            var Accounts = DB.Accounts.Where(f => (Any != null ? f.Id.ToString().Contains(Any) : true) && (f.EntryMovements.Select(d => d.Credit).Sum() - f.EntryMovements.Select(d => d.Debit).Sum()) > 0).Select(x => new
+            var Accounts = DB.TreeAccounts.Where(f => (Any != null ? f.Id.ToString().Contains(Any) : true) && (f.EntryMovements.Select(d => d.Credit).Sum() - f.EntryMovements.Select(d => d.Debit).Sum()) > 0).Select(x => new
             {
                 x.Id,
                 x.Description,
@@ -240,7 +240,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Account/GetById")]
         public IActionResult GetById(long Id)
         {
-            var Account = DB.Accounts.Where(i => i.Id == Id ).Select(x => new
+            var Account = DB.TreeAccounts.Where(i => i.Id == Id ).Select(x => new
             {
                 x.Id,
                 Name = x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Name : x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
@@ -255,14 +255,14 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("Account/Create")]
         [HttpPost]
-        public IActionResult Create(Account collection)
+        public IActionResult Create(TreeAccount collection)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
                     // TODO: Add insert logic here
-                    DB.Accounts.Add(collection);
+                    DB.TreeAccounts.Add(collection);
                     DB.SaveChanges();
 
                     return Ok(true);
@@ -277,13 +277,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [HttpPost]
         [Route("Account/Edit")]
-        public IActionResult Edit(Account collection)
+        public IActionResult Edit(TreeAccount collection)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    Account account = DB.Accounts.Where(x => x.Id == collection.Id).SingleOrDefault();
+                    TreeAccount account = DB.TreeAccounts.Where(x => x.Id == collection.Id).SingleOrDefault();
                     account.Name = collection.Name;
                     account.Code = collection.Code;
                     account.Type = collection.Type;
@@ -303,22 +303,19 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         [HttpPost]
         [Route("Account/Delete")]
-        public IActionResult Delete(long Id)
+        public IActionResult Delete(long? Id)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    Account collection = DB.Accounts.Where(x => x.Id == Id).SingleOrDefault();
-                    if (DB.Banks.Where(x => x.AccountId == collection.Id).SingleOrDefault() != null || DB.Cashes.Where(x => x.AccountId == collection.Id).SingleOrDefault() != null)
+                    TreeAccount collection = DB.TreeAccounts.Where(x => x.Id == Id).SingleOrDefault();
+                    if (DB.EntryMovements.Where(x => x.AccountId == collection.Id).SingleOrDefault() != null)
                         return Ok(false);
-                    if (DB.Vendors.Where(x => x.AccountId == collection.Id).SingleOrDefault() != null || DB.Members.Where(x => x.AccountId == collection.Id).SingleOrDefault() != null)
-                        return Ok(false);
-                    if (DB.EntryMovements.Where(x=>x.AccountId == collection.Id).SingleOrDefault() !=null || DB.Accounts.Where(x => x.ParentId == collection.Id).SingleOrDefault() !=null)
-                        return Ok(false);
+
                     else
                     {
-                        DB.Accounts.Remove(collection);
+                        DB.TreeAccounts.Remove(collection);
                         DB.SaveChanges();
                         return Ok(true);
                     }

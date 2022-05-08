@@ -4,9 +4,9 @@ using System;
 
 namespace Entities.Configuration
 {
-    public class AccountConfiguration : IEntityTypeConfiguration<Account>
+    public class AccountConfiguration : IEntityTypeConfiguration<TreeAccount>
     {
-        public void Configure(EntityTypeBuilder<Account> builder)
+        public void Configure(EntityTypeBuilder<TreeAccount> builder)
         {
    
                 builder.ToTable("Account");
@@ -27,7 +27,7 @@ namespace Entities.Configuration
                     .IsRequired();
 
 
-            builder.HasData
+          /*  builder.HasData
             (
                 new Account
                 {
@@ -41,7 +41,7 @@ namespace Entities.Configuration
                     ParentId = 0
 
                 },
-                new Account
+                new TreeAccount
                 {
                     Id = 2,
                     Name = "مطلوبات",
@@ -209,7 +209,7 @@ namespace Entities.Configuration
                     IsPrime = false,
                     ParentId = 0
                 }
-            );
+            );*/
         }
     }
 }
