@@ -15,7 +15,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public EntryAccountingController(ConicErpContext dbcontext)
         {
             DB = dbcontext;
-        }        [HttpGet]
+        }     
+        [HttpGet]
         public IActionResult GetEntryAccounting(long AccountId, DateTime DateFrom, DateTime DateTo)
         {
             var EntryMovements = DB.EntryMovements.Where(i => i.AccountId == AccountId && i.Entry.FakeDate >= DateFrom && i.Entry.FakeDate <= DateTo).Select(x=>new {

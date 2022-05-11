@@ -27,7 +27,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
         public IConfiguration Configuration { get; }
         private ConicErpContext DB;
-             private string BackUpPath = "C:\\BackUp\\";
 
         [Route("BackupRestore/GetBackup")]
         [HttpGet]
@@ -38,7 +37,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         }
         [Route("BackupRestore/Backup")]
         [HttpGet]
-        public IActionResult Backup()
+        public IActionResult Backup(string BackUpPath = "C:\\BackUp\\")
         {
             int lat = Environment.CurrentDirectory.LastIndexOf("\\") + 1;
             string Name = Environment.CurrentDirectory.Substring(lat, (Environment.CurrentDirectory.Length - lat));
