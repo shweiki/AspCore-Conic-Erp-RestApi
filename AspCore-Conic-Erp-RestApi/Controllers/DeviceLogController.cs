@@ -52,7 +52,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             // GetFromZkBio(TableName); for v5l speed ztk
       
-                 DeviceController Device = new DeviceController(DB);
+                 DeviceController Device = new(DB);
 
                  foreach (var D in DB.Devices.ToList())
                     {
@@ -65,7 +65,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 
           
 
-            var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any != null ? x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any) : true))
+            var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any == null || x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any)))
                 .AsEnumerable().Select(x => new {
                 x.Id,
                 x.DateTime,
@@ -85,36 +85,32 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             public dynamic GetFkData(string Fktable , string TableName)
             {
-
-                  dynamic Object;
-                switch (TableName)
+            dynamic Object = TableName switch
+            {
+                "Member" => DB.Members.Where(x => x.Id == Convert.ToInt32(Fktable)).Select(x => new
                 {
-                    case "Member":
-                        Object = DB.Members.Where(x => x.Id == Convert.ToInt32(Fktable)).Select(x=> new  {
-                            x.Id,
-                            x.Name,
-                            x.Description,
-                            x.Status,
-                            Style = DB.Oprationsys.Where(o => o.Status == x.Status && o.TableName == "Member").Select(o => new {
-                                o.Color,
-                                o.ClassName,
-                                o.IconClass
-                            }).SingleOrDefault(),
-                            TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
-                            TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum(),
-                            ActiveMemberShip = x.MembershipMovements.Where(f => f.MemberId == x.Id && f.Status == 1).Select(ms => new {
-                                ms.Id,
-                                ms.Type
-                            }).FirstOrDefault()
-                            }).SingleOrDefault();
-                        break;
-                    case "Employee":
-                        Object = DB.Employees.Where(x => x.Id == Convert.ToInt32(Fktable)).SingleOrDefault();
-                        break;
-                            default: Object = null; break;
-                        }
-
-               return Object;
+                    x.Id,
+                    x.Name,
+                    x.Description,
+                    x.Status,
+                    Style = DB.Oprationsys.Where(o => o.Status == x.Status && o.TableName == "Member").Select(o => new
+                    {
+                        o.Color,
+                        o.ClassName,
+                        o.IconClass
+                    }).SingleOrDefault(),
+                    TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
+                    TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum(),
+                    ActiveMemberShip = x.MembershipMovements.Where(f => f.MemberId == x.Id && f.Status == 1).Select(ms => new
+                    {
+                        ms.Id,
+                        ms.Type
+                    }).FirstOrDefault()
+                }).SingleOrDefault(),
+                "Employee" => DB.Employees.Where(x => x.Id == Convert.ToInt32(Fktable)).SingleOrDefault(),
+                _ => null,
+            };
+            return Object;
             }
 
         [Route("DeviceLog/CheckDeviceLog")]
@@ -188,7 +184,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     var DuplicateRow = DB.DeviceLogs.GroupBy(s => new { s.Fk,s.TableName, s.DateTime }).Select(grp => grp.Skip(1)).ToList();
                     foreach (var Dup in DuplicateRow)
                     {
-                        if (Dup.Count() == 0)
+                        if (!Dup.Any())
                             continue;
                         List<DeviceLog> duplog = Dup.Select(c => new DeviceLog { Id = c.Id }).ToList();
                         DB.DeviceLogs.RemoveRange(duplog);
@@ -234,7 +230,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == Id && l.TableName == TableName).ToList();
             isLogSaveIt = DB.DeviceLogs.Where(Ld => Ld.DateTime == datetime).ToList();
             var Device = DB.Devices.Where(x => x.Ip == Ip).SingleOrDefault();
-            if (isLogSaveIt.Count() <= 0 && Device !=null)
+            if (isLogSaveIt.Count <= 0 && Device !=null)
             {
                 var Log = new DeviceLog
                 {
@@ -347,7 +343,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             }
             else { return NotFound(); }
         }
-        public  void GetFromZkBio(string TableName)
+        public void GetFromZkBio(string TableName)
         {
             try
             {
@@ -367,7 +363,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         " INNER JOIN  [zkbiotime].[dbo].[iclock_terminal] as T ON L.terminal_id= T.id" +
                         " where L.reserved Is null";
 
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    using (SqlCommand command = new(sql, connection))
                     {
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
@@ -415,7 +411,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
                     String sql = "update [zkbiotime].[dbo].[iclock_transaction] set reserved = 'true' where id = " + id + "";
 
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    using (SqlCommand command = new(sql, connection))
                     {
                         command.ExecuteNonQuery();
 

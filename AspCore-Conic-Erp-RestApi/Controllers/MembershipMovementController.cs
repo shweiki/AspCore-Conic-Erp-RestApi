@@ -189,7 +189,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             double TotalMembershipMovementOrders = DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id && (x.Status == -2 || x.Status == -3)).ToList().Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
             int MembershipNumberDays = DB.Memberships.Where(m => m.Id == MS.MembershipId).FirstOrDefault().NumberDays;
             MS.EndDate = MS.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders);
-            if ((DateTime.Now >= MS.StartDate && DateTime.Now <= MS.EndDate))
+            if (DateTime.Now >= MS.StartDate.Date && DateTime.Now <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59))
                 {
               
                 MS.Status = 1;
@@ -212,7 +212,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 else
                 {
 
-                    if (MS.StartDate > DateTime.Now)
+                    if (MS.StartDate.Date > DateTime.Now)
                     {// معلق
                         MS.Status = -2;
                     }
@@ -232,7 +232,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         MSO.Status = -2;
                         continue;
                     }
-                    if ((DateTime.Now >= MSO.StartDate && DateTime.Now <= MSO.EndDate))
+                    if ((DateTime.Now >= MSO.StartDate.Date && DateTime.Now <= MSO.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59)))
                     {
                         if (MSO.Type == "Freeze")
                         {
@@ -261,7 +261,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                         }
 
                     }
-                    if ((MS.EndDate > DateTime.Now))
+                    if ((MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59) > DateTime.Now))
                     {
 
 
