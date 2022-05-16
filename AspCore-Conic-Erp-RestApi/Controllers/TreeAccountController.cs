@@ -11,7 +11,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class TreeAccountController : Controller
     {
-                private ConicErpContext DB;
+        private readonly ConicErpContext DB;
         public TreeAccountController(ConicErpContext dbcontext)
         {
             DB = dbcontext;
@@ -28,7 +28,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Description,
                     x.Status,
                     x.Code,
-                    Name = x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Name : x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                    x.Name,
                     x.ParentId,
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
@@ -60,7 +60,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Description,
                 x.Status,
                 Code = x.Code ==  null ? "" : x.Code, 
-                Name = x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Name : x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name ,
+                x.Name ,
                 x.ParentId,
                 TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
                 TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
@@ -118,6 +118,16 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             return Ok(Accounts);
            
+        }
+        [HttpGet]
+        [Route("Account/FixCode")]
+        public IActionResult FixCode()
+        {
+          
+         
+
+            return Ok(true);
+
         }
         [HttpPost]
         [Route("Account/GetByListQ")]
@@ -216,7 +226,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Description,
                 x.Status,
                 x.Code,
-                Name = x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Name : x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                x.Name,
                 x.ParentId,
                 TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
                 TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
@@ -243,7 +253,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             var Account = DB.TreeAccounts.Where(i => i.Id == Id ).Select(x => new
             {
                 x.Id,
-                Name = x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Name : x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                x.Name,
                 x.Code,
                 x.Status,
                 x.Type,

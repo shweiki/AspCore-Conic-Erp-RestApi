@@ -131,7 +131,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.TotalAmmount,
                 x.Type,
                 x.EditorName,
-                Name = x.Vendor.Name + " " + x.Member.Name + " - " + x.Name,
+                x.Name,
                 x.FakeDate,
                 x.ReceiveMethod,
                 ObjectId = x.VendorId == null ? x.MemberId : x.VendorId,

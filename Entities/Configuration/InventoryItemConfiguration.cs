@@ -21,19 +21,6 @@ namespace Entities.Configuration
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-          
-
-            builder.HasData
-            (
-                new InventoryItem
-                {
-                    Id = 1,
-                    Name = "المخزن 1",
-                    Description = "",
-                    Status = 0,
-                    IsPrime = true,
-                }
-            );
         }
     }
 }

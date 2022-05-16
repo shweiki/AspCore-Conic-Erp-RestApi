@@ -1,6 +1,5 @@
 ﻿using System;
 using Entities.Configuration;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -117,9 +116,9 @@ namespace Entities
             modelBuilder.ApplyConfiguration(new InventoryItemConfiguration());
 
             modelBuilder
-    .HasAnnotation("ProductVersion", "3.0.0")
-    .HasAnnotation("Relational:MaxIdentifierLength", 128)
-    .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+            .HasAnnotation("ProductVersion", "3.0.0")
+            .HasAnnotation("Relational:MaxIdentifierLength", 128)
+            .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
             {

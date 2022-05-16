@@ -16,7 +16,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class EmployeeController : Controller
     {
-        private ConicErpContext DB;
+        private readonly ConicErpContext DB;
        private readonly UserManager<IdentityUser> _userManager;
         public EmployeeController(ConicErpContext dbcontext,UserManager<IdentityUser> userManager)
 
@@ -86,7 +86,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetEmployeeByAny(string Any)
         {
-            Any.ToLower();
+            _ = Any.ToLower();
             var Employees = DB.Employees.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0","").Replace(" ","").Contains(Any.Replace("0", "").Replace(" ", "")))
                 .Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1}).ToList();
 
@@ -96,7 +96,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Employee/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page,int? Status, string Any)
         {
-            var Employees = DB.Employees.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+            var Employees = DB.Employees.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (Status == null || s.Status == Status)).Select(x => new
             {
                 x.Id,
                 x.Name,
@@ -121,7 +121,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 items = Employees.Skip((Page - 1) * Limit).Take(Limit).ToList(),
                 Totals = new
                 {
-                    Rows = Employees.Count(),
+                    Rows = Employees.Count,
                     Totals = Employees.Sum(s => s.TotalCredit - s.TotalDebit),
                     TotalCredit = Employees.Sum(s => s.TotalCredit),
                     TotalDebit = Employees.Sum(s => s.TotalDebit),
@@ -135,7 +135,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             var Employees = DB.Employees.Where(m => m.Ssn == Ssn || m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", "")).ToList();
 
-            return Ok(Employees.Count() > 0 ? true : false);
+            return Ok(Employees.Count > 0);
         }
 
         [Route("Employee/GetActiveEmployee")]
@@ -200,8 +200,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 var Pass = "123456";
 
-                TreeAccount NewAccount = new TreeAccount
+                TreeAccount NewAccount = new()
                 {
+                    Name = collection.Name,
                     Type = "Employee",
                     Description = collection.Description,
                     Status = 0,
@@ -290,7 +291,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Tag,
                     x.Vaccine,
                     Avatar = Url.Content("~/Images/Employee/" + x.Id + ".jpeg"),
-                    HaveFaceOnDevice = DB.FingerPrints.Where(f => f.Fk == x.Id.ToString() && f.TableName == "Employee").Count() > 0 ? true : false,
+                    HaveFaceOnDevice = DB.FingerPrints.Where(f => f.Fk == x.Id.ToString() && f.TableName == "Employee").Any() ? true : false,
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
                     x.AccountId,

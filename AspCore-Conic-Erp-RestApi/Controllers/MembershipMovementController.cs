@@ -10,7 +10,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class MembershipMovementController : Controller
     {
-                private ConicErpContext DB;
+         private readonly ConicErpContext DB;
         public MembershipMovementController(ConicErpContext dbcontext)
         {
             DB = dbcontext;
@@ -76,7 +76,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult CheckMembershipMovement()
         {
-            DateTime MaxDate = new DateTime(2021, 1, 1);
+            DateTime MaxDate = new(2021, 1, 1);
             IList<MembershipMovement>  MembershipMovements = DB.MembershipMovements.Where(x=>  x.EndDate  >= MaxDate)?.OrderBy(s => s.Id).ToList();
          
             foreach (MembershipMovement MS in MembershipMovements)
@@ -94,7 +94,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     var HowManyDaysLeft = (MS.EndDate - DateTime.Now).TotalDays;
                     if (HowManyDaysLeft == 3)
                     {
-                        Massage msg = new Massage();
+                        Massage msg = new();
                         msg.Body = "عزيزي " + member.Name + " يسعدنا ان تكون متواجد دائماَ معنا , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + MS.EndDate + " وشكرا";
                         msg.Status = 0;
                         msg.TableName = "Member";
@@ -197,7 +197,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     var HowManyDaysLeft = (MS.EndDate - DateTime.Now).TotalDays;
                     if (HowManyDaysLeft == 3)
                     {
-                        Massage msg = new Massage();
+                        Massage msg = new();
                         msg.Body = "عزيزي " + member.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + MS.EndDate + " وشكرا";
                         msg.Status = 0;
                         msg.TableName = "Member";

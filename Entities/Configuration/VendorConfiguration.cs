@@ -54,27 +54,6 @@ namespace Entities.Configuration
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Vendor_Account");
 
-
-            builder.HasData
-            (
-                new Vendor
-                {
-                    Id = 2,
-                    Name = "زبون نقدي",
-                    Description = "",
-                    Status = 0,
-                    Region = null,
-                    Email = null,
-                    PhoneNumber1 = null,
-                    PhoneNumber2 = null,
-                    Fax = null,
-                    CreditLimit = 0,
-                    IsPrime = true,
-                    Type = "Customer",
-                    AccountId = 15
-                }
-              
-            );
         }
     }
 }

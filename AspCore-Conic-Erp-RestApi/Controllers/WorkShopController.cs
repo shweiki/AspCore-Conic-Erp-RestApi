@@ -19,8 +19,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("WorkShop/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
         {
-            var Invoices = DB.WorkShops.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
-            && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (User != null ? DB.ActionLogs.Where(l => l.WorkShopId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+            var Invoices = DB.WorkShops.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.DeliveryDate >= DateFrom : true)
+            && (DateTo == null || s.DeliveryDate <= DateTo) && (Status == null || s.Status == Status) && (User != null ? DB.ActionLogs.Where(l => l.WorkShopId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
             {
                 x.Id,
                 x.Discount,
@@ -71,7 +71,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
 
                 x.Id,
-                Name = x.Vendor.Name + " - " + x.Name,
+                 x.Name,
                 x.Discount,
                 x.Tax,
                 x.FakeDate,
@@ -100,7 +100,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         public IActionResult GetByItem(long ItemId, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
         {
             var Invoices = DB.InventoryMovements.Where(s =>s.WorkShopId !=null && s.ItemsId == ItemId && (Any != null ? s.Id.ToString().Contains(Any) || s.WorkShop.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.WorkShop.Description.Contains(Any) || s.WorkShop.Name.Contains(Any) : true) && (DateFrom != null ? s.WorkShop.FakeDate >= DateFrom : true)
-              && (DateTo != null ? s.WorkShop.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&  (User != null ? DB.ActionLogs.Where(l => l.InventoryMovementId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+              && (DateTo == null || s.WorkShop.FakeDate <= DateTo) && (Status != null ? s.Status == Status : true) &&  (User != null ? DB.ActionLogs.Where(l => l.InventoryMovementId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
               {
                   x.Id,
                   x.WorkShopId,
@@ -216,7 +216,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             var Invoices = DB.WorkShops.Where(i => i.Id == Id).Select(x => new
             {
                 x.Id,
-                Name = x.Vendor.Name + " - " + x.Name,
+                 x.Name,
                 x.VendorId,
                 x.Discount,
                 x.Tax,
@@ -227,7 +227,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.PaymentMethod,
                 x.Status,
                 x.Description,
-                InventoryMovements = DB.InventoryMovements.Where(i => i.WorkShopId == x.Id && i.TypeMove == "In").Select(m => new
+                InventoryMovements = DB.InventoryMovements.Where(i => i.WorkShopId == x.Id ).Select(m => new
                 {
                     m.Id,
                     m.ItemsId,

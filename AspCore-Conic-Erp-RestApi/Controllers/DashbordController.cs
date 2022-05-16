@@ -71,7 +71,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                  {
                       Key =  g.First().FakeDate.ToString("MM") + "-" + g.First().FakeDate.ToString("yyyy"),
                      g.First().Type,
-                      Name = g.First().Name,
+                     g.First().Name,
                       Credit = g.Sum(d => d.Credit),
                       Debit = g.Sum(d => d.Debit),
                   }).ToList();

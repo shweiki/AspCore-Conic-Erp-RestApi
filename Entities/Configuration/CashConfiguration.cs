@@ -33,23 +33,7 @@ namespace Entities.Configuration
                     .WithMany(p => p.Cashes)
                     .HasForeignKey(d => d.AccountId)
                     .HasConstraintName("FK_Cash_Account");
-        
 
-
-            builder.HasData
-            (
-                new Cash
-                {
-                    Id = 2,
-                    Name = "خزينة 1",
-                    Description = "",
-                    Status = 0,
-                    Pcip = "192.168.1.0",
-                    Btcash = "Com3",
-                    IsPrime = true,
-                    AccountId = 5
-                }
-            );
         }
     }
 }
