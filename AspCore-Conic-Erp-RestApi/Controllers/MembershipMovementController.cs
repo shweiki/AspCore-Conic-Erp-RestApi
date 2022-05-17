@@ -72,114 +72,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             return Ok("False Valid");
         }
 
-        [Route("MembershipMovement/CheckMembershipMovement")]
-        [HttpGet]
-        public IActionResult CheckMembershipMovement()
-        {
-            DateTime MaxDate = new(2021, 1, 1);
-            IList<MembershipMovement>  MembershipMovements = DB.MembershipMovements.Where(x=>  x.EndDate  >= MaxDate)?.OrderBy(s => s.Id).ToList();
-         
-            foreach (MembershipMovement MS in MembershipMovements)
-            {
-                double TotalMembershipMovementOrders = DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id && (x.Status == -2 || x.Status == -3)).Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
-                var member = DB.Members.Where(x => x.Id == MS.MemberId).SingleOrDefault();
-                int OStatus = member.Status;
-                if (MS.Status == 0) continue;
 
-                if ((DateTime.Now >= MS.StartDate && DateTime.Now <= MS.EndDate))
-                {
-                 
-                        MS.Status = 1;
-                        member.Status = 0;
-                    var HowManyDaysLeft = (MS.EndDate - DateTime.Now).TotalDays;
-                    if (HowManyDaysLeft == 3)
-                    {
-                        Massage msg = new();
-                        msg.Body = "عزيزي " + member.Name + " يسعدنا ان تكون متواجد دائماَ معنا , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + MS.EndDate + " وشكرا";
-                        msg.Status = 0;
-                        msg.TableName = "Member";
-                        msg.Fktable = member.Id;
-                        msg.PhoneNumber = member.PhoneNumber1;
-                        msg.SendDate = DateTime.Now;
-                        msg.Type = "رسالة تذكير";
-                        DB.Massages.Add(msg);
-                    }
-
-                }
-                else
-                {
-
-                    if ( MS.StartDate > DateTime.Now ) {// معلق
-                        MS.Status = -2;
-                    }
-                    else
-                    {
-
-                        MS.Status = -1;
-                        member.Status = -1;
-                    }
-                }
-             
-                foreach (MembershipMovementOrder MSO in DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id &&( x.Status == 1 || x.Status == 2)).ToList())
-                {
-                    if (MSO.Status == 2)
-                    {
-                        MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
-                        MSO.Status = -2;
-                        continue;
-                    }
-                    if ((DateTime.Now >= MSO.StartDate && DateTime.Now <= MSO.EndDate))
-                    {
-                        if (MSO.Type == "Freeze")
-                        {
-                            MS.Status = 2;
-                            member.Status = 1;
-                        }
-                        if (MSO.Type == "Extra")
-                        {
-                            MS.Status = 3;
-                           member.Status = 2;
-
-                        }
-                    }
-                    else
-                    {
-                        if (MSO.Type == "Extra")
-                        {
-                            MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
-                            MSO.Status = -3;
-                        }
-                        if (DateTime.Now > MSO.EndDate)
-                        {
-
-                            MS.EndDate =  MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
-                            MSO.Status = -3;
-                        }
-
-                }
-                if ((MS.EndDate > DateTime.Now))
-                {
-                   
-                  
-                    MS.Status = 1;
-                        member.Status = 1;
-
-                }
-                if (MS == null )
-                {
-                        member.Status = -1;
-                    }
-
-                }
-
-                if (OStatus == -2) member.Status = -2;
-
-                    DB.SaveChanges();
-
-            }
-            return Ok(true);
-        }
- 
         public bool ScanMembershipMovementById(long ID)
         {
             MembershipMovement MS = DB.MembershipMovements.Where(x => x.Id == ID).SingleOrDefault();
@@ -191,7 +84,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             MS.EndDate = MS.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders);
             if (DateTime.Now >= MS.StartDate.Date && DateTime.Now <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59))
                 {
-              
+                var DeviceLogs = DB.DeviceLogs.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && (x.DateTime >= MS.StartDate.Date && x.DateTime <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59)))
+               .GroupBy(a => a.DateTime).ToList();
+                if (DeviceLogs.Count > 0) {
+                    DeviceLogs.Select(g => g.Last()).ToList();
+                    MS.VisitsUsed = DeviceLogs.Count();
+                    if (MS.VisitsUsed > MS.Membership.NumberClass)
+                    {
+                        MS.EndDate = DateTime.Now;
+                        MS.Status = -1;
+                        member.Status = -1;
+                    }
+                }
                 MS.Status = 1;
                     member.Status = 0;
                     var HowManyDaysLeft = (MS.EndDate - DateTime.Now).TotalDays;

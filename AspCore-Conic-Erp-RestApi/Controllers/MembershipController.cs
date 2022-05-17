@@ -8,7 +8,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
     [Authorize]
     public class MembershipController : Controller
     {
-                private ConicErpContext DB;
+        private readonly ConicErpContext DB;
         public MembershipController(ConicErpContext dbcontext)
         {
             DB = dbcontext;
@@ -18,7 +18,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMembership()
         {
-            var Memberships = DB.Memberships.Select(x => new
+
+            return Ok(DB.Memberships.Select(x => new
             {
                 x.Id,
                 x.Name,
@@ -31,10 +32,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.MaxFreezeLimitDays,
                 x.Description,
                 x.Status,
+                x.NumberClass,
                 TotalMembers = DB.MembershipMovements.Where(l => l.MembershipId == x.Id && l.Status > 0).Count(),
-            }).ToList();
-
-            return Ok(Memberships);
+            }).ToList());
         }
 
         [Route("Membership/GetActiveMembership")]
@@ -53,7 +53,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.NumberDays ,
                 x.Status ,
                 x.Tax ,
-                x.Rate
+                x.Rate,
+                x.NumberClass
             }).ToList();
             return Ok(Memberships);
         }
@@ -95,6 +96,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 Membership.Tax = collection.Tax;
                 Membership.Rate = collection.Rate;
                 Membership.Description = collection.Description;
+                Membership.NumberClass = collection.NumberClass;
                 try
                 {
                     DB.SaveChanges();

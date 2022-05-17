@@ -181,13 +181,12 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
                 try
                 {
-                    var DuplicateRow = DB.DeviceLogs.GroupBy(s => new { s.Fk,s.TableName, s.DateTime }).Select(grp => grp.Skip(1)).ToList();
+                    var DuplicateRow = DB.DeviceLogs.GroupBy(s => new { s.TableName, s.Fk, s.DateTime }).Select(grp => grp.Skip(1)).ToList();
                     foreach (var Dup in DuplicateRow)
                     {
                         if (!Dup.Any())
                             continue;
-                        List<DeviceLog> duplog = Dup.Select(c => new DeviceLog { Id = c.Id }).ToList();
-                        DB.DeviceLogs.RemoveRange(duplog);
+                        DB.DeviceLogs.RemoveRange(Dup);
                         DB.SaveChanges();
                     }
                     return Ok(true);

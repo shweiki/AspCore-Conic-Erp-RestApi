@@ -23,6 +23,7 @@ namespace Entities
         public int Status { get; set; }
         public int? MinFreezeLimitDays { get; set; }
         public int? MaxFreezeLimitDays { get; set; }
+        public int? NumberClass { get; set; }
 
         public virtual ICollection<MembershipMovement> MembershipMovements { get; set; }
     }

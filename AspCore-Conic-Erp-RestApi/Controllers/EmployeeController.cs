@@ -110,8 +110,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 x.Tag,
                 x.Vaccine,
                 x.JobTitle,
-                //lastLogByMember= x.MemberLogs.ToList().OrderBy(o=>o.DateTime).LastOrDefault().DateTime.ToString() + ' ',
-               // MembershipsCount = x.MembershipMovements.Count(),
                 TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
                 TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum(),
             }).ToList();
