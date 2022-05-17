@@ -43,10 +43,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                             e.Fktable,
                             e.TableName,
                             e.AccountId,
-                            Name = e.Account.Vendors.Where(v => v.AccountId == e.AccountId).SingleOrDefault().Name == null ? e.Account.Members.Where(v => v.AccountId == e.AccountId).SingleOrDefault().Name == null ? e.Account.Name : e.Account.Members.Where(v => v.AccountId == e.AccountId).SingleOrDefault().Name : e.Account.Vendors.Where(v => v.AccountId == e.AccountId).SingleOrDefault().Name,
+                            e.Account.Name,
                             e.Credit,
-                            e.Debit
+                            e.Debit,
+                            e.Description
                           }),
+                TotalCredit = x.EntryMovements.Sum(s=>s.Credit),
+                TotalDebit = x.EntryMovements.Sum(s=>s.Debit),
                 x.Description,
                 x.FakeDate,
                 x.Status,

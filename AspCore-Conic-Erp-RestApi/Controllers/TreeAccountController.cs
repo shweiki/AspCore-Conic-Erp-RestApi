@@ -133,10 +133,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Account/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
         {
-            var Accounts = DB.TreeAccounts.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+            var Accounts = DB.TreeAccounts.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Code.Contains(Any) || s.Type.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
             {
                 x.Id,
-                Name = x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Name : x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                x.Name,
                 x.Code,
                 x.Status,
                 x.Type,

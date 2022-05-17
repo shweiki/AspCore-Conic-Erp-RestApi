@@ -58,31 +58,39 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 return Ok(Data);
         }
         [HttpGet]
-        public IActionResult GetStatistics()
+        public IActionResult GetStatistics(String By = "MonthOfYear" ) //MonthOfYear , WeekOfMonth
         {
             var InComeOutCome = DB.EntryMovements.Where(x => x.Account.Type == "InCome" || x.Account.Type == "OutCome")
                  .Select(x => new {
-                      x.Entry.FakeDate,
-                      x.Credit,
-                      x.Debit,
-                      x.Account.Type,
-                      x.Account.Name
+                     Key = "",
+                     x.Entry.FakeDate,
+                     x.Credit,
+                     x.Debit,
+                     x.Account.Type,
+                     x.Account.Name
                  }).GroupBy(a => new { a.FakeDate.Month, a.FakeDate.Year }).Select(g => new
-                 {
-                      Key =  g.First().FakeDate.ToString("MM") + "-" + g.First().FakeDate.ToString("yyyy"),
-                     g.First().Type,
-                     g.First().Name,
-                      Credit = g.Sum(d => d.Credit),
-                      Debit = g.Sum(d => d.Debit),
-                  }).ToList();
+                {
+                    Key = g.First().FakeDate.ToString("MM") + "-" + g.First().FakeDate.ToString("yyyy"),
+                    g.First().Type,
+                    g.First().Name,
+                    Credit = g.Sum(d => d.Credit),
+                    Debit = g.Sum(d => d.Debit),
+                }).ToList();
+
+           
+             //   InComeOutCome.GroupBy(a => new { a.FakeDate.DayOfWeek, a.FakeDate.Month }).Select(g => new
+               
+                //    Key = g.First().FakeDate.ToString("dddd") + "-" + g.First().FakeDate.ToString("MM"),
+ 
+
             var Series = new
             {
-                InCome = InComeOutCome.Select(l => l.Debit),
                 OutCome = InComeOutCome.Select(l => l.Credit),
+                InCome = InComeOutCome.Select(l => l.Debit),
                 Profit = InComeOutCome.Select(l => l.Debit - l.Credit)
             };
 
-            return Ok(new { InComeOutCome,  xAxis = InComeOutCome.Select(x => x.Key) , Series });
+            return Ok(new { InComeOutCome,   xAxis = InComeOutCome.Select(x => x.Key), Series });
 
         }
     }
