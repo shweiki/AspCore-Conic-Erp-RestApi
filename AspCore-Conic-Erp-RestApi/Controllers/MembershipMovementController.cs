@@ -84,10 +84,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             MS.EndDate = MS.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders);
             if (DateTime.Now >= MS.StartDate.Date && DateTime.Now <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59))
                 {
-                var DeviceLogs = DB.DeviceLogs.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && (x.DateTime >= MS.StartDate.Date && x.DateTime <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59)))
-               .GroupBy(a => a.DateTime).ToList();
-                if (DeviceLogs.Count > 0) {
-                    DeviceLogs.Select(g => g.Last()).ToList();
+                var DeviceLogs = DB.DeviceLogs.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && (x.DateTime >= MS.StartDate.Date && x.DateTime <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59))).ToList()
+            ;
+                if (DeviceLogs !=null  &&DeviceLogs.Count > 0) {
+                    DeviceLogs.GroupBy(a => a.DateTime).Select(g => g.Last()).ToList();
                     MS.VisitsUsed = DeviceLogs.Count();
                     if (MS.VisitsUsed > MS.Membership.NumberClass)
                     {
