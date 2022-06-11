@@ -18,7 +18,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<UserController> _logger;
-                private ConicErpContext DB;
+        private readonly ConicErpContext DB;
 
 
         public UserController(ConicErpContext dbcontext,UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
@@ -120,6 +120,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             UserResponse response = new UserResponse();
             IdentityUser user = await _userManager.FindByNameAsync(User.Identity.Name);
             var roles = await _userManager.GetRolesAsync(user);
+
             roles.Add("Gest");
             response.Id = user.Id;
             response.name = user.UserName;
