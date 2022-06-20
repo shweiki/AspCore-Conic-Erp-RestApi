@@ -77,8 +77,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             MembershipMovement MS = DB.MembershipMovements.Where(x => x.Id == ID).SingleOrDefault();
 
-                var member = DB.Members.Where(x => x.Id == MS.MemberId).SingleOrDefault();
-                int OStatus = member.Status;
+            var member = DB.Members.Where(x => x.Id == MS.MemberId).SingleOrDefault();
+            int OStatus = member.Status;
             double TotalMembershipMovementOrders = DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id && (x.Status == -2 || x.Status == -3)).ToList().Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
             int MembershipNumberDays = DB.Memberships.Where(m => m.Id == MS.MembershipId).FirstOrDefault().NumberDays;
             MS.EndDate = MS.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders);
@@ -86,7 +86,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                 var DeviceLogs = DB.DeviceLogs.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && (x.DateTime >= MS.StartDate.Date && x.DateTime <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59))).ToList();
                 if (DeviceLogs !=null  &&DeviceLogs.Count > 0) {
-                    DeviceLogs.GroupBy(a => a.DateTime).Select(g => g.Last()).ToList();
+                    DeviceLogs = DeviceLogs.GroupBy(a => a.DateTime.Day).Select(g => g.Last()).ToList();
                     MS.VisitsUsed = DeviceLogs.Count();
                     if (MS.VisitsUsed > MS.Membership.NumberClass)
                     {
