@@ -276,8 +276,36 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                          
                               
             return Ok(MembershipMovements);
-        }     
-        
+        }
+        [Route("MembershipMovement/GetMembershipMovementByMembershipId")]
+        [HttpGet]
+        public IActionResult GetMembershipMovementByMembershipId(long MembershipId)
+        {
+
+
+            var MembershipMovements = DB.MembershipMovements.Where(z => z.MembershipId == MembershipId).Select(x => new {
+                x.Id,
+                x.TotalAmmount,
+                x.Tax,
+                x.StartDate,
+                x.EndDate,
+                x.Type,
+                x.VisitsUsed,
+                x.Discount,
+                x.DiscountDescription,
+                x.Description,
+                x.Status,
+                x.EditorName,
+                x.MemberId,
+                x.Member.PhoneNumber1,
+                x.Member.AccountId,
+                MemberName = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
+                MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
+            }).ToList();
+
+
+            return Ok(MembershipMovements);
+        }
         [Route("MembershipMovement/GetMembershipMovementByDateIn")]
         [HttpGet]
         public IActionResult GetMembershipMovementByDateIn(DateTime DateIn)
