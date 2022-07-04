@@ -84,17 +84,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             MS.EndDate = MS.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders);
             if (DateTime.Now >= MS.StartDate.Date && DateTime.Now <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59))
                 {
-                var DeviceLogs = DB.DeviceLogs.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && (x.DateTime >= MS.StartDate.Date && x.DateTime <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59))).ToList();
-                if (DeviceLogs !=null  &&DeviceLogs.Count > 0) {
-                    DeviceLogs = DeviceLogs.GroupBy(a => a.DateTime.Day).Select(g => g.Last()).ToList();
-                    MS.VisitsUsed = DeviceLogs.Count();
-                    if (MS.VisitsUsed > MS.Membership.NumberClass)
-                    {
-                        MS.EndDate = DateTime.Now;
-                        MS.Status = -1;
-                        member.Status = -1;
-                    }
-                }
+              
                 MS.Status = 1;
                     member.Status = 0;
                     var HowManyDaysLeft = (MS.EndDate - DateTime.Now).TotalDays;
@@ -180,6 +170,18 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                
                 DB.SaveChanges();
 
+            }
+            var DeviceLogs = DB.DeviceLogs.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && (x.DateTime >= MS.StartDate.Date && x.DateTime <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59))).ToList();
+            if (DeviceLogs != null && DeviceLogs.Count > 0)
+            {
+                DeviceLogs = DeviceLogs.GroupBy(a => a.DateTime.Day).Select(g => g.Last()).ToList();
+                MS.VisitsUsed = DeviceLogs.Count();
+                if (MS.VisitsUsed > MS.Membership.NumberClass)
+                {
+                    MS.EndDate = DateTime.Now;
+                    MS.Status = -1;
+                    member.Status = -1;
+                }
             }
             if (OStatus == -2) member.Status = -2;
             DB.SaveChanges();
