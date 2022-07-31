@@ -258,7 +258,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
 
             }
             var Member = DB.Members.Where(m => m.Id == Id).Select(
-                x => new
+                x => new 
                 {
                     x.Id,
                     x.Name,
@@ -272,8 +272,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     x.Type,
                     x.Tag,
                     x.Vaccine,
-                    MembershipsCount = x.MembershipMovements.Count(),
-                    HaveFaceOnDevice = DB.FingerPrints.Where(f=>f.Fk == x.Id.ToString() && f.TableName == "Member").Count() > 0 ? true : false,
+                    //MembershipsCount = x.MembershipMovements.Count(),
+                    HaveFaceOnDevice = false,// DB.FingerPrints.Where(f=>f.Fk == x.Id.ToString() && f.TableName == "Member").Count() > 0 ? true : false,
                     TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
                     TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
                     x.AccountId,

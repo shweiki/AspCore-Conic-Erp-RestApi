@@ -16,6 +16,24 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         {
             DB = dbcontext;
         }
+        [Route("MembershipMovementOrder/GetById")]
+        [HttpGet]
+        public IActionResult GetById(long? Id)
+        {
+            var MembershipMovementOrder = DB.MembershipMovementOrders.Where(i => i.Id == Id).Select(x => new
+            {
+                x.Id,
+                x.EditorName,
+                x.Type,
+                x.StartDate,
+                x.EndDate,
+                x.Status,
+                x.MemberShipMovementId,
+                x.Description
+            }).SingleOrDefault();
+
+            return Ok(MembershipMovementOrder);
+        }
         [Route("MembershipMovementOrder/GetMembershipMovementOrderByMemberShipId")]
         [HttpGet]
         public IActionResult GetMembershipMovementOrderByMemberShipId(long? MemberShipId)
@@ -79,7 +97,55 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
             }
             return Ok(false);
-        }    
+        }
+        [Route("MembershipMovementOrder/Edit")]
+        [HttpPost]
+        public IActionResult Edit(MembershipMovementOrder collection)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                MembershipMovementOrder membershipmovementorder = DB.MembershipMovementOrders.Where(x => x.Id == collection.Id).SingleOrDefault();
+                membershipmovementorder.Type = collection.Type;
+                membershipmovementorder.StartDate = collection.StartDate;
+                membershipmovementorder.EndDate = collection.EndDate;
+                membershipmovementorder.Status = collection.Status;
+                membershipmovementorder.Description = collection.Description;
+                membershipmovementorder.EditorName = collection.EditorName;
+                
+               
+                    DB.SaveChanges();
+                    return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+            }
+            return Ok(false);
+        }
+        [Route("MembershipMovementOrder/Delete")]
+        [HttpPost]
+        public IActionResult Delete(long Id)
+        {
+         
+                try
+                {
+                MembershipMovementOrder membershipmovementorder = DB.MembershipMovementOrders.Find(Id);
+                DB.MembershipMovementOrders.Remove(membershipmovementorder);
+
+                DB.SaveChanges();
+                 return Ok(true);
+                }
+                catch
+                {
+                    //Console.WriteLine(collection);
+                    return Ok(false);
+                }
+           
+        }
         [Route("MembershipMovementOrder/CreateMulti")]
         [HttpPost]
         public IActionResult CreateMulti(List<MembershipMovementOrder> collection)

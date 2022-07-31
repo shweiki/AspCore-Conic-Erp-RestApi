@@ -279,13 +279,13 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                               
             return Ok(MembershipMovements);
         }
-        [Route("MembershipMovement/GetMembershipMovementByMembershipId")]
         [HttpGet]
-        public IActionResult GetMembershipMovementByMembershipId(long MembershipId)
+        [Route("MembershipMovement/GetMembershipMovementByMembershipId")]
+        public IActionResult GetMembershipMovementByMembershipId(long? MembershipId ,DateTime? DateIn)
         {
-
-
-            var MembershipMovements = DB.MembershipMovements.Where(z => z.MembershipId == MembershipId).Select(x => new {
+          var MembershipMovements = DB.MembershipMovements.Where(z =>
+           (MembershipId == null || z.MembershipId == MembershipId) &&
+           (DateIn == null || DateIn >= z.StartDate && z.EndDate >= DateIn)).Select(x => new {
                 x.Id,
                 x.TotalAmmount,
                 x.Tax,
@@ -304,8 +304,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 MemberName = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
                 MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
             }).ToList();
-
-
             return Ok(MembershipMovements);
         }
         [Route("MembershipMovement/GetMembershipMovementByDateIn")]

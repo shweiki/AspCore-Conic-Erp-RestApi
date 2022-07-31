@@ -28,7 +28,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [Route("Item/GetByListQ")]
         public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
         {
-            var Items = DB.Items.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.MenuItem.Contains(Any) || s.Barcode.Contains(Any) : true) && (Status != null ? s.Status == Status : true))
+            var Items = DB.Items.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.MenuItem.Contains(Any) ||
+            s.Barcode.Contains(Any) : true) && (Status == null || s.Status == Status))
               .Select(x=>new   {
                 x.Id,
                 x.Name,

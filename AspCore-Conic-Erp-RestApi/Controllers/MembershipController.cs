@@ -18,7 +18,6 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public IActionResult GetMembership()
         {
-
             return Ok(DB.Memberships.Select(x => new
             {
                 x.Id,
