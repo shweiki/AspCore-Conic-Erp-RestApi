@@ -178,9 +178,9 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 MS.VisitsUsed = DeviceLogs.Count();
                 if (MS.VisitsUsed > MS.Membership.NumberClass)
                 {
-                    MS.EndDate = DateTime.Now;
-                    MS.Status = -1;
-                    member.Status = -1;
+                   // MS.EndDate = DateTime.Now;
+                 //   MS.Status = -1;
+                 //   member.Status = -1;
                 }
             }
             if (OStatus == -2) member.Status = -2;

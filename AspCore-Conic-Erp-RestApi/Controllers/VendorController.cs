@@ -113,6 +113,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 {
                    TreeAccount NewAccount = new TreeAccount
                     {
+                        Name = collection.Name,
                         Type = "Vendor",
                         Description = collection.Description,
                         Status = 0,
