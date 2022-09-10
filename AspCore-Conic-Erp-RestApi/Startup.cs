@@ -36,10 +36,10 @@ namespace AspCore_Conic_Erp_RestApi
             string Name = Environment.CurrentDirectory.Substring(lat, (Environment.CurrentDirectory.Length - lat));
             Name = Name.Replace("-", "").ToUpper();
 
-            var emailConfig = Configuration.GetSection("EmailConfiguration:" + Name + "").Get<EmailConfiguration>();
-           if(emailConfig ==null) emailConfig = Configuration.GetSection("EmailConfiguration:Default").Get<EmailConfiguration>();
-            services.AddSingleton(emailConfig);
-            services.AddScoped<IEmailSender, EmailSender>();
+           // var emailConfig = Configuration.GetSection("EmailConfiguration:" + Name + "").Get<EmailConfiguration>();
+          //  if (emailConfig == null) emailConfig = Configuration.GetSection("EmailConfiguration:Default").Get<EmailConfiguration>();
+          //  services.AddSingleton(emailConfig);
+           // services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<ConicErpContext>();
             services.Configure<FormOptions>(o => {
                 o.ValueLengthLimit = int.MaxValue;

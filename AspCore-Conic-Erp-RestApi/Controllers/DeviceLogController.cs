@@ -104,7 +104,10 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                     ActiveMemberShip = x.MembershipMovements.Where(f => f.MemberId == x.Id && f.Status == 1).Select(ms => new
                     {
                         ms.Id,
-                        ms.Type
+                        ms.Type,
+                        ms.VisitsUsed,
+                        ms.Membership.NumberClass
+
                     }).FirstOrDefault()
                 }).SingleOrDefault(),
                 "Employee" => DB.Employees.Where(x => x.Id == Convert.ToInt32(Fktable)).SingleOrDefault(),

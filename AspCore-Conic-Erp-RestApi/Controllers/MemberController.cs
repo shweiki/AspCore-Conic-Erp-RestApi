@@ -6,16 +6,21 @@ using System.Net.Http;
 using Microsoft.AspNetCore.Authorization;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
     [Authorize]
     public class MemberController : Controller
     {
-                private ConicErpContext DB;
-        public MemberController(ConicErpContext dbcontext)
+                private ConicErpContext DB; 
+        public IConfiguration Configuration { get; }
+
+        public MemberController(ConicErpContext dbcontext, IConfiguration configuration)
         {
             DB = dbcontext;
+            Configuration = configuration;
+
         }
         [Route("Member/GetReceivablesMember")]
         [HttpGet]
@@ -251,7 +256,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
         [HttpGet]
         public  IActionResult GetMemberById(long? Id)
         {
-            MembershipMovementController MSC = new MembershipMovementController(DB);
+            MembershipMovementController MSC = new MembershipMovementController(DB, Configuration);
             foreach (var MS in DB.MembershipMovements.Where(m => m.MemberId == Id).ToList())
             {
                 MSC.ScanMembershipMovementById(MS.Id);
@@ -324,7 +329,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
                 }
                 else
                 {
-                    MembershipMovementController MSC = new MembershipMovementController(DB);
+                    MembershipMovementController MSC = new MembershipMovementController(DB, Configuration);
                     foreach (var MS in MembershipMovements)
                     {
                         MSC.ScanMembershipMovementById(MS.Id);

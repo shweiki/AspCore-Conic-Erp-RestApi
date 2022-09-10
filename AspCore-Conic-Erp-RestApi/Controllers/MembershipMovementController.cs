@@ -4,16 +4,20 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Entities; 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers
 {
     [Authorize]
     public class MembershipMovementController : Controller
     {
-         private readonly ConicErpContext DB;
-        public MembershipMovementController(ConicErpContext dbcontext)
+         private readonly ConicErpContext DB; 
+        public IConfiguration Configuration { get; }
+
+        public MembershipMovementController(ConicErpContext dbcontext , IConfiguration configuration)
         {
             DB = dbcontext;
+            Configuration = configuration;
         }
 
         [Route("MembershipMovement/Create")]
@@ -176,12 +180,15 @@ namespace AspCore_Conic_Erp_RestApi.Controllers
             {
                 DeviceLogs = DeviceLogs.GroupBy(a => a.DateTime.Day).Select(g => g.Last()).ToList();
                 MS.VisitsUsed = DeviceLogs.Count();
-                if (MS.VisitsUsed > MS.Membership.NumberClass)
-                {
-                   // MS.EndDate = DateTime.Now;
-                 //   MS.Status = -1;
-                 //   member.Status = -1;
-                }
+                int NumberClass = (int)(MS.Membership.NumberClass == null ? 0 : MS.Membership.NumberClass);
+                    var WhenFinishNumberOfClassUnActiveMemberShip = Configuration["GymConfiguration:WhenFinishNumberOfClassUnActiveMemberShip"];
+                    if (WhenFinishNumberOfClassUnActiveMemberShip == "True"){
+                        if (MS.Membership.NumberClass <= MS.VisitsUsed){
+                            MS.EndDate = DeviceLogs.LastOrDefault().DateTime;
+                            MS.Status = -1;
+                            member.Status = -1;
+                        }
+                    }
             }
             if (OStatus == -2) member.Status = -2;
             DB.SaveChanges();
