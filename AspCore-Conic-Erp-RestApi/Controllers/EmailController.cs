@@ -8,30 +8,29 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace MailApp.Controllers
+namespace MailApp.Controllers;
+
+[Authorize]
+public class EmailController : Controller
 {
-    [Authorize]
-    public class EmailController : Controller
+
+
+    private readonly IEmailSender _emailSender;
+
+    public EmailController(IEmailSender emailSender)
     {
-    
-
-        private readonly IEmailSender _emailSender;
-
-        public EmailController(IEmailSender emailSender)
-        {
-            _emailSender = emailSender;
-        }
-        [Route("Email/Send")]
-        [HttpPost]
-        public async Task<IActionResult> Send(string to ,string subject , string body)
-        {
-
-            var message = new Message(new string[] { to }, subject, body, null);
-            await _emailSender.SendEmailAsync(message);
-
-            return Ok(true);
-        }
-    
-     
+        _emailSender = emailSender;
     }
+    [Route("Email/Send")]
+    [HttpPost]
+    public async Task<IActionResult> Send(string to ,string subject , string body)
+    {
+
+        var message = new Message(new string[] { to }, subject, body, null);
+        await _emailSender.SendEmailAsync(message);
+
+        return Ok(true);
+    }
+
+ 
 }

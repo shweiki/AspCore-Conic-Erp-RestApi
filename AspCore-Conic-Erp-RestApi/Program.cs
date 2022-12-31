@@ -4,71 +4,70 @@ using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace AspCore_Conic_Erp_RestApi
+namespace AspCore_Conic_Erp_RestApi;
+
+public class Program
 {
-    public class Program
+
+    public static void Main(string[] args)
+    {
+        /*        RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"Control Panel\International", true);
+                rk.SetValue("sTimeFormat", "HH:mm:ss"); // HH for 24hrs, hh for 12 hrs
+
+                RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"Control Panel\International", true);
+                rk.SetValue("sTimeFormat", "dd-MM-yyyy");*/
+        //  OpenBrowser();
+        CreateHostBuilder(args).Build().MigrateDatabase().Run();
+        //  CreateHostBuilder(args).Build().Run();
+
+
+    }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            }).UseWindowsService();
+    public static void OpenBrowser()
     {
 
-        public static void Main(string[] args)
-        {
-    /*        RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"Control Panel\International", true);
-            rk.SetValue("sTimeFormat", "HH:mm:ss"); // HH for 24hrs, hh for 12 hrs
-     
-            RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"Control Panel\International", true);
-            rk.SetValue("sTimeFormat", "dd-MM-yyyy");*/
-         //  OpenBrowser();
-          CreateHostBuilder(args).Build().MigrateDatabase().Run();
-         //  CreateHostBuilder(args).Build().Run();
 
-         
+        string rootUrl = "http://localhost:5000";
+        //_httpContextAccessor.HttpContext.Request.Scheme.ToString();// host;
+        ProcessStartInfo psi = new ProcessStartInfo("chrome", "--app=\"" + rootUrl + "\"") { UseShellExecute = true };
+        try
+        {
+            Process.Start(psi);
         }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                }).UseWindowsService();
-        public static void OpenBrowser()
+        catch
         {
-
-
-            string rootUrl = "http://localhost:5000";
-                //_httpContextAccessor.HttpContext.Request.Scheme.ToString();// host;
-            ProcessStartInfo psi = new ProcessStartInfo("chrome", "--app=\"" + rootUrl + "\"") { UseShellExecute = true };
             try
             {
+                psi.FileName = "firefox";
+                psi.Arguments = rootUrl;
                 Process.Start(psi);
             }
             catch
             {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    psi.FileName = "edge";
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    psi.FileName = "safari";
+                }
                 try
                 {
-                    psi.FileName = "firefox";
-                    psi.Arguments = rootUrl;
                     Process.Start(psi);
                 }
                 catch
                 {
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    {
-                        psi.FileName = "edge";
-                    }
-                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    {
-                        psi.FileName = "safari";
-                    }
-                    try
-                    {
-                        Process.Start(psi);
-                    }
-                    catch
-                    {
-                    }
                 }
             }
         }
- 
+    }
 
-}
+
 }

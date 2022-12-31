@@ -8,314 +8,313 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace AspCore_Conic_Erp_RestApi.Controllers
+namespace AspCore_Conic_Erp_RestApi.Controllers;
+
+public class OrderResaurantController : Controller
 {
-    public class OrderResaurantController : Controller
+    private ConicErpContext DB;
+    public OrderResaurantController(ConicErpContext dbcontext)
     {
-                private ConicErpContext DB;
-        public OrderResaurantController(ConicErpContext dbcontext)
-        {
-            DB = dbcontext;
-        }
+        DB = dbcontext;
+    }
 
 
-        [AllowAnonymous]
-        [Route("OrderResaurant/Create")]
-        [HttpPost]
-        public IActionResult Create(OrderRestaurant collection)
+    [AllowAnonymous]
+    [Route("OrderResaurant/Create")]
+    [HttpPost]
+    public IActionResult Create(OrderRestaurant collection)
+    {
+        if (ModelState.IsValid)
         {
-            if (ModelState.IsValid)
+
+
+            try
             {
-                
+                // TODO: Add insert logic here
+                DB.OrderRestaurants.Add(collection);
+                DB.SaveChanges();
+                return Ok(true);
+            }
+            catch (InvalidCastException e)
+            {
+                //Console.WriteLine(collection);
+                return Ok(e);
+            }
+        }
+        else return Ok(false);
+    }
 
-                try
+    [Authorize]
+    [HttpPost]
+    [Route("OrderRestaurant/GetByListQ")]
+    public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
+    {
+        var Deliveries = DB.OrderRestaurants.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+     && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
+     (User != null ? DB.ActionLogs.Where(l => l.OrderRestaurantId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+     {
+         x.Id,
+         x.OrderId,
+         x.Name,
+         x.PhoneNumber,
+         x.TotalPill,
+         x.TotalPrice,
+         x.Status,
+         x.Content,
+         x.Description,
+         x.FakeDate,
+         x.TableNo,
+         x.Vendor,
+     }).ToList();
+        Deliveries = (Sort == "+id" ? Deliveries.OrderBy(s => s.Id).ToList() : Deliveries.OrderByDescending(s => s.Id).ToList());
+        return Ok(new
+        {
+            items = Deliveries.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+            Totals = new
+            {
+                Rows = Deliveries.Count(),
+                TotalPrice = Deliveries.Sum(s => s.TotalPrice),
+                TotalPill = Deliveries.Sum(s => s.TotalPill),
+            }
+        });
+    }
+
+    [Authorize]
+    [Route("OrderRestaurant/GetOrderRestaurant")]
+    [HttpGet]
+    public IActionResult GetOrderRestaurant(int Limit, string Sort, int Page, int? Status, string Any)
+
+    {
+        var Orders = DB.OrderRestaurants.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+        {
+            x.Id,
+            x.OrderId,
+            x.Name,
+            x.PhoneNumber,
+            x.TotalPill,
+            x.TotalPrice,
+            x.Status,
+            x.Content,
+            x.Description,
+            x.FakeDate,
+            x.TableNo,
+            x.Vendor,
+
+        }).ToList();
+        Orders = (Sort == "+id" ? Orders.OrderBy(s => s.Id).ToList() : Orders.OrderByDescending(s => s.Id).ToList());
+
+        return Ok(new
+        {
+            items = Orders.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+            Totals = new
+            {
+                Rows = Orders.Count(),
+                TotalPrice = Orders.Sum(s => s.TotalPrice),
+                TotalPill = Orders.Sum(s => s.TotalPill),
+            }
+        });
+    }
+
+    [Authorize]
+    [Route("OrderRestaurant/OrderOnTable")]
+    [HttpPost]
+    public IActionResult OrderOnTable(long OrderId)
+    {
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == OrderId).SingleOrDefault();
+                int Status = 1;
+                string Description = "Delivered";
+                if (ChangeStatus(Order, Description, Status))
                 {
-                    // TODO: Add insert logic here
-                    DB.OrderRestaurants.Add(collection);
-                    DB.SaveChanges();
                     return Ok(true);
                 }
-                catch (InvalidCastException e)
-                {
-                    //Console.WriteLine(collection);
-                    return Ok(e);
-                }
+                else return NotFound();
             }
-            else return Ok(false);
-        }
- 
-        [Authorize]
-        [HttpPost]
-        [Route("OrderRestaurant/GetByListQ")]
-        public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
-        {
-               var Deliveries = DB.OrderRestaurants.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
-            && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
-            (User != null ? DB.ActionLogs.Where(l => l.OrderRestaurantId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+            catch
             {
-                x.Id,
-                x.OrderId,
-                x.Name,
-                x.PhoneNumber,
-                x.TotalPill,
-                x.TotalPrice,
-                x.Status,
-                x.Content,
-                x.Description,
-                x.FakeDate,
-                x.TableNo,
-                x.Vendor,
-            }).ToList();
-            Deliveries = (Sort == "+id" ? Deliveries.OrderBy(s => s.Id).ToList() : Deliveries.OrderByDescending(s => s.Id).ToList());
-            return Ok(new
-            {
-                items = Deliveries.Skip((Page - 1) * Limit).Take(Limit).ToList(),
-                Totals = new
-                {
-                    Rows = Deliveries.Count(),
-                    TotalPrice = Deliveries.Sum(s => s.TotalPrice),
-                    TotalPill = Deliveries.Sum(s => s.TotalPill),
-                }
-            });
-        }
-
-        [Authorize]
-        [Route("OrderRestaurant/GetOrderRestaurant")]
-        [HttpGet]
-        public IActionResult GetOrderRestaurant(int Limit, string Sort, int Page, int? Status, string Any)
-
-        {
-            var Orders = DB.OrderRestaurants.Where(s =>  (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
-            {
-                x.Id,
-                x.OrderId,
-                x.Name,
-                x.PhoneNumber,
-                x.TotalPill,
-                x.TotalPrice,
-                x.Status,
-                x.Content,
-                x.Description,
-                x.FakeDate,
-                x.TableNo,
-                x.Vendor,
-
-            }).ToList();
-            Orders = (Sort == "+id" ? Orders.OrderBy(s => s.Id).ToList() : Orders.OrderByDescending(s => s.Id).ToList());
-
-            return Ok(new
-            {
-                items = Orders.Skip((Page - 1) * Limit).Take(Limit).ToList(),
-                Totals = new
-                {
-                    Rows = Orders.Count(),
-                    TotalPrice = Orders.Sum(s => s.TotalPrice),
-                    TotalPill = Orders.Sum(s => s.TotalPill),
-                }
-            });
-        }
-
-        [Authorize]
-        [Route("OrderRestaurant/OrderOnTable")]
-        [HttpPost]
-        public IActionResult OrderOnTable(long OrderId)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == OrderId).SingleOrDefault();
-                    int Status = 1;
-                    string Description = "Delivered";
-                    if (ChangeStatus(Order, Description, Status))
-                    {
-                        return Ok(true);
-                    }
-                    else return NotFound();
-                }
-                catch
-                {
-                    //Console.WriteLine(collection);
-                    return Ok(false);
-                }
+                //Console.WriteLine(collection);
+                return Ok(false);
             }
-            return Ok(false);
         }
+        return Ok(false);
+    }
 
-        [Authorize]
-        [Route("OrderRestaurant/GetCustomerOrder")]
-        [HttpGet]
-        public IActionResult GetCustomerOrder(string Id, string name, int Limit, string Sort, int Page, int? Status, string Any)
+    [Authorize]
+    [Route("OrderRestaurant/GetCustomerOrder")]
+    [HttpGet]
+    public IActionResult GetCustomerOrder(string Id, string name, int Limit, string Sort, int Page, int? Status, string Any)
 
+    {
+        var Orders = DB.OrderRestaurants.Where(x => (x.Vendor.UserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2 || x.Status == 3 || x.Status == 4) && (Any != null ? x.Id.ToString().Contains(Any) || x.Name.Contains(Any) : true) && (Status != null ? x.Status == Status : true)).Select(x => new
+        // var Orders = DB.OrderRestaurants.Where(x => x.Driver.DriverUserId == Id || name == "Developer").Select(x => new
         {
-            var Orders = DB.OrderRestaurants.Where(x => (x.Vendor.UserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2 || x.Status == 3 || x.Status == 4) && (Any != null ? x.Id.ToString().Contains(Any) || x.Name.Contains(Any) : true) && (Status != null ? x.Status == Status : true)).Select(x => new
-            // var Orders = DB.OrderRestaurants.Where(x => x.Driver.DriverUserId == Id || name == "Developer").Select(x => new
-            {
-                x.Id,
-                x.OrderId,
-                x.Name,
-                x.PhoneNumber,
-                x.TotalPill,
-                x.TotalPrice,
-                x.Status,
-                x.Content,
-                x.Description,
-                x.FakeDate,
-                x.TableNo,
-                x.Vendor,
-                
-            }).ToList();
-            Orders = (Sort == "+id" ? Orders.OrderBy(s => s.Id).ToList() : Orders.OrderByDescending(s => s.Id).ToList());
+            x.Id,
+            x.OrderId,
+            x.Name,
+            x.PhoneNumber,
+            x.TotalPill,
+            x.TotalPrice,
+            x.Status,
+            x.Content,
+            x.Description,
+            x.FakeDate,
+            x.TableNo,
+            x.Vendor,
 
-            return Ok(new
-            {
-                items = Orders.Skip((Page - 1) * Limit).Take(Limit).ToList(),
-                Totals = new
-                {
-                    Rows = Orders.Count(),
-                    TotalPrice = Orders.Sum(s => s.TotalPrice),
-                    TotalPill = Orders.Sum(s => s.TotalPill),
-                }
-            });
-        
+        }).ToList();
+        Orders = (Sort == "+id" ? Orders.OrderBy(s => s.Id).ToList() : Orders.OrderByDescending(s => s.Id).ToList());
 
-        }
-
-        [Authorize]
-        [Route("OrderRestaurant/VendorDone")]
-        [HttpPost]
-        public IActionResult VendorDone(long id)
+        return Ok(new
         {
-            
-           
-
-            if (ModelState.IsValid)
+            items = Orders.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+            Totals = new
             {
-                try
-                {
-                    OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == id).SingleOrDefault();
-                    int Status = 2;
-                    string Description = "Received";
-                    if (ChangeStatus( Order, Description, Status ))
-                    {
-                        return Ok(true);
-                    }
-                    else return NotFound();
-                }
-                catch
-                {
-                    return Ok(false);
-                }
+                Rows = Orders.Count(),
+                TotalPrice = Orders.Sum(s => s.TotalPrice),
+                TotalPill = Orders.Sum(s => s.TotalPill),
             }
-            return Ok(false);
-        }
+        });
 
-        [Authorize]
-        [Route("OrderRestaurant/OrdrerCheckout")]
-        [HttpPost]
-        public IActionResult OrderCheckOut(long id)
+
+    }
+
+    [Authorize]
+    [Route("OrderRestaurant/VendorDone")]
+    [HttpPost]
+    public IActionResult VendorDone(long id)
+    {
+
+
+
+        if (ModelState.IsValid)
         {
-            if (ModelState.IsValid)
+            try
             {
-                try
+                OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == id).SingleOrDefault();
+                int Status = 2;
+                string Description = "Received";
+                if (ChangeStatus(Order, Description, Status))
                 {
-                    OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == id).SingleOrDefault();
-                    int Status = 3;
-                    string Description = "Checkout";
-                    if (ChangeStatus(Order, Description, Status))
-                    {
-                        return Ok(true);
-                    }
-                    else return NotFound();
+                    return Ok(true);
                 }
-                catch
-                {
-                    //Console.WriteLine(collection);
-                    return Ok(false);
-                }
+                else return NotFound();
             }
-            return Ok(false);
-        }
-
-        [Authorize]
-        [Route("OrderRestaurant/OrderDone")]
-        [HttpPost]
-        public IActionResult OrderDone(long id)
-        {
-            if (ModelState.IsValid)
+            catch
             {
-                try
-                {
-                    OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == id).SingleOrDefault();
-                    int Status = 4;
-                    string Description = "Done";
-                    if (ChangeStatus(Order, Description, Status))
-                    {
-                        return Ok(true);
-                    }
-                    else return NotFound();
-                }
-                catch
-                {
-                    //Console.WriteLine(collection);
-                    return Ok(false);
-                }
+                return Ok(false);
             }
-            return Ok(false);
         }
+        return Ok(false);
+    }
 
-        [Authorize]
-        [HttpPost]
-        [Route("OrderRestaurant/GetByListQByVendor")]
-        public IActionResult GetByListQByDriver(string Id, string name, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
+    [Authorize]
+    [Route("OrderRestaurant/OrdrerCheckout")]
+    [HttpPost]
+    public IActionResult OrderCheckOut(long id)
+    {
+        if (ModelState.IsValid)
         {
-            var Deliveries = DB.OrderRestaurants.Where(s => (s.Vendor.UserId == Id || name == "Developer") && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
-            && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
-            (User != null ? DB.ActionLogs.Where(l => l.OrderDeliveryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+            try
             {
-                x.Id,
-                x.OrderId,
-                x.Name,
-                x.Status,
-                x.Content,
-                x.FakeDate,
-                x.TableNo,
-                x.Vendor,
-            }).ToList();
-            Deliveries = (Sort == "+id" ? Deliveries.OrderBy(s => s.Id).ToList() : Deliveries.OrderByDescending(s => s.Id).ToList());
-            return Ok(new
-            {
-                items = Deliveries.Skip((Page - 1) * Limit).Take(Limit).ToList(),
-                Totals = new
+                OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == id).SingleOrDefault();
+                int Status = 3;
+                string Description = "Checkout";
+                if (ChangeStatus(Order, Description, Status))
                 {
-                    Rows = Deliveries.Count(),
+                    return Ok(true);
                 }
-            });
+                else return NotFound();
+            }
+            catch
+            {
+                //Console.WriteLine(collection);
+                return Ok(false);
+            }
         }
+        return Ok(false);
+    }
 
-
-       
-        public Boolean ChangeStatus(OrderRestaurant Order, string Description, int Status)
+    [Authorize]
+    [Route("OrderRestaurant/OrderDone")]
+    [HttpPost]
+    public IActionResult OrderDone(long id)
+    {
+        if (ModelState.IsValid)
         {
-            ActionLog log = new ActionLog();
-            log.PostingDateTime = DateTime.Now;
-            log.OprationId = (int)Order.Id;
-           // log.DriverId = Order.DriverId;
-            log.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            log.Description = Description;
-            log.Fktable = "{Vendor";
-            log.TableName = "OrederRestaurant";
-            log.OrderRestaurantId = (int)Order.Id;
-            DB.OrderRestaurants.Where(x => x.Id == log.OrderRestaurantId).SingleOrDefault().Status = Status;
-
-
-            // ActionLogController logCon = new ActionLogController(ConicErpContext Db);
-            DB.ActionLogs.Add(log);
-            
-                DB.SaveChanges();
-                return true;
-        
-
+            try
+            {
+                OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == id).SingleOrDefault();
+                int Status = 4;
+                string Description = "Done";
+                if (ChangeStatus(Order, Description, Status))
+                {
+                    return Ok(true);
+                }
+                else return NotFound();
+            }
+            catch
+            {
+                //Console.WriteLine(collection);
+                return Ok(false);
+            }
         }
+        return Ok(false);
+    }
+
+    [Authorize]
+    [HttpPost]
+    [Route("OrderRestaurant/GetByListQByVendor")]
+    public IActionResult GetByListQByDriver(string Id, string name, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
+    {
+        var Deliveries = DB.OrderRestaurants.Where(s => (s.Vendor.UserId == Id || name == "Developer") && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+        && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
+        (User != null ? DB.ActionLogs.Where(l => l.OrderDeliveryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        {
+            x.Id,
+            x.OrderId,
+            x.Name,
+            x.Status,
+            x.Content,
+            x.FakeDate,
+            x.TableNo,
+            x.Vendor,
+        }).ToList();
+        Deliveries = (Sort == "+id" ? Deliveries.OrderBy(s => s.Id).ToList() : Deliveries.OrderByDescending(s => s.Id).ToList());
+        return Ok(new
+        {
+            items = Deliveries.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+            Totals = new
+            {
+                Rows = Deliveries.Count(),
+            }
+        });
+    }
+
+
+
+    public Boolean ChangeStatus(OrderRestaurant Order, string Description, int Status)
+    {
+        ActionLog log = new ActionLog();
+        log.PostingDateTime = DateTime.Now;
+        log.OprationId = (int)Order.Id;
+        // log.DriverId = Order.DriverId;
+        log.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        log.Description = Description;
+        log.Fktable = "{Vendor";
+        log.TableName = "OrederRestaurant";
+        log.OrderRestaurantId = (int)Order.Id;
+        DB.OrderRestaurants.Where(x => x.Id == log.OrderRestaurantId).SingleOrDefault().Status = Status;
+
+
+        // ActionLogController logCon = new ActionLogController(ConicErpContext Db);
+        DB.ActionLogs.Add(log);
+
+        DB.SaveChanges();
+        return true;
+
+
     }
 }
