@@ -32,7 +32,7 @@ public class PurchaseInvoiceController : Controller
             x.Description,
             x.AccountInvoiceNumber,
             x.InvoicePurchaseDate,
-            Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+            Total = x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
             //  Logs = DB.ActionLogs.Where(l => l.PurchaseInvoiceId == x.Id).ToList(),
             AccountId = x.Vendor.AccountId,
             InventoryMovements = x.InventoryMovements.Select(imx => new
@@ -143,6 +143,7 @@ public class PurchaseInvoiceController : Controller
                 Cash = Invoices.Where(i => i.PaymentMethod == "Cash").Sum(s => s.Total),
                 Receivables = Invoices.Where(i => i.PaymentMethod == "Receivables").Sum(s => s.Total),
                 Discount = Invoices.Sum(s => s.Discount),
+                Tax = Invoices.Sum(s => s.Tax),
                 Visa = Invoices.Where(i => i.PaymentMethod == "Visa").Sum(s => s.Total)
             }
         });
@@ -162,7 +163,6 @@ public class PurchaseInvoiceController : Controller
                 DB.PurchaseInvoices.Add(collection);
                 DB.SaveChanges();
                 return Ok(collection.Id);
-
             }
             catch
             {
@@ -262,7 +262,7 @@ public class PurchaseInvoiceController : Controller
             x.PaymentMethod,
             x.Status,
             x.Description,
-            Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+            Total = x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
             InventoryMovements = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId == x.Id).Select(m => new
             {
                 m.Id,

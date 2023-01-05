@@ -44,7 +44,7 @@ public class SaleInvoiceController : Controller
             x.PhoneNumber,
             //  x.Vendor,
             TotalCost = x.InventoryMovements.Sum(s => s.Items.CostPrice * s.Qty),
-            Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+            Total = x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
             //     ActionLogs = DB.ActionLogs.Where(l=>l.SalesInvoiceId == x.Id).ToList(),
             InventoryMovements = x.InventoryMovements.Select(imx => new
             {
@@ -75,6 +75,7 @@ public class SaleInvoiceController : Controller
                 Cash = Invoices.Where(i => i.PaymentMethod == "Cash").Sum(s => s.Total),
                 Receivables = Invoices.Where(i => i.PaymentMethod == "Receivables").Sum(s => s.Total),
                 Discount = Invoices.Sum(s => s.Discount),
+                Tax = Invoices.Sum(s => s.Tax),
                 Visa = Invoices.Where(i => i.PaymentMethod == "Visa").Sum(s => s.Total)
             }
         });
@@ -104,7 +105,7 @@ public class SaleInvoiceController : Controller
             x.MemberId,
             x.PhoneNumber,
             x.Vendor,
-            Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+            Total = x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
             AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
             InventoryMovements = x.InventoryMovements.Select(imx => new
             {
@@ -176,6 +177,7 @@ public class SaleInvoiceController : Controller
                 Cash = Invoices.Where(i => i.PaymentMethod == "Cash").Sum(s => s.Total),
                 Receivables = Invoices.Where(i => i.PaymentMethod == "Receivables").Sum(s => s.Total),
                 Discount = Invoices.Sum(s => s.Discount),
+                Tax = Invoices.Sum(s => s.Tax),
                 Visa = Invoices.Where(i => i.PaymentMethod == "Visa").Sum(s => s.Total)
             }
         });
@@ -201,7 +203,7 @@ public class SaleInvoiceController : Controller
             x.PhoneNumber,
             x.Type,
             x.Description,
-            Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+            Total = x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
             AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
             InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == x.Id).Select(imx => new
             {
@@ -332,15 +334,13 @@ public class SaleInvoiceController : Controller
             x.Type,
             x.Description,
             TotalCost = x.InventoryMovements.Sum(s => s.Items.CostPrice * s.Qty),
-            Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+            Total = x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
             AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
             InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == x.Id).Select(imx => new
             {
                 imx.Id,
                 imx.ItemsId,
-                imx.Items.Name,
-                imx.Items.CostPrice,
-                imx.Items.Ingredients,
+                imx.Items,
                 imx.TypeMove,
                 imx.InventoryItemId,
                 imx.EXP,
@@ -362,6 +362,7 @@ public class SaleInvoiceController : Controller
                 Cash = Invoices.Where(i => i.PaymentMethod == "Cash").Sum(s => s.Total),
                 Receivables = Invoices.Where(i => i.PaymentMethod == "Receivables").Sum(s => s.Total),
                 Discount = Invoices.Sum(s => s.Discount),
+                Tax = Invoices.Sum(s => s.Tax),
                 Visa = Invoices.Where(i => i.PaymentMethod == "Visa").Sum(s => s.Total)
             }
         });
@@ -386,7 +387,7 @@ public class SaleInvoiceController : Controller
             x.Type,
             x.Description,
             x.PhoneNumber,
-            Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+            Total = x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
             InventoryMovements = DB.InventoryMovements.Where(Im => Im.SalesInvoiceId == x.Id).Select(m => new
             {
                 m.Id,
@@ -400,12 +401,20 @@ public class SaleInvoiceController : Controller
                 m.SellingPrice,
                 m.Description,
                 m.EXP,
-
+                TotalIn = DB.InventoryMovements.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty),
+                TotalOut = DB.InventoryMovements.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty),
             }).ToList()
         }).SingleOrDefault();
 
         return Ok(Invoices);
     }
+
+    private object CalculateInventoryItemQtyById(long itemsId)
+    {
+        ItemController Item = new ItemController(DB);
+        return Item.CalculateInventoryItemQtyById(itemsId);
+    }
+
     [Route("SaleInvoice/GetSaleInvoiceByVendorId")]
     [HttpGet]
     public IActionResult GetSaleInvoiceByVendorId(long? Id)
@@ -421,7 +430,7 @@ public class SaleInvoiceController : Controller
             x.Discount,
             x.FakeDate,
             x.VendorId,
-            Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+            Total =x.Tax+( x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
             InventoryMovements = x.InventoryMovements.Select(m => new
             {
                 m.Id,

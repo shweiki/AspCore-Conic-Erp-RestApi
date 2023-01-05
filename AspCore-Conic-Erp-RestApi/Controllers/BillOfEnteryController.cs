@@ -29,6 +29,7 @@ public class BillOfEnteryController : Controller
             x.Description,
             x.Status,
             x.PurchaseInvoiceId,
+            x.ST9,
             //  Logs = DB.ActionLogs.Where(l => l.BillOfEnteryId == x.Id).ToList(),
             InventoryMovements = DB.InventoryMovements.Where(m => m.PurchaseInvoiceId == x.PurchaseInvoiceId && m.Items.TakeBon == true).Select(imx => new
             {
@@ -169,7 +170,7 @@ public class BillOfEnteryController : Controller
     [HttpPost]
     public IActionResult Create(BillOfEntery collection)
     {
-        if (ModelState.IsValid)
+        if (ModelState.IsValid && collection.BonId is not null)
         {
             try
             {
@@ -204,6 +205,7 @@ public class BillOfEnteryController : Controller
                 Invoice.Description = collection.Description;
                 Invoice.Status = collection.Status;
                 Invoice.PurchaseInvoiceId = collection.PurchaseInvoiceId;
+                Invoice.ST9 = collection.ST9;
 
                 DB.SaveChanges();
 
@@ -231,6 +233,7 @@ public class BillOfEnteryController : Controller
             x.Description,
             x.Status,
             x.PurchaseInvoiceId,
+            x.ST9,
             //  Logs = DB.ActionLogs.Where(l => l.BillOfEnteryId == x.Id).ToList(),
             InventoryMovements = DB.InventoryMovements.Where(m => m.PurchaseInvoiceId == x.PurchaseInvoiceId && m.Items.TakeBon == true).Select(imx => new
             {
@@ -276,6 +279,7 @@ public class BillOfEnteryController : Controller
             x.Description,
             x.Status,
             x.PurchaseInvoiceId,
+            x.ST9,
         }).SingleOrDefault();
         return Ok(Invoices);
     }
@@ -289,6 +293,27 @@ public class BillOfEnteryController : Controller
             {
                 InventoryMovement Movement = DB.InventoryMovements.Where(x => x.Id == InventoryMovementsId).SingleOrDefault();
                 Movement.BillOfEnteryId = Pin == true ? BillOfEnteryId : null;
+                DB.SaveChanges();
+                return Ok(true);
+            }
+            catch
+            {
+                //Console.WriteLine(collection);
+                return Ok(false);
+            }
+        }
+        else return Ok(false);
+    }  
+    [HttpPost]
+    [Route("BillOfEntery/PinST9BillOfEntery")]
+    public IActionResult PinST9BillOfEntery(long BillOfEnteryId, string St9)
+    {
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                BillOfEntery Bill = DB.BillOfEnterys.Where(x => x.Id == BillOfEnteryId).SingleOrDefault();
+                Bill.ST9 = St9;
                 DB.SaveChanges();
                 return Ok(true);
             }
