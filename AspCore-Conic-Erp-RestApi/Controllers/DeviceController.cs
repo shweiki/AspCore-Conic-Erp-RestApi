@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Entities;
+using ESC_POS_USB_NET.Printer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Authorization;
-using Entities;
 using System.IO.Ports;
+using System.Linq;
 using System.Text;
-using ESC_POS_USB_NET.Printer;
-using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -28,7 +27,7 @@ public class DeviceController : Controller
     [HttpGet]
     public IActionResult GetById(long? Id)
     {
-        var Device = DB.Devices.Where(x => x.Id == Id).Select(x=> new { x.Id, x.Name, x.Feel, x.Status, x.Port,x.MAC, x.Ip, x.Description }).SingleOrDefault();
+        var Device = DB.Devices.Where(x => x.Id == Id).Select(x => new { x.Id, x.Name, x.Feel, x.Status, x.Port, x.MAC, x.Ip, x.Description }).SingleOrDefault();
 
         return Ok(Device);
     }
@@ -61,16 +60,16 @@ public class DeviceController : Controller
         {
             try
             {
-            Device Device = DB.Devices.Where(x => x.Id == collection.Id).SingleOrDefault();
-            Device.Name = collection.Name;
-            Device.Ip = collection.Ip;
-            Device.MAC = collection.MAC;
-            Device.Port = collection.Port;
-            Device.Feel = collection.Feel;
-            Device.Status = collection.Status;
-            Device.LastSetDateTime = collection.LastSetDateTime;
+                Device Device = DB.Devices.Where(x => x.Id == collection.Id).SingleOrDefault();
+                Device.Name = collection.Name;
+                Device.Ip = collection.Ip;
+                Device.MAC = collection.MAC;
+                Device.Port = collection.Port;
+                Device.Feel = collection.Feel;
+                Device.Status = collection.Status;
+                Device.LastSetDateTime = collection.LastSetDateTime;
                 Device.Description = collection.Description;
-            DB.SaveChanges();
+                DB.SaveChanges();
                 return Ok(true);
             }
             catch
@@ -91,7 +90,8 @@ public class DeviceController : Controller
             Devices.ForEach(e => CheckDeviceHere((int)e.Id));
             return Ok(true);
         }
-        catch {
+        catch
+        {
             return Ok(false);
         }
     }
@@ -126,7 +126,7 @@ public class DeviceController : Controller
     }
     [HttpGet]
     [Route("Device/DirectlyPrint")]
-    public IActionResult DirectlyPrint(string PrinterName ,string Ip ,string PortName )
+    public IActionResult DirectlyPrint(string PrinterName, string Ip, string PortName)
     {
         Printer printer = new Printer(PrinterName);
         printer.Append("يسشيس)");
@@ -139,14 +139,14 @@ public class DeviceController : Controller
     [HttpGet]
     public IActionResult GetDevice()
     {
-        var Device = DB.Devices.Select(d => new { d.Id, d.Name , d.Feel, d.Status, d.Port ,d.Ip , d.Description }).ToList();
+        var Device = DB.Devices.Select(d => new { d.Id, d.Name, d.Feel, d.Status, d.Port, d.Ip, d.Description }).ToList();
         return Ok(Device);
     }
     [HttpGet]
     [Route("Device/CheckDevice")]
     public IActionResult CheckDevice(int Id)
     {
-        if (CheckDeviceHere(Id))return Ok(true);
+        if (CheckDeviceHere(Id)) return Ok(true);
         else return Ok(false);
 
     }
@@ -160,11 +160,11 @@ public class DeviceController : Controller
             int iFingerIndex = 111;
             int idwErrorCode = 0;
             bool startenroll_retult = false;
-           objZkeeper.CancelOperation();
-         //   objZkeeper.SSR_DeleteEnrollData((int)DeviceId,sUserID, 0);//If the specified index of user's templates has existed ,delete it first.(SSR_DelUserTmp is also available sometimes)
-     //     objZkeeper.RefreshData(1);//the data in the device should be refreshed
+            objZkeeper.CancelOperation();
+            //   objZkeeper.SSR_DeleteEnrollData((int)DeviceId,sUserID, 0);//If the specified index of user's templates has existed ,delete it first.(SSR_DelUserTmp is also available sometimes)
+            //     objZkeeper.RefreshData(1);//the data in the device should be refreshed
 
-            if (objZkeeper.StartEnrollEx(UserId, iFingerIndex ,0))
+            if (objZkeeper.StartEnrollEx(UserId, iFingerIndex, 0))
             {
                 iCanSaveTmp = 1;
 
@@ -185,11 +185,12 @@ public class DeviceController : Controller
     }
     [Route("Device/SetUser")]
     [HttpGet]
-    public IActionResult SetUser(long DeviceId ,  string UserId , string Name , string TableName)
+    public IActionResult SetUser(long DeviceId, string UserId, string Name, string TableName)
     {
-        if (CheckDeviceHere((int)DeviceId)) {
-       
-           objZkeeper.EnableDevice(1, false);
+        if (CheckDeviceHere((int)DeviceId))
+        {
+
+            objZkeeper.EnableDevice(1, false);
 
             //bool GetUser = objZkeeper.GetUserInfo(1,(int)member.Id,ref  Name, ref password, ref Privilege, ref Enable);
 
@@ -208,32 +209,33 @@ public class DeviceController : Controller
                     {
                         FingerPrint.Length = length;
                         FingerPrint.Str = strface;
-                        FingerPrint.Fk =UserId;
-                        FingerPrint.TableName =TableName;
-                        FingerPrint.Type ="Face";
+                        FingerPrint.Fk = UserId;
+                        FingerPrint.TableName = TableName;
+                        FingerPrint.Type = "Face";
 
                         bool SetUserFace = objZkeeper.SetUserFaceStr(1, UserId, 50, strface, length);
                         // SetUserFace = objZkeeper.SSR_SetUserTmpStr(1, member.Id.ToString(), 50, strface);
-                     //    SetUserFace = objZkeeper.SetUserFace(1, member.Id.ToString(), 0, ref x, length);
+                        //    SetUserFace = objZkeeper.SetUserFace(1, member.Id.ToString(), 0, ref x, length);
                     }
                     else
                     {
                         DB.FingerPrints.Add(new FingerPrint
                         {
-                           Length = length,
+                            Length = length,
                             Str = strface,
                             Fk = UserId,
-                        TableName = TableName,
-                        Type = "Face"
-                    });
+                            TableName = TableName,
+                            Type = "Face"
+                        });
                         bool SetUserFace = objZkeeper.SetUserFaceStr(1, UserId, 50, strface, length);
-                    //    objZkeeper.SetUserFace(1, member.Id.ToString(), 50, strface, length);
+                        //    objZkeeper.SetUserFace(1, member.Id.ToString(), 50, strface, length);
                     }
                 }
                 else
                 {
-                    if (FingerPrint != null) {
-                        bool SetUserFace = objZkeeper.SetUserFaceStr(1,  UserId, 50, FingerPrint.Str, FingerPrint.Length);
+                    if (FingerPrint != null)
+                    {
+                        bool SetUserFace = objZkeeper.SetUserFaceStr(1, UserId, 50, FingerPrint.Str, FingerPrint.Length);
                     }
                 }
             }
@@ -249,7 +251,7 @@ public class DeviceController : Controller
 
     [Route("Device/GetUserLog")]
     [HttpGet]
-    public IActionResult GetUserLog(long DeviceId, string UserId ,string TableName)
+    public IActionResult GetUserLog(long DeviceId, string UserId, string TableName)
     {
         try
         {
@@ -260,10 +262,10 @@ public class DeviceController : Controller
                 if (MachineLog != null && MachineLog.Count > 0)
                 {
 
-                    foreach (var ML in MachineLog.Where(mlo=> mlo.IndRegID == Convert.ToInt64(UserId) ).ToList())
+                    foreach (var ML in MachineLog.Where(mlo => mlo.IndRegID == Convert.ToInt64(UserId)).ToList())
                     {
                         DateTime datetime = DateTime.Parse(ML.DateTimeRecord);
-                        var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == UserId && l.TableName==TableName && l.DateTime == datetime).Count();
+                        var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == UserId && l.TableName == TableName && l.DateTime == datetime).Count();
                         if (isLogSaveIt <= 0)
                         {
                             DeviceLog Log = new DeviceLog
@@ -285,7 +287,8 @@ public class DeviceController : Controller
                         }
                     }
                     objZkeeper.Disconnect();
-                    return Ok(DeviceLogs.Select(x => new {
+                    return Ok(DeviceLogs.Select(x => new
+                    {
                         x.Status,
                         x.Type,
                         x.DateTime,
@@ -309,13 +312,13 @@ public class DeviceController : Controller
         {
             return NotFound();
         }
-     }
+    }
     public bool CheckDeviceHere(int? Id)
     {
         bool IsDeviceConnected = false;
 
         var Device = DB.Devices.Where(x => x.Id == Id).SingleOrDefault();
-        if(Device ==null) return IsDeviceConnected;
+        if (Device == null) return IsDeviceConnected;
 
         bool isValidIpA = UniversalStatic.ValidateIP(Device.Ip);
         if (!isValidIpA)
@@ -328,7 +331,7 @@ public class DeviceController : Controller
             objZkeeper = new ZkemClient(RaiseDeviceEvent);
             Device.Description = "Is Device Connected : ";
             IsDeviceConnected = objZkeeper.Connect_Net(Device.Ip, Device.Port);
-          //  objZkeeper.SetDeviceTime2(1, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+            //  objZkeeper.SetDeviceTime2(1, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
         }
         DB.SaveChanges();
         return IsDeviceConnected;
@@ -347,12 +350,12 @@ public class DeviceController : Controller
         {
             objZkeeper = new ZkemClient(RaiseDeviceEvent);
             Device.Description = "Device Is Not Connected";
-             objZkeeper.Disconnect();
+            objZkeeper.Disconnect();
         }
         DB.SaveChanges();
         return true;
     }
-    public bool EnableMemberToDevice(long DeviceId , long UserId , bool Enable)
+    public bool EnableMemberToDevice(long DeviceId, long UserId, bool Enable)
     {
         if (CheckDeviceHere((int)DeviceId))
         {
@@ -360,7 +363,7 @@ public class DeviceController : Controller
 
             bool SetUser = objZkeeper.SSR_SetUserInfo(1, member.Id.ToString(), member.Name, "", 0, Enable);
             if (!SetUser)
-           return false;
+                return false;
 
             return true;
         }
@@ -370,24 +373,44 @@ public class DeviceController : Controller
     }
     [Route("Device/SetAll")]
     [HttpGet]
-    public IActionResult SetAll(long DeviceId ,string TableName)
+    public IActionResult SetAll(long DeviceId, string TableName)
     {
         if (CheckDeviceHere((int)DeviceId))
         {
             dynamic List = new List<dynamic>();
-            if (TableName == "Member") {
+            if (TableName == "Member")
+            {
                 DateTime last = DateTime.Today.AddMonths(-3);
-                 List = DB.Members.Where(x => x.MembershipMovements.Count() != 0 && (x.MembershipMovements != null ? x.MembershipMovements.OrderByDescending(x => x.Id).LastOrDefault().EndDate >= last : false))
-                    .Select(s=> new { s.Id , s.Name}).ToList();
+                List = DB.Members.Where(x => x.MembershipMovements.Count() != 0 && (x.MembershipMovements != null ? x.MembershipMovements.OrderByDescending(x => x.Id).LastOrDefault().EndDate >= last : false))
+                   .Select(s => new { s.Id, s.Name }).ToList();
             }
             if (TableName == "Employee")
             {
-                List = DB.Employees.Where(x => x.Status ==0)
+                List = DB.Employees.Where(x => x.Status == 0)
                    .Select(s => new { s.Id, s.Name }).ToList();
             }
             foreach (var O in List)
             {
-                SetUser((int)DeviceId, O.Id , O.Name , TableName);
+                SetUser(DeviceId, O.Id, O.Name, TableName);
+            }
+            objZkeeper.Disconnect();
+
+            return Ok(true);
+        }
+        else
+            return Ok("Device Is Not Connected");
+    }
+    [Route("Device/SetAllMember")]
+    [HttpGet]
+    public IActionResult SetAllMember(long DeviceId)
+    {
+        if (CheckDeviceHere((int)DeviceId))
+        {
+            var List = DB.Members.Where(x => x.Status == 0).Select(s => new { s.Id, s.Name }).ToList();
+            foreach (var O in List)
+            {
+                if (!string.IsNullOrWhiteSpace(O.Id.ToString()))
+                    SetUser(DeviceId, O.Id.ToString(), O.Name, "Member");
             }
             objZkeeper.Disconnect();
 
@@ -398,19 +421,19 @@ public class DeviceController : Controller
     }
     [Route("Device/GetAllFingerPrints")]
     [HttpGet]
-    public IActionResult GetAllFingerPrints(long DeviceId ,string TableName)
+    public IActionResult GetAllFingerPrints(long DeviceId, string TableName)
     {
         if (CheckDeviceHere((int)DeviceId))
         {
             var List = new List<UserDevice>();
-            if(TableName == "Member")
-            List = DB.Members?.Select(s => new UserDevice { Id = s.Id.ToString(),Name= s.Name }).ToList();
+            if (TableName == "Member")
+                List = DB.Members?.Select(s => new UserDevice { Id = s.Id.ToString(), Name = s.Name }).ToList();
             if (TableName == "Employee")
-                List = DB.Employees?.Select(s=> new UserDevice  { Id = s.Id.ToString() , Name = s.Name}).ToList();
+                List = DB.Employees?.Select(s => new UserDevice { Id = s.Id.ToString(), Name = s.Name }).ToList();
 
             foreach (var O in List)
             {
-               
+
                 var FingerPrint = DB.FingerPrints.Where(f => f.Fk == O.Id && f.TableName == TableName).SingleOrDefault();
                 if (FingerPrint == null)
                 {
@@ -430,7 +453,8 @@ public class DeviceController : Controller
                         });
                     }
                 }
-                else {
+                else
+                {
                     continue;
                 }
                 DB.SaveChanges();
@@ -442,50 +466,50 @@ public class DeviceController : Controller
         else
             return Ok("Device Is Not Connected");
     }
-    
+
     [HttpGet]
     [Route("Device/GetAllLog")]
-    public IActionResult GetAllLog(long DeviceId ,string TableName , bool WithClear = false)
+    public IActionResult GetAllLog(long DeviceId, string TableName, bool WithClear = false)
     {
         bool d = CheckDeviceHere((int)DeviceId);
-        if ( d)
+        if (d)
         {
             ICollection<MachineInfo> MachineLog = manipulator?.GetLogData(objZkeeper, 1);
             if (MachineLog != null && MachineLog.Count > 0)
             {
-                    foreach (var ML in MachineLog.ToList())
-                    {
+                foreach (var ML in MachineLog.ToList())
+                {
                     var member = DB.Members.Where(m => m.Id == ML.IndRegID).SingleOrDefault();
                     var Employee = DB.Employees.Where(m => m.Id == ML.IndRegID).SingleOrDefault();
                     if (member != null) TableName = "Member";
                     if (Employee != null) TableName = "Employee";
                     DateTime datetime = DateTime.Parse(ML.DateTimeRecord);
-                        datetime = new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour, datetime.Minute, 0);
-                        var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == ML.IndRegID.ToString() && l.TableName == TableName && l.DateTime == datetime).Count();
-                        if (isLogSaveIt <= 0)
+                    datetime = new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour, datetime.Minute, 0);
+                    var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == ML.IndRegID.ToString() && l.TableName == TableName && l.DateTime == datetime).Count();
+                    if (isLogSaveIt <= 0)
+                    {
+                        DeviceLog Log = new DeviceLog
                         {
-                            DeviceLog Log = new DeviceLog
-                            {
-                               Type = "In",
-                                DateTime = DateTime.Parse(ML.DateTimeRecord),
-                                DeviceId = DeviceId,
-                                Status = 0,
-                                TableName = TableName,
-                                Fk = ML.IndRegID.ToString(),
-                                Description = ""
-                            };
-                            if (Log.DateTime < DateTime.Today)
-                                Log.Status = -1;
-                            DB.DeviceLogs.Add(Log);
-                            DB.SaveChanges();
-                        }
-                        else
-                        {
-                            continue;
-                        }
+                            Type = "In",
+                            DateTime = DateTime.Parse(ML.DateTimeRecord),
+                            DeviceId = DeviceId,
+                            Status = 0,
+                            TableName = TableName,
+                            Fk = ML.IndRegID.ToString(),
+                            Description = ""
+                        };
+                        if (Log.DateTime < DateTime.Today)
+                            Log.Status = -1;
+                        DB.DeviceLogs.Add(Log);
+                        DB.SaveChanges();
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
-                 DB.SaveChanges();
-               if(WithClear) objZkeeper.ClearGLog(0);
+                DB.SaveChanges();
+                if (WithClear) objZkeeper.ClearGLog(0);
                 objZkeeper.Disconnect();
                 return Ok(MachineLog.ToList());
             }
@@ -504,24 +528,24 @@ public class DeviceController : Controller
     {
         if (CheckDeviceHere((int)DeviceId))
         {
-           bool ClearKeeperData = objZkeeper.ClearKeeperData(1);
-           bool ClearGLog = objZkeeper.ClearGLog(1);
+            bool ClearKeeperData = objZkeeper.ClearKeeperData(1);
+            bool ClearGLog = objZkeeper.ClearGLog(1);
             bool ClearSLog = objZkeeper.ClearSLog(1);
             objZkeeper.Disconnect();
 
-            return Ok("ClearKeeperData : " + ClearKeeperData + "-ClearGLog : "+ ClearGLog+ "-ClearSLog : "+ ClearSLog);
+            return Ok("ClearKeeperData : " + ClearKeeperData + "-ClearGLog : " + ClearGLog + "-ClearSLog : " + ClearSLog);
 
         }
         else
             return Ok("Device Is Not Connected");
-    }   
+    }
     [Route("Device/ClearAdministrators")]
     [HttpGet]
     public IActionResult ClearAdministrators(long DeviceId)
     {
         if (CheckDeviceHere((int)DeviceId))
         {
-           bool ClearAdministrators = objZkeeper.ClearAdministrators(1);
+            bool ClearAdministrators = objZkeeper.ClearAdministrators(1);
             objZkeeper.Disconnect();
 
             return Ok("ClearAdministrators : " + ClearAdministrators + "");
@@ -536,13 +560,13 @@ public class DeviceController : Controller
     {
         if (CheckDeviceHere((int)DeviceId))
         {
-         
-                if (objZkeeper.RestartDevice(0))
-                    return  Ok("The device is being restarted, Please wait...  true");
-                
+
+            if (objZkeeper.RestartDevice(0))
+                return Ok("The device is being restarted, Please wait...  true");
+
             else
-                    return Ok("Operation failed,please try again false" );
-            }
+                return Ok("Operation failed,please try again false");
+        }
         else
             return Ok("Device Is Not Connected");
     }
@@ -562,7 +586,7 @@ public class DeviceController : Controller
         else
             return Ok("Device Is Not Connected");
     }
-     public class UserDevice
+    public class UserDevice
     {
         public string Id { get; set; }
         public string Name { get; set; }

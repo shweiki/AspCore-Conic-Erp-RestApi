@@ -1,8 +1,8 @@
-﻿using System.Data;
-using System.Linq;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Entities; 
+using System.Data;
+using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -21,8 +21,9 @@ public class BankController : Controller
     [HttpGet]
     public IActionResult Get()
     {
-       // return Ok(UW.Banks.Get());
-        var Banks = DB.Banks.Select(x => new {
+        // return Ok(UW.Banks.Get());
+        var Banks = DB.Banks.Select(x => new
+        {
             x.Id,
             x.Iban,
             x.AccountId,
@@ -61,7 +62,7 @@ public class BankController : Controller
                     Description = collection.Description,
                     Status = 0,
                     Code = "",
-                    ParentId= DB.TreeAccounts.Where  (x => x.Type == "Banks-Main").SingleOrDefault().Code
+                    ParentId = DB.TreeAccounts.Where(x => x.Type == "Banks-Main").SingleOrDefault().Code
                 };
                 DB.TreeAccounts.Add(NewAccount);
                 DB.SaveChanges();
@@ -92,13 +93,13 @@ public class BankController : Controller
             try
             {
                 Bank bank = DB.Banks.Where(x => x.Id == collection.Id).SingleOrDefault();
-            bank.Name = collection.Name;
-            bank.Description = collection.Description;
-            bank.Iban = collection.Iban;
-            bank.AccountType = collection.AccountType;
-            bank.BranchName = collection.BranchName;
-            bank.AccountNumber = collection.AccountNumber;
-       
+                bank.Name = collection.Name;
+                bank.Description = collection.Description;
+                bank.Iban = collection.Iban;
+                bank.AccountType = collection.AccountType;
+                bank.BranchName = collection.BranchName;
+                bank.AccountNumber = collection.AccountNumber;
+
                 DB.SaveChanges();
                 return Ok(true);
             }

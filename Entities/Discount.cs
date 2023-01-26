@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#nullable disable
 
-#nullable disable
+namespace Entities;
 
-namespace Entities
+public partial class Discount
 {
-    public partial class Discount
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Type { get; set; }
-        public bool IsPrime { get; set; }
-        public int Status { get; set; }
-        public string Description { get; set; }
-        public double Value { get; set; }
-        public int? ValueOfDays { get; set; }
-    }
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Type { get; set; }
+    public bool IsPrime { get; set; }
+    public int Status { get; set; }
+    public string Description { get; set; }
+    public double Value { get; set; }
+    public int? ValueOfDays { get; set; }
 }

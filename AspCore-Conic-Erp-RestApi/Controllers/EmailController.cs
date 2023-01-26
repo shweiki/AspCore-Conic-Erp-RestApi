@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using EmailService;
+﻿using EmailService;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace MailApp.Controllers;
 
@@ -23,7 +18,7 @@ public class EmailController : Controller
     }
     [Route("Email/Send")]
     [HttpPost]
-    public async Task<IActionResult> Send(string to ,string subject , string body)
+    public async Task<IActionResult> Send(string to, string subject, string body)
     {
 
         var message = new Message(new string[] { to }, subject, body, null);
@@ -32,5 +27,5 @@ public class EmailController : Controller
         return Ok(true);
     }
 
- 
+
 }

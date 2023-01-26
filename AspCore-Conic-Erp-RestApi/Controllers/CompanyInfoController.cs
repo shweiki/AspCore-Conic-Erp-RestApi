@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Microsoft.AspNetCore.Mvc;
-using AspCore_Conic_Erp_RestApi.Controllers;
-using Entities; 
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -27,7 +23,8 @@ public class CompanyInfoController : Controller
             CompanyInfo companyInfo = DB.CompanyInfos.Where(x => x.Id == 1).SingleOrDefault();
             if (companyInfo == null)
                 DB.Add(collection);
-            else {
+            else
+            {
                 companyInfo.Name = collection.Name;
                 companyInfo.NickName = collection.NickName;
                 companyInfo.Logo = collection.Logo;
@@ -43,7 +40,7 @@ public class CompanyInfoController : Controller
 
             // TODO: Add update logic here
             DB.SaveChanges();
-          
+
             return Ok(true);
         }
         else
@@ -57,10 +54,10 @@ public class CompanyInfoController : Controller
     public IActionResult GetCompanyInfo()
     {
         var companyInfo = DB.CompanyInfos.Where(x => x.Id == 1).SingleOrDefault();
-            if(companyInfo == null)
-                return Ok();
-            else
-                return Ok(companyInfo);
+        if (companyInfo == null)
+            return Ok();
+        else
+            return Ok(companyInfo);
 
     }
 }

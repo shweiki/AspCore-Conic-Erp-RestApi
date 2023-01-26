@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Web;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
-using Entities;
-using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading.Tasks;
-
 using Driver = Entities.Driver;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
@@ -19,8 +12,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers;
 public class DriverController : Controller
 {
     private ConicErpContext DB;
-         private readonly UserManager<IdentityUser> _userManager;
-    public DriverController(ConicErpContext dbcontext,UserManager<IdentityUser> userManager)
+    private readonly UserManager<IdentityUser> _userManager;
+    public DriverController(ConicErpContext dbcontext, UserManager<IdentityUser> userManager)
 
     {
         _userManager = userManager;
@@ -40,8 +33,13 @@ public class DriverController : Controller
     [HttpGet]
     public IActionResult GetActiveDriver()
     {
-        var Drivers = DB.Drivers.Where(x => x.Status == 0).Select(x => new {
-            value = x.Id, label = x.Name, phone = x.PhoneNumber1, x.Company }).ToList();
+        var Drivers = DB.Drivers.Where(x => x.Status == 0).Select(x => new
+        {
+            value = x.Id,
+            label = x.Name,
+            phone = x.PhoneNumber1,
+            x.Company
+        }).ToList();
         return Ok(Drivers);
     }
     [Route("Driver/GetDriverByAny")]
@@ -110,15 +108,15 @@ public class DriverController : Controller
             x.Email,
             x.DriverUserId,
             x.Description,
-    
+
             // Avatar = Url.Content("~/Images/Driver/" + x.Id + ".jpeg").ToString(),
         }).ToList();
 
         return Ok(Drivers);
     }
 
- 
-[Route("Driver/Create")]
+
+    [Route("Driver/Create")]
     [HttpPost]
     public async Task<ActionResult> Create(Driver collection)
     {
@@ -134,8 +132,8 @@ public class DriverController : Controller
                 PhoneNumberConfirmed = true,
                 EmailConfirmed = true,
             };
-        IdentityResult result = await _userManager.CreateAsync(NewUser, collection.Pass);
-          
+            IdentityResult result = await _userManager.CreateAsync(NewUser, collection.Pass);
+
             var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
             if (!result.Succeeded)
             {
@@ -145,24 +143,24 @@ public class DriverController : Controller
             collection.DriverUserId = NewUser.Id;
             DB.Drivers.Add(collection);
             DB.SaveChanges();
-            
-               UserRouter NewRole = new UserRouter()
-               {
-                   UserId = NewUser.Id,
-                   Router = "[\"/OrderDelivery/DriverPage\",\"/OrderDelivery/DriverDeliveryList\"]",
-                   DefulateRedirect = "/",
-             };
-               DB.UserRouter.Add(NewRole);
-               DB.SaveChanges();
-               
-         
+
+            UserRouter NewRole = new UserRouter()
+            {
+                UserId = NewUser.Id,
+                Router = "[\"/OrderDelivery/DriverPage\",\"/OrderDelivery/DriverDeliveryList\"]",
+                DefulateRedirect = "/",
+            };
+            DB.UserRouter.Add(NewRole);
+            DB.SaveChanges();
+
+
             return Ok(collection);
-            
+
         }
         return Ok(false);
     }
-    
-  
+
+
     [Route("Driver/Edit")]
     [HttpPost]
     public IActionResult Edit(Driver collection)
@@ -211,7 +209,7 @@ public class DriverController : Controller
                 x.Type,
                 x.Tag,
                 x.Company,
-             
+
             }).SingleOrDefault();
         return Ok(Drivers);
     }
@@ -219,7 +217,8 @@ public class DriverController : Controller
     [HttpGet]
     public IActionResult GetDriverInfo(string UserId, string name)
     {
-        if (name != "Developer") {
+        if (name != "Developer")
+        {
             var Drivers = DB.Drivers.Where(m => m.DriverUserId == UserId).Select(
                 x => new
                 {
@@ -239,22 +238,25 @@ public class DriverController : Controller
                 }).SingleOrDefault();
             return Ok(Drivers);
         }
-        
-        else {
+
+        else
+        {
             Driver driver = new Driver();
-            return Ok(driver); }
+            return Ok(driver);
+        }
     }
     [Route("Driver/FixPhoneNumber")]
     [HttpGet]
     public IActionResult FixPhoneNumber()
     {
-        DB.Drivers.Where(i => i.PhoneNumber1 != null).ToList().ForEach(s => {
+        DB.Drivers.Where(i => i.PhoneNumber1 != null).ToList().ForEach(s =>
+        {
             s.PhoneNumber1 = s.PhoneNumber1.Replace(" ", "");
-            s.PhoneNumber1 = s.PhoneNumber1.Length == 10 ? s.PhoneNumber1.Substring(1) : s.PhoneNumber1; 
+            s.PhoneNumber1 = s.PhoneNumber1.Length == 10 ? s.PhoneNumber1.Substring(1) : s.PhoneNumber1;
         });
 
         DB.SaveChanges();
- 
+
 
         return Ok(true);
     }
@@ -263,7 +265,8 @@ public class DriverController : Controller
     [HttpGet]
     public IActionResult GetDriversLabel()
     {
-        var Drivers = DB.Drivers.Where(x => x.Status == 0).Select(x => new {
+        var Drivers = DB.Drivers.Where(x => x.Status == 0).Select(x => new
+        {
 
             value = x.Id,
             label = x.Name,
@@ -278,7 +281,7 @@ public class DriverController : Controller
     {
         var Drivers = DB.Drivers.Where(x => x.Id == Id).SingleOrDefault();
         Drivers.IsActive = 1;
-        
+
         try
         {
             DB.SaveChanges();
@@ -289,7 +292,7 @@ public class DriverController : Controller
             //Console.WriteLine(collection);
             return Ok(false);
         }
-       
+
     }
     [Route("Driver/DriverDeActivation")]
     [HttpGet]
@@ -308,7 +311,7 @@ public class DriverController : Controller
             //Console.WriteLine(collection);
             return Ok(false);
         }
-       
+
     }
 
 

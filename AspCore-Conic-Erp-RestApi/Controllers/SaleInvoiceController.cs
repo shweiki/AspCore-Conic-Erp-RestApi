@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
-using Entities;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -430,7 +430,7 @@ public class SaleInvoiceController : Controller
             x.Discount,
             x.FakeDate,
             x.VendorId,
-            Total =x.Tax+( x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
+            Total = x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
             InventoryMovements = x.InventoryMovements.Select(m => new
             {
                 m.Id,

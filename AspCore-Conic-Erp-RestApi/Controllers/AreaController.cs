@@ -1,8 +1,8 @@
-﻿using System.Data;
-using System.Linq;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Entities; 
+using System.Data;
+using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -14,30 +14,32 @@ public class AreaController : Controller
     {
         DB = dbcontext;
     }
-   
+
     [Route("Area/GetAreas")]
     [HttpGet]
     public IActionResult GetAreas()
 
-     {
-         var Areas = DB.Areas.Select(x => new {
-             x.Id,
-             x.Adress1,
-             x.Adress2,
-             x.Adress3,
-             x.DelievryPrice,
-             x.Status
-              
-          }).ToList();
+    {
+        var Areas = DB.Areas.Select(x => new
+        {
+            x.Id,
+            x.Adress1,
+            x.Adress2,
+            x.Adress3,
+            x.DelievryPrice,
+            x.Status
 
-          return Ok(Areas);
-       }
+        }).ToList();
+
+        return Ok(Areas);
+    }
 
     [Route("Area/GetAreasLabel")]
     [HttpGet]
     public IActionResult GetAreasLabel()
     {
-        var Areas = DB.Areas.Where(x => x.Status == 0).Select(x => new {
+        var Areas = DB.Areas.Where(x => x.Status == 0).Select(x => new
+        {
 
             value = x.Id,
             label = x.Adress1,

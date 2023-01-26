@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Web;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
-using Entities;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 

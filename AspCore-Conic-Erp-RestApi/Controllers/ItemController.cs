@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NinjaNye.SearchExtensions;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
@@ -486,7 +485,7 @@ public class ItemController : Controller
                                 };
 
         return Ok(InventoryItemsQty);
-    }   
+    }
     public object CalculateInventoryItemQtyById(long Id)
     {
         var InventoryItemsQty = from x in DB.InventoryMovements.Where(i => i.ItemsId == Id && i.Status >= 0).ToList()

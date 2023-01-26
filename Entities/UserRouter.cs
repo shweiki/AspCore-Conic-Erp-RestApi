@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#nullable disable
 
-#nullable disable
+namespace Entities;
 
-namespace Entities
+public partial class UserRouter
 {
-    public partial class UserRouter
-    {
-        public int Id { get; set; }
-        public string UserId { get; set; }
-        public string Router { get; set; }
-        public string DefulateRedirect { get; set; }
+    public int Id { get; set; }
+    public string UserId { get; set; }
+    public string Router { get; set; }
+    public string DefulateRedirect { get; set; }
 
 
-    }
 }

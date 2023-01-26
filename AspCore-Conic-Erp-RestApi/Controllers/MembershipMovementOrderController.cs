@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Entities;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -11,7 +10,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers;
 
 public class MembershipMovementOrderController : Controller
 {
-            private ConicErpContext DB;
+    private ConicErpContext DB;
     public MembershipMovementOrderController(ConicErpContext dbcontext)
     {
         DB = dbcontext;
@@ -71,8 +70,8 @@ public class MembershipMovementOrderController : Controller
             MemberId = DB.MembershipMovements.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId,
             Name = DB.Members.Where(m => m.Id == DB.MembershipMovements.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId).SingleOrDefault().Name,
         }).ToList();
-                  
-                       
+
+
         return Ok(MembershipMovementOrders);
     }
 
@@ -106,15 +105,15 @@ public class MembershipMovementOrderController : Controller
         {
             try
             {
-            MembershipMovementOrder membershipmovementorder = DB.MembershipMovementOrders.Where(x => x.Id == collection.Id).SingleOrDefault();
-            membershipmovementorder.Type = collection.Type;
-            membershipmovementorder.StartDate = collection.StartDate;
-            membershipmovementorder.EndDate = collection.EndDate;
-            membershipmovementorder.Status = collection.Status;
-            membershipmovementorder.Description = collection.Description;
-            membershipmovementorder.EditorName = collection.EditorName;
-            
-           
+                MembershipMovementOrder membershipmovementorder = DB.MembershipMovementOrders.Where(x => x.Id == collection.Id).SingleOrDefault();
+                membershipmovementorder.Type = collection.Type;
+                membershipmovementorder.StartDate = collection.StartDate;
+                membershipmovementorder.EndDate = collection.EndDate;
+                membershipmovementorder.Status = collection.Status;
+                membershipmovementorder.Description = collection.Description;
+                membershipmovementorder.EditorName = collection.EditorName;
+
+
                 DB.SaveChanges();
                 return Ok(true);
             }
@@ -130,21 +129,21 @@ public class MembershipMovementOrderController : Controller
     [HttpPost]
     public IActionResult Delete(long Id)
     {
-     
-            try
-            {
+
+        try
+        {
             MembershipMovementOrder membershipmovementorder = DB.MembershipMovementOrders.Find(Id);
             DB.MembershipMovementOrders.Remove(membershipmovementorder);
 
             DB.SaveChanges();
-             return Ok(true);
-            }
-            catch
-            {
-                //Console.WriteLine(collection);
-                return Ok(false);
-            }
-       
+            return Ok(true);
+        }
+        catch
+        {
+            //Console.WriteLine(collection);
+            return Ok(false);
+        }
+
     }
     [Route("MembershipMovementOrder/CreateMulti")]
     [HttpPost]

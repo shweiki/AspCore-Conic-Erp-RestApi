@@ -1,17 +1,16 @@
-﻿using System;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.SqlServer.Management.Common;
-using Microsoft.SqlServer.Management.Smo;
-using System.Configuration;
-using System.Linq;
-using Entities;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using System.IO;
-using System.Security.Claims;
 using Microsoft.Extensions.Configuration;
+using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.Management.Smo;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -20,10 +19,10 @@ public class BackupRestoreController : Controller
 {
     private readonly ConicErpContext DB;
 
-    public BackupRestoreController(IConfiguration configuration ,ConicErpContext dbcontext)
+    public BackupRestoreController(IConfiguration configuration, ConicErpContext dbcontext)
     {
         Configuration = configuration;
-                    DB = dbcontext;
+        DB = dbcontext;
 
     }
 
@@ -46,7 +45,7 @@ public class BackupRestoreController : Controller
         var ConnectionString = Configuration.GetConnectionString(Name);
         if (ConnectionString == null)
             Name = "Default";
-        DateTime DateTime = DateTime.Now; 
+        DateTime DateTime = DateTime.Now;
         ServerConnection serverConnection = new(new SqlConnection(Configuration.GetConnectionString(Name)));
         Server server = new(serverConnection);
         Backup backup = new();
@@ -64,7 +63,7 @@ public class BackupRestoreController : Controller
         backup.Incremental = false;
         backup.LogTruncation = BackupTruncateLogType.Truncate;
         backup.SqlBackup(server);
-        BackUp backup1 = new() { Name = name, BackUpPath = BackUpPath, DateTime = DateTime, UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value , DataBaseName = serverConnection.DatabaseName };
+        BackUp backup1 = new() { Name = name, BackUpPath = BackUpPath, DateTime = DateTime, UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value, DataBaseName = serverConnection.DatabaseName };
         DB.BackUps.Add(backup1);
         DB.SaveChanges();
         return Ok(true);
@@ -84,16 +83,16 @@ public class BackupRestoreController : Controller
         ServerConnection serverConnection = new(new SqlConnection(Configuration.GetConnectionString(Name)));
         Server dbServer = new(serverConnection);
 
-            Restore _Restore = new()
-            {
-                Database = serverConnection.DatabaseName,
-                Action = RestoreActionType.Database,
-                ReplaceDatabase = true,
-                NoRecovery = false
-            };
+        Restore _Restore = new()
+        {
+            Database = serverConnection.DatabaseName,
+            Action = RestoreActionType.Database,
+            ReplaceDatabase = true,
+            NoRecovery = false
+        };
         if (!System.IO.File.Exists(DirectoryBak))
         {
-         return Ok("File is not Exsit");
+            return Ok("File is not Exsit");
 
         }
         else

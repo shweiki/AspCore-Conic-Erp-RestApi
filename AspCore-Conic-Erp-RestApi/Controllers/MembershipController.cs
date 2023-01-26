@@ -1,7 +1,7 @@
-﻿using System.Linq;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
-using Entities; 
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -41,20 +41,21 @@ public class MembershipController : Controller
     public IActionResult GetActiveMembership()
     {
         var Memberships = DB.Memberships.Where(x => x.Status == 0).Select(
-            x => new {
-            x.Id,
-            x.Name ,
-            x.Description ,
-            x.FullDayPrice ,
-            x.MinFreezeLimitDays,
-            x.MaxFreezeLimitDays,
-            x.MorningPrice ,
-            x.NumberDays ,
-            x.Status ,
-            x.Tax ,
-            x.Rate,
-            x.NumberClass
-        }).ToList();
+            x => new
+            {
+                x.Id,
+                x.Name,
+                x.Description,
+                x.FullDayPrice,
+                x.MinFreezeLimitDays,
+                x.MaxFreezeLimitDays,
+                x.MorningPrice,
+                x.NumberDays,
+                x.Status,
+                x.Tax,
+                x.Rate,
+                x.NumberClass
+            }).ToList();
         return Ok(Memberships);
     }
     [Route("Membership/Create")]

@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Web;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
-using Entities;
-using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -17,8 +11,8 @@ namespace AspCore_Conic_Erp_RestApi.Controllers;
 public class EmployeeController : Controller
 {
     private readonly ConicErpContext DB;
-   private readonly UserManager<IdentityUser> _userManager;
-    public EmployeeController(ConicErpContext dbcontext,UserManager<IdentityUser> userManager)
+    private readonly UserManager<IdentityUser> _userManager;
+    public EmployeeController(ConicErpContext dbcontext, UserManager<IdentityUser> userManager)
 
     {
         _userManager = userManager;
@@ -87,14 +81,14 @@ public class EmployeeController : Controller
     public IActionResult GetEmployeeByAny(string Any)
     {
         _ = Any.ToLower();
-        var Employees = DB.Employees.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0","").Replace(" ","").Contains(Any.Replace("0", "").Replace(" ", "")))
-            .Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1}).ToList();
+        var Employees = DB.Employees.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")))
+            .Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1 }).ToList();
 
         return Ok(Employees);
     }
     [HttpPost]
     [Route("Employee/GetByListQ")]
-    public IActionResult GetByListQ(int Limit, string Sort, int Page,int? Status, string Any)
+    public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
     {
         var Employees = DB.Employees.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (Status == null || s.Status == Status)).Select(x => new
         {
@@ -129,7 +123,7 @@ public class EmployeeController : Controller
 
     [Route("Employee/CheckEmployeeIsExist")]
     [HttpGet]
-    public IActionResult CheckEmployeeIsExist(string Ssn , string PhoneNumber)
+    public IActionResult CheckEmployeeIsExist(string Ssn, string PhoneNumber)
     {
         var Employees = DB.Employees.Where(m => m.Ssn == Ssn || m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", "")).ToList();
 
@@ -142,21 +136,21 @@ public class EmployeeController : Controller
     {
         try
         {
-          var Employee = DB.Employees.Where(x => x.Status == 0).Select(x => new
+            var Employee = DB.Employees.Where(x => x.Status == 0).Select(x => new
             {
-              x.Id,
-              x.Name,
-              x.LatinName,
-              x.Ssn,
-              x.PhoneNumber1,
-              x.PhoneNumber2,
-              x.Status,
-              x.Type,
-              x.AccountId,
-              x.Tag,
-              x.Vaccine,
-              x.JobTitle,
-          }).ToList();
+                x.Id,
+                x.Name,
+                x.LatinName,
+                x.Ssn,
+                x.PhoneNumber1,
+                x.PhoneNumber2,
+                x.Status,
+                x.Type,
+                x.AccountId,
+                x.Tag,
+                x.Vaccine,
+                x.JobTitle,
+            }).ToList();
             return Ok(Employee);
         }
         catch
@@ -207,7 +201,7 @@ public class EmployeeController : Controller
                 Code = "",
                 ParentId = DB.TreeAccounts.Where(x => x.Type == "Employees-Main").SingleOrDefault().Code
             };
-            
+
             var NewUser = new IdentityUser()
             {
 
@@ -220,7 +214,7 @@ public class EmployeeController : Controller
             IdentityResult result = await _userManager.CreateAsync(NewUser, Pass);
 
             var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
-          
+
             Pass = NewUser.PasswordHash;
 
             collection.EmployeeUserId = NewUser.Id;
@@ -300,13 +294,14 @@ public class EmployeeController : Controller
     [HttpGet]
     public IActionResult FixPhoneNumber()
     {
-        DB.Employees.Where(i => i.PhoneNumber1 != null).ToList().ForEach(s => {
+        DB.Employees.Where(i => i.PhoneNumber1 != null).ToList().ForEach(s =>
+        {
             s.PhoneNumber1 = s.PhoneNumber1.Replace(" ", "");
-            s.PhoneNumber1 = s.PhoneNumber1.Length == 10 ? s.PhoneNumber1.Substring(1) : s.PhoneNumber1; 
+            s.PhoneNumber1 = s.PhoneNumber1.Length == 10 ? s.PhoneNumber1.Substring(1) : s.PhoneNumber1;
         });
 
         DB.SaveChanges();
- 
+
 
         return Ok(true);
     }
@@ -315,19 +310,20 @@ public class EmployeeController : Controller
     [HttpGet]
     public IActionResult CheckEmployees()
     {
-       var Members = DB.Members?.ToList();
-    
+        var Members = DB.Members?.ToList();
+
         foreach (var M in Members)
         {
             int OStatus = M.Status;
 
-           if (DB.MembershipMovements.Where(x=>x.MemberId == M.Id).Count() <= 0)
-           {
-               M.Status = -1;
-           }
+            if (DB.MembershipMovements.Where(x => x.MemberId == M.Id).Count() <= 0)
+            {
+                M.Status = -1;
+            }
 
             var ActiveMemberShip = M.MembershipMovements.Where(m => m.Status == 1).SingleOrDefault();
-            if (ActiveMemberShip == null) {
+            if (ActiveMemberShip == null)
+            {
                 M.Status = -1;
             }
 
@@ -338,7 +334,7 @@ public class EmployeeController : Controller
 
         return Ok(true);
     }
-   
+
     [Route("Employee/CheckBlackListActionLogEmployees")]
     [HttpGet]
     public IActionResult CheckBlackListActionLogEmployees()
@@ -349,10 +345,10 @@ public class EmployeeController : Controller
         {
             int OStatus = M.Status;
 
-            var logblacklist = DB.ActionLogs.Where(x => x.MemberId == M.Id  && x.Opration.OprationName== "BlackList").OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
+            var logblacklist = DB.ActionLogs.Where(x => x.MemberId == M.Id && x.Opration.OprationName == "BlackList").OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
             if (logblacklist != null)
             {
-                M.Status = DB.Oprationsys.Where(o=>o.Id == logblacklist.OprationId).SingleOrDefault().Status;
+                M.Status = DB.Oprationsys.Where(o => o.Id == logblacklist.OprationId).SingleOrDefault().Status;
             }
             DB.SaveChanges();
         }

@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 #nullable disable
 
-namespace Entities
+namespace Entities;
+
+public partial class MenuItem
 {
-    public partial class MenuItem
+    public MenuItem()
     {
-        public MenuItem()
-        {
-            ItemMuos = new HashSet<ItemMuo>();
-        }
-
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public int Status { get; set; }
-        public string Description { get; set; }
-        public bool IsPrime { get; set; }
-
-        public virtual ICollection<ItemMuo> ItemMuos { get; set; }
+        ItemMuos = new HashSet<ItemMuo>();
     }
+
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public int Status { get; set; }
+    public string Description { get; set; }
+    public bool IsPrime { get; set; }
+
+    public virtual ICollection<ItemMuo> ItemMuos { get; set; }
 }

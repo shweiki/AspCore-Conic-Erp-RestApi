@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Web;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
-using Entities;
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
+using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -23,7 +17,7 @@ public class AdjustmentController : Controller
     [HttpPost]
 
     public IActionResult Create(Adjustment collection)
-   {
+    {
         if (ModelState.IsValid)
         {
             try
@@ -59,8 +53,8 @@ public class AdjustmentController : Controller
             //Console.WriteLine(collection);
             return Ok(false);
         }
-    
-}
+
+    }
     [Route("Adjustment/GetRAdjustments")]
     [HttpGet]
     public IActionResult GetRAdjustments()

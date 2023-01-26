@@ -1,8 +1,7 @@
-﻿namespace AspCore_Conic_Erp_RestApi
+﻿namespace AspCore_Conic_Erp_RestApi;
+
+public enum ClearFlag
 {
-    public enum ClearFlag
-    {
-        UserData = 5,
-        FingerPrintTemplate = 2
-    }
+    UserData = 5,
+    FingerPrintTemplate = 2
 }

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
-using Entities;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -12,7 +12,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers;
 
 public class InventoryMovementController : Controller
 {
-            private ConicErpContext DB;
+    private ConicErpContext DB;
     public InventoryMovementController(ConicErpContext dbcontext)
     {
         DB = dbcontext;
@@ -58,5 +58,5 @@ public class InventoryMovementController : Controller
         return Ok(InventoryMovements);
     }
 
-  
+
 }

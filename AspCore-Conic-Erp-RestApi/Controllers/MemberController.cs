@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
-using Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
 [Authorize]
 public class MemberController : Controller
 {
-            private ConicErpContext DB; 
+    private ConicErpContext DB;
     public IConfiguration Configuration { get; }
 
     public MemberController(ConicErpContext dbcontext, IConfiguration configuration)
@@ -80,14 +77,14 @@ public class MemberController : Controller
     public IActionResult GetMemberByAny(string Any)
     {
         Any.ToLower();
-        var Members = DB.Members.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0","").Replace(" ","").Contains(Any.Replace("0", "").Replace(" ", "")) || m.Tag.Contains(Any))
+        var Members = DB.Members.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.Tag.Contains(Any))
             .Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1, x.Tag }).ToList();
 
         return Ok(Members);
     }
     [HttpPost]
     [Route("Member/GetByListQ")]
-    public IActionResult GetByListQ(int Limit, string Sort, int Page,int? Status, string Any)
+    public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
     {
         var Members = DB.Members.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.ToLower().Contains(Any) || s.Ssn.Contains(Any) || s.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.Tag.Contains(Any))
         && (Status == null || s.Status == Status)).Select(x => new
@@ -122,7 +119,7 @@ public class MemberController : Controller
 
     [Route("Member/CheckMemberIsExist")]
     [HttpGet]
-    public IActionResult CheckMemberIsExist(string Ssn , string PhoneNumber)
+    public IActionResult CheckMemberIsExist(string Ssn, string PhoneNumber)
     {
         var Members = DB.Members.Where(m => m.Ssn == Ssn || m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", "")).ToList();
 
@@ -138,11 +135,11 @@ public class MemberController : Controller
 
             var membershiplist = DB.ActionLogs.Where(l => l.MembershipMovementId != null && l.PostingDateTime >= DateTime.Today).Select(x => x.MembershipMovementId).ToList();
 
-          var Members = DB.MembershipMovements.Where(x => membershiplist.Contains(x.Id)).ToList().Select(x => new
+            var Members = DB.MembershipMovements.Where(x => membershiplist.Contains(x.Id)).ToList().Select(x => new
             {
                 x.Id,
                 Name = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
-              MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
+                MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
                 x.VisitsUsed,
                 x.Type,
                 x.StartDate,
@@ -150,9 +147,9 @@ public class MemberController : Controller
                 x.TotalAmmount,
                 x.Description,
                 x.Status,
-              x.Member.Vaccine,
-              // lastLog = DB.MemberLogs.Where(ml => ml.MemberId == x.MemberId).LastOrDefault().DateTime,
-              x.MemberId
+                x.Member.Vaccine,
+                // lastLog = DB.MemberLogs.Where(ml => ml.MemberId == x.MemberId).LastOrDefault().DateTime,
+                x.MemberId
             }).ToList();
             return Ok(Members);
         }
@@ -201,7 +198,7 @@ public class MemberController : Controller
                     Type = "Member",
                     Description = collection.Description,
                     Status = 0,
-                    Code ="",
+                    Code = "",
                     ParentId = DB.TreeAccounts.Where(x => x.Type == "Members-Main").SingleOrDefault().Code
 
                 };
@@ -254,7 +251,7 @@ public class MemberController : Controller
     }
     [Route("Member/GetMemberById")]
     [HttpGet]
-    public  IActionResult GetMemberById(long? Id)
+    public IActionResult GetMemberById(long? Id)
     {
         MembershipMovementController MSC = new MembershipMovementController(DB, Configuration);
         foreach (var MS in DB.MembershipMovements.Where(m => m.MemberId == Id).ToList())
@@ -263,7 +260,7 @@ public class MemberController : Controller
 
         }
         var Member = DB.Members.Where(m => m.Id == Id).Select(
-            x => new 
+            x => new
             {
                 x.Id,
                 x.Name,
@@ -300,13 +297,14 @@ public class MemberController : Controller
     [HttpGet]
     public IActionResult FixPhoneNumber()
     {
-        DB.Members.Where(i => i.PhoneNumber1 != null).ToList().ForEach(s => {
+        DB.Members.Where(i => i.PhoneNumber1 != null).ToList().ForEach(s =>
+        {
             s.PhoneNumber1 = s.PhoneNumber1.Replace(" ", "");
-            s.PhoneNumber1 = s.PhoneNumber1.Length == 10 ? s.PhoneNumber1.Substring(1) : s.PhoneNumber1; 
+            s.PhoneNumber1 = s.PhoneNumber1.Length == 10 ? s.PhoneNumber1.Substring(1) : s.PhoneNumber1;
         });
 
         DB.SaveChanges();
- 
+
 
         return Ok(true);
     }
@@ -315,13 +313,13 @@ public class MemberController : Controller
     [HttpGet]
     public IActionResult CheckMembers()
     {
-       var Members = DB.Members?.ToList();
+        var Members = DB.Members?.ToList();
 
         foreach (var M in Members)
         {
             int OStatus = M.Status;
 
-            var MembershipMovements = DB.MembershipMovements.Where(m=> m.MemberId == M.Id).ToList();
+            var MembershipMovements = DB.MembershipMovements.Where(m => m.MemberId == M.Id).ToList();
 
             if (MembershipMovements.Count() <= 0)
             {
@@ -343,11 +341,11 @@ public class MemberController : Controller
 
             DB.SaveChanges();
         }
-          //CheckBlackListActionLogMembers();
+        //CheckBlackListActionLogMembers();
 
         return Ok(true);
     }
-   
+
     [Route("Member/CheckBlackListActionLogMembers")]
     [HttpGet]
     public IActionResult CheckBlackListActionLogMembers()
@@ -358,7 +356,7 @@ public class MemberController : Controller
         {
             int OStatus = M.Status;
 
-            var LastLog = DB.ActionLogs.Where(x => x.MemberId == M.Id && x.Opration.TableName =="Member" )?.OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
+            var LastLog = DB.ActionLogs.Where(x => x.MemberId == M.Id && x.Opration.TableName == "Member")?.OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
             if (LastLog != null)
             {
                 M.Status = DB.Oprationsys.Where(x => x.Id == LastLog.OprationId).SingleOrDefault().Status;

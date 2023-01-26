@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Data;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
-using Entities; 
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -15,13 +14,13 @@ public class CashPoolController : Controller
     public CashPoolController(ConicErpContext dbcontext)
     {
         DB = dbcontext;
-    }       
+    }
     [HttpPost]
     [Route("CashPool/GetByListQ")]
-    public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any ,string Type)
+    public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
     {
-        var List = DB.CashPools.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Description.Contains(Any)  : true ) && (DateFrom != null ? s.DateTime >= DateFrom : true)
-        && (DateTo != null ? s.DateTime <= DateTo : true) && (Status != null ? s.Status == Status : true)&&(Type != null ? s.Type == Type : true) && (User != null ? DB.ActionLogs.Where(l =>l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        var List = DB.CashPools.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Description.Contains(Any) : true) && (DateFrom != null ? s.DateTime >= DateFrom : true)
+        && (DateTo != null ? s.DateTime <= DateTo : true) && (Status != null ? s.Status == Status : true) && (Type != null ? s.Type == Type : true) && (User != null ? DB.ActionLogs.Where(l => l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
         {
             x.Id,
             x.Type,
@@ -39,18 +38,22 @@ public class CashPoolController : Controller
             x.Fktable,
             Totals = 0
         }).ToList();
-        List =  (Sort == "+id" ? List.OrderBy(s => s.Id).ToList() : List.OrderByDescending(s => s.Id).ToList());
-        return Ok(new {items = List.Skip((Page - 1) * Limit).Take(Limit).ToList(), 
-        Totals = new {
-            Rows = List.Count(),
-            Cash = List.Sum(s => s.TotalCash),
-            Coins = List.Sum(s => s.TotalCoins),
-            Visa = List.Sum(s => s.TotalVisa),
-            Reject = List.Sum(s => s.TotalReject),
-            Outlay = List.Sum(s => s.TotalOutlay),
-            Restitution = List.Sum(s => s.TotalRestitution),
-        } });
-}
+        List = (Sort == "+id" ? List.OrderBy(s => s.Id).ToList() : List.OrderByDescending(s => s.Id).ToList());
+        return Ok(new
+        {
+            items = List.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+            Totals = new
+            {
+                Rows = List.Count(),
+                Cash = List.Sum(s => s.TotalCash),
+                Coins = List.Sum(s => s.TotalCoins),
+                Visa = List.Sum(s => s.TotalVisa),
+                Reject = List.Sum(s => s.TotalReject),
+                Outlay = List.Sum(s => s.TotalOutlay),
+                Restitution = List.Sum(s => s.TotalRestitution),
+            }
+        });
+    }
 
     [HttpPost]
     [Route("CashPool/Create")]
@@ -99,7 +102,7 @@ public class CashPoolController : Controller
                 Invoice.EditorName = collection.EditorName;
                 Invoice.TableName = collection.TableName;
                 Invoice.Fktable = collection.Fktable;
-             
+
                 DB.SaveChanges();
 
                 return Ok(true);
@@ -117,7 +120,8 @@ public class CashPoolController : Controller
     [HttpGet]
     public IActionResult GetCashPoolById(long? Id)
     {
-        var List = DB.CashPools.Where(x => x.Id == Id).Select(x => new {
+        var List = DB.CashPools.Where(x => x.Id == Id).Select(x => new
+        {
             x.Id,
             x.Type,
             x.TotalCash,

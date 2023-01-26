@@ -1,7 +1,6 @@
-﻿namespace AspCore_Conic_Erp_RestApi
+﻿namespace AspCore_Conic_Erp_RestApi;
+
+internal class DeviceTimeInfo
 {
-    internal class DeviceTimeInfo
-    {
-        public string DeviceTime { get; set; }
-    }
+    public string DeviceTime { get; set; }
 }

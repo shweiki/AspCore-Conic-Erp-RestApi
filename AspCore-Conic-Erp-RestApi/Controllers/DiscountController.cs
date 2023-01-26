@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
-using Entities; 
-using Microsoft.AspNetCore.Mvc;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -14,11 +13,13 @@ public class DiscountController : Controller
     public DiscountController(ConicErpContext dbcontext)
     {
         DB = dbcontext;
-    }        [Route("Discount/GetDiscount")]
+    }
+    [Route("Discount/GetDiscount")]
     [HttpGet]
     public IActionResult GetDiscount()
     {
-        var Discounts = DB.Discounts.Select(x => new {
+        var Discounts = DB.Discounts.Select(x => new
+        {
             x.Id,
             x.Name,
             x.Type,
@@ -35,7 +36,7 @@ public class DiscountController : Controller
     [HttpGet]
     public IActionResult GetActiveDiscount()
     {
-        var Discounts = DB.Discounts.Select(x => new { value = x.Value, type = x.Type, label = x.Name ,x.ValueOfDays }).ToList();
+        var Discounts = DB.Discounts.Select(x => new { value = x.Value, type = x.Type, label = x.Name, x.ValueOfDays }).ToList();
 
         return Ok(Discounts);
     }
@@ -64,12 +65,12 @@ public class DiscountController : Controller
     {
         if (ModelState.IsValid)
         {
-                Discount Discount = DB.Discounts.Where(x => x.Id == collection.Id).SingleOrDefault();
-                Discount.Name = collection.Name;
-                Discount.Value = collection.Value;
-                Discount.ValueOfDays = collection.ValueOfDays;
-                Discount.Type = collection.Type;
-                Discount.Description = collection.Description;
+            Discount Discount = DB.Discounts.Where(x => x.Id == collection.Id).SingleOrDefault();
+            Discount.Name = collection.Name;
+            Discount.Value = collection.Value;
+            Discount.ValueOfDays = collection.ValueOfDays;
+            Discount.Type = collection.Type;
+            Discount.Description = collection.Description;
             try
             {
                 DB.SaveChanges();

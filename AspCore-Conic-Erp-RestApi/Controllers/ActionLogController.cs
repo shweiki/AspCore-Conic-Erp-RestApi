@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Data.SqlClient;
-using System.Web;
-using Microsoft.AspNetCore.Mvc;
-using Entities;
-using Microsoft.AspNetCore.Authorization;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -21,7 +19,7 @@ public class ActionLogController : Controller
     {
         try
         {
-           LogOpratio.PostingDateTime = DateTime.Now;
+            LogOpratio.PostingDateTime = DateTime.Now;
 
             // TODO: Add insert logic here
             DB.ActionLogs.Add(LogOpratio);
@@ -40,14 +38,14 @@ public class ActionLogController : Controller
     [HttpGet]
     public IActionResult GetLogByObjTable(string TableName, int Id)
     {
-        List<ActionLog> ActionLogs = new List<ActionLog>() ; 
+        List<ActionLog> ActionLogs = new List<ActionLog>();
         switch (TableName)
         {
             case "InventoryItem":
-                  ActionLogs = DB.ActionLogs.Where(l => l.InventoryItemId == Id).ToList();
+                ActionLogs = DB.ActionLogs.Where(l => l.InventoryItemId == Id).ToList();
                 break;
             case "OrderInventory":
-                 ActionLogs = DB.ActionLogs.Where(l => l.OrderInventoryId == Id).ToList();
+                ActionLogs = DB.ActionLogs.Where(l => l.OrderInventoryId == Id).ToList();
                 break;
             case "StocktakingInventory":
                 ActionLogs = DB.ActionLogs.Where(l => l.StocktakingInventoryId == Id).ToList();
@@ -128,7 +126,7 @@ public class ActionLogController : Controller
                 ActionLogs = DB.ActionLogs.Where(l => l.OrderRestaurantId == Id).ToList();
                 break;
         };
-        
+
         return Ok(ActionLogs);
 
 

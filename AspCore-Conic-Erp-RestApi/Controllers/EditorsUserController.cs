@@ -1,8 +1,8 @@
-﻿using System.Data;
-using System.Linq;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Entities; 
+using System.Data;
+using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -24,8 +24,8 @@ public class EditorsUserController : Controller
             x.Id,
             x.Name
         }).ToList();
-                     
-                        
+
+
         return Ok(EditorsUsers);
 
     }
@@ -67,8 +67,8 @@ public class EditorsUserController : Controller
                 DB.EditorsUsers.Add(collection);
                 DB.SaveChanges();
 
-                    return Ok(true);
-                
+                return Ok(true);
+
             }
             catch
             {

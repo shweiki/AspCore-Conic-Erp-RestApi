@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net;
-using Microsoft.AspNetCore.Authorization;
-using Entities; 
-using Microsoft.AspNetCore.Mvc;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -15,17 +14,19 @@ public class DashbordController : Controller
 {
 
     private readonly ConicErpContext DB;
-    public   DashbordController(ConicErpContext dbcontext)
+    public DashbordController(ConicErpContext dbcontext)
     {
         DB = dbcontext;
-    }        [Route("Dashbord/GetTotal")]
+    }
+    [Route("Dashbord/GetTotal")]
     [HttpGet]
     public IActionResult GetTotal()
     {
         string MsgCredit = "0";
         WebRequest request = WebRequest.Create(
           "http://josmsservice.com/smsonline/GetBalance.cfm?AccName=highfit&AccPass=D7!cT5!SgU0");
-        if (request.ContentLength > 0) { 
+        if (request.ContentLength > 0)
+        {
             request.Credentials = CredentialCache.DefaultCredentials;
             WebResponse response = request.GetResponse();
             string responseFromServer;
@@ -35,33 +36,36 @@ public class DashbordController : Controller
             MsgCredit = responseFromServer;
             response.Close();
         }
-        DateTime LastWeek = DateTime.Today.AddDays(- 6);
-        var SalelastWeek = DB.SalesInvoices.Where(x => x.Status == 1 && x.FakeDate >= LastWeek )
-            .AsEnumerable().Select(x => new {
-                Total = DB.InventoryMovements.Where(ms=> ms.SalesInvoiceId == x.Id).Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+        DateTime LastWeek = DateTime.Today.AddDays(-6);
+        var SalelastWeek = DB.SalesInvoices.Where(x => x.Status == 1 && x.FakeDate >= LastWeek)
+            .AsEnumerable().Select(x => new
+            {
+                Total = DB.InventoryMovements.Where(ms => ms.SalesInvoiceId == x.Id).Sum(s => s.SellingPrice * s.Qty) - x.Discount,
                 x.FakeDate
-            }).GroupBy(a => new { a.FakeDate.DayOfWeek }).Select(g => new {
+            }).GroupBy(a => new { a.FakeDate.DayOfWeek }).Select(g => new
+            {
                 Key = g.First().FakeDate.ToString("ddd"),
                 Value = g.Sum(d => d.Total),
             }).ToList();
         var Data = new
-            {
-                Items = DB.Items.Count(),
-                Purchases = DB.PurchaseInvoices.Count(),
-                Sales = new { Count = DB.SalesInvoices.Count(), xAxisdata = SalelastWeek.Select(x=>x.Key), expectedData = SalelastWeek.Select(l => l.Value), actualData = SalelastWeek.Select(l=>l.Value) },
-                Clients = DB.Vendors.Where(x => x.Type == "Customer").Count(),
-                Suppliers = DB.Vendors.Where(x => x.Type == "Supplier").Count(),
-                Members = DB.Members.Count(),
-                MembersActive = DB.Members.Where(x => x.Status >= 0).Count(),
-                MsgCredit
-            };
-            return Ok(Data);
+        {
+            Items = DB.Items.Count(),
+            Purchases = DB.PurchaseInvoices.Count(),
+            Sales = new { Count = DB.SalesInvoices.Count(), xAxisdata = SalelastWeek.Select(x => x.Key), expectedData = SalelastWeek.Select(l => l.Value), actualData = SalelastWeek.Select(l => l.Value) },
+            Clients = DB.Vendors.Where(x => x.Type == "Customer").Count(),
+            Suppliers = DB.Vendors.Where(x => x.Type == "Supplier").Count(),
+            Members = DB.Members.Count(),
+            MembersActive = DB.Members.Where(x => x.Status >= 0).Count(),
+            MsgCredit
+        };
+        return Ok(Data);
     }
     [HttpGet]
-    public IActionResult GetStatistics(String By = "MonthOfYear" ) //MonthOfYear , WeekOfMonth
+    public IActionResult GetStatistics(String By = "MonthOfYear") //MonthOfYear , WeekOfMonth
     {
         var InComeOutCome = DB.EntryMovements.Where(x => x.Account.Type == "InCome" || x.Account.Type == "OutCome")
-             .Select(x => new {
+             .Select(x => new
+             {
                  Key = "",
                  x.Entry.FakeDate,
                  x.Credit,
@@ -69,18 +73,18 @@ public class DashbordController : Controller
                  x.Account.Type,
                  x.Account.Name
              }).GroupBy(a => new { a.FakeDate.Month, a.FakeDate.Year }).Select(g => new
-            {
-                Key = g.First().FakeDate.ToString("MM") + "-" + g.First().FakeDate.ToString("yyyy"),
-                g.First().Type,
-                g.First().Name,
-                Credit = g.Sum(d => d.Credit),
-                Debit = g.Sum(d => d.Debit),
-            }).ToList();
+             {
+                 Key = g.First().FakeDate.ToString("MM") + "-" + g.First().FakeDate.ToString("yyyy"),
+                 g.First().Type,
+                 g.First().Name,
+                 Credit = g.Sum(d => d.Credit),
+                 Debit = g.Sum(d => d.Debit),
+             }).ToList();
 
-       
-         //   InComeOutCome.GroupBy(a => new { a.FakeDate.DayOfWeek, a.FakeDate.Month }).Select(g => new
-           
-            //    Key = g.First().FakeDate.ToString("dddd") + "-" + g.First().FakeDate.ToString("MM"),
+
+        //   InComeOutCome.GroupBy(a => new { a.FakeDate.DayOfWeek, a.FakeDate.Month }).Select(g => new
+
+        //    Key = g.First().FakeDate.ToString("dddd") + "-" + g.First().FakeDate.ToString("MM"),
 
 
         var Series = new
@@ -90,7 +94,7 @@ public class DashbordController : Controller
             Profit = InComeOutCome.Select(l => l.Debit - l.Credit)
         };
 
-        return Ok(new { InComeOutCome,   xAxis = InComeOutCome.Select(x => x.Key), Series });
+        return Ok(new { InComeOutCome, xAxis = InComeOutCome.Select(x => x.Key), Series });
 
     }
 }

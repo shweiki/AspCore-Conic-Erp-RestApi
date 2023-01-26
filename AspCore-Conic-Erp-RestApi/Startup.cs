@@ -1,6 +1,8 @@
 using Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,12 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using EmailService;
-using Microsoft.AspNetCore.Http.Features;
 using System;
-using Microsoft.AspNetCore.Http;
-using Entities.Repositories;
-using Entities.Interfaces;
 
 namespace AspCore_Conic_Erp_RestApi;
 

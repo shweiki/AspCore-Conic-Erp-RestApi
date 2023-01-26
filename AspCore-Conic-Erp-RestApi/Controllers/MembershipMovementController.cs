@@ -1,20 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
-using Entities; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
 [Authorize]
 public class MembershipMovementController : Controller
 {
-     private readonly ConicErpContext DB; 
+    private readonly ConicErpContext DB;
     public IConfiguration Configuration { get; }
 
-    public MembershipMovementController(ConicErpContext dbcontext , IConfiguration configuration)
+    public MembershipMovementController(ConicErpContext dbcontext, IConfiguration configuration)
     {
         DB = dbcontext;
         Configuration = configuration;
@@ -87,91 +86,91 @@ public class MembershipMovementController : Controller
         int MembershipNumberDays = DB.Memberships.Where(m => m.Id == MS.MembershipId).FirstOrDefault().NumberDays;
         MS.EndDate = MS.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders);
         if (DateTime.Now >= MS.StartDate.Date && DateTime.Now <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59))
-            {
-          
-            MS.Status = 1;
-                member.Status = 0;
-                var HowManyDaysLeft = (MS.EndDate - DateTime.Now).TotalDays;
-                if (HowManyDaysLeft == 3)
-                {
-                    Massage msg = new();
-                    msg.Body = "عزيزي " + member.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + MS.EndDate + " وشكرا";
-                    msg.Status = 0;
-                    msg.TableName = "Member";
-                    msg.Fktable = member.Id;
-                    msg.PhoneNumber = member.PhoneNumber1;
-                    msg.SendDate = DateTime.Now;
-                    msg.Type = "رسالة تذكير";
-                    DB.Massages.Add(msg);
-                }
+        {
 
+            MS.Status = 1;
+            member.Status = 0;
+            var HowManyDaysLeft = (MS.EndDate - DateTime.Now).TotalDays;
+            if (HowManyDaysLeft == 3)
+            {
+                Massage msg = new();
+                msg.Body = "عزيزي " + member.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + MS.EndDate + " وشكرا";
+                msg.Status = 0;
+                msg.TableName = "Member";
+                msg.Fktable = member.Id;
+                msg.PhoneNumber = member.PhoneNumber1;
+                msg.SendDate = DateTime.Now;
+                msg.Type = "رسالة تذكير";
+                DB.Massages.Add(msg);
+            }
+
+        }
+        else
+        {
+
+            if (MS.StartDate.Date > DateTime.Now)
+            {// معلق
+                MS.Status = -2;
             }
             else
             {
 
-                if (MS.StartDate.Date > DateTime.Now)
-                {// معلق
-                    MS.Status = -2;
-                }
-                else
-                {
+                MS.Status = -1;
+                member.Status = -1;
+            }
+        }
 
-                    MS.Status = -1;
-                    member.Status = -1;
+        foreach (MembershipMovementOrder MSO in DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id && (x.Status == 1 || x.Status == 2)).ToList())
+        {
+            if (MSO.Status == 2)
+            {
+                MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
+                MSO.Status = -2;
+                continue;
+            }
+            if ((DateTime.Now >= MSO.StartDate.Date && DateTime.Now <= MSO.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59)))
+            {
+                if (MSO.Type == "Freeze")
+                {
+                    MS.Status = 2;
+                    member.Status = 1;
+                }
+                if (MSO.Type == "Extra")
+                {
+                    MS.Status = 3;
+                    member.Status = 2;
+
                 }
             }
-
-            foreach (MembershipMovementOrder MSO in DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id && (x.Status == 1 || x.Status == 2)).ToList())
+            else
             {
-                if (MSO.Status == 2)
+                if (MSO.Type == "Extra")
                 {
                     MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
-                    MSO.Status = -2;
-                    continue;
+                    MSO.Status = -3;
                 }
-                if ((DateTime.Now >= MSO.StartDate.Date && DateTime.Now <= MSO.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59)))
-                {
-                    if (MSO.Type == "Freeze")
-                    {
-                        MS.Status = 2;
-                        member.Status = 1;
-                    }
-                    if (MSO.Type == "Extra")
-                    {
-                        MS.Status = 3;
-                        member.Status = 2;
-
-                    }
-                }
-                else
-                {
-                    if (MSO.Type == "Extra")
-                    {
-                        MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
-                        MSO.Status = -3;
-                    }
-                    if (DateTime.Now > MSO.EndDate)
-                    {
-
-                        MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
-                        MSO.Status = -3;
-                    }
-
-                }
-                if ((MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59) > DateTime.Now))
+                if (DateTime.Now > MSO.EndDate)
                 {
 
-
-                    MS.Status = 1;
-                    member.Status = 1;
-
-                }
-                if (MS == null)
-                {
-                    member.Status = -1;
+                    MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
+                    MSO.Status = -3;
                 }
 
-           
+            }
+            if ((MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59) > DateTime.Now))
+            {
+
+
+                MS.Status = 1;
+                member.Status = 1;
+
+            }
+            if (MS == null)
+            {
+                member.Status = -1;
+            }
+
+
             DB.SaveChanges();
 
         }
@@ -181,14 +180,16 @@ public class MembershipMovementController : Controller
             DeviceLogs = DeviceLogs.GroupBy(a => a.DateTime.Day).Select(g => g.Last()).ToList();
             MS.VisitsUsed = DeviceLogs.Count();
             int NumberClass = (int)(MS.Membership.NumberClass == null ? 0 : MS.Membership.NumberClass);
-                var WhenFinishNumberOfClassUnActiveMemberShip = Configuration["GymConfiguration:WhenFinishNumberOfClassUnActiveMemberShip"];
-                if (WhenFinishNumberOfClassUnActiveMemberShip == "True"){
-                    if (MS.Membership.NumberClass <= MS.VisitsUsed){
-                        MS.EndDate = DeviceLogs.LastOrDefault().DateTime;
-                        MS.Status = -1;
-                        member.Status = -1;
-                    }
+            var WhenFinishNumberOfClassUnActiveMemberShip = Configuration["GymConfiguration:WhenFinishNumberOfClassUnActiveMemberShip"];
+            if (WhenFinishNumberOfClassUnActiveMemberShip == "True")
+            {
+                if (MS.Membership.NumberClass <= MS.VisitsUsed)
+                {
+                    MS.EndDate = DeviceLogs.LastOrDefault().DateTime;
+                    MS.Status = -1;
+                    member.Status = -1;
                 }
+            }
         }
         if (OStatus == -2) member.Status = -2;
         DB.SaveChanges();
@@ -231,16 +232,17 @@ public class MembershipMovementController : Controller
 
             }).ToList(),
         }).ToList();
-                                
-                                     
-             
+
+
+
         return Ok(MembershipMovements);
     }
     [Route("MembershipMovement/GetMembershipMovementById")]
     [HttpGet]
     public IActionResult GetMembershipMovementById(long? Id)
     {
-        var MembershipMovements = DB.MembershipMovements.Where(z => z.Id == Id).Select(x => new {
+        var MembershipMovements = DB.MembershipMovements.Where(z => z.Id == Id).Select(x => new
+        {
             x.Id,
             x.VisitsUsed,
             x.Type,
@@ -264,7 +266,8 @@ public class MembershipMovementController : Controller
     [HttpGet]
     public IActionResult GetMembershipMovementByStatus(int? Status)
     {
-        var MembershipMovements = DB.MembershipMovements.Where(z => z.Status == Status).Select(x => new {
+        var MembershipMovements = DB.MembershipMovements.Where(z => z.Status == Status).Select(x => new
+        {
             x.Id,
             x.TotalAmmount,
             x.Tax,
@@ -282,35 +285,36 @@ public class MembershipMovementController : Controller
             MemberName = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
             MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
         }).ToList();
-                     
-                          
+
+
         return Ok(MembershipMovements);
     }
     [HttpGet]
     [Route("MembershipMovement/GetMembershipMovementByMembershipId")]
-    public IActionResult GetMembershipMovementByMembershipId(long? MembershipId ,DateTime? DateIn)
+    public IActionResult GetMembershipMovementByMembershipId(long? MembershipId, DateTime? DateIn)
     {
-      var MembershipMovements = DB.MembershipMovements.Where(z =>
-       (MembershipId == null || z.MembershipId == MembershipId) &&
-       (DateIn == null || DateIn >= z.StartDate && z.EndDate >= DateIn)).Select(x => new {
-            x.Id,
-            x.TotalAmmount,
-            x.Tax,
-            x.StartDate,
-            x.EndDate,
-            x.Type,
-            x.VisitsUsed,
-            x.Discount,
-            x.DiscountDescription,
-            x.Description,
-            x.Status,
-            x.EditorName,
-            x.MemberId,
-            x.Member.PhoneNumber1,
-            x.Member.AccountId,
-            MemberName = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
-            MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
-        }).ToList();
+        var MembershipMovements = DB.MembershipMovements.Where(z =>
+         (MembershipId == null || z.MembershipId == MembershipId) &&
+         (DateIn == null || DateIn >= z.StartDate && z.EndDate >= DateIn)).Select(x => new
+         {
+             x.Id,
+             x.TotalAmmount,
+             x.Tax,
+             x.StartDate,
+             x.EndDate,
+             x.Type,
+             x.VisitsUsed,
+             x.Discount,
+             x.DiscountDescription,
+             x.Description,
+             x.Status,
+             x.EditorName,
+             x.MemberId,
+             x.Member.PhoneNumber1,
+             x.Member.AccountId,
+             MemberName = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
+             MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
+         }).ToList();
         return Ok(MembershipMovements);
     }
     [Route("MembershipMovement/GetMembershipMovementByDateIn")]
@@ -318,8 +322,9 @@ public class MembershipMovementController : Controller
     public IActionResult GetMembershipMovementByDateIn(DateTime DateIn)
     {
 
-     
-        var MembershipMovements = DB.MembershipMovements.Where(z => DateIn >= z.StartDate && z.EndDate  >= DateIn).Select(x => new {
+
+        var MembershipMovements = DB.MembershipMovements.Where(z => DateIn >= z.StartDate && z.EndDate >= DateIn).Select(x => new
+        {
             x.Id,
             x.TotalAmmount,
             x.Tax,
@@ -337,8 +342,8 @@ public class MembershipMovementController : Controller
             MemberName = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
             MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
         }).ToList();
- 
-                          
-      return Ok(MembershipMovements);
+
+
+        return Ok(MembershipMovements);
     }
 }

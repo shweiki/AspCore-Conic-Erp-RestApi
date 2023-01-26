@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Entities; 
+using System.Data;
+using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -17,11 +13,13 @@ public class ChequeController : Controller
     public ChequeController(ConicErpContext dbcontext)
     {
         DB = dbcontext;
-    }        [Route("Cheques/GetCheques")]
+    }
+    [Route("Cheques/GetCheques")]
     [HttpGet]
     public IActionResult GetCheque()
     {
-        var Cheques = DB.Cheques.Select(x=>new {
+        var Cheques = DB.Cheques.Select(x => new
+        {
             x.Id,
             x.BankAddress,
             x.BankName,
@@ -36,9 +34,9 @@ public class ChequeController : Controller
             x.VendorId,
             x.Vendor.Name,
         }).ToList();
-                      
 
-                     
+
+
         return Ok(Cheques);
     }
 

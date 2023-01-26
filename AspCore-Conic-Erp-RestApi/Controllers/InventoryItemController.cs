@@ -1,8 +1,8 @@
-﻿using System.Data;
-using System.Linq;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
-using Entities; 
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Linq;
 
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
@@ -10,7 +10,7 @@ namespace AspCore_Conic_Erp_RestApi.Controllers;
 [Authorize]
 public class InventoryItemController : Controller
 {
-            private ConicErpContext DB;
+    private ConicErpContext DB;
     public InventoryItemController(ConicErpContext dbcontext)
     {
         DB = dbcontext;
@@ -50,7 +50,7 @@ public class InventoryItemController : Controller
             try
             {
                 DB.SaveChanges();
-                return Ok(true); 
+                return Ok(true);
             }
             catch
             {
@@ -65,12 +65,13 @@ public class InventoryItemController : Controller
     [HttpGet]
     public IActionResult GetInventoryItem()
     {
-        var InventoryItems = DB.InventoryItems.Select(x => new {
+        var InventoryItems = DB.InventoryItems.Select(x => new
+        {
             x.Id,
             x.Name,
             x.Description,
             x.Status,
-          //  InventoryQty = InventoryQty(x.Id)
+            //  InventoryQty = InventoryQty(x.Id)
         }).ToList();
 
         return Ok(InventoryItems);
@@ -81,7 +82,7 @@ public class InventoryItemController : Controller
     public IActionResult GetActiveInventory()
     {
         var InventoryItems = DB.InventoryItems.Where(x => x.Status == 0).Select(x => new { value = x.Id, label = x.Name }).ToList();
-            return Ok(InventoryItems);
+        return Ok(InventoryItems);
 
     }
 
@@ -93,8 +94,9 @@ public class InventoryItemController : Controller
                             group i by i.ItemsId into g
                             select new
                             {
-                            
-                                Item = DB.Items.Where(x=>x.Id == g.Key).Select(x=> new{
+
+                                Item = DB.Items.Where(x => x.Id == g.Key).Select(x => new
+                                {
                                     x.Id,
                                     x.CostPrice,
                                     x.Name,

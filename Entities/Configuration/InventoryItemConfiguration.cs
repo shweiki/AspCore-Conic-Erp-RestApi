@@ -1,26 +1,24 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
 
-namespace Entities.Configuration
+namespace Entities.Configuration;
+
+public class InventoryItemConfiguration : IEntityTypeConfiguration<InventoryItem>
 {
-    public class InventoryItemConfiguration : IEntityTypeConfiguration<InventoryItem>
+    public void Configure(EntityTypeBuilder<InventoryItem> builder)
     {
-        public void Configure(EntityTypeBuilder<InventoryItem> builder)
-        {
 
 
-            builder.ToTable("InventoryItem");
+        builder.ToTable("InventoryItem");
 
-            builder.Property(e => e.Id);
+        builder.Property(e => e.Id);
 
-            builder.Property(e => e.Description);
+        builder.Property(e => e.Description);
 
-            builder.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
+        builder.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(255)
+                .IsUnicode(false);
 
-        }
     }
 }

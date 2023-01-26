@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
-using Entities;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using NinjaNye.SearchExtensions;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 

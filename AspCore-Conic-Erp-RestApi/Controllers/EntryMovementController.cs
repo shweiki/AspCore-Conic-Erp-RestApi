@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
-using Entities; 
-using Microsoft.AspNetCore.Mvc;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -14,24 +14,25 @@ public class EntryMovementController : Controller
     public EntryMovementController(ConicErpContext dbcontext)
     {
         DB = dbcontext;
-    }        [Route("EntryMovement/Create")]
+    }
+    [Route("EntryMovement/Create")]
     [HttpPost]
     public IActionResult Create(IList<EntryMovement> EntryMoves)
     {
         try
         {
             var EntryMovements = from field in EntryMoves
-                       select new EntryMovement
-                       {
-                           AccountId = field.AccountId,
-                           Description = field.Description,
-                           Debit = field.Debit,
-                           Credit = field.Credit,
-                           EntryId = field.EntryId,
-                       };
+                                 select new EntryMovement
+                                 {
+                                     AccountId = field.AccountId,
+                                     Description = field.Description,
+                                     Debit = field.Debit,
+                                     Credit = field.Credit,
+                                     EntryId = field.EntryId,
+                                 };
             DB.EntryMovements.AddRange(EntryMovements);
             DB.SaveChanges();
-                return Ok(true);
+            return Ok(true);
         }
         catch
         {
@@ -44,7 +45,8 @@ public class EntryMovementController : Controller
     [HttpGet]
     public IActionResult GetEntryMovementsByAccountId(long? AccountId)
     {
-        var EntryMovements = DB.EntryMovements.Where(l => l.AccountId == AccountId).Select(x => new {
+        var EntryMovements = DB.EntryMovements.Where(l => l.AccountId == AccountId).Select(x => new
+        {
             x.Id,
             x.Credit,
             x.Debit,
@@ -55,7 +57,7 @@ public class EntryMovementController : Controller
             TotalRow = 0,
         }).ToList();
 
- 
+
 
         return Ok(EntryMovements);
     }

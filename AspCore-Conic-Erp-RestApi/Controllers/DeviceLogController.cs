@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
-using Entities; 
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 
@@ -24,7 +23,7 @@ public class DeviceLogController : ControllerBase
     public IActionResult GetDeviceLog()
     {
         var DeviceLogs = DB.DeviceLogs.Select(x => new { x.Id, x.DateTime, x.Description, x.Device.Name }).ToList();
-                  
+
         return Ok(DeviceLogs);
     }
     [Route("DeviceLog/GetById")]
@@ -36,7 +35,7 @@ public class DeviceLogController : ControllerBase
     }
     [Route("DeviceLog/GetlastLogByUserId")]
     [HttpGet]
-    public IActionResult GetlastLogByUserId(string UserId , string TableName)
+    public IActionResult GetlastLogByUserId(string UserId, string TableName)
     {
         var L = DB.DeviceLogs.Where(ml => ml.Fk == UserId && ml.TableName == TableName)?.ToList()?.LastOrDefault()?.DateTime;
         if (L != null)
@@ -46,45 +45,46 @@ public class DeviceLogController : ControllerBase
     }
     [Route("DeviceLog/GetByStatus")]
     [HttpGet]
-    public IActionResult GetByStatus(int Status ,string TableName ,int Limit, string Sort, int Page, string Any)
+    public IActionResult GetByStatus(int Status, string TableName, int Limit, string Sort, int Page, string Any)
     {
         // Get Log From ZkBio Data base 
 
         // GetFromZkBio(TableName); for v5l speed ztk
-  
-             DeviceController Device = new(DB);
 
-             foreach (var D in DB.Devices.ToList())
-                {
-                        Device.GetAllLog(D.Id, "Member");
-                        Device.GetAllLog(D.Id, "Employee", true);
-                }
+        DeviceController Device = new(DB);
 
-              //  DeviceLog.GetAllLog(D.Id, "Member");
-                //     DeviceLog.GetAllLog(D.Id, "Employee", true);
-            
-      
+        foreach (var D in DB.Devices.ToList())
+        {
+            Device.GetAllLog(D.Id, "Member");
+            Device.GetAllLog(D.Id, "Employee", true);
+        }
+
+        //  DeviceLog.GetAllLog(D.Id, "Member");
+        //     DeviceLog.GetAllLog(D.Id, "Employee", true);
+
+
 
         var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any == null || x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any)))
-            .AsEnumerable().Select(x => new {
-            x.Id,
-            x.DateTime,
-            x.Description,
-            x.Fk,
-            x.TableName,
-            User = GetFkData(x.Fk, x.TableName)
-        }).ToList();
+            .AsEnumerable().Select(x => new
+            {
+                x.Id,
+                x.DateTime,
+                x.Description,
+                x.Fk,
+                x.TableName,
+                User = GetFkData(x.Fk, x.TableName)
+            }).ToList();
 
         DeviceLogs = (Sort == "+id" ? DeviceLogs.OrderBy(s => s.Id).ToList() : DeviceLogs.OrderByDescending(s => s.Id).ToList());
 
-        DeviceLogs = DeviceLogs.GroupBy(a => new {a.Fk,  a.DateTime }).Select(g => g.Last()).ToList();
+        DeviceLogs = DeviceLogs.GroupBy(a => new { a.Fk, a.DateTime }).Select(g => g.Last()).ToList();
 
-   
+
         return Ok(DeviceLogs.Skip((Page - 1) * Limit).Take(Limit).ToList());
     }
 
-        public dynamic GetFkData(string Fktable , string TableName)
-        {
+    public dynamic GetFkData(string Fktable, string TableName)
+    {
         dynamic Object = TableName switch
         {
             "Member" => DB.Members.Where(x => x.Id == Convert.ToInt32(Fktable)).Select(x => new
@@ -114,15 +114,17 @@ public class DeviceLogController : ControllerBase
             _ => null,
         };
         return Object;
-        }
+    }
 
     [Route("DeviceLog/CheckDeviceLog")]
     [HttpGet]
     public IActionResult CheckDeviceLog()
     {
-        foreach (DeviceLog ML in DB.DeviceLogs.Where(x => x.Status >= 0 && x.TableName =="Member").ToList()) {
+        foreach (DeviceLog ML in DB.DeviceLogs.Where(x => x.Status >= 0 && x.TableName == "Member").ToList())
+        {
 
-            if (DateTime.Today > ML.DateTime) {
+            if (DateTime.Today > ML.DateTime)
+            {
                 ML.Status = -1;
             }
         }
@@ -137,7 +139,7 @@ public class DeviceLogController : ControllerBase
         {
             try
             {
-      
+
                 DB.DeviceLogs.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
@@ -158,17 +160,17 @@ public class DeviceLogController : ControllerBase
         {
             try
             {
-            DeviceLog DeviceLog = DB.DeviceLogs.Where(x => x.Id == collection.Id).SingleOrDefault();
-            DeviceLog.DeviceId = collection.DeviceId;
-            DeviceLog.Fk = collection.Fk;
-            DeviceLog.TableName = collection.TableName;
-            DeviceLog.DateTime = collection.DateTime;
-            DeviceLog.Type = collection.Type;
-            DeviceLog.Description = collection.Description;
-            DeviceLog.Status = collection.Status;              
-            DB.SaveChanges();
-            return Ok(true);
-            
+                DeviceLog DeviceLog = DB.DeviceLogs.Where(x => x.Id == collection.Id).SingleOrDefault();
+                DeviceLog.DeviceId = collection.DeviceId;
+                DeviceLog.Fk = collection.Fk;
+                DeviceLog.TableName = collection.TableName;
+                DeviceLog.DateTime = collection.DateTime;
+                DeviceLog.Type = collection.Type;
+                DeviceLog.Description = collection.Description;
+                DeviceLog.Status = collection.Status;
+                DB.SaveChanges();
+                return Ok(true);
+
             }
             catch
             {
@@ -182,30 +184,31 @@ public class DeviceLogController : ControllerBase
     [Route("DeviceLog/RemoveDuplicate")]
     public IActionResult RemoveDuplicate()
     {
-            try
+        try
+        {
+            var DuplicateRow = DB.DeviceLogs.GroupBy(s => new { s.TableName, s.Fk, s.DateTime }).Select(grp => grp.Skip(1)).ToList();
+            foreach (var Dup in DuplicateRow)
             {
-                var DuplicateRow = DB.DeviceLogs.GroupBy(s => new { s.TableName, s.Fk, s.DateTime }).Select(grp => grp.Skip(1)).ToList();
-                foreach (var Dup in DuplicateRow)
-                {
-                    if (!Dup.Any())
-                        continue;
-                    DB.DeviceLogs.RemoveRange(Dup);
-                    DB.SaveChanges();
-                }
-                return Ok(true);
+                if (!Dup.Any())
+                    continue;
+                DB.DeviceLogs.RemoveRange(Dup);
+                DB.SaveChanges();
             }
-            catch
-            {
-                //Console.WriteLine(collection);
-                return Ok(false);
-            }
+            return Ok(true);
+        }
+        catch
+        {
+            //Console.WriteLine(collection);
+            return Ok(false);
+        }
     }
 
     [Route("DeviceLog/GetLogByUserId")]
     [HttpGet]
-    public IActionResult GetLogByUserId(string UserId , string TableName, DateTime? DateFrom, DateTime? DateTo)
+    public IActionResult GetLogByUserId(string UserId, string TableName, DateTime? DateFrom, DateTime? DateTo)
     {
-        var DeviceLogs = DB.DeviceLogs.Where(x => x.Fk == UserId && x.TableName == TableName && x.DateTime >= DateFrom && x.DateTime<=DateTo).Select(x => new {
+        var DeviceLogs = DB.DeviceLogs.Where(x => x.Fk == UserId && x.TableName == TableName && x.DateTime >= DateFrom && x.DateTime <= DateTo).Select(x => new
+        {
             x.Status,
             x.Type,
             x.DateTime,
@@ -216,23 +219,23 @@ public class DeviceLogController : ControllerBase
             x.Fk,
             x.TableName
         }).ToList();
-        
+
         return Ok(DeviceLogs);
     }
 
-    public async Task<ActionResult> RegisterLog(string Id , DateTime datetime, string Ip )
+    public async Task<ActionResult> RegisterLog(string Id, DateTime datetime, string Ip)
     {
         long ID = Convert.ToInt32(Id);
         string TableName = "";
-        var member =  DB.Members.Where(m=>m.Id == ID).SingleOrDefault();
-        var Employee =  DB.Employees.Where(m=>m.Id == ID).SingleOrDefault();
+        var member = DB.Members.Where(m => m.Id == ID).SingleOrDefault();
+        var Employee = DB.Employees.Where(m => m.Id == ID).SingleOrDefault();
         if (member != null) TableName = "Member";
         if (Employee != null) TableName = "Employee";
 
         var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == Id && l.TableName == TableName).ToList();
         isLogSaveIt = DB.DeviceLogs.Where(Ld => Ld.DateTime == datetime).ToList();
         var Device = DB.Devices.Where(x => x.Ip == Ip).SingleOrDefault();
-        if (isLogSaveIt.Count <= 0 && Device !=null)
+        if (isLogSaveIt.Count <= 0 && Device != null)
         {
             var Log = new DeviceLog
             {
@@ -350,7 +353,7 @@ public class DeviceLogController : ControllerBase
         try
         {
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-            
+
             builder.DataSource = "" + Environment.MachineName + "\\SQLEXPRESS";
             builder.UserID = "sa";
             builder.Password = "Taha123456++";
@@ -370,20 +373,20 @@ public class DeviceLogController : ControllerBase
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         if (reader.HasRows)
-                        { 
+                        {
                             while (reader.Read())
                             {
-                            if (reader[1].ToString() == "0") continue;
+                                if (reader[1].ToString() == "0") continue;
 
-                            DateTime action_time = DateTime.Parse(reader[0].ToString());
-                            action_time = new DateTime(action_time.Year, action_time.Month, action_time.Day, action_time.Hour, action_time.Minute, 0);
+                                DateTime action_time = DateTime.Parse(reader[0].ToString());
+                                action_time = new DateTime(action_time.Year, action_time.Month, action_time.Day, action_time.Hour, action_time.Minute, 0);
 
-                            string objectId = reader[1].ToString();
-                            string Ip = reader[2].ToString();
+                                string objectId = reader[1].ToString();
+                                string Ip = reader[2].ToString();
                                 _ = RegisterLog(objectId, action_time, Ip);
 
-                            UpdateFromZkBioReserved(reader[3].ToString());
-                            
+                                UpdateFromZkBioReserved(reader[3].ToString());
+
                             }
                         }
                     }

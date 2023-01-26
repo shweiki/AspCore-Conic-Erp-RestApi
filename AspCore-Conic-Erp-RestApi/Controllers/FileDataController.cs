@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Data;
-using Entities;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -35,7 +34,8 @@ public class FileDataController : Controller
     public IActionResult GetProfilePictureByObjId(string TableName, long ObjId)
     {
 
-        var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId && i.Type == "ProfilePicture").Select(x => new {
+        var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId && i.Type == "ProfilePicture").Select(x => new
+        {
             x.Id,
             x.Type,
             x.File,
@@ -49,7 +49,7 @@ public class FileDataController : Controller
     }
     [Route("Files/SetTypeByObjId")]
     [HttpPost]
-    public IActionResult SetTypeByObjId(long Id ,string type)
+    public IActionResult SetTypeByObjId(long Id, string type)
     {
 
         var file = DB.FileData.Where(i => i.Id == Id).SingleOrDefault();
@@ -65,18 +65,19 @@ public class FileDataController : Controller
     }
     [Route("Files/GetFileByObjId")]
     [HttpGet]
-    public IActionResult GetFileByObjId(string TableName , long ObjId )
+    public IActionResult GetFileByObjId(string TableName, long ObjId)
     {
 
-        var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new {
+        var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new
+        {
             x.Id,
             x.Type,
             x.File,
             x.FileType
         }).ToList().LastOrDefault();
 
-      if(file != null)
-        return Ok(file);
+        if (file != null)
+            return Ok(file);
 
         return Ok(false);
     }
@@ -85,7 +86,8 @@ public class FileDataController : Controller
     public IActionResult GetFilesByObjId(string TableName, long ObjId)
     {
 
-        var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new {
+        var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new
+        {
             x.Id,
             x.Type,
             x.File,
@@ -120,7 +122,7 @@ public class FileDataController : Controller
     }
 
     ///  LoadImage
-    public Boolean LoadImage(String Base64String, long ImageNameById , string where)
+    public Boolean LoadImage(String Base64String, long ImageNameById, string where)
     {
 
         string paths = Path.Combine("Images/" + where);

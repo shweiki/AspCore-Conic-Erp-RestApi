@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
-using Entities; 
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using System.Diagnostics;
 using System;
+using System.Data;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
@@ -23,7 +21,8 @@ public class SettingController : Controller
     [HttpGet]
     public IActionResult GetSetting()
     {
-        var Settings = DB.Settings.Select(x => new {
+        var Settings = DB.Settings.Select(x => new
+        {
             x.Id,
             x.Name,
             x.Value,
@@ -38,7 +37,8 @@ public class SettingController : Controller
     [HttpGet]
     public IActionResult GetActiveSetting()
     {
-        var Settings = DB.Settings.Where(i=>i.Status==0).Select(x => new {
+        var Settings = DB.Settings.Where(i => i.Status == 0).Select(x => new
+        {
             x.Id,
             x.Name,
             x.Value,

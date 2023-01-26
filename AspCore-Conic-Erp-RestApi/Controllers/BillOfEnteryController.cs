@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Data;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
-using Entities;
-using Microsoft.AspNetCore.Mvc;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -303,7 +303,7 @@ public class BillOfEnteryController : Controller
             }
         }
         else return Ok(false);
-    }  
+    }
     [HttpPost]
     [Route("BillOfEntery/PinST9BillOfEntery")]
     public IActionResult PinST9BillOfEntery(long BillOfEnteryId, string St9)

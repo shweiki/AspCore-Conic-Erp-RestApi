@@ -1,8 +1,8 @@
-﻿using System.Data;
-using System.Linq;
+﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Entities; 
+using System.Data;
+using System.Linq;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -28,7 +28,7 @@ public class CashesController : Controller
     public IActionResult GetActive()
     {
         var Cash = DB.Cashes.Where(
-            x => x.Status != -1 ).Select(x => new { value = x.AccountId, label = x.Name }).ToList();
+            x => x.Status != -1).Select(x => new { value = x.AccountId, label = x.Name }).ToList();
         return Ok(Cash);
     }
 
@@ -95,7 +95,7 @@ public class CashesController : Controller
         return Ok(false);
     }
 
- 
+
 }
 
 
