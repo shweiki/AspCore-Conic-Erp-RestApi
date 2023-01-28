@@ -16,7 +16,6 @@ public class DeviceController : Controller
     DeviceManipulator manipulator = new DeviceManipulator();
 
     private ZkemClient objZkeeper;
-    private int iCanSaveTmp = 0;
 
     private ConicErpContext DB;
     public DeviceController(ConicErpContext dbcontext)
@@ -166,7 +165,7 @@ public class DeviceController : Controller
 
             if (objZkeeper.StartEnrollEx(UserId, iFingerIndex, 0))
             {
-                iCanSaveTmp = 1;
+             //  int iCanSaveTmp = 1;
 
                 objZkeeper.StartIdentify();//After enrolling templates,you should let the device into the 1:N verification condition
                 objZkeeper.RefreshData(1);//the data in the device should be refreshed
@@ -469,7 +468,7 @@ public class DeviceController : Controller
 
     [HttpGet]
     [Route("Device/GetAllLog")]
-    public IActionResult GetAllLog(long DeviceId, string TableName, bool WithClear = false)
+    public  IActionResult GetAllLog(long DeviceId, string TableName, bool WithClear = false)
     {
         bool d = CheckDeviceHere((int)DeviceId);
         if (d)

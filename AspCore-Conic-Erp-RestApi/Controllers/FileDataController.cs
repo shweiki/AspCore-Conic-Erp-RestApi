@@ -99,6 +99,7 @@ public class FileDataController : Controller
 
         return Ok(false);
     }
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     [Route("Files/Create")]
     [HttpPost]
     public IActionResult Create(FileDatum filex)
@@ -120,6 +121,7 @@ public class FileDataController : Controller
 
         return Ok(false);
     }
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
 
     ///  LoadImage
     public Boolean LoadImage(String Base64String, long ImageNameById, string where)
@@ -138,12 +140,11 @@ public class FileDataController : Controller
 
             System.IO.File.Delete(SourcePath);
         }
-        var image = new Bitmap(LoadImageFromBase64String(Base64String));
-#pragma warning disable CA1416 // Validate platform compatibility
+        Image image = LoadImageFromBase64String(Base64String);
         image.Save(SourcePath, ImageFormat.Bmp);
-#pragma warning restore CA1416 // Validate platform compatibility
         return (true);
     }
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
 
     public Image LoadImageFromBase64String(String Base64String)
     {

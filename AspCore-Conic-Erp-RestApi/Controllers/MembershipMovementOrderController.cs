@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -127,15 +128,15 @@ public class MembershipMovementOrderController : Controller
     }
     [Route("MembershipMovementOrder/Delete")]
     [HttpPost]
-    public IActionResult Delete(long Id)
+    public async Task<IActionResult> Delete(int Id)
     {
 
         try
         {
-            MembershipMovementOrder membershipmovementorder = DB.MembershipMovementOrders.Find(Id);
+            MembershipMovementOrder membershipmovementorder = await DB.MembershipMovementOrders.FindAsync(Id);
             DB.MembershipMovementOrders.Remove(membershipmovementorder);
 
-            DB.SaveChanges();
+            await DB.SaveChangesAsync();
             return Ok(true);
         }
         catch

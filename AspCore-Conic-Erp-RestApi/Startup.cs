@@ -52,7 +52,7 @@ public class Startup
         services.AddDbContext<ConicErpContext>(options =>
         {
 
-            options.UseSqlServer(ConnectionString,
+            options.UseLazyLoadingProxies().UseSqlServer(ConnectionString,
             sqlServerOptionsAction: options =>
             {
                 options.MigrationsAssembly("AspCore-Conic-Erp-RestApi");

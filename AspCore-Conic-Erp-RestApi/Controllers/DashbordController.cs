@@ -1,11 +1,11 @@
 ﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data;
-using System.IO;
 using System.Linq;
-using System.Net;
+using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -20,33 +20,19 @@ public class DashbordController : Controller
     }
     [Route("Dashbord/GetTotal")]
     [HttpGet]
-    public IActionResult GetTotal()
+    public async Task<IActionResult> GetTotal()
     {
-        string MsgCredit = "0";
-        WebRequest request = WebRequest.Create(
-          "http://josmsservice.com/smsonline/GetBalance.cfm?AccName=highfit&AccPass=D7!cT5!SgU0");
-        if (request.ContentLength > 0)
-        {
-            request.Credentials = CredentialCache.DefaultCredentials;
-            WebResponse response = request.GetResponse();
-            string responseFromServer;
-            using Stream dataStream = response.GetResponseStream();
-            StreamReader reader = new(dataStream);
-            responseFromServer = reader.ReadToEnd();
-            MsgCredit = responseFromServer;
-            response.Close();
-        }
         DateTime LastWeek = DateTime.Today.AddDays(-6);
-        var SalelastWeek = DB.SalesInvoices.Where(x => x.Status == 1 && x.FakeDate >= LastWeek)
-            .AsEnumerable().Select(x => new
-            {
-                Total = DB.InventoryMovements.Where(ms => ms.SalesInvoiceId == x.Id).Sum(s => s.SellingPrice * s.Qty) - x.Discount,
-                x.FakeDate
-            }).GroupBy(a => new { a.FakeDate.DayOfWeek }).Select(g => new
-            {
-                Key = g.First().FakeDate.ToString("ddd"),
-                Value = g.Sum(d => d.Total),
-            }).ToList();
+        var SalelastWeekQuery = await DB.SalesInvoices.Where(x => x.Status == 1 && x.FakeDate >= LastWeek).ToListAsync();
+        var SalelastWeek = SalelastWeekQuery.Select(x => new
+        {
+            Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,
+            x.FakeDate
+        }).GroupBy(a => new { a.FakeDate.DayOfWeek }).Select(g => new
+        {
+            Key = g.First().FakeDate.ToString("ddd"),
+            Value = g.Sum(d => d.Total),
+        }).ToList();
         var Data = new
         {
             Items = DB.Items.Count(),
@@ -56,14 +42,14 @@ public class DashbordController : Controller
             Suppliers = DB.Vendors.Where(x => x.Type == "Supplier").Count(),
             Members = DB.Members.Count(),
             MembersActive = DB.Members.Where(x => x.Status >= 0).Count(),
-            MsgCredit
+            MsgCredit = 0
         };
         return Ok(Data);
     }
     [HttpGet]
-    public IActionResult GetStatistics(String By = "MonthOfYear") //MonthOfYear , WeekOfMonth
+    public async Task<IActionResult> GetStatistics(string By = "MonthOfYear") //MonthOfYear , WeekOfMonth
     {
-        var InComeOutCome = DB.EntryMovements.Where(x => x.Account.Type == "InCome" || x.Account.Type == "OutCome")
+        var InComeOutCome = await DB.EntryMovements.Where(x => x.Account.Type == "InCome" || x.Account.Type == "OutCome")
              .Select(x => new
              {
                  Key = "",
@@ -79,7 +65,7 @@ public class DashbordController : Controller
                  g.First().Name,
                  Credit = g.Sum(d => d.Credit),
                  Debit = g.Sum(d => d.Debit),
-             }).ToList();
+             }).ToListAsync();
 
 
         //   InComeOutCome.GroupBy(a => new { a.FakeDate.DayOfWeek, a.FakeDate.Month }).Select(g => new

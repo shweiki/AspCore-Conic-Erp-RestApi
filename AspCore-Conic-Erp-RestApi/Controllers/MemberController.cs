@@ -1,9 +1,11 @@
 ﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -23,7 +25,8 @@ public class MemberController : Controller
     [HttpGet]
     public IActionResult GetReceivablesMember()
     {
-        var Members = DB.Members.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) > 0).Select(x => new
+        var Members = DB.Members.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) > 0).AsQueryable()
+        .Select(x => new
         {
             x.Id,
             x.Name,
@@ -45,7 +48,7 @@ public class MemberController : Controller
     [HttpGet]
     public IActionResult GetPayablesMember()
     {
-        var Members = DB.Members.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) < 0).Select(x => new
+        var Members = DB.Members.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) < 0).AsQueryable().Select(x => new
         {
             x.Id,
             x.Name,
@@ -251,47 +254,47 @@ public class MemberController : Controller
     }
     [Route("Member/GetMemberById")]
     [HttpGet]
-    public IActionResult GetMemberById(long? Id)
+    public async Task<IActionResult> GetMemberById(long? Id)
     {
-        MembershipMovementController MSC = new MembershipMovementController(DB, Configuration);
-        foreach (var MS in DB.MembershipMovements.Where(m => m.MemberId == Id).ToList())
-        {
-            MSC.ScanMembershipMovementById(MS.Id);
 
+        var member = await DB.Members.SingleOrDefaultAsync(m => m.Id == Id);
+        if (member == null) return BadRequest();
+        foreach (var MS in member.MembershipMovements.Where(m => m.MemberId == Id).ToList())
+        {
+            await MembershipMovementController.ScanMembershipMovementById(MS.Id, DB, Configuration);
         }
-        var Member = DB.Members.Where(m => m.Id == Id).Select(
-            x => new
-            {
-                x.Id,
-                x.Name,
-                x.Ssn,
-                x.DateofBirth,
-                x.Email,
-                x.PhoneNumber1,
-                x.PhoneNumber2,
-                x.Description,
-                x.Status,
-                x.Type,
-                x.Tag,
-                x.Vaccine,
-                //MembershipsCount = x.MembershipMovements.Count(),
-                HaveFaceOnDevice = false,// DB.FingerPrints.Where(f=>f.Fk == x.Id.ToString() && f.TableName == "Member").Count() > 0 ? true : false,
-                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
-                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
-                x.AccountId,
-                ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == x.Id && f.Status > 0).Select(MS => new
-                {
-                    MS.Id,
-                    MS.Membership.Name,
-                    MS.Membership.NumberClass,
-                    MS.VisitsUsed,
-                    MS.Type,
-                    MS.StartDate,
-                    MS.EndDate,
-                    MS.Description,
-                }).FirstOrDefault(),
-            }).SingleOrDefault();
-        return Ok(Member);
+        return Ok(
+           new
+           {
+               member.Id,
+               member.Name,
+               member.Ssn,
+               member.DateofBirth,
+               member.Email,
+               member.PhoneNumber1,
+               member.PhoneNumber2,
+               member.Description,
+               member.Status,
+               member.Type,
+               member.Tag,
+               member.Vaccine,
+               member.AccountId,
+               MembershipsCount = member.MembershipMovements.Count(),
+               HaveFaceOnDevice = false,// DB.FingerPrints.Where(f=>f.Fk == x.Id.ToString() && f.TableName == "Member").Count() > 0 ? true : false,
+               TotalDebit = member.Account.EntryMovements.Select(d => d.Debit).Sum(),
+               TotalCredit = member.Account.EntryMovements.Select(c => c.Credit).Sum(),
+               ActiveMemberShip = member.MembershipMovements.Where(f => f.Status > 0).Select(MS => new
+               {
+                   MS.Id,
+                   MS.Membership.Name,
+                   MS.Membership.NumberClass,
+                   MS.VisitsUsed,
+                   MS.Type,
+                   MS.StartDate,
+                   MS.EndDate,
+                   MS.Description,
+               }).FirstOrDefault(),
+           });
     }
     [Route("Member/FixPhoneNumber")]
     [HttpGet]
@@ -311,35 +314,30 @@ public class MemberController : Controller
 
     [Route("Member/CheckMembers")]
     [HttpGet]
-    public IActionResult CheckMembers()
+    public async Task<IActionResult> CheckMembers()
     {
-        var Members = DB.Members?.ToList();
+        var Members = await DB.Members.ToListAsync();
 
-        foreach (var M in Members)
+        foreach (var member in Members)
         {
-            int OStatus = M.Status;
+            int OStatus = member.Status;
 
-            var MembershipMovements = DB.MembershipMovements.Where(m => m.MemberId == M.Id).ToList();
+            var MembershipMovements = member.MembershipMovements.Where(m => m.MemberId == member.Id).ToList();
 
             if (MembershipMovements.Count() <= 0)
             {
-                M.Status = -1;
+                member.Status = -1;
             }
             else
             {
-                MembershipMovementController MSC = new MembershipMovementController(DB, Configuration);
                 foreach (var MS in MembershipMovements)
                 {
-                    MSC.ScanMembershipMovementById(MS.Id);
-
+                    await MembershipMovementController.ScanMembershipMovementById(MS.Id, DB, Configuration);
                 }
-
-
-
             }
-            if (OStatus == -2) M.Status = -2;
+            if (OStatus == -2) member.Status = -2;
 
-            DB.SaveChanges();
+            await DB.SaveChangesAsync();
         }
         //CheckBlackListActionLogMembers();
 

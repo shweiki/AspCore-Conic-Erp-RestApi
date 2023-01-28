@@ -1,7 +1,9 @@
 ﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -45,7 +47,7 @@ public class DeviceLogController : ControllerBase
     }
     [Route("DeviceLog/GetByStatus")]
     [HttpGet]
-    public IActionResult GetByStatus(int Status, string TableName, int Limit, string Sort, int Page, string Any)
+    public async Task<IActionResult> GetByStatus(int Status, string TableName, int Limit, string Sort, int Page, string Any)
     {
         // Get Log From ZkBio Data base 
 
@@ -53,41 +55,44 @@ public class DeviceLogController : ControllerBase
 
         DeviceController Device = new(DB);
 
-        foreach (var D in DB.Devices.ToList())
+        foreach (var D in await DB.Devices.ToListAsync())
         {
             Device.GetAllLog(D.Id, "Member");
             Device.GetAllLog(D.Id, "Employee", true);
         }
 
-        //  DeviceLog.GetAllLog(D.Id, "Member");
-        //     DeviceLog.GetAllLog(D.Id, "Employee", true);
-
-
-
-        var DeviceLogs = DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any == null || x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any)))
-            .AsEnumerable().Select(x => new
-            {
-                x.Id,
-                x.DateTime,
-                x.Description,
-                x.Fk,
-                x.TableName,
-                User = GetFkData(x.Fk, x.TableName)
-            }).ToList();
+        var DeviceLogs = await DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any == null || x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any))).ToListAsync();
 
         DeviceLogs = (Sort == "+id" ? DeviceLogs.OrderBy(s => s.Id).ToList() : DeviceLogs.OrderByDescending(s => s.Id).ToList());
 
         DeviceLogs = DeviceLogs.GroupBy(a => new { a.Fk, a.DateTime }).Select(g => g.Last()).ToList();
 
+        var itemsQuery = DeviceLogs.Skip((Page - 1) * Limit).Take(Limit).ToList();
 
-        return Ok(DeviceLogs.Skip((Page - 1) * Limit).Take(Limit).ToList());
+        var result = new List<dynamic>();
+
+        foreach (var deviceLog in itemsQuery)
+        {
+            var User = await GetFkData(deviceLog.Fk, TableName, DB);
+            result.Add(new
+            {
+                deviceLog.Id,
+                deviceLog.DateTime,
+                deviceLog.Description,
+                deviceLog.Fk,
+                deviceLog.TableName,
+                User
+            });
+        }
+
+        return Ok(result);
     }
 
-    public dynamic GetFkData(string Fktable, string TableName)
+    public static async Task<dynamic> GetFkData(string Fktable, string TableName, ConicErpContext DB)
     {
         dynamic Object = TableName switch
         {
-            "Member" => DB.Members.Where(x => x.Id == Convert.ToInt32(Fktable)).Select(x => new
+            "Member" => await DB.Members.Where(x => x.Id == Convert.ToInt32(Fktable)).Select(x => new
             {
                 x.Id,
                 x.Name,
@@ -101,16 +106,15 @@ public class DeviceLogController : ControllerBase
                 }).SingleOrDefault(),
                 TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
                 TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum(),
-                ActiveMemberShip = x.MembershipMovements.Where(f => f.MemberId == x.Id && f.Status == 1).Select(ms => new
+                ActiveMemberShip = x.MembershipMovements.Where(f => f.Status == 1).Select(ms => new
                 {
                     ms.Id,
                     ms.Type,
                     ms.VisitsUsed,
                     ms.Membership.NumberClass
-
                 }).FirstOrDefault()
-            }).SingleOrDefault(),
-            "Employee" => DB.Employees.Where(x => x.Id == Convert.ToInt32(Fktable)).SingleOrDefault(),
+            }).SingleOrDefaultAsync(),
+            "Employee" => await DB.Employees.SingleOrDefaultAsync(x => x.Id == Convert.ToInt32(Fktable)),
             _ => null,
         };
         return Object;

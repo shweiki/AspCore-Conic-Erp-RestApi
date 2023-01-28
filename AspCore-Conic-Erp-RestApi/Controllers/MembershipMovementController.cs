@@ -1,9 +1,11 @@
 ﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -76,14 +78,15 @@ public class MembershipMovementController : Controller
     }
 
 
-    public bool ScanMembershipMovementById(long ID)
+    public static async Task<bool> ScanMembershipMovementById(long ID, ConicErpContext DB, IConfiguration Configuration)
     {
-        MembershipMovement MS = DB.MembershipMovements.Where(x => x.Id == ID).SingleOrDefault();
 
-        var member = DB.Members.Where(x => x.Id == MS.MemberId).SingleOrDefault();
+        MembershipMovement MS = await DB.MembershipMovements.SingleOrDefaultAsync(x => x.Id == ID);
+
+        var member = MS.Member;
         int OStatus = member.Status;
-        double TotalMembershipMovementOrders = DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id && (x.Status == -2 || x.Status == -3)).ToList().Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
-        int MembershipNumberDays = DB.Memberships.Where(m => m.Id == MS.MembershipId).FirstOrDefault().NumberDays;
+        double TotalMembershipMovementOrders = MS.MembershipMovementOrders.Where(x =>  x.Status == -2 || x.Status == -3).ToList().Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
+        int MembershipNumberDays = MS.Membership.NumberDays;// DB.Memberships.Where(m => m.Id == MS.MembershipId).FirstOrDefault().NumberDays;
         MS.EndDate = MS.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders);
         if (DateTime.Now >= MS.StartDate.Date && DateTime.Now <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59))
         {
@@ -120,7 +123,7 @@ public class MembershipMovementController : Controller
             }
         }
 
-        foreach (MembershipMovementOrder MSO in DB.MembershipMovementOrders.Where(x => x.MemberShipMovementId == MS.Id && (x.Status == 1 || x.Status == 2)).ToList())
+        foreach (var MSO in MS.MembershipMovementOrders.Where(x =>x.Status == 1 || x.Status == 2).ToList())
         {
             if (MSO.Status == 2)
             {
@@ -171,15 +174,16 @@ public class MembershipMovementController : Controller
             }
 
 
-            DB.SaveChanges();
+            await DB.SaveChangesAsync();
 
         }
-        var DeviceLogs = DB.DeviceLogs.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && (x.DateTime >= MS.StartDate.Date && x.DateTime <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59))).ToList();
+        var DeviceLogs = await DB.DeviceLogs.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && (x.DateTime >= MS.StartDate.Date && x.DateTime <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59))).ToListAsync();
         if (DeviceLogs != null && DeviceLogs.Count > 0)
         {
             DeviceLogs = DeviceLogs.GroupBy(a => a.DateTime.Day).Select(g => g.Last()).ToList();
             MS.VisitsUsed = DeviceLogs.Count();
             int NumberClass = (int)(MS.Membership.NumberClass == null ? 0 : MS.Membership.NumberClass);
+
             var WhenFinishNumberOfClassUnActiveMemberShip = Configuration["GymConfiguration:WhenFinishNumberOfClassUnActiveMemberShip"];
             if (WhenFinishNumberOfClassUnActiveMemberShip == "True")
             {
@@ -192,9 +196,10 @@ public class MembershipMovementController : Controller
             }
         }
         if (OStatus == -2) member.Status = -2;
-        DB.SaveChanges();
+        await DB.SaveChangesAsync();
 
         return true;
+
     }
 
     [Route("MembershipMovement/GetMembershipMovementByMemberId")]
@@ -220,7 +225,7 @@ public class MembershipMovementController : Controller
             MS.EditorName,
             MS.Status,
             MS.Tax,
-            MembershipMovementOrders = DB.MembershipMovementOrders.Where(f => f.MemberShipMovementId == MS.Id).Select(MSO => new
+            MembershipMovementOrders = MS.MembershipMovementOrders.Select(MSO => new
             {
                 MSO.Id,
                 MSO.Type,
@@ -282,8 +287,8 @@ public class MembershipMovementController : Controller
             x.EditorName,
             x.MemberId,
             x.Member.AccountId,
-            MemberName = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
-            MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
+            MemberName = x.Member.Name,
+            MembershipName = x.Membership.Name,
         }).ToList();
 
 
