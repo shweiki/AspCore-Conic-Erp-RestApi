@@ -7,11 +7,6 @@ namespace Entities;
 
 public partial class Device
 {
-    public Device()
-    {
-        DeviceLogs = new HashSet<DeviceLog>();
-    }
-
     public long Id { get; set; }
     public string Name { get; set; }
     public string Ip { get; set; }

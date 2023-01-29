@@ -7,11 +7,6 @@ namespace Entities;
 
 public partial class OrderInventory
 {
-    public OrderInventory()
-    {
-        InventoryMovements = new HashSet<InventoryMovement>();
-    }
-
     public long Id { get; set; }
     public DateTime? FakeDate { get; set; }
     public string OrderType { get; set; }

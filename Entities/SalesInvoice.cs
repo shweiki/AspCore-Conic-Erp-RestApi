@@ -7,10 +7,7 @@ namespace Entities;
 
 public partial class SalesInvoice
 {
-    public SalesInvoice()
-    {
-        InventoryMovements = new HashSet<InventoryMovement>();
-    }
+
 
     public long Id { get; set; }
     public string Name { get; set; }

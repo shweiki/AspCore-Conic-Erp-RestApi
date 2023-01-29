@@ -92,7 +92,7 @@ public class DeviceLogController : ControllerBase
     {
         dynamic Object = TableName switch
         {
-            "Member" => await DB.Members.Where(x => x.Id == Convert.ToInt32(Fktable)).Select(x => new
+            "Member" => await DB.Members.Include(x => x.MembershipMovements).Include(x => x.Account.EntryMovements).Where(x => x.Id == Convert.ToInt32(Fktable)).Select(x => new
             {
                 x.Id,
                 x.Name,

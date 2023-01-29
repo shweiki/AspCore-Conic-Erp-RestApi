@@ -5,10 +5,7 @@ namespace Entities;
 
 public partial class SalaryPayment
 {
-    public SalaryPayment()
-    {
-        SalaryAdjustmentLogs = new HashSet<SalaryAdjustmentLog>();
-    }
+
     public long Id { get; set; }
     public long EmployeeId { get; set; }
     public double GrossSalary { get; set; }

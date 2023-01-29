@@ -7,12 +7,6 @@ namespace Entities;
 
 public partial class Employee
 {
-    public Employee()
-    {
-        SalaryPayments = new HashSet<SalaryPayment>();
-
-    }
-
     public long Id { get; set; }
     public string Name { get; set; }
     public string LatinName { get; set; }

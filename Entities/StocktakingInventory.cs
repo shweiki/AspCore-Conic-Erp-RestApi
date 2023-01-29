@@ -7,10 +7,7 @@ namespace Entities;
 
 public partial class StocktakingInventory
 {
-    public StocktakingInventory()
-    {
-        StockMovements = new HashSet<StockMovement>();
-    }
+
 
     public long Id { get; set; }
     public DateTime FakeDate { get; set; }

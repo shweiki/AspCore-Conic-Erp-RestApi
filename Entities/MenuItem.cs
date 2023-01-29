@@ -6,11 +6,6 @@ namespace Entities;
 
 public partial class MenuItem
 {
-    public MenuItem()
-    {
-        ItemMuos = new HashSet<ItemMuo>();
-    }
-
     public int Id { get; set; }
     public string Name { get; set; }
     public int Status { get; set; }

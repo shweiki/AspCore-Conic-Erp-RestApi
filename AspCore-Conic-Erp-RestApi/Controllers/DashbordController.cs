@@ -23,7 +23,7 @@ public class DashbordController : Controller
     public async Task<IActionResult> GetTotal()
     {
         DateTime LastWeek = DateTime.Today.AddDays(-6);
-        var SalelastWeekQuery = await DB.SalesInvoices.Where(x => x.Status == 1 && x.FakeDate >= LastWeek).ToListAsync();
+        var SalelastWeekQuery = await DB.SalesInvoices.Include(x=>x.InventoryMovements).Where(x => x.Status == 1 && x.FakeDate >= LastWeek).ToListAsync();
         var SalelastWeek = SalelastWeekQuery.Select(x => new
         {
             Total = x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount,

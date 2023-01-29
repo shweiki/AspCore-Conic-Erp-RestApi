@@ -7,11 +7,6 @@ namespace Entities;
 
 public partial class MembershipMovement
 {
-    public MembershipMovement()
-    {
-        MembershipMovementOrders = new HashSet<MembershipMovementOrder>();
-    }
-
     public long Id { get; set; }
     public double TotalAmmount { get; set; }
     public double? Tax { get; set; }

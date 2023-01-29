@@ -6,12 +6,7 @@ using System.Collections.Generic;
 namespace Entities;
 
 public partial class WorkShop
-{
-    public WorkShop()
-    {
-        InventoryMovements = new HashSet<InventoryMovement>();
-    }
-
+{ 
     public long Id { get; set; }
     public string Name { get; set; }
     public double? Tax { get; set; }

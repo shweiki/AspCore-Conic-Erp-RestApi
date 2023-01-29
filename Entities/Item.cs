@@ -6,14 +6,6 @@ namespace Entities;
 
 public partial class Item
 {
-    public Item()
-    {
-        InventoryMovements = new HashSet<InventoryMovement>();
-        ItemMuos = new HashSet<ItemMuo>();
-        Services = new HashSet<Service>();
-        StockMovements = new HashSet<StockMovement>();
-    }
-
     public long Id { get; set; }
     public string Name { get; set; }
     public string Type { get; set; }

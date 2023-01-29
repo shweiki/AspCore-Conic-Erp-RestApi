@@ -6,10 +6,6 @@ namespace Entities;
 
 public partial class Membership
 {
-    public Membership()
-    {
-        MembershipMovements = new HashSet<MembershipMovement>();
-    }
 
     public int Id { get; set; }
     public string Name { get; set; }

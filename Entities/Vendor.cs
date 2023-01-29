@@ -6,14 +6,6 @@ namespace Entities;
 
 public partial class Vendor
 {
-    public Vendor()
-    {
-        Cheques = new HashSet<Cheque>();
-        Payments = new HashSet<Payment>();
-        PurchaseInvoices = new HashSet<PurchaseInvoice>();
-        WorkShops = new HashSet<WorkShop>();
-        SalesInvoices = new HashSet<SalesInvoice>();
-    }
 
     public long Id { get; set; }
     public string Name { get; set; }

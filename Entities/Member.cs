@@ -7,12 +7,6 @@ namespace Entities;
 
 public partial class Member
 {
-    public Member()
-    {
-        MembershipMovements = new HashSet<MembershipMovement>();
-        Payments = new HashSet<Payment>();
-        SalesInvoices = new HashSet<SalesInvoice>();
-    }
 
     public long Id { get; set; }
     public string Name { get; set; }

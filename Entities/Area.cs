@@ -6,10 +6,6 @@ namespace Entities;
 
 public partial class Area
 {
-    //  public Area()
-    //  {
-    //     Vendors = new HashSet<Vendor>();
-    //  }
     public long Id { get; set; }
     public string Adress1 { get; set; }
     public string Adress2 { get; set; }

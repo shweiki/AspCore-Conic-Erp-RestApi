@@ -6,12 +6,6 @@ namespace Entities;
 
 public partial class InventoryItem
 {
-    public InventoryItem()
-    {
-        InventoryMovements = new HashSet<InventoryMovement>();
-        StockMovements = new HashSet<StockMovement>();
-    }
-
     public int Id { get; set; }
     public string Name { get; set; }
     public int Status { get; set; }

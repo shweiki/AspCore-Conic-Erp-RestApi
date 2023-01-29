@@ -7,15 +7,6 @@ namespace Entities;
 
 public partial class TreeAccount
 {
-    public TreeAccount()
-    {
-        Banks = new HashSet<Bank>();
-        Cashes = new HashSet<Cash>();
-        EntryMovements = new HashSet<EntryMovement>();
-        Members = new HashSet<Member>();
-        Vendors = new HashSet<Vendor>();
-    }
-
     public long Id { get; set; }
     public string Description { get; set; }
     public int Status { get; set; }

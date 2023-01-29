@@ -25,7 +25,7 @@ public class MemberController : Controller
     [HttpGet]
     public IActionResult GetReceivablesMember()
     {
-        var Members = DB.Members.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) > 0).AsQueryable()
+        var Members = DB.Members.Include(x => x.Account.EntryMovements).Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) > 0).AsQueryable()
         .Select(x => new
         {
             x.Id,
@@ -48,7 +48,7 @@ public class MemberController : Controller
     [HttpGet]
     public IActionResult GetPayablesMember()
     {
-        var Members = DB.Members.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) < 0).AsQueryable().Select(x => new
+        var Members = DB.Members.Include(x => x.Account.EntryMovements).Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) < 0).AsQueryable().Select(x => new
         {
             x.Id,
             x.Name,
@@ -257,7 +257,7 @@ public class MemberController : Controller
     public async Task<IActionResult> GetMemberById(long? Id)
     {
 
-        var member = await DB.Members.SingleOrDefaultAsync(m => m.Id == Id);
+        var member = await DB.Members.Include(x => x.MembershipMovements).Include(x => x.Account.EntryMovements).SingleOrDefaultAsync(m => m.Id == Id);
         if (member == null) return BadRequest();
         foreach (var MS in member.MembershipMovements.Where(m => m.MemberId == Id).ToList())
         {
@@ -316,13 +316,13 @@ public class MemberController : Controller
     [HttpGet]
     public async Task<IActionResult> CheckMembers()
     {
-        var Members = await DB.Members.ToListAsync();
+        var Members = await DB.Members.Include(x => x.MembershipMovements).ToListAsync();
 
         foreach (var member in Members)
         {
             int OStatus = member.Status;
 
-            var MembershipMovements = member.MembershipMovements.Where(m => m.MemberId == member.Id).ToList();
+            var MembershipMovements = member.MembershipMovements.ToList();
 
             if (MembershipMovements.Count() <= 0)
             {

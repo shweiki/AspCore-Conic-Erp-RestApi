@@ -81,7 +81,7 @@ public class MembershipMovementController : Controller
     public static async Task<bool> ScanMembershipMovementById(long ID, ConicErpContext DB, IConfiguration Configuration)
     {
 
-        MembershipMovement MS = await DB.MembershipMovements.SingleOrDefaultAsync(x => x.Id == ID);
+        MembershipMovement MS = await DB.MembershipMovements.Include(x => x.Member).Include(x => x.Membership).Include(x => x.MembershipMovementOrders).SingleOrDefaultAsync(x => x.Id == ID);
 
         var member = MS.Member;
         int OStatus = member.Status;

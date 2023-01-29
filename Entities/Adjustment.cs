@@ -4,11 +4,6 @@ namespace Entities;
 
 public partial class Adjustment
 {
-    public Adjustment()
-    {
-        SalaryAdjustmentLogs = new HashSet<SalaryAdjustmentLog>();
-    }
-
     public long Id { get; set; }
     public string Name { get; set; }
     public double AdjustmentAmount { get; set; }

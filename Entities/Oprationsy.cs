@@ -6,11 +6,6 @@ namespace Entities;
 
 public partial class Oprationsy
 {
-    public Oprationsy()
-    {
-        ActionLogs = new HashSet<ActionLog>();
-    }
-
     public int Id { get; set; }
     public string OprationName { get; set; }
     public string TableName { get; set; }

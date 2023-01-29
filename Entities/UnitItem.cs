@@ -6,10 +6,6 @@ namespace Entities;
 
 public partial class UnitItem
 {
-    public UnitItem()
-    {
-        ItemMuos = new HashSet<ItemMuo>();
-    }
 
     public int Id { get; set; }
     public string Name { get; set; }
