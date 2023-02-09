@@ -89,7 +89,7 @@ public class MemberController : Controller
     [Route("Member/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
     {
-        var Members = DB.Members.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.ToLower().Contains(Any) || s.Ssn.Contains(Any) || s.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.Tag.Contains(Any))
+        var Members = DB.Members.Include(x=>x.Account.EntryMovements).Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.ToLower().Contains(Any) || s.Ssn.Contains(Any) || s.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.Tag.Contains(Any))
         && (Status == null || s.Status == Status)).Select(x => new
         {
             x.Id,
@@ -292,6 +292,8 @@ public class MemberController : Controller
                    MS.Type,
                    MS.StartDate,
                    MS.EndDate,
+                   (MS.EndDate - MS.StartDate).TotalDays,
+                   Remaining = Math.Ceiling((MS.EndDate - DateTime.Now).TotalDays),
                    MS.Description,
                }).FirstOrDefault(),
            });

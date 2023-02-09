@@ -225,6 +225,8 @@ public class MembershipMovementController : Controller
             MS.EditorName,
             MS.Status,
             MS.Tax,
+            (MS.EndDate - MS.StartDate).TotalDays,
+            Remaining = Math.Ceiling((MS.EndDate - DateTime.Now).TotalDays),
             MembershipMovementOrders = MS.MembershipMovementOrders.Select(MSO => new
             {
                 MSO.Id,
