@@ -349,6 +349,10 @@ public class OprationsysController : Controller
                 log.OrderDeliveryId = (int)ObjId;
                 DB.OrderRestaurants.Where(x => x.Id == log.OrderRestaurantId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
+            case "Employee":
+                // log.OrderDeliveryId = (int)ObjId;
+                DB.Employees.Where(x => x.Id == (int)ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                break;
             default:
                 log.Fktable = ObjId.ToString();
                 break;
