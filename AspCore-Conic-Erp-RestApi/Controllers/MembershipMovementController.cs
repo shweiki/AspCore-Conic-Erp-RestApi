@@ -76,7 +76,26 @@ public class MembershipMovementController : Controller
         }
         return Ok("False Valid");
     }
+    [Route("MembershipMovement/Delete")]
+    [HttpPost]
+    public async Task<IActionResult> Delete(int Id)
+    {
 
+        try
+        {
+            MembershipMovement membershipmovement = await DB.MembershipMovements.FindAsync(Id);
+            DB.MembershipMovements.Remove(membershipmovement);
+
+            await DB.SaveChangesAsync();
+            return Ok(true);
+        }
+        catch
+        {
+            //Console.WriteLine(collection);
+            return Ok(false);
+        }
+
+    }
 
     public static async Task<bool> ScanMembershipMovementById(long ID, ConicErpContext DB, IConfiguration Configuration)
     {

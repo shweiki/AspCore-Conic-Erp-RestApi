@@ -133,11 +133,18 @@ public class MembershipMovementOrderController : Controller
 
         try
         {
-            MembershipMovementOrder membershipmovementorder = await DB.MembershipMovementOrders.FindAsync(Id);
-            DB.MembershipMovementOrders.Remove(membershipmovementorder);
+            var entryAccount = DB.EntryMovements.Where(x => x.TableName == "MembershipMovement" && x.Fktable == Id).LastOrDefault();
+            if (entryAccount is not null)
+            {
+                DB.EntryAccountings.Remove(await DB.EntryAccountings.FindAsync(entryAccount.EntryId));
+                MembershipMovementOrder membershipmovementorder = await DB.MembershipMovementOrders.FindAsync(Id);
+                DB.MembershipMovementOrders.Remove(membershipmovementorder);
 
-            await DB.SaveChangesAsync();
-            return Ok(true);
+                await DB.SaveChangesAsync();
+                return Ok(true);
+            }
+            else return Ok(false);
+
         }
         catch
         {
