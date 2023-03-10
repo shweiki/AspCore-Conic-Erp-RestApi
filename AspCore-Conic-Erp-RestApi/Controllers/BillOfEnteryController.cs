@@ -1,9 +1,11 @@
 ﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -19,8 +21,8 @@ public class BillOfEnteryController : Controller
     [Route("BillOfEntery/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var Invoices = DB.BillOfEnterys.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.BonId.Contains(Any) || s.Description.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
-        && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+        var Invoices = DB.BillOfEnterys.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.BonId.Contains(Any) || s.Description.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
+        && (DateTo == null || s.FakeDate <= DateTo) && (Status == null || s.Status == Status)).Select(x => new
         {
             x.Id,
             x.BonId,
@@ -72,19 +74,22 @@ public class BillOfEnteryController : Controller
             items = Invoices.Skip((Page - 1) * Limit).Take(Limit).ToList(),
             Totals = new
             {
-                Rows = Invoices.Count(),
+                Open = Invoices.Count(x => x.Status == 0),
+                Close = Invoices.Count(x => x.Status == 1),
+                Rows = Invoices.Count()
             }
         });
     }
     [HttpGet]
     [Route("BillOfEntery/CalBillOfEntery")]
-    public IActionResult CalBillOfEntery()
+    public async Task<IActionResult> CalBillOfEntery()
     {
         DB.InventoryMovements.ToList().ForEach(x => x.BillOfEnteryId = null);
-        DB.BillOfEnterys.ToList().ForEach(x => x.Status = 0);
+        var billOfEnterys = await DB.BillOfEnterys.ToListAsync();
+        billOfEnterys.ForEach(x => x.Status = 0);
         DB.SaveChanges();
 
-        var BillOfEnterys = DB.BillOfEnterys.OrderBy(o => o.FakeDate).Select(x => new
+        var BillOfEnterys = billOfEnterys.OrderBy(o => o.FakeDate).Select(x => new
         {
             x.Id,
             x.BonId,
@@ -109,10 +114,10 @@ public class BillOfEnteryController : Controller
                 imx.Description,
             }).ToList()
         }).ToList();
-        foreach (var boe in BillOfEnterys)
+        foreach (var billOfEntery in BillOfEnterys)
         {
-            int HowWillBeClose = boe.InventoryMovements.Count(); // when be 0 mean all item is close 
-            foreach (var boei in boe.InventoryMovements)
+            int HowWillBeClose = billOfEntery.InventoryMovements.Count(); // when be 0 mean all item is close 
+            foreach (var boei in billOfEntery.InventoryMovements)
             {
                 double QtyBillEnteryItem = boei.Qty;
                 var SaleItemMove = DB.InventoryMovements.Where(x => x.SalesInvoice != null && x.ItemsId == boei.ItemsId && x.BillOfEnteryId == null).OrderBy(o => o.SalesInvoice.FakeDate).ToList();
@@ -122,7 +127,7 @@ public class BillOfEnteryController : Controller
                     if (SIM.Qty <= QtyBillEnteryItem)
                     {
                         QtyBillEnteryItem -= SIM.Qty;
-                        SIM.BillOfEnteryId = boe.Id;
+                        SIM.BillOfEnteryId = billOfEntery.Id;
                         DB.SaveChanges();
                         //    SaleItemMove.Remove(SIM);
                         if (QtyBillEnteryItem == 0) { break; } else continue;
@@ -132,7 +137,7 @@ public class BillOfEnteryController : Controller
                         double ModQty = SIM.Qty - QtyBillEnteryItem;
                         QtyBillEnteryItem -= QtyBillEnteryItem; // mean zero
                         SIM.Qty -= ModQty;
-                        SIM.BillOfEnteryId = boe.Id;
+                        SIM.BillOfEnteryId = billOfEntery.Id;
                         DB.InventoryMovements.Add(new InventoryMovement
                         {
                             ItemsId = SIM.ItemsId,
@@ -154,11 +159,11 @@ public class BillOfEnteryController : Controller
                         break;
                     }
                 }
-                if (DB.InventoryMovements.Where(m => m.BillOfEnteryId == boe.Id && m.ItemsId == boei.ItemsId && m.SalesInvoiceId != null).Sum(s => s.Qty) - boei.Qty == 0)
+                if (DB.InventoryMovements.Where(m => m.BillOfEnteryId == billOfEntery.Id && m.ItemsId == boei.ItemsId && m.SalesInvoiceId != null).Sum(s => s.Qty) - boei.Qty == 0)
                     HowWillBeClose -= 1;
             }
             if (HowWillBeClose == 0)
-                DB.BillOfEnterys.Find(boe.Id).Status = 1; // Bon Is Close
+                DB.BillOfEnterys.Find(billOfEntery.Id).Status = 1; // Bon Is Close
             DB.SaveChanges();
 
         }
