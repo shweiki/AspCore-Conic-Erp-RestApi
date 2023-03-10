@@ -63,7 +63,8 @@ public class SaleInvoiceController : Controller
             }).ToList(),
         }).Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.PaymentMethod.Contains(Any) || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any) : true) &&
         (DateFrom != null ? s.FakeDate >= DateFrom : true) && (DateTo != null ? s.FakeDate <= DateTo : true) &&
-        (Status != null ? s.Status == Status : true) && (Type != null ? s.Type == Type : true) && (User != null ? DB.ActionLogs.Where(l => l.SalesInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).AsQueryable()
+        (Status != null ? s.Status == Status : true) && (Type != null ? s.Type == Type : true) && 
+        (User != null ? DB.ActionLogs.Where(l => l.TableName == "SaleInvoice" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).AsQueryable()
 ;
 
         itemsQuery = (Sort == "+id" ? itemsQuery.OrderBy(s => s.Id) : itemsQuery.OrderByDescending(s => s.Id));
@@ -150,7 +151,8 @@ public class SaleInvoiceController : Controller
     public IActionResult GetByItem(long ItemId, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
     {
         var Invoices = DB.InventoryMovements.Where(s => s.SalesInvoiceId != null && s.ItemsId == ItemId && (Any != null ? s.Id.ToString().Contains(Any) || s.SalesInvoice.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.SalesInvoice.PhoneNumber.Contains(Any) || s.SalesInvoice.Name.Contains(Any) : true) && (DateFrom != null ? s.SalesInvoice.FakeDate >= DateFrom : true)
-          && (DateTo != null ? s.SalesInvoice.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (Type != null ? s.SalesInvoice.Type == Type : true) && (User != null ? DB.ActionLogs.Where(l => l.InventoryMovementId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+          && (DateTo != null ? s.SalesInvoice.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (Type != null ? s.SalesInvoice.Type == Type : true)
+          && (User != null ? DB.ActionLogs.Where(l => l.TableName == "InventoryMovement" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
           {
               x.Id,
               x.SalesInvoiceId,

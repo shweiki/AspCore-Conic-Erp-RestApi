@@ -32,16 +32,16 @@ public class MembershipMovementController : Controller
 
                 DB.MembershipMovements.Add(collection);
                 DB.SaveChanges();
-                return Ok(collection.Id);
+                return Created("", collection);
 
             }
-            catch
+            catch (Exception ex)
             {
                 //Console.WriteLine(collection);
-                return Ok("catch");
+                return Forbid(ex.Message);
             }
         }
-        return Ok("False Valid");
+        return Forbid("False Valid");
     }
     [Route("MembershipMovement/Edit")]
     [HttpPost]
@@ -68,33 +68,42 @@ public class MembershipMovementController : Controller
                 return Ok(collection.Id);
 
             }
-            catch
+            catch (Exception ex)
             {
                 //Console.WriteLine(collection);
-                return Ok("catch");
+                return Forbid(ex.Message);
             }
         }
-        return Ok("False Valid");
+        return Forbid("False Valid");
     }
     [Route("MembershipMovement/Delete")]
     [HttpPost]
-    public async Task<IActionResult> Delete(int Id)
+    public async Task<IActionResult> Delete(long Id)
     {
-
         try
         {
-            MembershipMovement membershipmovement = await DB.MembershipMovements.FindAsync(Id);
-            DB.MembershipMovements.Remove(membershipmovement);
+            var entryAccount = await DB.EntryMovements.Where(x => x.TableName == "MembershipMovement" && x.Fktable == Id).FirstOrDefaultAsync();
+            if (entryAccount is not null)
+            {
+                var entryAccounting = await DB.EntryAccountings.Include(x => x.EntryMovements).SingleOrDefaultAsync(x => x.Id == entryAccount.EntryId);
+                DB.EntryMovements.RemoveRange(entryAccounting.EntryMovements);
+                DB.EntryAccountings.Remove(entryAccounting);
+               
+                MembershipMovement membershipmovement = await DB.MembershipMovements.Include(x => x.MembershipMovementOrders).SingleOrDefaultAsync(x => x.Id == Id);
+                DB.MembershipMovementOrders.RemoveRange(membershipmovement.MembershipMovementOrders);
+                DB.MembershipMovements.Remove(membershipmovement);
 
-            await DB.SaveChangesAsync();
-            return Ok(true);
+                await DB.SaveChangesAsync();
+                return Ok(true);
+            }
+            else return Forbid("Can't found entry account");
+
         }
-        catch
+        catch (Exception ex)
         {
-            //Console.WriteLine(collection);
-            return Ok(false);
-        }
+            return Forbid(ex.Message);
 
+        }
     }
 
     public static async Task<bool> ScanMembershipMovementById(long ID, ConicErpContext DB, IConfiguration Configuration)
@@ -104,7 +113,7 @@ public class MembershipMovementController : Controller
 
         var member = MS.Member;
         int OStatus = member.Status;
-        double TotalMembershipMovementOrders = MS.MembershipMovementOrders.Where(x =>  x.Status == -2 || x.Status == -3).ToList().Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
+        double TotalMembershipMovementOrders = MS.MembershipMovementOrders.Where(x => x.Status == -2 || x.Status == -3).ToList().Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
         int MembershipNumberDays = MS.Membership.NumberDays;// DB.Memberships.Where(m => m.Id == MS.MembershipId).FirstOrDefault().NumberDays;
         MS.EndDate = MS.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders);
         if (DateTime.Now >= MS.StartDate.Date && DateTime.Now <= MS.EndDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59))
@@ -142,7 +151,7 @@ public class MembershipMovementController : Controller
             }
         }
 
-        foreach (var MSO in MS.MembershipMovementOrders.Where(x =>x.Status == 1 || x.Status == 2).ToList())
+        foreach (var MSO in MS.MembershipMovementOrders.Where(x => x.Status == 1 || x.Status == 2).ToList())
         {
             if (MSO.Status == 2)
             {

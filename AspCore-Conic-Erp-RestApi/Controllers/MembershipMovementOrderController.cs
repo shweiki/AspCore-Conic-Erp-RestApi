@@ -1,6 +1,7 @@
 ﻿using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -133,23 +134,15 @@ public class MembershipMovementOrderController : Controller
 
         try
         {
-            var entryAccount = DB.EntryMovements.Where(x => x.TableName == "MembershipMovement" && x.Fktable == Id).LastOrDefault();
-            if (entryAccount is not null)
-            {
-                DB.EntryAccountings.Remove(await DB.EntryAccountings.FindAsync(entryAccount.EntryId));
-                MembershipMovementOrder membershipmovementorder = await DB.MembershipMovementOrders.FindAsync(Id);
-                DB.MembershipMovementOrders.Remove(membershipmovementorder);
+            MembershipMovementOrder membershipmovementorder = await DB.MembershipMovementOrders.FindAsync(Id);
+            DB.MembershipMovementOrders.Remove(membershipmovementorder);
 
-                await DB.SaveChangesAsync();
-                return Ok(true);
-            }
-            else return Ok(false);
-
+            await DB.SaveChangesAsync();
+            return Ok(true);
         }
-        catch
+        catch (Exception ex)
         {
-            //Console.WriteLine(collection);
-            return Ok(false);
+            return Ok(ex.Message);
         }
 
     }

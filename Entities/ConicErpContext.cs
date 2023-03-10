@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
 using System;
 
-#nullable disable
 
 namespace Entities;
 
@@ -425,63 +424,10 @@ public partial class ConicErpContext : IdentityDbContext
 
             entity.Property(e => e.Id);
 
-            entity.Property(e => e.AccountId);
-
-            entity.Property(e => e.BankId);
-
-            entity.Property(e => e.CashId);
-
-            entity.Property(e => e.ChequeId);
-
-            entity.Property(e => e.Description);
-
-            entity.Property(e => e.DiscountId);
-
-            entity.Property(e => e.EntryId);
-
-            entity.Property(e => e.InventoryItemId);
-
-            entity.Property(e => e.InventoryMovementId);
-
-            entity.Property(e => e.ItemsId);
-
-            entity.Property(e => e.MemberId);
-
-            entity.Property(e => e.MembershipId);
-
-            entity.Property(e => e.MembershipMovementId);
-
-            entity.Property(e => e.MembershipMovementOrderId);
-
-            entity.Property(e => e.MenuId);
-
-            entity.Property(e => e.OprationId);
-
-            entity.Property(e => e.OrderInventoryId);
-
-            entity.Property(e => e.OriginId);
-
-            entity.Property(e => e.PaymentId);
-
-            entity.Property(e => e.PostingDateTime);
-
-            entity.Property(e => e.PurchaseInvoiceId);
-
-            entity.Property(e => e.SalesInvoiceId);
-
-            entity.Property(e => e.ServiceId);
-
-            entity.Property(e => e.StockMovementId);
-
-            entity.Property(e => e.StocktakingInventoryId);
-
-            entity.Property(e => e.UnitId);
 
             entity.Property(e => e.UserId)
-                .IsRequired()
-                ;
+                .IsRequired();
 
-            entity.Property(e => e.VendorId);
 
             entity.HasOne(d => d.Opration)
                 .WithMany(p => p.ActionLogs)

@@ -22,7 +22,7 @@ public class PaymentController : Controller
     {
         var Invoices = DB.Payments.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
         && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
-        (User != null ? DB.ActionLogs.Where(l => l.PaymentId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        (User != null ? DB.ActionLogs.Where(l => l.TableName == "Payment" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
 
         {
             x.Id,

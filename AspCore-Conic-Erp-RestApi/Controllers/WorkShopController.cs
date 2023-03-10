@@ -19,8 +19,8 @@ public class WorkShopController : Controller
     [Route("WorkShop/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var Invoices = DB.WorkShops.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.DeliveryDate >= DateFrom : true)
-        && (DateTo == null || s.DeliveryDate <= DateTo) && (Status == null || s.Status == Status) && (User != null ? DB.ActionLogs.Where(l => l.WorkShopId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        var Invoices = DB.WorkShops.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any)) && (DateFrom == null || s.DeliveryDate >= DateFrom)
+        && (DateTo == null || s.DeliveryDate <= DateTo) && (Status == null || s.Status == Status) && (User == null || DB.ActionLogs.Where(l => l.TableName == "WorkShop" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
         {
             x.Id,
             x.Discount,
@@ -99,8 +99,9 @@ public class WorkShopController : Controller
     [HttpGet]
     public IActionResult GetByItem(long ItemId, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
     {
-        var Invoices = DB.InventoryMovements.Where(s => s.WorkShopId != null && s.ItemsId == ItemId && (Any != null ? s.Id.ToString().Contains(Any) || s.WorkShop.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.WorkShop.Description.Contains(Any) || s.WorkShop.Name.Contains(Any) : true) && (DateFrom != null ? s.WorkShop.FakeDate >= DateFrom : true)
-          && (DateTo == null || s.WorkShop.FakeDate <= DateTo) && (Status != null ? s.Status == Status : true) && (User != null ? DB.ActionLogs.Where(l => l.InventoryMovementId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        var Invoices = DB.InventoryMovements.Where(s => s.WorkShopId != null && s.ItemsId == ItemId && (Any == null || s.Id.ToString().Contains(Any) || s.WorkShop.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.WorkShop.Description.Contains(Any) || s.WorkShop.Name.Contains(Any)) && (DateFrom == null || s.WorkShop.FakeDate >= DateFrom)
+          && (DateTo == null || s.WorkShop.FakeDate <= DateTo) && (Status == null || s.Status == Status)
+          && (User == null || DB.ActionLogs.Where(l => l.TableName == "InventoryMovement" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
           {
               x.Id,
               x.WorkShopId,

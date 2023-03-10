@@ -33,9 +33,10 @@ public class EntryAccountingController : Controller
     [Route("EntryAccounting/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var EntryAccountings = DB.EntryAccountings.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Description.Contains(Any)) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
-        && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status == null || s.Status == Status) &&
-        (User != null ? DB.ActionLogs.Where(l => l.EntryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        var EntryAccountings = DB.EntryAccountings.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Description.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
+        && (DateTo == null || s.FakeDate <= DateTo) && (Status == null || s.Status == Status)
+      //  && (User == null || DB.ActionLogs.Where(l => l.TableName == "EntryAccounting" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)
+        ).Select(x => new
         {
             x.Id,
             EntryMovements = x.EntryMovements.Select(e => new

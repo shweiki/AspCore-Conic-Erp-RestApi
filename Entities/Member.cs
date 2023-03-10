@@ -25,5 +25,6 @@ public partial class Member
     public virtual TreeAccount Account { get; set; }
     public virtual ICollection<MembershipMovement> MembershipMovements { get; set; }
     public virtual ICollection<Payment> Payments { get; set; }
+    public virtual ICollection<Receive> Receives { get; set; }
     public virtual ICollection<SalesInvoice> SalesInvoices { get; set; }
 }

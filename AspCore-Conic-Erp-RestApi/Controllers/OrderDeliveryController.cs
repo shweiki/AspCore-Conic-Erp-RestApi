@@ -80,9 +80,9 @@ public class OrderDeliveryController : Controller
     [Route("OrderDelivery/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var Deliveries = DB.OrderDeliveries.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
-     && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
-     (User != null ? DB.ActionLogs.Where(l => l.OrderDeliveryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        var Deliveries = DB.OrderDeliveries.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
+     && (DateTo == null || s.FakeDate <= DateTo) && (Status == null || s.Status == Status) &&
+     (User == null || DB.ActionLogs.Where(l => l.TableName == "OrderDelivery" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
      {
          x.Id,
          x.OrderId,
@@ -118,7 +118,7 @@ public class OrderDeliveryController : Controller
     public IActionResult GetOrderDelivery(int Limit, string Sort, int Page, int? Status, string Any)
 
     {
-        var Orders = DB.OrderDeliveries.Where(s => (s.Status != 4) && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+        var Orders = DB.OrderDeliveries.Where(s => (s.Status != 4) && (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (Status == null || s.Status == Status)).Select(x => new
         {
             x.Id,
             x.OrderId,
@@ -182,7 +182,7 @@ public class OrderDeliveryController : Controller
     public IActionResult GetDriverOrder(string Id, string name, int Limit, string Sort, int Page, int? Status, string Any)
 
     {
-        var Orders = DB.OrderDeliveries.Where(x => (x.Driver.DriverUserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2 || x.Status == 3) && (Any != null ? x.Id.ToString().Contains(Any) || x.Name.Contains(Any) : true) && (Status != null ? x.Status == Status : true)).Select(x => new
+        var Orders = DB.OrderDeliveries.Where(x => (x.Driver.DriverUserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2 || x.Status == 3) && (Any == null || x.Id.ToString().Contains(Any) || x.Name.Contains(Any)) && (Status == null || x.Status == Status)).Select(x => new
         // var Orders = DB.OrderDeliveries.Where(x => x.Driver.DriverUserId == Id || name == "Developer").Select(x => new
         {
             x.Id,
@@ -305,9 +305,9 @@ public class OrderDeliveryController : Controller
     [Route("OrderDelivery/GetByListQByDriver")]
     public IActionResult GetByListQByDriver(string Id, string name, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var Deliveries = DB.OrderDeliveries.Where(s => (s.Driver.DriverUserId == Id || name == "Developer") && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
-        && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
-        (User != null ? DB.ActionLogs.Where(l => l.OrderDeliveryId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        var Deliveries = DB.OrderDeliveries.Where(s => (s.Driver.DriverUserId == Id || name == "Developer") && (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
+        && (DateTo == null || s.FakeDate <= DateTo) && (Status == null || s.Status == Status) &&
+        (User == null || DB.ActionLogs.Where(l => l.TableName == "OrderDelivery" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
         {
             x.Id,
             x.OrderId,
@@ -336,13 +336,11 @@ public class OrderDeliveryController : Controller
         ActionLog log = new ActionLog();
         log.PostingDateTime = DateTime.Now;
         log.OprationId = (int)Order.Id;
-        log.DriverId = Order.DriverId;
+        log.Fktable = Order.DriverId.ToString();
         log.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
         log.Description = Description;
-        log.Fktable = "Driver";
         log.TableName = "OrderDelivery";
-        log.OrderDeliveryId = (int)Order.Id;
-        DB.OrderDeliveries.Where(x => x.Id == log.OrderDeliveryId).SingleOrDefault().Status = Status;
+        DB.OrderDeliveries.Where(x => x.Id == Order.DriverId).SingleOrDefault().Status = Status;
 
 
         // ActionLogController logCon = new ActionLogController(ConicErpContext Db);

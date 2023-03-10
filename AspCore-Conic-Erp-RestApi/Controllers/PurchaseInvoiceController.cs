@@ -20,7 +20,7 @@ public class PurchaseInvoiceController : Controller
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
         var Invoices = DB.PurchaseInvoices.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
-        && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (User != null ? DB.ActionLogs.Where(l => l.PurchaseInvoiceId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (User != null ? DB.ActionLogs.Where(l => l.TableName == "PurchaseInvoice" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
         {
             x.Id,
             x.Discount,
@@ -100,7 +100,8 @@ public class PurchaseInvoiceController : Controller
     public IActionResult GetByItem(long ItemId, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
     {
         var Invoices = DB.InventoryMovements.Where(s => s.PurchaseInvoiceId != null && s.ItemsId == ItemId && (Any != null ? s.Id.ToString().Contains(Any) || s.PurchaseInvoice.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PurchaseInvoice.Description.Contains(Any) || s.PurchaseInvoice.Name.Contains(Any) : true) && (DateFrom != null ? s.PurchaseInvoice.FakeDate >= DateFrom : true)
-          && (DateTo != null ? s.PurchaseInvoice.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (User != null ? DB.ActionLogs.Where(l => l.InventoryMovementId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+          && (DateTo != null ? s.PurchaseInvoice.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true)
+          && (User != null ? DB.ActionLogs.Where(l => l.TableName == "PurchaseInvoice" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
           {
               x.Id,
               x.PurchaseInvoiceId,

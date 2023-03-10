@@ -22,7 +22,7 @@ public class ReceiveController : Controller
     {
         var Invoices = DB.Receives.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
         && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
-        (User != null ? DB.ActionLogs.Where(l => l.ReceiveId == s.Id && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        (User != null ? DB.ActionLogs.Where(l => l.TableName == "Receive" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
 
         {
             x.Id,

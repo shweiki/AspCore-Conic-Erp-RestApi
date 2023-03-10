@@ -89,8 +89,8 @@ public class MemberController : Controller
     [Route("Member/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
     {
-        var Members = DB.Members.Include(x=>x.Account.EntryMovements).Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.ToLower().Contains(Any) || s.Ssn.Contains(Any) || s.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.Tag.Contains(Any))
-        && (Status == null || s.Status == Status)).Select(x => new
+        var Members = DB.Members.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.ToLower().Contains(Any) || s.Ssn.Contains(Any) || s.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.Tag.Contains(Any))
+        && (Status == null || s.Status == Status)).Include(x => x.Account).Include(x => x.Account.EntryMovements).Select(x => new
         {
             x.Id,
             x.Name,
@@ -103,8 +103,8 @@ public class MemberController : Controller
             x.Tag,
             x.Vaccine,
             MembershipsCount = x.MembershipMovements.Count(),
-            TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
-            TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum(),
+            TotalDebit = x.Account.EntryMovements.Sum(d => d.Debit),
+            TotalCredit = x.Account.EntryMovements.Sum(c => c.Credit),
         }).ToList();
         Members = (Sort == "+id" ? Members.OrderBy(s => s.Id).ToList() : Members.OrderByDescending(s => s.Id).ToList());
         return Ok(new
@@ -126,7 +126,7 @@ public class MemberController : Controller
     {
         var Members = DB.Members.Where(m => m.Ssn == Ssn || m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", "")).ToList();
 
-        return Ok(Members.Count() > 0 ? true : false);
+        return Ok(Members.Count() > 0);
     }
 
     [Route("Member/GetActiveMember")]
@@ -136,7 +136,7 @@ public class MemberController : Controller
         try
         {
 
-            var membershiplist = DB.ActionLogs.Where(l => l.MembershipMovementId != null && l.PostingDateTime >= DateTime.Today).Select(x => x.MembershipMovementId).ToList();
+            var membershiplist = DB.ActionLogs.Where(l => l.TableName == "Membership" && l.Fktable != null && l.PostingDateTime >= DateTime.Today).Select(x => long.Parse(x.Fktable)).ToList();
 
             var Members = DB.MembershipMovements.Where(x => membershiplist.Contains(x.Id)).ToList().Select(x => new
             {
@@ -259,7 +259,13 @@ public class MemberController : Controller
 
         var member = await DB.Members.Include(x => x.MembershipMovements).Include(x => x.Account.EntryMovements).SingleOrDefaultAsync(m => m.Id == Id);
         if (member == null) return BadRequest();
-        foreach (var MS in member.MembershipMovements.Where(m => m.MemberId == Id).ToList())
+        var membershipMovement = member.MembershipMovements.Where(m => m.MemberId == Id).ToList();
+        if (membershipMovement.Count == 0)
+        {
+            member.Status = -1;
+            await DB.SaveChangesAsync();
+        }
+        foreach (var MS in membershipMovement)
         {
             await MembershipMovementController.ScanMembershipMovementById(MS.Id, DB, Configuration);
         }
@@ -297,6 +303,80 @@ public class MemberController : Controller
                    MS.Description,
                }).FirstOrDefault(),
            });
+    }
+    [Route("Member/Delete")]
+    [HttpPost]
+    public async Task<IActionResult> Delete(long Id)
+    {
+        try
+        {
+            var member = await DB.Members.Include(x => x.MembershipMovements).Include(x => x.Payments).Include(x => x.Receives).Include(x => x.SalesInvoices).Include(x => x.Account.EntryMovements).SingleOrDefaultAsync(m => m.Id == Id);
+
+            if (member is not null)
+            {
+                DB.Members.Remove(member);
+                DB.TreeAccounts.Remove(member.Account);
+                await DB.SaveChangesAsync();
+                return Ok(true);
+            }
+            else return Forbid("Can't found member");
+
+        }
+        catch (Exception ex)
+        {
+            return Forbid(ex.Message);
+
+        }
+    }
+    [Route("Member/MergeTwoMembers")]
+    [HttpPost]
+    public async Task<IActionResult> MergeTwoMembers(long IntoId, long CurrentId)
+    {
+        try
+        {
+            if (IntoId == CurrentId) return Forbid("Same Ids");
+
+            var currentMember = await DB.Members.Include(x => x.MembershipMovements).Include(x => x.Payments).Include(x => x.Receives).Include(x => x.SalesInvoices).Include(x => x.Account.EntryMovements).SingleOrDefaultAsync(m => m.Id == CurrentId);
+            var intoMember = await DB.Members.Include(x => x.MembershipMovements).Include(x => x.Payments).Include(x => x.Receives).Include(x => x.SalesInvoices).Include(x => x.Account.EntryMovements).SingleOrDefaultAsync(m => m.Id == IntoId);
+            foreach (var membershipMovement in currentMember.MembershipMovements)
+            {
+                membershipMovement.MemberId = intoMember.Id;
+
+            }
+            foreach (var payment in currentMember.Payments)
+            {
+                payment.MemberId = intoMember.Id;
+
+            }
+            foreach (var receive in currentMember.Receives)
+            {
+                receive.MemberId = intoMember.Id;
+            }
+            foreach (var salesInvoice in currentMember.SalesInvoices)
+            {
+                salesInvoice.MemberId = intoMember.Id;
+            }
+            foreach (var entryMovement in currentMember.Account.EntryMovements)
+            {
+                entryMovement.AccountId = intoMember.AccountId;
+            }
+            foreach (var deviceLog in DB.DeviceLogs.Where(x => x.TableName == "Member" && x.Fk == currentMember.Id.ToString()).ToList())
+            {
+                deviceLog.Fk = intoMember.Id.ToString();
+            }
+            foreach (var fileData in DB.FileData.Where(x => x.TableName == "Member" && x.Fktable == currentMember.Id).ToList())
+            {
+                fileData.Fktable = intoMember.Id;
+            }
+            await DB.SaveChangesAsync();
+            await Delete(currentMember.Id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return Forbid(ex.Message);
+        }
+
     }
     [Route("Member/FixPhoneNumber")]
     [HttpGet]
@@ -356,7 +436,7 @@ public class MemberController : Controller
         {
             int OStatus = M.Status;
 
-            var LastLog = DB.ActionLogs.Where(x => x.MemberId == M.Id && x.Opration.TableName == "Member")?.OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
+            var LastLog = DB.ActionLogs.Where(x => x.TableName == "Member" && x.Fktable == M.Id.ToString())?.OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
             if (LastLog != null)
             {
                 M.Status = DB.Oprationsys.Where(x => x.Id == LastLog.OprationId).SingleOrDefault().Status;

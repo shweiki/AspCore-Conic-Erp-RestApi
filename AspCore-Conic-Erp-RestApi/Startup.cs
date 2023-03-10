@@ -51,12 +51,11 @@ public class Startup
 
         services.AddDbContext<ConicErpContext>(options =>
         {
-
-            options.UseSqlServer(ConnectionString,
-            sqlServerOptionsAction: options =>
+            options.UseSqlServer(ConnectionString, sqlServerOptionsAction: options =>
             {
                 options.MigrationsAssembly("AspCore-Conic-Erp-RestApi");
             });
+            options.EnableSensitiveDataLogging(true);
         });
 
         services.AddTransient<IUnitOfWork, UnitOfWork>();
