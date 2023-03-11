@@ -59,12 +59,14 @@ public class SaleInvoiceController : Controller
                 imx.EXP,
                 imx.SellingPrice,
                 Total = imx.SellingPrice * imx.Qty,
-                imx.Description
+                imx.Description,
+                imx.BillOfEnteryId
+
             }).ToList(),
-        }).Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.PaymentMethod.Contains(Any) || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any) : true) &&
-        (DateFrom != null ? s.FakeDate >= DateFrom : true) && (DateTo != null ? s.FakeDate <= DateTo : true) &&
-        (Status != null ? s.Status == Status : true) && (Type != null ? s.Type == Type : true) && 
-        (User != null ? DB.ActionLogs.Where(l => l.TableName == "SaleInvoice" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).AsQueryable()
+        }).Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.PaymentMethod.Contains(Any) || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any)) &&
+        (DateFrom == null || s.FakeDate >= DateFrom) && (DateTo == null || s.FakeDate <= DateTo) &&
+        (Status == null || s.Status == Status) && (Type == null || s.Type == Type) &&
+        (User == null || DB.ActionLogs.Where(l => l.TableName == "SaleInvoice" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).AsQueryable()
 ;
 
         itemsQuery = (Sort == "+id" ? itemsQuery.OrderBy(s => s.Id) : itemsQuery.OrderByDescending(s => s.Id));
@@ -140,7 +142,9 @@ public class SaleInvoiceController : Controller
                 imx.EXP,
                 imx.SellingPrice,
                 Total = imx.SellingPrice * imx.Qty,
-                imx.Description
+                imx.Description,
+                imx.BillOfEnteryId
+
             }).ToList(),
         }).ToList();
 
@@ -150,9 +154,9 @@ public class SaleInvoiceController : Controller
     [HttpGet]
     public IActionResult GetByItem(long ItemId, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
     {
-        var Invoices = DB.InventoryMovements.Where(s => s.SalesInvoiceId != null && s.ItemsId == ItemId && (Any != null ? s.Id.ToString().Contains(Any) || s.SalesInvoice.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.SalesInvoice.PhoneNumber.Contains(Any) || s.SalesInvoice.Name.Contains(Any) : true) && (DateFrom != null ? s.SalesInvoice.FakeDate >= DateFrom : true)
-          && (DateTo != null ? s.SalesInvoice.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (Type != null ? s.SalesInvoice.Type == Type : true)
-          && (User != null ? DB.ActionLogs.Where(l => l.TableName == "InventoryMovement" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        var Invoices = DB.InventoryMovements.Where(s => s.SalesInvoiceId != null && s.ItemsId == ItemId && (Any == null || s.Id.ToString().Contains(Any) || s.SalesInvoice.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.SalesInvoice.PhoneNumber.Contains(Any) || s.SalesInvoice.Name.Contains(Any)) && (DateFrom == null || s.SalesInvoice.FakeDate >= DateFrom)
+          && (DateTo == null || s.SalesInvoice.FakeDate <= DateTo) && (Status == null || s.Status == Status) && (Type == null || s.SalesInvoice.Type == Type)
+          && (User == null || DB.ActionLogs.Where(l => l.TableName == "InventoryMovement" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
           {
               x.Id,
               x.SalesInvoiceId,
@@ -184,7 +188,9 @@ public class SaleInvoiceController : Controller
                   imx.EXP,
                   imx.SellingPrice,
                   Total = imx.SellingPrice * imx.Qty,
-                  imx.Description
+                  imx.Description,
+                  imx.BillOfEnteryId
+
               }).ToList(),
           }).ToList();
         Invoices = (Sort == "+id" ? Invoices.OrderBy(s => s.Id).ToList() : Invoices.OrderByDescending(s => s.Id).ToList());
@@ -209,8 +215,8 @@ public class SaleInvoiceController : Controller
     [HttpGet]
     public IActionResult GetSaleInvoiceByStatus(DateTime? DateFrom, DateTime? DateTo, int? Status)
     {
-        var Invoices = DB.SalesInvoices.Where(s => (DateFrom != null ? s.FakeDate >= DateFrom : true)
-        && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+        var Invoices = DB.SalesInvoices.Where(s => (DateFrom == null || s.FakeDate >= DateFrom)
+        && (DateTo == null || s.FakeDate <= DateTo) && (Status == null || s.Status == Status)).Select(x => new
         {
             x.Id,
             x.Discount,
@@ -238,7 +244,8 @@ public class SaleInvoiceController : Controller
                 imx.Qty,
                 imx.SellingPrice,
                 Total = imx.SellingPrice * imx.Qty,
-                imx.Description
+                imx.Description,
+                imx.BillOfEnteryId
             }).ToList(),
         }).ToList();
 
@@ -261,7 +268,7 @@ public class SaleInvoiceController : Controller
                 //  collection.PhoneNumber = collection.PhoneNumber == null || collection.PhoneNumber == "" ? Vendor.PhoneNumber1 : collection.PhoneNumber;
                 DB.SalesInvoices.Add(collection);
                 DB.SaveChanges();
-                return Ok(new { Id = collection.Id, Name = collection.Name, PhoneNumber = collection.PhoneNumber });
+                return Ok(new { collection.Id, collection.Name, collection.PhoneNumber });
 
             }
             catch
@@ -368,7 +375,9 @@ public class SaleInvoiceController : Controller
                 imx.Qty,
                 imx.SellingPrice,
                 Total = imx.SellingPrice * imx.Qty,
-                imx.Description
+                imx.Description,
+                imx.BillOfEnteryId
+
             }).ToList(),
         }).ToList();
         return Ok(new
@@ -422,6 +431,8 @@ public class SaleInvoiceController : Controller
                 m.SellingPrice,
                 m.Description,
                 m.EXP,
+                m.BillOfEnteryId,
+
                 TotalIn = DB.InventoryMovements.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty),
                 TotalOut = DB.InventoryMovements.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty),
             }).ToList()
@@ -461,6 +472,7 @@ public class SaleInvoiceController : Controller
                 m.SellingPrice,
                 m.Description,
                 m.EXP,
+                m.BillOfEnteryId,
                 Total = m.SellingPrice * m.Qty,
             }).ToList(),
 
@@ -471,7 +483,7 @@ public class SaleInvoiceController : Controller
     [HttpGet]
     public IActionResult GetSaleInvoiceByMemberId(long? Id, bool IsService)
     {
-        var Invoices = DB.SalesInvoices.Where(f => f.MemberId != null && f.MemberId == Id && (IsService == true ? f.IsPrime == true : true)).Select(x => new
+        var Invoices = DB.SalesInvoices.Where(f => f.MemberId != null && f.MemberId == Id && (IsService != true || f.IsPrime == true)).Select(x => new
         {
             x.Id,
             Name = x.Vendor.Name + x.Member.Name,
@@ -492,6 +504,7 @@ public class SaleInvoiceController : Controller
                 m.SellingPrice,
                 m.Description,
                 m.EXP,
+                m.BillOfEnteryId,
                 Total = m.SellingPrice * m.Qty,
             }).ToList(),
 

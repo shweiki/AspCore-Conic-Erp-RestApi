@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
 [Authorize]
@@ -67,8 +67,8 @@ public class VendorController : Controller
     [Route("Vendor/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
     {
-        var Vendors = DB.Vendors.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) : true)
-        && (Status != null ? s.Status == Status : true)).Select(x => new
+        var Vendors = DB.Vendors.Include(x => x.Account.EntryMovements).Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")))
+        && (Status == null || s.Status == Status)).Select(x => new
         {
             x.Id,
             x.Name,
@@ -99,9 +99,9 @@ public class VendorController : Controller
     [HttpGet]
     public IActionResult CheckIsExist(string Name, string PhoneNumber, string Ssn)
     {
-        var Vendor = DB.Vendors.Where(m => (Name != null ? m.Name == Name : false) || (Ssn != null ? m.Ssn == Ssn : false) || (PhoneNumber != null ? m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", "") : false)).ToList();
+        var Vendor = DB.Vendors.Where(m => (Name != null && m.Name == Name) || (Ssn != null && m.Ssn == Ssn) || (PhoneNumber != null && m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", ""))).ToList();
 
-        return Ok(Vendor.Count() > 0 ? true : false);
+        return Ok(Vendor.Count() > 0);
     }
     [Route("Vendor/Create")]
     [HttpPost]
@@ -139,9 +139,9 @@ public class VendorController : Controller
     }
     [Route("Vendor/GetById")]
     [HttpGet]
-    public IActionResult GetById(long? Id)
+    public async Task<IActionResult> GetById(long? Id)
     {
-        var Vendor = DB.Vendors.Where(m => m.Id == Id).Select(
+        var Vendor = await DB.Vendors.Include(x => x.Account.EntryMovements).Where(m => m.Id == Id).Select(
             x => new
             {
                 x.Id,
@@ -154,11 +154,11 @@ public class VendorController : Controller
                 x.Status,
                 x.Region,
                 x.Type,
-                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
-                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
+                TotalDebit = x.Account.EntryMovements.Sum(d => d.Debit),
+                TotalCredit = x.Account.EntryMovements.Sum(c => c.Credit),
                 x.AccountId,
 
-            }).SingleOrDefault();
+            }).SingleOrDefaultAsync();
         return Ok(Vendor);
     }
     [Route("Vendor/Edit")]
