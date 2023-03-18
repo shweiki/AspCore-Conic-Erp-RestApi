@@ -1,10 +1,14 @@
-﻿using Entities.Configuration;
+﻿using Entities.Common;
+using Entities.Configuration;
+using Entities.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
 using System;
-
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Entities;
 
@@ -24,6 +28,7 @@ public partial class ConicErpContext : IdentityDbContext
 
 
     public virtual DbSet<TreeAccount> TreeAccounts { get; set; }
+    public DbSet<Audit> AuditLogs => Set<Audit>();
     public virtual DbSet<Setting> Settings { get; set; }
     public virtual DbSet<UserRouter> UserRouter { get; set; }
     public virtual DbSet<ActionLog> ActionLogs { get; set; }
@@ -86,26 +91,89 @@ public partial class ConicErpContext : IdentityDbContext
         }
 
     }
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+    {
+        PrepareSaveChanges();
 
-    static string GetCon()
+        var result = await base.SaveChangesAsync(cancellationToken);
+        return result;
+    }
+    public virtual async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken(), string userName = null)
     {
-        //   return "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Conic_Erp;Integrated Security=True";
-        return "Data Source=" + GetServerName() + ";Initial Catalog=" + GetDataBaseName() + ";Integrated Security=True; MultipleActiveResultSets=true; timeout=1000000";
-        //  return "Data Source=tcp:aspcore-conic-erp-restapidbserver.database.windows.net,1433;Initial Catalog=AspCore-Conic-Erp-RestApi_db;User Id=taha;Password=()=>{Allah}";
+        PrepareSaveChanges();
+        OnBeforeSaveChanges(userName);
 
+        var result = await base.SaveChangesAsync(cancellationToken);
+        return result;
     }
-    static string GetServerName()
+    private void OnBeforeSaveChanges(string userName = "System User")
     {
-        //    return "(localdb)\\mssqllocaldb";
-        return "" + Environment.MachineName + "\\SQLEXPRESS";
+        ChangeTracker.DetectChanges();
+        var auditEntries = new List<AuditEntry>();
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            if (entry.Entity is Audit || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
+                continue;
+
+            var auditEntry = new AuditEntry(entry);
+            auditEntry.TableName = entry.Entity.GetType().Name;
+            auditEntry.UserId = string.IsNullOrWhiteSpace(userName) ? "System User" : userName;
+            auditEntries.Add(auditEntry);
+            foreach (var property in entry.Properties)
+            {
+                string propertyName = property.Metadata.Name;
+                if (property.Metadata.IsPrimaryKey())
+                {
+                    auditEntry.KeyValues[propertyName] = property.CurrentValue;
+                    continue;
+                }
+
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        auditEntry.AuditActionType = AuditActionType.Create;
+                        auditEntry.NewValues[propertyName] = property.CurrentValue;
+                        break;
+
+                    case EntityState.Deleted:
+                        auditEntry.AuditActionType = AuditActionType.Delete;
+                        auditEntry.OldValues[propertyName] = property.OriginalValue;
+                        break;
+
+                    case EntityState.Modified:
+                        if (property.IsModified)
+                        {
+                            auditEntry.ChangedColumns.Add(propertyName);
+                            auditEntry.AuditActionType = AuditActionType.Update;
+                            auditEntry.OldValues[propertyName] = property.OriginalValue;
+                            auditEntry.NewValues[propertyName] = property.CurrentValue;
+                        }
+                        break;
+                }
+            }
+        }
+        foreach (var auditEntry in auditEntries)
+        {
+            AuditLogs.Add(auditEntry.ToAudit());
+        }
     }
-    static string GetDataBaseName()
+    private void PrepareSaveChanges()
     {
-        //return "SHAMEYALZEEN";
-        int lat = Environment.CurrentDirectory.LastIndexOf("\\") + 1;
-        string Name = Environment.CurrentDirectory[lat..];
-        return Name.Replace("-", "").ToUpper();
+        foreach (var entry in ChangeTracker.Entries<AuditEntity>())
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.Created = DateTime.UtcNow;
+                    break;
+
+                case EntityState.Modified:
+                    entry.Entity.LastModified = DateTime.UtcNow;
+                    break;
+            }
+        }
     }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.UseCollation("Arabic_CI_AI");

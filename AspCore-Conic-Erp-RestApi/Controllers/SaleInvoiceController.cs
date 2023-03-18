@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
@@ -255,7 +256,7 @@ public class SaleInvoiceController : Controller
     [HttpPost]
     [Route("SaleInvoice/Create")]
 
-    public IActionResult Create(SalesInvoice collection)
+    public async Task<IActionResult> Create(SalesInvoice collection)
     {
         if (ModelState.IsValid)
         {
@@ -267,7 +268,7 @@ public class SaleInvoiceController : Controller
                 //  collection.Name = Vendor.Name;
                 //  collection.PhoneNumber = collection.PhoneNumber == null || collection.PhoneNumber == "" ? Vendor.PhoneNumber1 : collection.PhoneNumber;
                 DB.SalesInvoices.Add(collection);
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(new { collection.Id, collection.Name, collection.PhoneNumber });
 
             }
@@ -281,7 +282,7 @@ public class SaleInvoiceController : Controller
     }
     [Route("SaleInvoice/Edit")]
     [HttpPost]
-    public IActionResult Edit(SalesInvoice collection)
+    public async Task<IActionResult> Edit(SalesInvoice collection)
     {
         if (ModelState.IsValid)
         {
@@ -307,7 +308,7 @@ public class SaleInvoiceController : Controller
                 Invoice.Type = collection.Type;
                 DB.InventoryMovements.RemoveRange(DB.InventoryMovements.Where(m => m.SalesInvoiceId == Invoice.Id).ToList());
                 Invoice.InventoryMovements = collection.InventoryMovements;
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
 
                 return Ok(true);
 
@@ -323,7 +324,7 @@ public class SaleInvoiceController : Controller
 
     [HttpPost]
     [Route("SaleInvoice/EditPaymentMethod")]
-    public IActionResult EditPaymentMethod(long ID, string PaymentMethod)
+    public async Task<IActionResult> EditPaymentMethod(long ID, string PaymentMethod)
     {
         if (ModelState.IsValid)
         {
@@ -331,7 +332,7 @@ public class SaleInvoiceController : Controller
             {
                 SalesInvoice Invoice = DB.SalesInvoices.Where(x => x.Id == ID).SingleOrDefault();
                 Invoice.PaymentMethod = PaymentMethod;
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
             }
             catch

@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -219,7 +221,7 @@ public class PaymentController : Controller
     }
     [HttpPost]
     [Route("Payment/Create")]
-    public IActionResult Create(Payment collection)
+    public async Task<IActionResult> Create(Payment collection)
     {
         if (ModelState.IsValid)
         {
@@ -227,7 +229,7 @@ public class PaymentController : Controller
             {
                 // TODO: Add insert logic here
                 DB.Payments.Add(collection);
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(collection.Id);
 
             }
@@ -241,7 +243,7 @@ public class PaymentController : Controller
     }
     [Route("Payment/Edit")]
     [HttpPost]
-    public IActionResult Edit(Payment collection)
+    public async Task<IActionResult> Edit(Payment collection)
     {
         if (ModelState.IsValid)
         {
@@ -259,7 +261,7 @@ public class PaymentController : Controller
                 payment.Type = collection.Type;
                 payment.EditorName = collection.EditorName;
 
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
             }
             catch
@@ -272,7 +274,7 @@ public class PaymentController : Controller
     }
     [HttpPost]
     [Route("Payment/EditPaymentMethod")]
-    public IActionResult EditPaymentMethod(long ID, string PaymentMethod)
+    public async Task<IActionResult> EditPaymentMethod(long ID, string PaymentMethod)
     {
         if (ModelState.IsValid)
         {
@@ -280,7 +282,7 @@ public class PaymentController : Controller
             {
                 Payment payment = DB.Payments.Where(x => x.Id == ID).SingleOrDefault();
                 payment.PaymentMethod = PaymentMethod;
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
             }
             catch

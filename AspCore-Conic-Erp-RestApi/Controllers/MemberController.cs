@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
@@ -189,27 +190,22 @@ public class MemberController : Controller
 
     [Route("Member/Create")]
     [HttpPost]
-    public IActionResult Create(Member collection)
+    public async Task<IActionResult> Create(Member collection)
     {
         if (ModelState.IsValid)
         {
             try
             {
-
-                TreeAccount NewAccount = new TreeAccount
+                collection.Account = new TreeAccount
                 {
                     Type = "Member",
                     Description = collection.Description,
                     Status = 0,
                     Code = "",
                     ParentId = DB.TreeAccounts.Where(x => x.Type == "Members-Main").SingleOrDefault().Code
-
                 };
-                DB.TreeAccounts.Add(NewAccount);
-                DB.SaveChanges();
-                collection.AccountId = NewAccount.Id;
                 DB.Members.Add(collection);
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(collection.Id);
             }
             catch
@@ -223,7 +219,7 @@ public class MemberController : Controller
 
     [Route("Member/Edit")]
     [HttpPost]
-    public IActionResult Edit(Member collection)
+    public async Task<IActionResult> Edit(Member collection)
     {
         if (ModelState.IsValid)
         {
@@ -241,7 +237,7 @@ public class MemberController : Controller
             member.Vaccine = collection.Vaccine;
             try
             {
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
             }
             catch
@@ -263,7 +259,7 @@ public class MemberController : Controller
         if (membershipMovement.Count == 0)
         {
             member.Status = -1;
-            await DB.SaveChangesAsync();
+            await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
         }
         foreach (var MS in membershipMovement)
         {
@@ -316,7 +312,7 @@ public class MemberController : Controller
             {
                 DB.Members.Remove(member);
                 DB.TreeAccounts.Remove(member.Account);
-                await DB.SaveChangesAsync();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
             }
             else return Forbid("Can't found member");
@@ -368,8 +364,8 @@ public class MemberController : Controller
             {
                 fileData.Fktable = intoMember.Id;
             }
-            await DB.SaveChangesAsync();
             await Delete(currentMember.Id);
+            await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
             return Ok();
         }
         catch (Exception ex)
@@ -380,7 +376,7 @@ public class MemberController : Controller
     }
     [Route("Member/FixPhoneNumber")]
     [HttpGet]
-    public IActionResult FixPhoneNumber()
+    public async Task<IActionResult> FixPhoneNumber()
     {
         DB.Members.Where(i => i.PhoneNumber1 != null).ToList().ForEach(s =>
         {
@@ -388,7 +384,7 @@ public class MemberController : Controller
             s.PhoneNumber1 = s.PhoneNumber1.Length == 10 ? s.PhoneNumber1.Substring(1) : s.PhoneNumber1;
         });
 
-        DB.SaveChanges();
+        await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
 
 
         return Ok(true);
@@ -419,7 +415,7 @@ public class MemberController : Controller
             }
             if (OStatus == -2) member.Status = -2;
 
-            await DB.SaveChangesAsync();
+            await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
         }
         //CheckBlackListActionLogMembers();
 
@@ -428,7 +424,7 @@ public class MemberController : Controller
 
     [Route("Member/CheckBlackListActionLogMembers")]
     [HttpGet]
-    public IActionResult CheckBlackListActionLogMembers()
+    public async Task<IActionResult> CheckBlackListActionLogMembers()
     {
         var Members = DB.Members?.ToList();
 
@@ -441,7 +437,7 @@ public class MemberController : Controller
             {
                 M.Status = DB.Oprationsys.Where(x => x.Id == LastLog.OprationId).SingleOrDefault().Status;
             }
-            DB.SaveChanges();
+            await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
         }
         return Ok(true);
     }

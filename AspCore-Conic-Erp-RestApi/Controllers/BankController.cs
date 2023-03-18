@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
 
@@ -49,13 +51,16 @@ public class BankController : Controller
     [Route("Bank/Create")]
     [HttpPost]
 
-    public IActionResult Create(Bank collection)
+    public async Task<IActionResult> Create(Bank collection)
     {
         if (ModelState.IsValid)
         {
             try
             {
-                TreeAccount NewAccount = new TreeAccount
+
+                // TODO: Add insert logic here
+                collection.Status = 0;
+                collection.Account = new TreeAccount
                 {
                     Type = "Bank",
                     Name = collection.Name,
@@ -64,13 +69,8 @@ public class BankController : Controller
                     Code = "",
                     ParentId = DB.TreeAccounts.Where(x => x.Type == "Banks-Main").SingleOrDefault().Code
                 };
-                DB.TreeAccounts.Add(NewAccount);
-                DB.SaveChanges();
-                // TODO: Add insert logic here
-                collection.Status = 0;
-                collection.AccountId = NewAccount.Id;
                 DB.Banks.Add(collection);
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
 
 
             }
@@ -86,7 +86,7 @@ public class BankController : Controller
     // DELETE: Banks/5
     [Route("Banks/Edit")]
     [HttpPost]
-    public IActionResult Edit(Bank collection)
+    public async Task<IActionResult> Edit(Bank collection)
     {
         if (ModelState.IsValid)
         {
@@ -100,7 +100,7 @@ public class BankController : Controller
                 bank.BranchName = collection.BranchName;
                 bank.AccountNumber = collection.AccountNumber;
 
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
             }
             catch

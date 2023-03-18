@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AspCore_Conic_Erp_RestApi.Controllers;
@@ -223,7 +224,7 @@ public class BillOfEnteryController : Controller
 
     [Route("BillOfEntery/Create")]
     [HttpPost]
-    public IActionResult Create(BillOfEntery collection)
+    public async Task<IActionResult> Create(BillOfEntery collection)
     {
         if (ModelState.IsValid && collection.BonId is not null)
         {
@@ -232,7 +233,7 @@ public class BillOfEnteryController : Controller
                 // TODO: Add insert logic here
                 //  collection.InventoryMovements.ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
                 DB.BillOfEnterys.Add(collection);
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(collection.Id);
 
             }
@@ -246,7 +247,7 @@ public class BillOfEnteryController : Controller
     }
     [Route("BillOfEntery/Edit")]
     [HttpPost]
-    public IActionResult Edit(BillOfEntery collection)
+    public async Task<IActionResult> Edit(BillOfEntery collection)
     {
         if (ModelState.IsValid)
         {
@@ -262,7 +263,7 @@ public class BillOfEnteryController : Controller
                 Invoice.PurchaseInvoiceId = collection.PurchaseInvoiceId;
                 Invoice.ST9 = collection.ST9;
 
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
 
                 return Ok(true);
 
@@ -358,7 +359,7 @@ public class BillOfEnteryController : Controller
     }
     [HttpPost]
     [Route("BillOfEntery/PinBillOfEntery")]
-    public IActionResult PinBillOfEntery(long InventoryMovementsId, long? BillOfEnteryId, bool Pin)
+    public async Task<IActionResult> PinBillOfEntery(long InventoryMovementsId, long? BillOfEnteryId, bool Pin)
     {
         if (ModelState.IsValid)
         {
@@ -366,7 +367,7 @@ public class BillOfEnteryController : Controller
             {
                 InventoryMovement Movement = DB.InventoryMovements.Where(x => x.Id == InventoryMovementsId).SingleOrDefault();
                 Movement.BillOfEnteryId = Pin == true ? BillOfEnteryId : null;
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
             }
             catch
@@ -379,7 +380,7 @@ public class BillOfEnteryController : Controller
     }
     [HttpPost]
     [Route("BillOfEntery/PinST9BillOfEntery")]
-    public IActionResult PinST9BillOfEntery(long BillOfEnteryId, string St9)
+    public async Task<IActionResult> PinST9BillOfEntery(long BillOfEnteryId, string St9)
     {
         if (ModelState.IsValid)
         {
@@ -387,7 +388,7 @@ public class BillOfEnteryController : Controller
             {
                 BillOfEntery Bill = DB.BillOfEnterys.Where(x => x.Id == BillOfEnteryId).SingleOrDefault();
                 Bill.ST9 = St9;
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
             }
             catch
