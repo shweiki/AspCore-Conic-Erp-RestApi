@@ -69,11 +69,11 @@ public class ItemController : Controller
     }
     [Route("Item/GetItemByAny")]
     [HttpGet]
-    public IActionResult GetItemByAny(string Any)
+    public IActionResult GetItemByAny(string Any, bool IsDisplay = false)
     {
         if (Any == null) return NotFound();
         Any = Any.ToLower();
-        var Items = DB.Items.Search(x => x.Name, x => x.Barcode, x => x.Id.ToString(), x => x.MenuItem, x => x.Address, x => x.Model, x => x.SN, x => x.Type).Containing(Any)
+        var Items = DB.Items.Where(h => IsDisplay == true? h.IsPrime == true : (h.IsPrime == true || false)).Search(x => x.Name, x => x.Barcode, x => x.Id.ToString(), x => x.MenuItem, x => x.Address, x => x.Model, x => x.SN, x => x.Type).Containing(Any)
             .Select(x => new
             {
                 x.Id,
