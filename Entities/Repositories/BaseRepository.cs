@@ -1,4 +1,5 @@
-﻿using Entities.Interfaces;
+﻿using Domain;
+using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 
 
-namespace Entities.Repositories;
+namespace Domain.Repositories;
 
 public class BaseRepository<T> : IBaseRepository<T> where T : class
 {

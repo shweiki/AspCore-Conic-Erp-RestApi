@@ -1,4 +1,4 @@
-﻿namespace Entities.Identity;
+﻿namespace Domain.Identity;
 
 public enum AuditActionType
 {

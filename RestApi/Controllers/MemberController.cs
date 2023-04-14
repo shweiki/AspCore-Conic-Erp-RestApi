@@ -1,4 +1,4 @@
-﻿using Entities;
+﻿using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +13,7 @@ namespace RestApi.Controllers;
 [Authorize]
 public class MemberController : Controller
 {
-    private ConicErpContext DB;
+    public readonly ConicErpContext DB;
     public IConfiguration Configuration { get; }
 
     public MemberController(ConicErpContext dbcontext, IConfiguration configuration)
@@ -49,7 +49,7 @@ public class MemberController : Controller
     [HttpGet]
     public IActionResult GetPayablesMember()
     {
-        var Members = DB.Members.Include(x => x.Account.EntryMovements).Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) < 0).AsQueryable().Select(x => new
+        var Members = DB.Members.Include(x => x.Account.EntryMovements).Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) < 0).ToList().Select(x => new
         {
             x.Id,
             x.Name,
@@ -259,7 +259,7 @@ public class MemberController : Controller
         if (membershipMovement.Count == 0)
         {
             member.Status = -1;
-            await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
+            await DB.SaveChangesAsync();
         }
         else
         {
@@ -268,7 +268,7 @@ public class MemberController : Controller
                 await MembershipMovementController.ScanMembershipMovementById(MS.Id, DB, Configuration);
             }
         }
-      
+
         return Ok(
            new
            {

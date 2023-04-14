@@ -1,6 +1,6 @@
 ﻿#nullable disable
 
-namespace Entities;
+namespace Domain;
 
 public partial class EditorsUser
 {

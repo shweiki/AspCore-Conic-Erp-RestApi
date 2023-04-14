@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace  Entities.Identity;
+namespace Domain.Identity;
 
 public class Audit
 {

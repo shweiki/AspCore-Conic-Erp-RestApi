@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace Entities.Identity;
+namespace Domain.Identity;
 
 
 public class AuditEntry

@@ -1,10 +1,10 @@
-﻿using Entities;
+﻿using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
-using Driver = Entities.Driver;
+using Driver = Domain.Driver;
 
 namespace RestApi.Controllers;
 

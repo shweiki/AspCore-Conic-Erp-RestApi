@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 #nullable disable
 
-namespace Entities;
+namespace Domain;
 
 public partial class TreeAccount
 {

@@ -1,4 +1,4 @@
-﻿using Entities;
+﻿using Domain;
 using ESC_POS_USB_NET.Printer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -128,7 +128,6 @@ public class DeviceController : Controller
     public IActionResult DirectlyPrint(string PrinterName, string Ip, string PortName)
     {
         Printer printer = new Printer(PrinterName);
-        printer.Append("يسشيس)");
 
         printer.FullPaperCut();
         printer.PrintDocument();

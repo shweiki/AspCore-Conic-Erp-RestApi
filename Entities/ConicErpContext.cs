@@ -1,6 +1,6 @@
-﻿using Entities.Common;
-using Entities.Configuration;
-using Entities.Identity;
+﻿using Domain.Common;
+using Domain.Configuration;
+using Domain.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Entities;
+namespace Domain;
 
 public partial class ConicErpContext : IdentityDbContext
 {

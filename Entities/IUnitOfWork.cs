@@ -1,7 +1,7 @@
-﻿using Entities.Interfaces;
+﻿using Domain.Interfaces;
 using System;
 
-namespace Entities;
+namespace Domain;
 
 public interface IUnitOfWork : IDisposable
 {

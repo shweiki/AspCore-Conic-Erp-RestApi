@@ -1,4 +1,4 @@
-﻿using Entities;
+﻿using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -384,10 +384,10 @@ public class MembershipMovementController : Controller
     [HttpGet]
     public IActionResult CheckEntryAccountForMembershipMovement()
     {
-        var MembershipMovements =  DB.MembershipMovements.ToList();
+        var MembershipMovements = DB.MembershipMovements.ToList();
         foreach (var membershipMovement in MembershipMovements)
         {
-            var entry =  DB.EntryMovements.Where(x => x.TableName == "MembershipMovement" && x.Fktable == membershipMovement.Id).FirstOrDefault();
+            var entry = DB.EntryMovements.Where(x => x.TableName == "MembershipMovement" && x.Fktable == membershipMovement.Id).FirstOrDefault();
             if (entry == null)
             {
                 DB.EntryAccountings.Add(new EntryAccounting

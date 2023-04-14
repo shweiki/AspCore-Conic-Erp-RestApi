@@ -1,6 +1,7 @@
-﻿using Entities;
+﻿using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Data;
@@ -9,6 +10,8 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace RestApi.Controllers;
 
@@ -16,12 +19,12 @@ namespace RestApi.Controllers;
 public class FileDataController : Controller
 {
     private ConicErpContext DB;
-    public IConfiguration Configuration { get; }
+    public IConfiguration _configuration { get; }
 
     public FileDataController(ConicErpContext dbcontext, IConfiguration configuration)
     {
         DB = dbcontext;
-        Configuration = configuration;
+        _configuration = configuration;
     }
 
     [Authorize]
@@ -30,16 +33,13 @@ public class FileDataController : Controller
     public IActionResult GetProfilePictureByObjId(string TableName, long ObjId)
     {
 
-        var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId && i.Type == "ProfilePicture").Select(x => new
+        var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId && i.Type == "ProfilePicture").FirstOrDefault();
+        if (file is not null)
         {
-            x.Id,
-            x.Type,
-            x.File,
-            x.FileType
-        }).FirstOrDefault();
-
-        if (file != null)
-            return Ok(file);
+            //  string ImagesPath = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/{TableName}/{Path.GetFileName(file.FilePath)}";
+            return Ok(file.File);
+        }
+        //  return Ok(file);
 
         return Ok(false);
     }
@@ -69,6 +69,7 @@ public class FileDataController : Controller
             x.Id,
             x.Type,
             x.File,
+            x.FilePath,
             x.FileType
         }).ToList().LastOrDefault();
 
@@ -87,6 +88,7 @@ public class FileDataController : Controller
             x.Id,
             x.Type,
             x.File,
+            FilePath = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/{TableName}/{Path.GetFileName(x.FilePath)}",
             x.FileType
         }).ToList();
 
@@ -128,33 +130,41 @@ public class FileDataController : Controller
     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     [Route("Files/FixBase64ToPathWithLoaded")]
     [HttpGet]
-    public IActionResult FixBase64ToPathWithLoaded()
+    public async Task<IActionResult> FixBase64ToPathWithLoaded()
     {
         try
         {
-            var files = DB.FileData.ToList();
+            var files = await DB.FileData.Where(x => x.FileType == "image" && (x.File != null || x.File != ""))
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Type,
+                    x.FileType,
+                    x.TableName,
+                    x.Fktable,
+                })
+                .ToListAsync();
             foreach (var file in files)
             {
-                if (file.FileType != "image")
-                {
-                    continue;
-                }
-                string base64String = file.File;// Regex.Replace(file.File, @"^data:image\/[a-zA-Z]+;base64,", string.Empty);
+                var fileData = DB.FileData.Where(i => i.Id == file.Id).SingleOrDefault();
+                string base64String = Regex.Replace(fileData.File, @"^data:image\/[a-zA-Z]+;base64,", string.Empty);
 
                 string path = LoadJpeg(base64String, file.Fktable, file.TableName);
+
                 if (!string.IsNullOrWhiteSpace(path))
                 {
-                    file.FilePath = path;
-                    file.File = string.Empty;
+
+                    fileData.FilePath = path;
+                  //  fileData.File = string.Empty;
+                    DB.SaveChanges();
                 }
             }
-            DB.SaveChanges();
             return Ok(true);
 
         }
         catch (Exception ex)
         {
-            return Ok(false);
+            return Ok(ex.Message);
         }
     }
     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
@@ -162,7 +172,7 @@ public class FileDataController : Controller
     {
         try
         {
-            string productImagePath = Path.GetFullPath(Configuration.GetConnectionString("ProductImagePath") ?? "C:\\ConicImages");
+            string productImagePath = Path.GetFullPath(_configuration.GetConnectionString("ProductImagePath") ?? "C:\\ConicImages");
             string SourceFoldar = Path.Combine(productImagePath, foldarName);
             if (!Directory.Exists(SourceFoldar))
             {
@@ -176,9 +186,19 @@ public class FileDataController : Controller
 
                 System.IO.File.Delete(SourcePath);
             }
-            Image image = Base64ToImage(base64String);
-            image.Save(SourcePath, ImageFormat.Jpeg);
-            return SourcePath;
+            byte[] bitmapData = new byte[base64String.Length];
+            bitmapData = Convert.FromBase64String(base64String);
+
+            using (var streamBitmap = new MemoryStream(bitmapData))
+            {
+                using (Image image = Image.FromStream(streamBitmap))
+                {
+                    image.Save(SourcePath, ImageFormat.Jpeg);
+                    return SourcePath;
+
+                    //  image.Save(path);
+                }
+            }
         }
         catch (Exception ex) { return null; }
 
@@ -189,7 +209,7 @@ public class FileDataController : Controller
     {
         try
         {
-            string productImagePath = Path.GetFullPath(Configuration.GetConnectionString("ProductImagePath") ?? "C:\\ConicImages");
+            string productImagePath = Path.GetFullPath(_configuration.GetConnectionString("ProductImagePath") ?? "C:\\ConicImages");
             string SourceFoldar = Path.Combine(productImagePath, foldarName);
             if (!Directory.Exists(SourceFoldar))
             {

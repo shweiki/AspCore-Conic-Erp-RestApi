@@ -1,5 +1,5 @@
 using Application.Interfaces;
-using Entities;
+using Domain;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,15 +20,15 @@ namespace RestApi;
 public class Startup
 {
     public IConfiguration Configuration { get; }
-    public string ProductImagePath { get; set; } = "C:\\ConicImages";
+    public string ImagesPath { get; set; } = "C:\\ConicImages";
 
     public Startup(IConfiguration configuration)
     {
         Configuration = configuration;
-        ProductImagePath = configuration.GetValue<string>("ProductImagePath") ?? "C:\\ConicImages";
-        if (!Directory.Exists(ProductImagePath))
+        ImagesPath = configuration.GetValue<string>("ImagesPath") ?? "C:\\ConicImages";
+        if (!Directory.Exists(ImagesPath))
         {
-            Directory.CreateDirectory(ProductImagePath);
+            Directory.CreateDirectory(ImagesPath);
         }
 
     }
@@ -76,13 +76,13 @@ public class Startup
             .AddEntityFrameworkStores<ConicErpContext>()
             .AddRoleManager<RoleManager<IdentityRole>>()
             .AddUserManager<UserManager<IdentityUser>>();
-        services.AddAuthentication("esvlogin")
-      .AddCookie("esvlogin", act =>
-      {
-          act.LoginPath = "/home/login";
-          act.AccessDeniedPath = "/home/login";
-          act.SlidingExpiration = true;
-      });
+      //  services.AddAuthentication("esvlogin")
+      //.AddCookie("esvlogin", act =>
+      //{
+      //    act.LoginPath = "/home/login";
+      //    act.AccessDeniedPath = "/home/login";
+      //    act.SlidingExpiration = true;
+      //});
         services.AddCors();
         services.AddHttpContextAccessor();
         services.AddControllers().AddNewtonsoftJson(options =>
@@ -115,8 +115,8 @@ public class Startup
         app.UseStaticFiles(new StaticFileOptions()
         {
             FileProvider = new PhysicalFileProvider(
-            Path.GetFullPath(ProductImagePath)),
-            RequestPath = new PathString("/product-images"),
+            Path.GetFullPath(ImagesPath)),
+            RequestPath = new PathString("/images"),
             DefaultContentType = "application/octet-stream"
         });
         app.UseRouting();

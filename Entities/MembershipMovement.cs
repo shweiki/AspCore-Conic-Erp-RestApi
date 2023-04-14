@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace Entities;
+namespace Domain;
 
 public partial class MembershipMovement
 {

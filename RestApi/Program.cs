@@ -1,4 +1,4 @@
-using Entities;
+using Domain;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;

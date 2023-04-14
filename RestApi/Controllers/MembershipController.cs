@@ -1,5 +1,5 @@
 ﻿using RestApi.Enums;
-using Entities;
+using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;

@@ -1,7 +1,7 @@
-﻿using Entities.Interfaces;
-using Entities.Repositories;
+﻿using Domain.Interfaces;
+using Domain.Repositories;
 
-namespace Entities;
+namespace Domain;
 
 public class UnitOfWork : IUnitOfWork
 {
