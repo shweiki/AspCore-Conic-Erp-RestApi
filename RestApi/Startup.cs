@@ -38,7 +38,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
+        services.AddMemoryCache();
         services.Configure<FormOptions>(o =>
         {
             o.ValueLengthLimit = int.MaxValue;

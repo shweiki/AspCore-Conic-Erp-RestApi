@@ -14,10 +14,13 @@ namespace Domain;
 
 public partial class ConicErpContext : IdentityDbContext
 {
-    public ConicErpContext()
-    {
-    }
     public IConfiguration Configuration { get; }
+
+    public ConicErpContext(IConfiguration configuration)
+    {
+        Configuration = configuration;
+
+    }
 
     public ConicErpContext(DbContextOptions<ConicErpContext> options, IConfiguration configuration)
         : base(options)
@@ -25,69 +28,12 @@ public partial class ConicErpContext : IdentityDbContext
         Configuration = configuration;
 
     }
-
-
-    public virtual DbSet<TreeAccount> TreeAccounts { get; set; }
-    public DbSet<Audit> AuditLogs => Set<Audit>();
-    public virtual DbSet<Setting> Settings { get; set; }
-    public virtual DbSet<UserRouter> UserRouter { get; set; }
-    public virtual DbSet<ActionLog> ActionLogs { get; set; }
-    public virtual DbSet<Area> Areas { get; set; }
-    public virtual DbSet<BackUp> BackUps { get; set; }
-    public virtual DbSet<Bank> Banks { get; set; }
-    public virtual DbSet<Cash> Cashes { get; set; }
-    public virtual DbSet<Cheque> Cheques { get; set; }
-    public virtual DbSet<CompanyInfo> CompanyInfos { get; set; }
-    public virtual DbSet<Device> Devices { get; set; }
-    public virtual DbSet<Discount> Discounts { get; set; }
-    public virtual DbSet<EditorsUser> EditorsUsers { get; set; }
-    public virtual DbSet<Visit> Visits { get; set; }
-    public virtual DbSet<CashPool> CashPools { get; set; }
-    public virtual DbSet<Driver> Drivers { get; set; }
-    public virtual DbSet<EntryAccounting> EntryAccountings { get; set; }
-    public virtual DbSet<EntryMovement> EntryMovements { get; set; }
-    public virtual DbSet<FileDatum> FileData { get; set; }
-    public virtual DbSet<InventoryItem> InventoryItems { get; set; }
-    public virtual DbSet<InventoryMovement> InventoryMovements { get; set; }
-    public virtual DbSet<Item> Items { get; set; }
-    public virtual DbSet<ItemMuo> ItemMuos { get; set; }
-    public virtual DbSet<Massage> Massages { get; set; }
-    public virtual DbSet<Member> Members { get; set; }
-    public virtual DbSet<FingerPrint> FingerPrints { get; set; }
-    public virtual DbSet<DeviceLog> DeviceLogs { get; set; }
-    public virtual DbSet<Membership> Memberships { get; set; }
-    public virtual DbSet<MembershipMovement> MembershipMovements { get; set; }
-    public virtual DbSet<MembershipMovementOrder> MembershipMovementOrders { get; set; }
-    public virtual DbSet<MenuItem> MenuItems { get; set; }
-    public virtual DbSet<Oprationsy> Oprationsys { get; set; }
-    public virtual DbSet<OrderInventory> OrderInventories { get; set; }
-    public virtual DbSet<OriginItem> OriginItems { get; set; }
-    public virtual DbSet<Payment> Payments { get; set; }
-    public virtual DbSet<Receive> Receives { get; set; }
-    public virtual DbSet<PurchaseInvoice> PurchaseInvoices { get; set; }
-    public virtual DbSet<BillOfEntery> BillOfEnterys { get; set; }
-    public virtual DbSet<WorkShop> WorkShops { get; set; }
-    public virtual DbSet<SalesInvoice> SalesInvoices { get; set; }
-    public virtual DbSet<Service> Services { get; set; }
-    public virtual DbSet<StockMovement> StockMovements { get; set; }
-    public virtual DbSet<StocktakingInventory> StocktakingInventories { get; set; }
-    public virtual DbSet<UnitItem> UnitItems { get; set; }
-    public virtual DbSet<Vendor> Vendors { get; set; }
-    public virtual DbSet<Report> Reports { get; set; }
-    public virtual DbSet<OrderDelivery> OrderDeliveries { get; set; }
-    public virtual DbSet<Employee> Employees { get; set; }
-    public virtual DbSet<SalaryAdjustmentLog> SalaryAdjustmentLogs { get; set; }
-    public virtual DbSet<SalaryPayment> SalaryPayments { get; set; }
-    public virtual DbSet<Adjustment> Adjustments { get; set; }
-    public virtual DbSet<OrderRestaurant> OrderRestaurants { get; set; }
-
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+
         if (!optionsBuilder.IsConfigured)
         {
-
-            // optionsBuilder.UseSqlServer(GetCon());            
+            optionsBuilder.UseSqlServer(Configuration.GetConnectionString("Default"));
         }
 
     }
@@ -173,7 +119,59 @@ public partial class ConicErpContext : IdentityDbContext
             }
         }
     }
-
+    public virtual DbSet<TreeAccount> TreeAccounts { get; set; }
+    public DbSet<Audit> AuditLogs => Set<Audit>();
+    public virtual DbSet<Setting> Settings { get; set; }
+    public virtual DbSet<UserRouter> UserRouter { get; set; }
+    public virtual DbSet<ActionLog> ActionLogs { get; set; }
+    public virtual DbSet<Area> Areas { get; set; }
+    public virtual DbSet<BackUp> BackUps { get; set; }
+    public virtual DbSet<Bank> Banks { get; set; }
+    public virtual DbSet<Cash> Cashes { get; set; }
+    public virtual DbSet<Cheque> Cheques { get; set; }
+    public virtual DbSet<CompanyInfo> CompanyInfos { get; set; }
+    public virtual DbSet<Device> Devices { get; set; }
+    public virtual DbSet<Discount> Discounts { get; set; }
+    public virtual DbSet<EditorsUser> EditorsUsers { get; set; }
+    public virtual DbSet<Visit> Visits { get; set; }
+    public virtual DbSet<CashPool> CashPools { get; set; }
+    public virtual DbSet<Driver> Drivers { get; set; }
+    public virtual DbSet<EntryAccounting> EntryAccountings { get; set; }
+    public virtual DbSet<EntryMovement> EntryMovements { get; set; }
+    public virtual DbSet<FileDatum> FileData { get; set; }
+    public virtual DbSet<InventoryItem> InventoryItems { get; set; }
+    public virtual DbSet<InventoryMovement> InventoryMovements { get; set; }
+    public virtual DbSet<Item> Items { get; set; }
+    public virtual DbSet<ItemMuo> ItemMuos { get; set; }
+    public virtual DbSet<Massage> Massages { get; set; }
+    public virtual DbSet<Member> Members { get; set; }
+    public virtual DbSet<FingerPrint> FingerPrints { get; set; }
+    public virtual DbSet<DeviceLog> DeviceLogs { get; set; }
+    public virtual DbSet<Membership> Memberships { get; set; }
+    public virtual DbSet<MembershipMovement> MembershipMovements { get; set; }
+    public virtual DbSet<MembershipMovementOrder> MembershipMovementOrders { get; set; }
+    public virtual DbSet<MenuItem> MenuItems { get; set; }
+    public virtual DbSet<Oprationsy> Oprationsys { get; set; }
+    public virtual DbSet<OrderInventory> OrderInventories { get; set; }
+    public virtual DbSet<OriginItem> OriginItems { get; set; }
+    public virtual DbSet<Payment> Payments { get; set; }
+    public virtual DbSet<Receive> Receives { get; set; }
+    public virtual DbSet<PurchaseInvoice> PurchaseInvoices { get; set; }
+    public virtual DbSet<BillOfEntery> BillOfEnterys { get; set; }
+    public virtual DbSet<WorkShop> WorkShops { get; set; }
+    public virtual DbSet<SalesInvoice> SalesInvoices { get; set; }
+    public virtual DbSet<Service> Services { get; set; }
+    public virtual DbSet<StockMovement> StockMovements { get; set; }
+    public virtual DbSet<StocktakingInventory> StocktakingInventories { get; set; }
+    public virtual DbSet<UnitItem> UnitItems { get; set; }
+    public virtual DbSet<Vendor> Vendors { get; set; }
+    public virtual DbSet<Report> Reports { get; set; }
+    public virtual DbSet<OrderDelivery> OrderDeliveries { get; set; }
+    public virtual DbSet<Employee> Employees { get; set; }
+    public virtual DbSet<SalaryAdjustmentLog> SalaryAdjustmentLogs { get; set; }
+    public virtual DbSet<SalaryPayment> SalaryPayments { get; set; }
+    public virtual DbSet<Adjustment> Adjustments { get; set; }
+    public virtual DbSet<OrderRestaurant> OrderRestaurants { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.UseCollation("Arabic_CI_AI");

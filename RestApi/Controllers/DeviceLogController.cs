@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +16,14 @@ namespace RestApi.Controllers;
 public class DeviceLogController : ControllerBase
 {
     private readonly ConicErpContext DB;
+    public IConfiguration _configuration { get; }
+    private IMemoryCache _memoryCache;
 
-    public DeviceLogController(ConicErpContext dbcontext)
+    public DeviceLogController(ConicErpContext dbcontext, IConfiguration configuration, IMemoryCache memoryCache)
     {
         DB = dbcontext;
+        _configuration = configuration;
+        _memoryCache = memoryCache;
     }
     [Route("DeviceLog/GetDeviceLog")]
     [HttpGet]
@@ -38,12 +44,15 @@ public class DeviceLogController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetlastLogByUserId(string UserId, string TableName)
     {
-        var deviceLog = await DB.DeviceLogs.Where(ml => ml.Fk == UserId && ml.TableName == TableName)?.OrderByDescending(x => x.Id)?.LastOrDefaultAsync();
-        if (deviceLog is null)
+        using (ConicErpContext _db = new ConicErpContext(_configuration))
         {
-            return Ok();
+            var deviceLog = await _db.DeviceLogs.Where(ml => ml.Fk == UserId && ml.TableName == TableName)?.OrderByDescending(x => x.Id)?.LastOrDefaultAsync();
+            if (deviceLog is null)
+            {
+                return Ok();
+            }
+            return Ok(deviceLog.DateTime);
         }
-        return Ok(deviceLog.DateTime);
 
     }
     [Route("DeviceLog/GetByStatus")]
@@ -53,40 +62,42 @@ public class DeviceLogController : ControllerBase
         // Get Log From ZkBio Data base 
 
         // GetFromZkBio(TableName); for v5l speed ztk
-
-        DeviceController Device = new(DB);
-
-        foreach (var D in await DB.Devices.ToListAsync())
+        using (ConicErpContext _db = new ConicErpContext(_configuration))
         {
-            Device.GetAllLog(D.Id, "Member");
-            Device.GetAllLog(D.Id, "Employee", true);
-        }
+            DeviceController Device = new(_db);
 
-        var DeviceLogs = await DB.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any == null || x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any))).ToListAsync();
-
-        DeviceLogs = (Sort == "+id" ? DeviceLogs.OrderBy(s => s.Id).ToList() : DeviceLogs.OrderByDescending(s => s.Id).ToList());
-
-        DeviceLogs = DeviceLogs.GroupBy(a => new { a.Fk, a.DateTime }).Select(g => g.Last()).ToList();
-
-        var itemsQuery = DeviceLogs.Skip((Page - 1) * Limit).Take(Limit).ToList();
-
-        var result = new List<dynamic>();
-
-        foreach (var deviceLog in itemsQuery)
-        {
-            var User = await GetFkData(deviceLog.Fk, TableName, DB);
-            result.Add(new
+            foreach (var D in await _db.Devices.ToListAsync())
             {
-                deviceLog.Id,
-                deviceLog.DateTime,
-                deviceLog.Description,
-                deviceLog.Fk,
-                deviceLog.TableName,
-                User
-            });
-        }
+                Device.GetAllLog(D.Id, "Member");
+                Device.GetAllLog(D.Id, "Employee", true);
+            }
 
-        return Ok(result);
+            var DeviceLogs = await _db.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any == null || x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any))).ToListAsync();
+
+            DeviceLogs = (Sort == "+id" ? DeviceLogs.OrderBy(s => s.Id).ToList() : DeviceLogs.OrderByDescending(s => s.Id).ToList());
+
+            DeviceLogs = DeviceLogs.GroupBy(a => new { a.Fk, a.DateTime }).Select(g => g.Last()).ToList();
+
+            var itemsQuery = DeviceLogs.Skip((Page - 1) * Limit).Take(Limit).ToList();
+
+            var result = new List<dynamic>();
+
+            foreach (var deviceLog in itemsQuery)
+            {
+                var User = await GetFkData(deviceLog.Fk, TableName, _db);
+                result.Add(new
+                {
+                    deviceLog.Id,
+                    deviceLog.DateTime,
+                    deviceLog.Description,
+                    deviceLog.Fk,
+                    deviceLog.TableName,
+                    User
+                });
+            }
+
+            return Ok(result);
+        }
     }
 
     public static async Task<dynamic> GetFkData(string Fktable, string TableName, ConicErpContext DB)
@@ -125,16 +136,32 @@ public class DeviceLogController : ControllerBase
     [HttpGet]
     public IActionResult CheckDeviceLog()
     {
-        foreach (DeviceLog ML in DB.DeviceLogs.Where(x => x.Status >= 0 && x.TableName == "Member").ToList())
+        bool IsWorkingCheckMembers = false;
+        if (_memoryCache.TryGetValue(IsWorkingCheckMembers, out IsWorkingCheckMembers))
         {
-
-            if (DateTime.Today > ML.DateTime)
-            {
-                ML.Status = -1;
-            }
+            if (IsWorkingCheckMembers)
+                return Ok("IsWorkingCheckMembers");
         }
-        DB.SaveChanges();
-        return Ok(true);
+
+        var cacheEntryOptions = new MemoryCacheEntryOptions()
+            .SetAbsoluteExpiration(TimeSpan.FromMinutes(60))
+                  //    .SetSlidingExpiration(TimeSpan.FromMinutes(60))
+                  .SetPriority(CacheItemPriority.High);
+
+        _memoryCache.Set(IsWorkingCheckMembers, true, cacheEntryOptions);
+        using (ConicErpContext _db = new ConicErpContext(_configuration))
+        {
+            foreach (DeviceLog ML in _db.DeviceLogs.Where(x => x.Status >= 0 && x.TableName == "Member").ToList())
+            {
+
+                if (DateTime.Today > ML.DateTime)
+                {
+                    ML.Status = -1;
+                }
+            }
+            _db.SaveChanges();
+            return Ok(true);
+        }
     }
     [Route("DeviceLog/Create")]
     [HttpPost]

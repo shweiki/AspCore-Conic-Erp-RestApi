@@ -11,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
 namespace RestApi.Controllers;
 
@@ -146,17 +145,20 @@ public class FileDataController : Controller
                 .ToListAsync();
             foreach (var file in files)
             {
-                var fileData = DB.FileData.Where(i => i.Id == file.Id).SingleOrDefault();
-                string base64String = Regex.Replace(fileData.File, @"^data:image\/[a-zA-Z]+;base64,", string.Empty);
-
-                string path = LoadJpeg(base64String, file.Fktable, file.TableName);
-
-                if (!string.IsNullOrWhiteSpace(path))
+                using (ConicErpContext _db = new ConicErpContext(_configuration))
                 {
+                    var fileData = _db.FileData.Where(i => i.Id == file.Id).SingleOrDefault();
+                    string base64String = Regex.Replace(fileData.File, @"^data:image\/[a-zA-Z]+;base64,", string.Empty);
 
-                    fileData.FilePath = path;
-                  //  fileData.File = string.Empty;
-                    DB.SaveChanges();
+                    string path = LoadJpeg(base64String, file.Fktable, file.TableName);
+
+                    if (!string.IsNullOrWhiteSpace(path))
+                    {
+
+                        fileData.FilePath = path;
+                        //  fileData.File = string.Empty;
+                        _db.SaveChanges();
+                    }
                 }
             }
             return Ok(true);

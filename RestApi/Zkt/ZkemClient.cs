@@ -1,11 +1,7 @@
-﻿using Domain;
-using Microsoft.AspNetCore.Mvc;
-///    Experimented By : Ozesh Thapa
+﻿///    Experimented By : Ozesh Thapa
 ///    Email: dablackscarlet@gmail.com
 ///
 using System;
-using System.Linq;
-using System.Threading.Tasks;
 using zkemkeeper;
 
 namespace RestApi;
@@ -258,46 +254,6 @@ public class ZkemClient
         return true;
         */
     }
-    public async Task<IActionResult> RLog(string Id, DateTime datetime, string Ip)
-    {
-        long ID = Convert.ToInt32(Id);
-        string TableName = ""; using (var DB = new ConicErpContext())
-        {
-            var member = DB.Members.Where(m => m.Id == ID).SingleOrDefault();
-            var Employee = DB.Employees.Where(m => m.Id == ID).SingleOrDefault();
-            if (member != null) TableName = "Member";
-            if (Employee != null) TableName = "Employee";
-
-            var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == Id && l.TableName == TableName).ToList();
-            isLogSaveIt = DB.DeviceLogs.Where(Ld => Ld.DateTime == datetime).ToList();
-            var Device = DB.Devices.Where(x => x.Ip == Ip).SingleOrDefault();
-            if (isLogSaveIt.Count() <= 0 && Device != null)
-            {
-                var Log = new DeviceLog
-                {
-                    Type = "In",
-                    DateTime = datetime,
-                    DeviceId = Device.Id,
-                    Status = 0,
-                    Description = "Event Log",
-                    TableName = TableName,
-                    Fk = Id.ToString(),
-                };
-                DB.DeviceLogs.Add(Log);
-                await DB.SaveChangesAsync();
-                return Ok();
-
-            }
-        }
-        return Ok();
-
-    }
-
-    private IActionResult Ok()
-    {
-        throw new NotImplementedException();
-    }
-
     private void zkemClient_OnAttTransaction(int EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second)
     {
     }

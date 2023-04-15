@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
@@ -13,20 +14,23 @@ namespace RestApi.Controllers;
 [Authorize]
 public class MemberController : Controller
 {
-    public readonly ConicErpContext DB;
-    public IConfiguration Configuration { get; }
+    private readonly ConicErpContext DB;
+    private IConfiguration _configuration { get; }
+    private IMemoryCache _memoryCache;
 
-    public MemberController(ConicErpContext dbcontext, IConfiguration configuration)
+
+    public MemberController(ConicErpContext dbcontext, IConfiguration configuration, IMemoryCache cache)
     {
         DB = dbcontext;
-        Configuration = configuration;
+        _configuration = configuration;
+        _memoryCache = cache;
 
     }
     [Route("Member/GetReceivablesMember")]
     [HttpGet]
     public IActionResult GetReceivablesMember()
     {
-        var Members = DB.Members.Include(x => x.Account.EntryMovements).Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) > 0).ToList()
+        var Members = DB.Members.Where(f => (f.Account.EntryMovements.Sum(s => s.Credit) - f.Account.EntryMovements.Sum(s => s.Debit)) > 0)
         .Select(x => new
         {
             x.Id,
@@ -39,8 +43,10 @@ public class MemberController : Controller
             x.AccountId,
             x.Tag,
             x.Vaccine,
-            TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
-            TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum()
+            TotalDebit = x.Account.EntryMovements.Sum(s => s.Debit),
+            TotalCredit = x.Account.EntryMovements.Sum(s => s.Credit)  
+         //   TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Sum(s => s.Debit),
+          //  TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Sum(s => s.Credit)
         }).ToList();
 
         return Ok(Members);
@@ -49,7 +55,7 @@ public class MemberController : Controller
     [HttpGet]
     public IActionResult GetPayablesMember()
     {
-        var Members = DB.Members.Include(x => x.Account.EntryMovements).Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) < 0).ToList().Select(x => new
+        var Members = DB.Members.Where(f => (f.Account.EntryMovements.Sum(s => s.Credit) - f.Account.EntryMovements.Sum(s => s.Debit)) < 0).Select(x => new
         {
             x.Id,
             x.Name,
@@ -61,8 +67,8 @@ public class MemberController : Controller
             x.AccountId,
             x.Tag,
             x.Vaccine,
-            TotalDebit = x.Account.EntryMovements.Select(d => d.Debit).Sum(),
-            TotalCredit = x.Account.EntryMovements.Select(c => c.Credit).Sum()
+            TotalDebit = x.Account.EntryMovements.Sum(s => s.Debit),
+            TotalCredit = x.Account.EntryMovements.Sum(s => s.Credit)
         }).ToList();
 
         return Ok(Members);
@@ -90,7 +96,9 @@ public class MemberController : Controller
     [Route("Member/GetByListQ")]
     public async Task<IActionResult> GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
     {
-        var Members = await DB.Members.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.ToLower().Contains(Any) || s.Ssn.Contains(Any) || s.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.Tag.Contains(Any))
+        using (ConicErpContext _db = new ConicErpContext(_configuration))
+        {
+            var Members = await DB.Members.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.ToLower().Contains(Any) || s.Ssn.Contains(Any) || s.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.Tag.Contains(Any))
         && (Status == null || s.Status == Status)).Include(x => x.Account).Include(x => x.Account.EntryMovements).Select(x => new
         {
             x.Id,
@@ -107,18 +115,19 @@ public class MemberController : Controller
             TotalDebit = x.Account.EntryMovements.Sum(d => d.Debit),
             TotalCredit = x.Account.EntryMovements.Sum(c => c.Credit),
         }).ToListAsync();
-        Members = (Sort == "+id" ? Members.OrderBy(s => s.Id).ToList() : Members.OrderByDescending(s => s.Id).ToList());
-        return Ok(new
-        {
-            items = Members.Skip((Page - 1) * Limit).Take(Limit).ToList(),
-            Totals = new
+            Members = (Sort == "+id" ? Members.OrderBy(s => s.Id).ToList() : Members.OrderByDescending(s => s.Id).ToList());
+            return Ok(new
             {
-                Rows = Members.Count(),
-                Totals = Members.Sum(s => s.TotalCredit - s.TotalDebit),
-                TotalCredit = Members.Sum(s => s.TotalCredit),
-                TotalDebit = Members.Sum(s => s.TotalDebit),
-            }
-        });
+                items = Members.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+                Totals = new
+                {
+                    Rows = Members.Count(),
+                    Totals = Members.Sum(s => s.TotalCredit - s.TotalDebit),
+                    TotalCredit = Members.Sum(s => s.TotalCredit),
+                    TotalDebit = Members.Sum(s => s.TotalDebit),
+                }
+            });
+        }
     }
 
     [Route("Member/CheckMemberIsExist")]
@@ -142,7 +151,7 @@ public class MemberController : Controller
             var Members = DB.MembershipMovements.Where(x => membershiplist.Contains(x.Id)).ToList().Select(x => new
             {
                 x.Id,
-                Name = DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
+                DB.Members.Where(m => m.Id == x.MemberId).SingleOrDefault().Name,
                 MembershipName = DB.Memberships.Where(m => m.Id == x.MembershipId).SingleOrDefault().Name,
                 x.VisitsUsed,
                 x.Type,
@@ -252,57 +261,59 @@ public class MemberController : Controller
     [HttpGet]
     public async Task<IActionResult> GetMemberById(long? Id)
     {
-
-        var member = await DB.Members.Include(x => x.MembershipMovements).Include(x => x.Account.EntryMovements).SingleOrDefaultAsync(m => m.Id == Id);
-        if (member is null) return BadRequest();
-        var membershipMovement = member.MembershipMovements.ToList();
-        if (membershipMovement.Count == 0)
+        using (ConicErpContext _db = new ConicErpContext(_configuration))
         {
-            member.Status = -1;
-            await DB.SaveChangesAsync();
-        }
-        else
-        {
-            foreach (var MS in membershipMovement)
+            var member = await _db.Members.Include(x => x.MembershipMovements).Include(x => x.Account.EntryMovements).SingleOrDefaultAsync(m => m.Id == Id);
+            if (member is null) return BadRequest();
+            var membershipMovement = member.MembershipMovements.ToList();
+            if (membershipMovement.Count == 0)
             {
-                await MembershipMovementController.ScanMembershipMovementById(MS.Id, DB, Configuration);
+                member.Status = -1;
             }
-        }
+            else
+            {
+                foreach (var MS in membershipMovement.OrderBy(o => o.Id))
+                {
+                    await MembershipMovementController.ScanMembershipMovementById(MS.Id, _db, _configuration);
+                }
+            }
+            await _db.SaveChangesAsync();
 
-        return Ok(
-           new
-           {
-               member.Id,
-               member.Name,
-               member.Ssn,
-               member.DateofBirth,
-               member.Email,
-               member.PhoneNumber1,
-               member.PhoneNumber2,
-               member.Description,
-               member.Status,
-               member.Type,
-               member.Tag,
-               member.Vaccine,
-               member.AccountId,
-               MembershipsCount = member.MembershipMovements.Count(),
-               HaveFaceOnDevice = false,// DB.FingerPrints.Where(f=>f.Fk == x.Id.ToString() && f.TableName == "Member").Count() > 0 ? true : false,
-               TotalDebit = member.Account.EntryMovements.Select(d => d.Debit).Sum(),
-               TotalCredit = member.Account.EntryMovements.Select(c => c.Credit).Sum(),
-               ActiveMemberShip = member.MembershipMovements.Where(f => f.Status > 0).Select(MS => new
+            return Ok(
+               new
                {
-                   MS.Id,
-                   MS.Membership.Name,
-                   MS.Membership.NumberClass,
-                   MS.VisitsUsed,
-                   MS.Type,
-                   MS.StartDate,
-                   MS.EndDate,
-                   TotalDays = Math.Ceiling((MS.EndDate - MS.StartDate).TotalDays),
-                   Remaining = Math.Ceiling((MS.EndDate - DateTime.Now).TotalDays),
-                   MS.Description,
-               }).FirstOrDefault(),
-           });
+                   member.Id,
+                   member.Name,
+                   member.Ssn,
+                   member.DateofBirth,
+                   member.Email,
+                   member.PhoneNumber1,
+                   member.PhoneNumber2,
+                   member.Description,
+                   member.Status,
+                   member.Type,
+                   member.Tag,
+                   member.Vaccine,
+                   member.AccountId,
+                   MembershipsCount = member.MembershipMovements.Count(),
+                   HaveFaceOnDevice = false,// DB.FingerPrints.Where(f=>f.Fk == x.Id.ToString() && f.TableName == "Member").Count() > 0 ? true : false,
+                   TotalDebit = member.Account.EntryMovements.Select(d => d.Debit).Sum(),
+                   TotalCredit = member.Account.EntryMovements.Select(c => c.Credit).Sum(),
+                   ActiveMemberShip = member.MembershipMovements.Where(f => f.Status > 0).Select(MS => new
+                   {
+                       MS.Id,
+                       MS.Membership.Name,
+                       MS.Membership.NumberClass,
+                       MS.VisitsUsed,
+                       MS.Type,
+                       StartDate = MS.StartDate.ToShortDateString(),
+                       EndDate = MS.EndDate.ToShortDateString(),
+                       TotalDays = Math.Ceiling((MS.EndDate.Date - MS.StartDate.Date).TotalDays),
+                       Remaining = Math.Ceiling((MS.EndDate.Date - DateTime.Today).TotalDays),
+                       MS.Description,
+                   }).FirstOrDefault(),
+               });
+        }
     }
     [Route("Member/Delete")]
     [HttpPost]
@@ -327,6 +338,65 @@ public class MemberController : Controller
             return Forbid(ex.Message);
 
         }
+    }
+
+    [Route("Member/CheckMembers")]
+    [HttpGet]
+    public async Task<IActionResult> CheckMembers()
+    {
+        bool IsWorkingCheckMembers = false;
+        if (_memoryCache.TryGetValue(IsWorkingCheckMembers, out IsWorkingCheckMembers))
+        {
+            if (IsWorkingCheckMembers)
+                return Ok("IsWorkingCheckMembers");
+        }
+
+        var cacheEntryOptions = new MemoryCacheEntryOptions()
+            .SetAbsoluteExpiration(TimeSpan.FromMinutes(60))
+                  //    .SetSlidingExpiration(TimeSpan.FromMinutes(60))
+                  .SetPriority(CacheItemPriority.High);
+
+        _memoryCache.Set(IsWorkingCheckMembers, true, cacheEntryOptions);
+
+        var Members = await DB.Members.Include(x => x.MembershipMovements).ToListAsync();
+
+        foreach (var member in Members)
+        {
+            try
+            {
+                using (ConicErpContext _db = new ConicErpContext(_configuration))
+                {
+
+                    int OStatus = member.Status;
+
+                    var MembershipMovements = member.MembershipMovements.ToList();
+
+                    if (MembershipMovements.Count() <= 0)
+                    {
+                        member.Status = -1;
+                    }
+                    else
+                    {
+                        foreach (var MS in MembershipMovements.OrderBy(o => o.Id))
+                        {
+                            await MembershipMovementController.ScanMembershipMovementById(MS.Id, _db, _configuration);
+                        }
+                    }
+                    if (OStatus == -2) member.Status = -2;
+
+                    await _db.SaveChangesAsync();
+                }
+                //CheckBlackListActionLogMembers();
+            }
+            catch (Exception ex)
+            {
+                _memoryCache.Remove(IsWorkingCheckMembers);
+                return Ok(ex.Message);
+            }
+        }
+
+
+        return Ok(true);
     }
     [Route("Member/MergeTwoMembers")]
     [HttpPost]
@@ -390,38 +460,6 @@ public class MemberController : Controller
 
         await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
 
-
-        return Ok(true);
-    }
-
-    [Route("Member/CheckMembers")]
-    [HttpGet]
-    public async Task<IActionResult> CheckMembers()
-    {
-        var Members = await DB.Members.Include(x => x.MembershipMovements).ToListAsync();
-
-        foreach (var member in Members)
-        {
-            int OStatus = member.Status;
-
-            var MembershipMovements = member.MembershipMovements.ToList();
-
-            if (MembershipMovements.Count() <= 0)
-            {
-                member.Status = -1;
-            }
-            else
-            {
-                foreach (var MS in MembershipMovements)
-                {
-                    await MembershipMovementController.ScanMembershipMovementById(MS.Id, DB, Configuration);
-                }
-            }
-            if (OStatus == -2) member.Status = -2;
-
-            await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
-        }
-        //CheckBlackListActionLogMembers();
 
         return Ok(true);
     }

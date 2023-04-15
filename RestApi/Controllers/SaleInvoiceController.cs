@@ -109,7 +109,7 @@ public class SaleInvoiceController : Controller
     {
         if (Any == null || Any == "") return Ok();
         DateTime StartToday = DateTime.Today;
-        DateTime EndToday = StartToday.AddHours(23).AddMinutes(59).AddSeconds(59);
+        DateTime EndToday = StartToday.Date.AddDays(1).AddSeconds(-1);
         var Invoices = DB.SalesInvoices.Where(s => (s.Status == Status || (s.FakeDate >= StartToday && s.FakeDate <= EndToday)) && (s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any))
         ).Select(x => new
         {
