@@ -136,11 +136,12 @@ public class DeviceLogController : ControllerBase
     [HttpGet]
     public IActionResult CheckDeviceLog()
     {
-        bool IsWorkingCheckMembers = false;
-        if (_memoryCache.TryGetValue(IsWorkingCheckMembers, out IsWorkingCheckMembers))
+
+        bool IsWorkingCheckDeviceLog = false;
+        if (_memoryCache.TryGetValue(IsWorkingCheckDeviceLog, out IsWorkingCheckDeviceLog))
         {
-            if (IsWorkingCheckMembers)
-                return Ok("IsWorkingCheckMembers");
+            if (IsWorkingCheckDeviceLog)
+                return Ok("IsWorkingCheckDeviceLog");
         }
 
         var cacheEntryOptions = new MemoryCacheEntryOptions()
@@ -148,19 +149,37 @@ public class DeviceLogController : ControllerBase
                   //    .SetSlidingExpiration(TimeSpan.FromMinutes(60))
                   .SetPriority(CacheItemPriority.High);
 
-        _memoryCache.Set(IsWorkingCheckMembers, true, cacheEntryOptions);
-        using (ConicErpContext _db = new ConicErpContext(_configuration))
+        _memoryCache.Set(IsWorkingCheckDeviceLog, true, cacheEntryOptions);
+        try
         {
-            foreach (DeviceLog ML in _db.DeviceLogs.Where(x => x.Status >= 0 && x.TableName == "Member").ToList())
+            using (ConicErpContext _db = new ConicErpContext(_configuration))
             {
+                var deviceLogs = _db.DeviceLogs.Where(x => x.Status >= 0 && x.TableName == "Member").ToList();
 
-                if (DateTime.Today > ML.DateTime)
+                foreach (var ML in deviceLogs)
                 {
-                    ML.Status = -1;
+
+                    if (DateTime.Today > ML.DateTime.Date)
+                    {
+                        ML.Status = -1;
+                    }
+                    else
+                    {
+                        ML.Status = 0;
+                    }
+                    _db.SaveChanges();
+
                 }
+                return Ok(true);
             }
-            _db.SaveChanges();
-            return Ok(true);
+        }
+        catch (Exception ex)
+        {
+            return Ok(ex.Message);
+        }
+        finally
+        {
+            _memoryCache.Remove(IsWorkingCheckDeviceLog);
         }
     }
     [Route("DeviceLog/Create")]

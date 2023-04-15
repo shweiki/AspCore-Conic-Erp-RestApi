@@ -392,19 +392,21 @@ public class MembershipMovementController : Controller
     [HttpGet]
     public IActionResult CheckEntryAccountForMembershipMovement()
     {
-        var MembershipMovements = DB.MembershipMovements.ToList();
-        foreach (var membershipMovement in MembershipMovements)
+        try
         {
-            var entry = DB.EntryMovements.Where(x => x.TableName == "MembershipMovement" && x.Fktable == membershipMovement.Id).FirstOrDefault();
-            if (entry == null)
+            var MembershipMovements = DB.MembershipMovements.ToList();
+            foreach (var membershipMovement in MembershipMovements)
             {
-                DB.EntryAccountings.Add(new EntryAccounting
+                var entry = DB.EntryMovements.Where(x => x.TableName == "MembershipMovement" && x.Fktable == membershipMovement.Id).FirstOrDefault();
+                if (entry == null)
                 {
-                    Description = "",
-                    FakeDate = membershipMovement.StartDate,
-                    Status = 0,
-                    Type = "Auto",
-                    EntryMovements = new List<EntryMovement>() { new EntryMovement {
+                    DB.EntryAccountings.Add(new EntryAccounting
+                    {
+                        Description = "",
+                        FakeDate = membershipMovement.StartDate,
+                        Status = 0,
+                        Type = "Auto",
+                        EntryMovements = new List<EntryMovement>() { new EntryMovement {
                         TableName = "MembershipMovement",
                         Fktable =membershipMovement.Id,
                         AccountId =DB.Members.Where(x=>x.Id == membershipMovement.MemberId).SingleOrDefault().AccountId,// membershipMovement.Member.AccountId,
@@ -421,13 +423,19 @@ public class MembershipMovementController : Controller
                         Debit =membershipMovement.TotalAmmount,
                       },
                     }
-                });
-                DB.SaveChanges();
+                    });
+                    DB.SaveChanges();
 
+                }
+                continue;
             }
-            continue;
+
+            return Ok(true);
+        }
+        catch(Exception ex)
+        {
+            return Ok(ex.Message);
         }
 
-        return Ok(true);
     }
 }

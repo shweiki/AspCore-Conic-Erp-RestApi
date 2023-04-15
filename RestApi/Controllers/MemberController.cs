@@ -390,8 +390,12 @@ public class MemberController : Controller
             }
             catch (Exception ex)
             {
-                _memoryCache.Remove(IsWorkingCheckMembers);
                 return Ok(ex.Message);
+            }
+            finally
+            {
+                _memoryCache.Remove(IsWorkingCheckMembers);
+
             }
         }
 

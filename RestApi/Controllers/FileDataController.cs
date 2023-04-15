@@ -35,8 +35,8 @@ public class FileDataController : Controller
         var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId && i.Type == "ProfilePicture").FirstOrDefault();
         if (file is not null)
         {
-            //  string ImagesPath = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/{TableName}/{Path.GetFileName(file.FilePath)}";
-            return Ok(file.File);
+            string ImageUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/{TableName}/{file.Type}/{Path.GetFileName(file.FilePath)}";
+            return Ok(ImageUrl);
         }
         //  return Ok(file);
 
@@ -67,7 +67,7 @@ public class FileDataController : Controller
         {
             x.Id,
             x.Type,
-            x.File,
+            FileUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/{TableName}/{x.Type}/{Path.GetFileName(x.FilePath)}",
             x.FilePath,
             x.FileType
         }).ToList().LastOrDefault();
@@ -86,8 +86,7 @@ public class FileDataController : Controller
         {
             x.Id,
             x.Type,
-            x.File,
-            FilePath = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/{TableName}/{Path.GetFileName(x.FilePath)}",
+            FileUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/{TableName}/{x.Type}/{Path.GetFileName(x.FilePath)}",
             x.FileType
         }).ToList();
 
@@ -105,15 +104,21 @@ public class FileDataController : Controller
             if (collection.FileType == "image")
             {
                 string base64String = Regex.Replace(collection.File, @"^data:image\/[a-zA-Z]+;base64,", string.Empty);
+                if (string.IsNullOrWhiteSpace(collection.Type))
+                {
+                    collection.Type = "Picture";
+                }
 
-                string path = LoadJpeg(base64String, collection.Fktable, collection.TableName);
+                collection.File = string.Empty;
+                DB.FileData.Add(collection);
+
+                DB.SaveChanges();
+                string path = LoadJpeg(base64String, collection.Type, collection.TableName, collection.Id);
                 if (!string.IsNullOrWhiteSpace(path))
                 {
                     collection.FilePath = path;
-                    collection.File = string.Empty;
-                    DB.FileData.Add(collection);
-
                     DB.SaveChanges();
+
                     return Ok(true);
                 }
                 //  LoadImage(collection.File, collection.Fktable, collection.TableName) &&
@@ -133,7 +138,9 @@ public class FileDataController : Controller
     {
         try
         {
-            var files = await DB.FileData.Where(x => x.FileType == "image" && (x.File != null || x.File != ""))
+            using (ConicErpContext _db = new ConicErpContext(_configuration))
+            {
+                var files = await _db.FileData.Where(x => x.FileType == "image" && x.File != null && x.File != "")
                 .Select(x => new
                 {
                     x.Id,
@@ -143,39 +150,43 @@ public class FileDataController : Controller
                     x.Fktable,
                 })
                 .ToListAsync();
-            foreach (var file in files)
-            {
-                using (ConicErpContext _db = new ConicErpContext(_configuration))
+                foreach (var file in files)
                 {
-                    var fileData = _db.FileData.Where(i => i.Id == file.Id).SingleOrDefault();
+
+                    var fileData = await _db.FileData.SingleOrDefaultAsync(i => i.Id == file.Id);
+
+                    if (string.IsNullOrWhiteSpace(fileData.Type))
+                    {
+                        fileData.Type = "Picture";
+                    }
                     string base64String = Regex.Replace(fileData.File, @"^data:image\/[a-zA-Z]+;base64,", string.Empty);
 
-                    string path = LoadJpeg(base64String, file.Fktable, file.TableName);
+                    string path = LoadJpeg(base64String, fileData.Type, fileData.TableName, fileData.Id);
 
                     if (!string.IsNullOrWhiteSpace(path))
                     {
-
                         fileData.FilePath = path;
-                        //  fileData.File = string.Empty;
-                        _db.SaveChanges();
+                        fileData.File = "";
+                        await _db.SaveChangesAsync();
                     }
-                }
-            }
-            return Ok(true);
 
+                }
+                return Ok(true);
+            }
         }
         catch (Exception ex)
         {
             return Ok(ex.Message);
         }
+
     }
     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
-    public string LoadJpeg(string base64String, long imageName, string foldarName)
+    public string LoadJpeg(string base64String, string foldarType, string foldarName, long imageName)
     {
         try
         {
             string productImagePath = Path.GetFullPath(_configuration.GetConnectionString("ProductImagePath") ?? "C:\\ConicImages");
-            string SourceFoldar = Path.Combine(productImagePath, foldarName);
+            string SourceFoldar = Path.Combine(productImagePath, foldarName, foldarType);
             if (!Directory.Exists(SourceFoldar))
             {
                 Directory.CreateDirectory(SourceFoldar);
@@ -202,7 +213,7 @@ public class FileDataController : Controller
                 }
             }
         }
-        catch (Exception ex) { return null; }
+        catch (Exception ex) { throw ex; }
 
     }
 
