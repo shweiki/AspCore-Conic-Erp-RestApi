@@ -46,7 +46,7 @@ public class DeviceLogController : ControllerBase
     {
         using (ConicErpContext _db = new ConicErpContext(_configuration))
         {
-            var deviceLog = await _db.DeviceLogs.Where(ml => ml.Fk == UserId && ml.TableName == TableName)?.OrderByDescending(x => x.Id)?.LastOrDefaultAsync();
+            var deviceLog = await _db.DeviceLogs.Where(ml => ml.Fk == UserId && ml.TableName == TableName)?.OrderByDescending(x => x.Id)?.FirstOrDefaultAsync();
             if (deviceLog is null)
             {
                 return Ok();
@@ -152,6 +152,8 @@ public class DeviceLogController : ControllerBase
         _memoryCache.Set(IsWorkingCheckDeviceLog, true, cacheEntryOptions);
         try
         {
+            RemoveDuplicate();
+
             using (ConicErpContext _db = new ConicErpContext(_configuration))
             {
                 var deviceLogs = _db.DeviceLogs.Where(x => x.Status >= 0 && x.TableName == "Member").ToList();
