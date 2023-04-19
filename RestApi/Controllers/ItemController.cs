@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NinjaNye.SearchExtensions;
+using RestApi.Helper;
 using System;
 using System.Linq;
 
@@ -51,8 +52,8 @@ public class ItemController : Controller
               x.Description,
               x.Ingredients,
               x.TakeBon,
-              TotalIn = DB.InventoryMovements.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty),
-              TotalOut = DB.InventoryMovements.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty),
+              TotalIn = Utility.toFixed(DB.InventoryMovements.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty), 2),
+              TotalOut = Utility.toFixed(DB.InventoryMovements.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty), 2),
           }).ToList();
         Items = (Sort == "+id" ? Items.OrderBy(s => s.Id).ToList() : Items.OrderByDescending(s => s.Id).ToList());
         return Ok(new

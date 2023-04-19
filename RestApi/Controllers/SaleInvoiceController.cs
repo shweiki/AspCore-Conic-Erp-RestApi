@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RestApi.Helper;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -29,7 +30,7 @@ public class SaleInvoiceController : Controller
             x.Id,
             x.Discount,
             x.Tax,
-            Name = x.Name + (x.Vendor.Name ?? "") + (x.Member.Name ?? ""),
+            Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
             x.Status,
@@ -116,7 +117,7 @@ public class SaleInvoiceController : Controller
             x.Id,
             x.Discount,
             x.Tax,
-            Name = x.Name + DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+            Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
             x.Status,
@@ -142,7 +143,7 @@ public class SaleInvoiceController : Controller
                 imx.Qty,
                 imx.EXP,
                 imx.SellingPrice,
-                Total = imx.SellingPrice * imx.Qty,
+                Total = Utility.toFixed(imx.SellingPrice * imx.Qty, 2),
                 imx.Description,
                 imx.BillOfEnteryId
 
@@ -188,7 +189,7 @@ public class SaleInvoiceController : Controller
                   imx.Qty,
                   imx.EXP,
                   imx.SellingPrice,
-                  Total = imx.SellingPrice * imx.Qty,
+                  Total = Utility.toFixed(imx.SellingPrice * imx.Qty, 2),
                   imx.Description,
                   imx.BillOfEnteryId
 
@@ -222,7 +223,7 @@ public class SaleInvoiceController : Controller
             x.Id,
             x.Discount,
             x.Tax,
-            Name = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+            Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
             x.Status,
@@ -231,7 +232,7 @@ public class SaleInvoiceController : Controller
             x.PhoneNumber,
             x.Type,
             x.Description,
-            Total = x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
+            Total = Utility.toFixed(x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount, 2),
             AccountId = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().AccountId.ToString() + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().AccountId.ToString(),
             InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == x.Id).Select(imx => new
             {
@@ -244,7 +245,7 @@ public class SaleInvoiceController : Controller
                 imx.EXP,
                 imx.Qty,
                 imx.SellingPrice,
-                Total = imx.SellingPrice * imx.Qty,
+                Total = Utility.toFixed(imx.SellingPrice * imx.Qty, 2),
                 imx.Description,
                 imx.BillOfEnteryId
             }).ToList(),
@@ -353,7 +354,7 @@ public class SaleInvoiceController : Controller
             x.Id,
             x.Discount,
             x.Tax,
-            Name = DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+            Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
             x.Status,
@@ -455,7 +456,7 @@ public class SaleInvoiceController : Controller
         var Invoices = DB.SalesInvoices.Where(f => f.VendorId != null && f.VendorId == Id).Select(x => new
         {
             x.Id,
-            Name = x.Vendor.Name,
+            Name = (x.Vendor.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.Status,
             x.Type,
             x.Description,
@@ -487,7 +488,7 @@ public class SaleInvoiceController : Controller
         var Invoices = await DB.SalesInvoices.Where(f => f.MemberId != null && f.MemberId == Id && (IsService != true || f.IsPrime == true)).Select(x => new
         {
             x.Id,
-            Name = x.Vendor.Name + x.Member.Name,
+            Name = (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.Status,
             x.Type,
             x.Description,

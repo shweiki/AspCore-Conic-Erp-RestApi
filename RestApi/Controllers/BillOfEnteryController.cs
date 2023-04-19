@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RestApi.Helper;
 using System;
 using System.Data;
 using System.Linq;
@@ -64,7 +65,7 @@ public class BillOfEnteryController : Controller
                     ibex.TypeMove,
                     ibex.InventoryItemId,
                     ibex.Qty,
-                    Total = Math.Abs(DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null && m.Id <= ibex.Id).Sum(s => s.Qty) - imx.Qty),
+                    Total = Utility.toFixed(Math.Abs(DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null && m.Id <= ibex.Id).Sum(s => s.Qty) - imx.Qty), 2),
                     ibex.EXP,
                     ibex.SellingPrice,
                     ibex.Description,

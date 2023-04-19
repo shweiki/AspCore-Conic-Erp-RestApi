@@ -25,7 +25,7 @@ public class PurchaseInvoiceController : Controller
             x.Id,
             x.Discount,
             x.Tax,
-            Name = x.Vendor.Name,
+            Name = (x.Vendor.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
             x.Status,
@@ -34,7 +34,7 @@ public class PurchaseInvoiceController : Controller
             x.InvoicePurchaseDate,
             Total = x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
             //  Logs = DB.ActionLogs.Where(l => l.PurchaseInvoiceId == x.Id).ToList(),
-            AccountId = x.Vendor.AccountId,
+            x.Vendor.AccountId,
             InventoryMovements = x.InventoryMovements.Select(imx => new
             {
                 imx.Id,
@@ -71,7 +71,7 @@ public class PurchaseInvoiceController : Controller
         {
 
             x.Id,
-            Name = x.Vendor.Name + " - " + x.Name,
+            Name = (x.Vendor.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.Discount,
             x.Tax,
             x.FakeDate,
@@ -107,7 +107,7 @@ public class PurchaseInvoiceController : Controller
               x.PurchaseInvoiceId,
               x.PurchaseInvoice.Discount,
               x.Tax,
-              Name = x.PurchaseInvoice.Name, //+ DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+              Name = (x.PurchaseInvoice.Vendor.Name ?? "") + (String.IsNullOrWhiteSpace(x.PurchaseInvoice.Name) ? "" : " - " + x.PurchaseInvoice.Name),
               x.PurchaseInvoice.FakeDate,
               x.PurchaseInvoice.InvoicePurchaseDate,
               x.PurchaseInvoice.PaymentMethod,
@@ -183,6 +183,7 @@ public class PurchaseInvoiceController : Controller
             {
                 PurchaseInvoice Invoice = DB.PurchaseInvoices.Where(x => x.Id == collection.Id).SingleOrDefault();
 
+                Invoice.Name = collection.Name;
                 Invoice.AccountInvoiceNumber = collection.AccountInvoiceNumber;
                 Invoice.Tax = collection.Tax;
                 Invoice.Discount = collection.Discount;
@@ -216,7 +217,7 @@ public class PurchaseInvoiceController : Controller
         var Invoices = DB.PurchaseInvoices.Where(i => i.Id == Id).Select(x => new
         {
             x.Id,
-            Name = x.Vendor.Name + " - " + x.Name,
+            x.Name,
             x.VendorId,
             x.Discount,
             x.Tax,
@@ -253,7 +254,7 @@ public class PurchaseInvoiceController : Controller
         var Invoices = DB.PurchaseInvoices.Where(i => i.VendorId == Id).Select(x => new
         {
             x.Id,
-            Name = x.Vendor.Name + " - " + x.Name,
+            Name = (x.Vendor.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.VendorId,
             x.Discount,
             x.Tax,

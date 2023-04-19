@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using RestApi.Helper;
 using System;
 using System.Data;
 using System.Linq;
@@ -72,8 +73,8 @@ public class DashbordController : Controller
                  Key = g.First().FakeDate.ToString("MM") + "-" + g.First().FakeDate.ToString("yyyy"),
                  g.First().Type,
                  g.First().Name,
-                 Credit = g.Sum(d => d.Credit),
-                 Debit = g.Sum(d => d.Debit),
+                 Credit = Utility.toFixed(g.Sum(d => d.Credit), 2),
+                 Debit = Utility.toFixed(g.Sum(d => d.Debit), 2),
              }).ToListAsync();
 
 
