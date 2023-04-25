@@ -10,11 +10,12 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RestApi.Controllers;
 
-
+[Authorize]
 public class FileDataController : Controller
 {
     private ConicErpContext DB;
@@ -44,7 +45,7 @@ public class FileDataController : Controller
     }
     [Route("Files/SetTypeByObjId")]
     [HttpPost]
-    public IActionResult SetTypeByObjId(long Id, string type)
+    public async Task<IActionResult> SetTypeByObjId(long Id, string type)
     {
 
         var file = DB.FileData.Where(i => i.Id == Id).SingleOrDefault();
@@ -52,7 +53,7 @@ public class FileDataController : Controller
         if (file != null)
         {
             file.Type = type;
-            DB.SaveChanges();
+            await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
             return Ok(true);
         }
 
@@ -96,7 +97,7 @@ public class FileDataController : Controller
     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     [Route("Files/Create")]
     [HttpPost]
-    public IActionResult Create(FileDatum collection)
+    public async Task<IActionResult> Create(FileDatum collection)
     {
         if (ModelState.IsValid)
         {
@@ -112,7 +113,7 @@ public class FileDataController : Controller
                 collection.File = string.Empty;
                 DB.FileData.Add(collection);
 
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 string path = LoadJpeg(base64String, collection.Type, collection.TableName, collection.Id);
                 if (!string.IsNullOrWhiteSpace(path))
                 {
