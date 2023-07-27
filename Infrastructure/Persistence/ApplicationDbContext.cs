@@ -15,6 +15,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 {
     public virtual DbSet<TreeAccount> TreeAccount => Set<TreeAccount>();
     public virtual DbSet<Audit> AuditLog => Set<Audit>();
+    public virtual DbSet<SystemConfiguration> SystemConfiguration => Set<SystemConfiguration>();
     public virtual DbSet<Setting> Setting => Set<Setting>();
     public virtual DbSet<UserRouter> UserRouter => Set<UserRouter>();
     public virtual DbSet<ActionLog> ActionLog => Set<ActionLog>();

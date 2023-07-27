@@ -26,6 +26,7 @@
 	<ItemGroup>
 	  <Folder Include="Features\Members\Commands\" />
 	  <Folder Include="Features\Members\Queries\" />
+	  <Folder Include="Features\SystemConfiguration\Command\UpdateSystemConfiguration\" />
 	  <Folder Include="Features\SystemNotifications\Queries\" />
 	  <Folder Include="Services\MemberServices\" />
 	</ItemGroup>

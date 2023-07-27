@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 
-namespace Api.Filters;
+namespace RestApi.Filters;
 
 public class CustomAuthorizationHandler : IAuthorizationHandler
 {

@@ -73,10 +73,9 @@ public class UserController : Controller
         var userInfo = await _identityService.GetUserInfoAsync(User.Identity.Name);
 
         response.name = user.User.FullName;
-        response.phone = long.Parse(user.User.PhoneNumber);
+        response.phone = user.User.PhoneNumber;
         response.introduction = "I am a super hero";
-        response.avatar = DB.FileData.Where(x => x.TableName == "User" && x.Fktable == long.Parse(user.User.PhoneNumber))?.ToList()?.LastOrDefault()?.File;
-        // Url.Content("~/Images/User/" + long.Parse() + ".jpeg");
+        response.avatar = Url.Content("~/Images/User/" + user.User.UserName + ".jpeg");
         response.userrouter = DB.UserRouter.Where(x => x.UserId == userInfo.Id)?.SingleOrDefault()?.Router;
         response.defulateRedirect = DB.UserRouter.Where(x => x.UserId == userInfo.Id)?.SingleOrDefault()?.DefulateRedirect;
         response.roles = user.Roles.ToArray();
@@ -199,7 +198,6 @@ public class UserController : Controller
     {
         public string Username { get; set; }
         public string Password { get; set; }
-        public bool RememberMe { get; set; }
 
     }
     public class UserRegister
@@ -214,7 +212,7 @@ public class UserController : Controller
     {
         public string Id { get; set; }
         public string name { get; set; }
-        public long phone { get; set; }
+        public string phone { get; set; }
         public string[] roles { get; set; }
         public string avatar { get; set; }
         public string userrouter { get; set; }

@@ -1,5 +1,5 @@
-﻿using Api.Filters;
-using Api.Models;
+﻿using RestApi.Filters;
+using RestApi.Models;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +13,7 @@ using Serilog;
 using Serilog.Core;
 using System;
 using System.Text;
+using Newtonsoft.Json.Serialization;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -36,7 +37,15 @@ public static class ConfigureServices
         services.Configure<ForwardedHeadersOptions>(options => { options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto; });
 
         services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
+       
+        services.AddControllers().AddNewtonsoftJson(options =>
+        {
+            options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            //   options.SerializerSettings.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
+            options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+            options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 
+        });
 
         return services;
     }

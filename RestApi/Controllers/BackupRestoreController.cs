@@ -45,7 +45,7 @@ public class BackupRestoreController : Controller
         Name = Name.Replace("-", "").ToUpper();
         var ConnectionString = Configuration.GetConnectionString(Name);
         if (ConnectionString == null)
-            Name = "Default";
+            Name = "DefaultConnection";
         DateTime DateTime = DateTime.Now;
         ServerConnection serverConnection = new(new SqlConnection(Configuration.GetConnectionString(Name)));
         Server server = new(serverConnection);

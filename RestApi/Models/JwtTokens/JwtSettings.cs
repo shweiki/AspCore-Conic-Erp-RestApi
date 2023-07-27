@@ -1,4 +1,4 @@
-﻿namespace Api.Models;
+﻿namespace RestApi.Models;
 #nullable disable
 public class JwtSettings
 {

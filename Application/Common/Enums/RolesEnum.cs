@@ -17,16 +17,5 @@ public static class RolesEnum
         public const string Name = "User";
         public const string Display = "User";
     }
-    public static class Signer
-    {
-        public const string Name = "Signer";
-        public const string Display = "Signer";
-        public const string AlternativeDisplay = "Has authority to sign";
-    }
-    public static class CanSendToExternalUsers
-    {
-        public const string Name = "CanSendToExternalUsers";
-        public const string Display = "CanSendToExternalUsers";
-        public const string AlternativeDisplay = "Can send to external users";
-    }
+
 }

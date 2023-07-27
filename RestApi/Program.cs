@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
+using Application.Features.Role.Commands.AddDefaultRoles;
+using Application.Features.SystemConfiguration.Command.AddDefaultSystemConfiguration;
+using MediatR;
 using Microsoft.Extensions.FileProviders;
 using Swashbuckle.AspNetCore.SwaggerUI;
-using System;
 
-  string ImagesPath = "C:\\ConicImages";
+string ImagesPath = "C:\\ConicImages";
 
 var builder = WebApplication.CreateBuilder(args);
 ImagesPath = builder.Configuration.GetValue<string>("ImagesPath") ?? "C:\\ConicImages";
@@ -35,11 +35,11 @@ builder.Services.AddSwaggerGen();
 // TODO: Move this code to a better place
 try
 {
-    // var provider = builder.Services.BuildServiceProvider();
+    var provider = builder.Services.BuildServiceProvider();
 
-    //  var mediator = provider.GetService<ISender>()!;
-    //  await mediator.Send(new AddDefaultRolesCommand());
-    //  await mediator.Send(new AddDefaultSystemConfigurationCommand());
+    var mediator = provider.GetService<ISender>()!;
+    await mediator.Send(new AddDefaultRolesCommand());
+    await mediator.Send(new AddDefaultSystemConfigurationCommand());
 }
 catch (Exception ex)
 {
@@ -60,7 +60,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
-    c.DocExpansion(DocExpansion.List);
+    c.DocExpansion(DocExpansion.None);
 });
 app.UseForwardedHeaders();
 

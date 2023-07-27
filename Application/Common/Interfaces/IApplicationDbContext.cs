@@ -9,6 +9,7 @@ public interface IApplicationDbContext
 
     DbSet<TreeAccount> TreeAccount { get; }
     DbSet<Setting> Setting { get; }
+    DbSet<SystemConfiguration> SystemConfiguration { get; }
     DbSet<UserRouter> UserRouter { get; }
     DbSet<ActionLog> ActionLog { get; }
     DbSet<Area> Area { get; }

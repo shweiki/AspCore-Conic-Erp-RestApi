@@ -1,11 +1,7 @@
-﻿using Domain.Entities; using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 
 namespace RestApi.Controllers;
@@ -15,15 +11,12 @@ namespace RestApi.Controllers;
 
 public class OprationsysController : Controller
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
-    private readonly ILogger<UserController> _logger;
+
+    private readonly ILogger<OprationsysController> _logger;
     private readonly IApplicationDbContext DB;
 
-    public OprationsysController(IApplicationDbContext dbcontext, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
+    public OprationsysController(IApplicationDbContext dbcontext,  ILogger<OprationsysController> logger)
     {
-        _userManager = userManager;
-        _signInManager = signInManager;
         _logger = logger;
         DB = dbcontext;
     }
