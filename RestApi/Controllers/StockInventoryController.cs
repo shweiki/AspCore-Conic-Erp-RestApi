@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,8 +11,8 @@ namespace RestApi.Controllers;
 
 public class StockInventoryController : Controller
 {
-    private ConicErpContext DB;
-    public StockInventoryController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public StockInventoryController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -20,13 +20,13 @@ public class StockInventoryController : Controller
     [HttpGet]
     public IActionResult GetStockInventory(DateTime DateFrom, DateTime DateTo)
     {
-        var Orders = DB.StocktakingInventories.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new
+        var Orders = DB.StocktakingInventory.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new
         {
             x.Id,
             x.FakeDate,
             x.Status,
             x.Description,
-            StockMovements = DB.StockMovements.Where(i => i.StocktakingInventoryId == x.Id).Select(m => new
+            StockMovements = DB.StockMovement.Where(i => i.StocktakingInventoryId == x.Id).Select(m => new
             {
                 m.Id,
                 m.ItemsId,
@@ -56,7 +56,7 @@ public class StockInventoryController : Controller
             try
             {
                 // TODO: Add insert logic here
-                DB.StocktakingInventories.Add(collection);
+                DB.StocktakingInventory.Add(collection);
                 DB.SaveChanges();
 
                 return Ok(true);

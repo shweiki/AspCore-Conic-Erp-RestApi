@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -9,8 +10,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class UnitItemController : Controller
 {
-    private ConicErpContext DB;
-    public UnitItemController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public UnitItemController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -18,7 +19,7 @@ public class UnitItemController : Controller
     [HttpGet]
     public IActionResult GetUnitItem()
     {
-        var UnitItems = DB.UnitItems.Select(x => new
+        var UnitItems = DB.UnitItem.Select(x => new
         {
             x.Id,
             x.Name,
@@ -31,7 +32,7 @@ public class UnitItemController : Controller
     [HttpGet]
     public IActionResult GetActiveUnitItem()
     {
-        var UnitItems = DB.UnitItems.Where(i => i.Status == 0).Select(x => new { value = x.Name, label = x.Name }).ToList();
+        var UnitItems = DB.UnitItem.Where(i => i.Status == 0).Select(x => new { value = x.Name, label = x.Name }).ToList();
 
         return Ok(UnitItems);
     }
@@ -43,7 +44,7 @@ public class UnitItemController : Controller
         {
             try
             {
-                DB.UnitItems.Add(collection);
+                DB.UnitItem.Add(collection);
                 DB.SaveChanges();
                 return Ok(collection);
 
@@ -62,7 +63,7 @@ public class UnitItemController : Controller
     {
         if (ModelState.IsValid)
         {
-            UnitItem UnitItem = DB.UnitItems.Where(x => x.Id == collection.Id).SingleOrDefault();
+            UnitItem UnitItem = DB.UnitItem.Where(x => x.Id == collection.Id).SingleOrDefault();
             UnitItem.Name = collection.Name;
             UnitItem.Description = collection.Description;
             try

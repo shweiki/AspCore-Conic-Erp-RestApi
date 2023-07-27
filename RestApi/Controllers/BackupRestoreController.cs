@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -17,9 +18,9 @@ namespace RestApi.Controllers;
 [Authorize]
 public class BackupRestoreController : Controller
 {
-    private readonly ConicErpContext DB;
+    private readonly IApplicationDbContext DB;
 
-    public BackupRestoreController(IConfiguration configuration, ConicErpContext dbcontext)
+    public BackupRestoreController(IConfiguration configuration, IApplicationDbContext dbcontext)
     {
         Configuration = configuration;
         DB = dbcontext;
@@ -32,7 +33,7 @@ public class BackupRestoreController : Controller
     [HttpGet]
     public IActionResult GetBackup()
     {
-        var BackUps = DB.BackUps.ToList();
+        var BackUps = DB.BackUp.ToList();
         return Ok(BackUps);
     }
     [Route("BackupRestore/Backup")]
@@ -64,7 +65,7 @@ public class BackupRestoreController : Controller
         backup.LogTruncation = BackupTruncateLogType.Truncate;
         backup.SqlBackup(server);
         BackUp backup1 = new() { Name = name, BackUpPath = BackUpPath, DateTime = DateTime, UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value, DataBaseName = serverConnection.DatabaseName };
-        DB.BackUps.Add(backup1);
+        DB.BackUp.Add(backup1);
         DB.SaveChanges();
         return Ok(true);
     }

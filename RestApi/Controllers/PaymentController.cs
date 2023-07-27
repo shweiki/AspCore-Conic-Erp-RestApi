@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,8 +13,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class PaymentController : Controller
 {
-    private ConicErpContext DB;
-    public PaymentController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public PaymentController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -22,9 +22,9 @@ public class PaymentController : Controller
     [Route("Payment/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var Invoices = DB.Payments.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+        var Invoices = DB.Payment.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
         && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
-        (User != null ? DB.ActionLogs.Where(l => l.TableName == "Payment" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        (User != null ? DB.ActionLog.Where(l => l.TableName == "Payment" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
 
         {
             x.Id,
@@ -60,7 +60,7 @@ public class PaymentController : Controller
     [HttpGet]
     public ActionResult GetPayment(DateTime DateFrom, DateTime DateTo, int Status)
     {
-        var Payments = DB.Payments.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo && i.Status == Status).Select(x => new
+        var Payments = DB.Payment.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo && i.Status == Status).Select(x => new
         {
             x.Id,
             x.TotalAmmount,
@@ -84,7 +84,7 @@ public class PaymentController : Controller
     [HttpGet]
     public IActionResult GetPaymentsByMemberId(long? MemberId)
     {
-        var Payments = DB.Payments.Where(i => i.MemberId == MemberId).Select(x => new
+        var Payments = DB.Payment.Where(i => i.MemberId == MemberId).Select(x => new
         {
             x.Id,
             x.TotalAmmount,
@@ -107,7 +107,7 @@ public class PaymentController : Controller
     [HttpGet]
     public IActionResult GetPaymentsByVendorId(long? VendorId)
     {
-        var Payments = DB.Payments.Where(i => i.VendorId == VendorId).Select(x => new
+        var Payments = DB.Payment.Where(i => i.VendorId == VendorId).Select(x => new
         {
             x.Id,
             x.TotalAmmount,
@@ -130,7 +130,7 @@ public class PaymentController : Controller
     [HttpGet]
     public IActionResult GetById(long? Id)
     {
-        var Payment = DB.Payments.Where(i => i.Id == Id).Select(x => new
+        var Payment = DB.Payment.Where(i => i.Id == Id).Select(x => new
         {
             x.Id,
             x.TotalAmmount,
@@ -153,7 +153,7 @@ public class PaymentController : Controller
     [HttpGet]
     public IActionResult GetPaymentByStatus(int Limit, string Sort, int Page, int? Status)
     {
-        var Payments = DB.Payments.Where(i => i.Status == Status).Select(x => new
+        var Payments = DB.Payment.Where(i => i.Status == Status).Select(x => new
         {
             x.Id,
             x.TotalAmmount,
@@ -190,7 +190,7 @@ public class PaymentController : Controller
     public IActionResult GetPaymentByListId(string listid)
     {
         List<long> list = listid.Split(',').Select(long.Parse).ToList();
-        var Payments = DB.Payments.Where(s => list.Contains(s.Id)).Select(x => new
+        var Payments = DB.Payment.Where(s => list.Contains(s.Id)).Select(x => new
         {
             x.Id,
             x.TotalAmmount,
@@ -228,7 +228,7 @@ public class PaymentController : Controller
             try
             {
                 // TODO: Add insert logic here
-                DB.Payments.Add(collection);
+                DB.Payment.Add(collection);
                 await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(collection.Id);
 
@@ -249,7 +249,7 @@ public class PaymentController : Controller
         {
             try
             {
-                Payment payment = DB.Payments.Where(x => x.Id == collection.Id).SingleOrDefault();
+                Payment payment = DB.Payment.Where(x => x.Id == collection.Id).SingleOrDefault();
                 payment.Name = collection.Name;
                 payment.FakeDate = collection.FakeDate;
                 payment.PaymentMethod = collection.PaymentMethod;
@@ -280,7 +280,7 @@ public class PaymentController : Controller
         {
             try
             {
-                Payment payment = DB.Payments.Where(x => x.Id == ID).SingleOrDefault();
+                Payment payment = DB.Payment.Where(x => x.Id == ID).SingleOrDefault();
                 payment.PaymentMethod = PaymentMethod;
                 await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);

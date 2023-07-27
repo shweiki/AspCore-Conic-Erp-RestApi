@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +12,9 @@ namespace RestApi.Controllers;
 [Authorize]
 public class VendorController : Controller
 {
-    private ConicErpContext DB;
+    private readonly IApplicationDbContext DB;
     private readonly UserManager<IdentityUser> _userManager;
-    public VendorController(ConicErpContext dbcontext, UserManager<IdentityUser> userManager)
+    public VendorController(IApplicationDbContext dbcontext, UserManager<IdentityUser> userManager)
     {
         DB = dbcontext;
         _userManager = userManager;
@@ -24,7 +24,7 @@ public class VendorController : Controller
     [HttpGet]
     public IActionResult GetVendor()
     {
-        var Vendors = DB.Vendors.Select(x => new
+        var Vendors = DB.Vendor.Select(x => new
         {
             x.Id,
             x.Name,
@@ -40,8 +40,8 @@ public class VendorController : Controller
             x.Ssn,
             x.AccountId,
             x.Status,
-            TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
-            TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
+            TotalDebit = DB.EntryMovement.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
+            TotalCredit = DB.EntryMovement.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
         }).ToList();
 
         return Ok(Vendors);
@@ -50,7 +50,7 @@ public class VendorController : Controller
     [HttpGet]
     public IActionResult GetActiveVendor()
     {
-        var Vendor = DB.Vendors.Where(x => x.Status == 0).Select(x => new { value = x.Id, label = x.Name }).ToList();
+        var Vendor = DB.Vendor.Where(x => x.Status == 0).Select(x => new { value = x.Id, label = x.Name }).ToList();
         return Ok(Vendor);
     }
     [Route("Vendor/GetVendorByAny")]
@@ -58,7 +58,7 @@ public class VendorController : Controller
     public IActionResult GetVendorByAny(string Any)
     {
         Any.ToLower();
-        var Vendors = DB.Vendors.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")))
+        var Vendors = DB.Vendor.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")))
             .Select(x => new { x.Id, x.Name, x.PhoneNumber1, x.Ssn, x.AccountId }).ToList();
 
         return Ok(Vendors);
@@ -67,7 +67,7 @@ public class VendorController : Controller
     [Route("Vendor/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
     {
-        var Vendors = DB.Vendors.Include(x => x.Account.EntryMovements).Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")))
+        var Vendors = DB.Vendor.Include(x => x.Account.EntryMovements).Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || s.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")))
         && (Status == null || s.Status == Status)).Select(x => new
         {
             x.Id,
@@ -99,7 +99,7 @@ public class VendorController : Controller
     [HttpGet]
     public IActionResult CheckIsExist(string Name, string PhoneNumber, string Ssn)
     {
-        var Vendor = DB.Vendors.Where(m => (Name != null && m.Name == Name) || (Ssn != null && m.Ssn == Ssn) || (PhoneNumber != null && m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", ""))).ToList();
+        var Vendor = DB.Vendor.Where(m => (Name != null && m.Name == Name) || (Ssn != null && m.Ssn == Ssn) || (PhoneNumber != null && m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", ""))).ToList();
 
         return Ok(Vendor.Count() > 0);
     }
@@ -118,13 +118,13 @@ public class VendorController : Controller
                     Description = collection.Description,
                     Status = 0,
                     Code = "",
-                    ParentId = DB.TreeAccounts.Where(x => x.Type == collection.Type + "s-Main").SingleOrDefault().Code
+                    ParentId = DB.TreeAccount.Where(x => x.Type == collection.Type + "s-Main").SingleOrDefault().Code
                 };
-                DB.TreeAccounts.Add(NewAccount);
+                DB.TreeAccount.Add(NewAccount);
                 DB.SaveChanges();
                 collection.Status = 0;
                 collection.AccountId = NewAccount.Id;
-                DB.Vendors.Add(collection);
+                DB.Vendor.Add(collection);
                 DB.SaveChanges();
                 return Ok(collection.Id);
 
@@ -141,7 +141,7 @@ public class VendorController : Controller
     [HttpGet]
     public async Task<IActionResult> GetById(long? Id)
     {
-        var Vendor = await DB.Vendors.Include(x => x.Account.EntryMovements).Where(m => m.Id == Id).Select(
+        var Vendor = await DB.Vendor.Include(x => x.Account.EntryMovements).Where(m => m.Id == Id).Select(
             x => new
             {
                 x.Id,
@@ -169,7 +169,7 @@ public class VendorController : Controller
         {
             try
             {
-                Vendor vendor = DB.Vendors.Where(x => x.Id == collection.Id).SingleOrDefault();
+                Vendor vendor = DB.Vendor.Where(x => x.Id == collection.Id).SingleOrDefault();
                 vendor.Name = collection.Name;
                 vendor.Ssn = collection.Ssn;
                 vendor.Region = collection.Region;
@@ -198,7 +198,7 @@ public class VendorController : Controller
     [HttpGet]
     public IActionResult GetVendorCheque()
     {
-        var Vendor = DB.Vendors.Where(x => x.Status == 0).Select(x => new { value = x.Id, label = x.Name }).ToList();
+        var Vendor = DB.Vendor.Where(x => x.Status == 0).Select(x => new { value = x.Id, label = x.Name }).ToList();
         return Ok(Vendor);
     }
 
@@ -227,7 +227,7 @@ public class VendorController : Controller
             }
             collection.Pass = NewUser.PasswordHash;
             collection.UserId = NewUser.Id;
-            DB.Vendors.Add(collection);
+            DB.Vendor.Add(collection);
             DB.SaveChanges();
 
             UserRouter NewRole = new UserRouter()
@@ -260,9 +260,9 @@ public class VendorController : Controller
                 Description = collection.Description,
                 Status = 0,
                 Code = "",
-                ParentId = DB.TreeAccounts.Where(x => x.Type == "Customers-Main").SingleOrDefault().Code
+                ParentId = DB.TreeAccount.Where(x => x.Type == "Customers-Main").SingleOrDefault().Code
             };
-            DB.TreeAccounts.Add(NewAccount);
+            DB.TreeAccount.Add(NewAccount);
             DB.SaveChanges();
             var NewUser = new IdentityUser()
             {
@@ -283,7 +283,7 @@ public class VendorController : Controller
             collection.Pass = NewUser.PasswordHash;
             collection.UserId = NewUser.Id;
             collection.AccountId = NewAccount.Id;
-            DB.Vendors.Add(collection);
+            DB.Vendor.Add(collection);
             DB.SaveChanges();
 
             UserRouter NewRole = new UserRouter()
@@ -306,7 +306,7 @@ public class VendorController : Controller
     public IActionResult GetVendorByUserId(String Id)
     {
 
-        var Vendors = DB.Vendors.Where(m => m.UserId == Id)
+        var Vendors = DB.Vendor.Where(m => m.UserId == Id)
             .Select(x => new { x.Id, x.Name, x.PhoneNumber1 }).ToList();
 
         return Ok(Vendors);
@@ -315,7 +315,7 @@ public class VendorController : Controller
         //{
         //    try
         //    {
-        //        var vendors = DB.Vendors.Where(m => m.UserId == Id)
+        //        var vendors = DB.Vendor.Where(m => m.UserId == Id)
         //            .Select(x => new {
         //                x.Id
         //            }).SingleOrDefault();

@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +16,11 @@ namespace RestApi.Controllers;
 [Authorize]
 public class DeviceLogController : ControllerBase
 {
-    private readonly ConicErpContext DB;
+    private readonly IApplicationDbContext DB;
     public IConfiguration _configuration { get; }
     private IMemoryCache _memoryCache;
 
-    public DeviceLogController(ConicErpContext dbcontext, IConfiguration configuration, IMemoryCache memoryCache)
+    public DeviceLogController(IApplicationDbContext dbcontext, IConfiguration configuration, IMemoryCache memoryCache)
     {
         DB = dbcontext;
         _configuration = configuration;
@@ -29,7 +30,7 @@ public class DeviceLogController : ControllerBase
     [HttpGet]
     public IActionResult GetDeviceLog()
     {
-        var DeviceLogs = DB.DeviceLogs.Select(x => new { x.Id, x.DateTime, x.Description, x.Device.Name }).ToList();
+        var DeviceLogs = DB.DeviceLog.Select(x => new { x.Id, x.DateTime, x.Description, x.Device.Name }).ToList();
 
         return Ok(DeviceLogs);
     }
@@ -38,21 +39,20 @@ public class DeviceLogController : ControllerBase
     public IActionResult GetById(long Id)
     {
 
-        return Ok(DB.DeviceLogs.Where(ml => ml.Id == Id).SingleOrDefault());
+        return Ok(DB.DeviceLog.Where(ml => ml.Id == Id).SingleOrDefault());
     }
     [Route("DeviceLog/GetlastLogByUserId")]
     [HttpGet]
     public async Task<IActionResult> GetlastLogByUserId(string UserId, string TableName)
     {
-        using (ConicErpContext _db = new ConicErpContext(_configuration))
+
+        var deviceLog = await DB.DeviceLog.Where(ml => ml.Fk == UserId && ml.TableName == TableName)?.OrderByDescending(x => x.Id)?.FirstOrDefaultAsync();
+        if (deviceLog is null)
         {
-            var deviceLog = await _db.DeviceLogs.Where(ml => ml.Fk == UserId && ml.TableName == TableName)?.OrderByDescending(x => x.Id)?.FirstOrDefaultAsync();
-            if (deviceLog is null)
-            {
-                return Ok();
-            }
-            return Ok(deviceLog.DateTime);
+            return Ok();
         }
+        return Ok(deviceLog.DateTime);
+
 
     }
     [Route("DeviceLog/GetByStatus")]
@@ -62,55 +62,54 @@ public class DeviceLogController : ControllerBase
         // Get Log From ZkBio Data base 
 
         // GetFromZkBio(TableName); for v5l speed ztk
-        using (ConicErpContext _db = new ConicErpContext(_configuration))
+
+        DeviceController Device = new(DB);
+
+        foreach (var D in await DB.Device.ToListAsync())
         {
-            DeviceController Device = new(_db);
-
-            foreach (var D in await _db.Devices.ToListAsync())
-            {
-                Device.GetAllLog(D.Id, "Member");
-                Device.GetAllLog(D.Id, "Employee", true);
-            }
-
-            var DeviceLogs = await _db.DeviceLogs.Where(x => x.Status == Status && x.TableName == TableName && (Any == null || x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any))).ToListAsync();
-
-            DeviceLogs = (Sort == "+id" ? DeviceLogs.OrderBy(s => s.Id).ToList() : DeviceLogs.OrderByDescending(s => s.Id).ToList());
-
-            DeviceLogs = DeviceLogs.GroupBy(a => new { a.Fk, a.DateTime }).Select(g => g.Last()).ToList();
-
-            var itemsQuery = DeviceLogs.Skip((Page - 1) * Limit).Take(Limit).ToList();
-
-            var result = new List<dynamic>();
-
-            foreach (var deviceLog in itemsQuery)
-            {
-                var User = await GetFkData(deviceLog.Fk, TableName, _db);
-                result.Add(new
-                {
-                    deviceLog.Id,
-                    deviceLog.DateTime,
-                    deviceLog.Description,
-                    deviceLog.Fk,
-                    deviceLog.TableName,
-                    User
-                });
-            }
-
-            return Ok(result);
+            Device.GetAllLog(D.Id, "Member");
+            Device.GetAllLog(D.Id, "Employee", true);
         }
+
+        var DeviceLogs = await DB.DeviceLog.Where(x => x.Status == Status && x.TableName == TableName && (Any == null || x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any))).ToListAsync();
+
+        DeviceLogs = (Sort == "+id" ? DeviceLogs.OrderBy(s => s.Id).ToList() : DeviceLogs.OrderByDescending(s => s.Id).ToList());
+
+        DeviceLogs = DeviceLogs.GroupBy(a => new { a.Fk, a.DateTime }).Select(g => g.Last()).ToList();
+
+        var itemsQuery = DeviceLogs.Skip((Page - 1) * Limit).Take(Limit).ToList();
+
+        var result = new List<dynamic>();
+
+        foreach (var deviceLog in itemsQuery)
+        {
+            var User = await GetFkData(deviceLog.Fk, TableName, DB);
+            result.Add(new
+            {
+                deviceLog.Id,
+                deviceLog.DateTime,
+                deviceLog.Description,
+                deviceLog.Fk,
+                deviceLog.TableName,
+                User
+            });
+        }
+
+        return Ok(result);
+
     }
 
-    public static async Task<dynamic> GetFkData(string Fktable, string TableName, ConicErpContext DB)
+    public static async Task<dynamic> GetFkData(string Fktable, string TableName, IApplicationDbContext DB)
     {
         dynamic Object = TableName switch
         {
-            "Member" => await DB.Members.Include(x => x.MembershipMovements).Include(x => x.Account.EntryMovements).Where(x => x.Id == Convert.ToInt32(Fktable)).Select(x => new
+            "Member" => await DB.Member.Include(x => x.MembershipMovements).Include(x => x.Account.EntryMovements).Where(x => x.Id == Convert.ToInt32(Fktable)).Select(x => new
             {
                 x.Id,
                 x.Name,
                 x.Description,
                 x.Status,
-                Style = DB.Oprationsys.Where(o => o.Status == x.Status && o.TableName == "Member").Select(o => new
+                Style = DB.Oprationsy.Where(o => o.Status == x.Status && o.TableName == "Member").Select(o => new
                 {
                     o.Color,
                     o.ClassName,
@@ -126,7 +125,7 @@ public class DeviceLogController : ControllerBase
                     ms.Membership.NumberClass
                 }).FirstOrDefault()
             }).SingleOrDefaultAsync(),
-            "Employee" => await DB.Employees.SingleOrDefaultAsync(x => x.Id == Convert.ToInt32(Fktable)),
+            "Employee" => await DB.Employee.SingleOrDefaultAsync(x => x.Id == Convert.ToInt32(Fktable)),
             _ => null,
         };
         return Object;
@@ -154,26 +153,24 @@ public class DeviceLogController : ControllerBase
         {
             RemoveDuplicate();
 
-            using (ConicErpContext _db = new ConicErpContext(_configuration))
+            var deviceLogs = DB.DeviceLog.Where(x => x.Status >= 0 && x.TableName == "Member").ToList();
+
+            foreach (var ML in deviceLogs)
             {
-                var deviceLogs = _db.DeviceLogs.Where(x => x.Status >= 0 && x.TableName == "Member").ToList();
 
-                foreach (var ML in deviceLogs)
+                if (DateTime.Today > ML.DateTime.Date)
                 {
-
-                    if (DateTime.Today > ML.DateTime.Date)
-                    {
-                        ML.Status = -1;
-                    }
-                    else
-                    {
-                        ML.Status = 0;
-                    }
-                    _db.SaveChanges();
-
+                    ML.Status = -1;
                 }
-                return Ok(true);
+                else
+                {
+                    ML.Status = 0;
+                }
+                DB.SaveChanges();
+
             }
+            return Ok(true);
+
         }
         catch (Exception ex)
         {
@@ -193,7 +190,7 @@ public class DeviceLogController : ControllerBase
             try
             {
 
-                DB.DeviceLogs.Add(collection);
+                DB.DeviceLog.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
             }
@@ -213,7 +210,7 @@ public class DeviceLogController : ControllerBase
         {
             try
             {
-                DeviceLog DeviceLog = DB.DeviceLogs.Where(x => x.Id == collection.Id).SingleOrDefault();
+                DeviceLog DeviceLog = DB.DeviceLog.Where(x => x.Id == collection.Id).SingleOrDefault();
                 DeviceLog.DeviceId = collection.DeviceId;
                 DeviceLog.Fk = collection.Fk;
                 DeviceLog.TableName = collection.TableName;
@@ -239,12 +236,12 @@ public class DeviceLogController : ControllerBase
     {
         try
         {
-            var DuplicateRow = DB.DeviceLogs.GroupBy(s => new { s.TableName, s.Fk, s.DateTime }).Select(grp => grp.Skip(1)).ToList();
+            var DuplicateRow = DB.DeviceLog.GroupBy(s => new { s.TableName, s.Fk, s.DateTime }).Select(grp => grp.Skip(1)).ToList();
             foreach (var Dup in DuplicateRow)
             {
                 if (!Dup.Any())
                     continue;
-                DB.DeviceLogs.RemoveRange(Dup);
+                DB.DeviceLog.RemoveRange(Dup);
                 DB.SaveChanges();
             }
             return Ok(true);
@@ -260,7 +257,7 @@ public class DeviceLogController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetLogByUserId(string UserId, string TableName, DateTime? DateFrom, DateTime? DateTo)
     {
-        var DeviceLogs = await DB.DeviceLogs.Where(x => x.Fk == UserId && x.TableName == TableName && x.DateTime >= DateFrom && x.DateTime <= DateTo).Select(x => new
+        var DeviceLogs = await DB.DeviceLog.Where(x => x.Fk == UserId && x.TableName == TableName && x.DateTime >= DateFrom && x.DateTime <= DateTo).Select(x => new
         {
             x.Status,
             x.Type,
@@ -280,14 +277,14 @@ public class DeviceLogController : ControllerBase
     {
         long ID = Convert.ToInt32(Id);
         string TableName = "";
-        var member = DB.Members.Where(m => m.Id == ID).SingleOrDefault();
-        var Employee = DB.Employees.Where(m => m.Id == ID).SingleOrDefault();
+        var member = DB.Member.Where(m => m.Id == ID).SingleOrDefault();
+        var Employee = DB.Employee.Where(m => m.Id == ID).SingleOrDefault();
         if (member != null) TableName = "Member";
         if (Employee != null) TableName = "Employee";
 
-        var isLogSaveIt = DB.DeviceLogs.Where(l => l.Fk == Id && l.TableName == TableName).ToList();
-        isLogSaveIt = DB.DeviceLogs.Where(Ld => Ld.DateTime == datetime).ToList();
-        var Device = DB.Devices.Where(x => x.Ip == Ip).SingleOrDefault();
+        var isLogSaveIt = DB.DeviceLog.Where(l => l.Fk == Id && l.TableName == TableName).ToList();
+        isLogSaveIt = DB.DeviceLog.Where(Ld => Ld.DateTime == datetime).ToList();
+        var Device = DB.Device.Where(x => x.Ip == Ip).SingleOrDefault();
         if (isLogSaveIt.Count <= 0 && Device != null)
         {
             var Log = new DeviceLog
@@ -300,12 +297,12 @@ public class DeviceLogController : ControllerBase
                 TableName = TableName,
                 Fk = Id.ToString(),
             };
-            DB.DeviceLogs.Add(Log);
+            DB.DeviceLog.Add(Log);
             await DB.SaveChangesAsync();
 
             /*
              MassageController massage = new MassageController();
-             string OwnerPhone = DB.CompanyInfos.FirstOrDefault().PhoneNumber1;
+             string OwnerPhone = DB.CompanyInfo.FirstOrDefault().PhoneNumber1;
              if (OwnerPhone != null && OwnerPhone.Length == 10) OwnerPhone = OwnerPhone.Substring(1, 9);
 
 
@@ -324,34 +321,34 @@ public class DeviceLogController : ControllerBase
 
 
 
-             double Total = (from D in DB.EntryMovements.Where(l => l.AccountId == member.AccountId).ToList() select D.Credit).Sum() - (from D in DB.EntryMovements.Where(l => l.AccountId == member.AccountId).ToList() select D.Debit).Sum();
+             double Total = (from D in DB.EntryMovement.Where(l => l.AccountId == member.AccountId).ToList() select D.Credit).Sum() - (from D in DB.EntryMovement.Where(l => l.AccountId == member.AccountId).ToList() select D.Debit).Sum();
              if (Total > 0)// مدين
              {
                  Msg.Body = "المدين " + member.Name + " - " + member.Id + "متواجد في الصالة وعليه ذمة " + Total + " .";
                  Msg.PhoneNumber = OwnerPhone;
                  //  massage.SendSms(OwnerPhone, Msg.Body);
 
-                 DB.Massages.Add(Msg);
+                 DB.Massage.Add(Msg);
 
              }
              if (member.Status == 1)// مجمد
              {
-                 member.MembershipMovements.Where(MS => MS.Status == 2).SingleOrDefault().MembershipMovementOrders.Where(MSO => MSO.Status == 1).SingleOrDefault().Status = -1;
+                 member.MembershipMovement.Where(MS => MS.Status == 2).SingleOrDefault().MembershipMovementOrder.Where(MSO => MSO.Status == 1).SingleOrDefault().Status = -1;
              }
              if (member.Status == -1)// متهي
              {
-                 var ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == member.Id && f.Status > 0).FirstOrDefault();
+                 var ActiveMemberShip = DB.MembershipMovement.Where(f => f.MemberId == member.Id && f.Status > 0).FirstOrDefault();
                  if (ActiveMemberShip != null)
                  {
                      Msg.Body = "عزيزي " + member.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بتجديد إشتراكك للفترة الحالية";
                      Msg.PhoneNumber = member.PhoneNumber1;
                      //  massage.SendSms(member.PhoneNumber1, Msg.Body);
-                     DB.Massages.Add(Msg);
+                     DB.Massage.Add(Msg);
 
                      Msg.Body = "تم تنبيه " + member.Name + " - " + member.Id + " إنتهى اشتراكه في " + ActiveMemberShip.EndDate + ".";
                      //   massage.SendSms(OwnerPhone, Msg.Body);
                      Msg.PhoneNumber = OwnerPhone;
-                     DB.Massages.Add(Msg);
+                     DB.Massage.Add(Msg);
                  }
 
 
@@ -359,18 +356,18 @@ public class DeviceLogController : ControllerBase
              }
              if (member.Status == 0)// المتجاوز الفترة الصباحية
              {
-                 var ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == member.Id && f.Status > 0).FirstOrDefault();
+                 var ActiveMemberShip = DB.MembershipMovement.Where(f => f.MemberId == member.Id && f.Status > 0).FirstOrDefault();
                  if (ActiveMemberShip != null && ActiveMemberShip.Type == "Morning" && datetime.Hour > 15)
                  {
 
                      Msg.Body = "عزيزي " + member.Name + "نود تذكيرك بأن الوقت النهائي لدخول الصالة للفترة الصباحية الساعة 3:00 عصرا.دمتم بخير";
                      //   massage.SendSms(member.PhoneNumber1, Msg.Body);
                      Msg.PhoneNumber = member.PhoneNumber1;
-                     DB.Massages.Add(Msg);
+                     DB.Massage.Add(Msg);
                      Msg.Body = "تم تنبيه " + member.Name + " - " + member.Id + "تعدى الوقت الصباحي , وتم الدخول في الوقت " + datetime + " .";
                      // massage.SendSms(OwnerPhone, Msg.Body);
                      Msg.PhoneNumber = OwnerPhone;
-                     DB.Massages.Add(Msg);
+                     DB.Massage.Add(Msg);
                  }
 
              }
@@ -381,17 +378,17 @@ public class DeviceLogController : ControllerBase
                  // massage.SendSms(OwnerPhone, Msg.Body);
                  Msg.PhoneNumber = OwnerPhone;
 
-                 DB.Massages.Add(Msg);
+                 DB.Massage.Add(Msg);
              }
              if (member.Status == 0)// قائمة معلق
              {
-                 var HoldMembership =  DB.MembershipMovements.Where(f => f.MemberId == member.Id && f.Status == -2).FirstOrDefault();
-                 var ActiveMemberShip = DB.MembershipMovements.Where(f => f.MemberId == member.Id && f.Status > 0).FirstOrDefault();
+                 var HoldMembership =  DB.MembershipMovement.Where(f => f.MemberId == member.Id && f.Status == -2).FirstOrDefault();
+                 var ActiveMemberShip = DB.MembershipMovement.Where(f => f.MemberId == member.Id && f.Status > 0).FirstOrDefault();
                  if (HoldMembership != null && ActiveMemberShip == null)
                  {
                      Msg.Body = "المعلق " + member.Name + " - " + member.Id + "متواجد في الصالة .";
                      Msg.PhoneNumber = OwnerPhone;
-                     DB.Massages.Add(Msg);
+                     DB.Massage.Add(Msg);
                  }
 
              }

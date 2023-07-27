@@ -1,5 +1,6 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,8 +12,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class ReceiveController : Controller
 {
-    private ConicErpContext DB;
-    public ReceiveController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public ReceiveController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -20,9 +21,9 @@ public class ReceiveController : Controller
     [Route("Receive/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var Invoices = DB.Receives.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+        var Invoices = DB.Receive.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
         && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) &&
-        (User != null ? DB.ActionLogs.Where(l => l.TableName == "Receive" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        (User != null ? DB.ActionLog.Where(l => l.TableName == "Receive" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
 
         {
             x.Id,
@@ -58,7 +59,7 @@ public class ReceiveController : Controller
     [HttpGet]
     public ActionResult GetReceive(DateTime DateFrom, DateTime DateTo, int Status)
     {
-        var Receives = DB.Receives.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo && i.Status == Status).Select(x => new
+        var Receives = DB.Receive.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo && i.Status == Status).Select(x => new
         {
             x.Id,
             x.TotalAmmount,
@@ -82,7 +83,7 @@ public class ReceiveController : Controller
     [HttpGet]
     public IActionResult GetReceivesByMemberId(long? MemberId)
     {
-        var Receives = DB.Receives.Where(i => i.MemberId == MemberId).Select(x => new
+        var Receives = DB.Receive.Where(i => i.MemberId == MemberId).Select(x => new
         {
             x.Id,
             x.TotalAmmount,
@@ -105,7 +106,7 @@ public class ReceiveController : Controller
     [HttpGet]
     public IActionResult GetReceivesByVendorId(long? VendorId)
     {
-        var Receives = DB.Receives.Where(i => i.VendorId == VendorId).Select(x => new
+        var Receives = DB.Receive.Where(i => i.VendorId == VendorId).Select(x => new
         {
             x.Id,
             x.TotalAmmount,
@@ -128,7 +129,7 @@ public class ReceiveController : Controller
     [HttpGet]
     public IActionResult GetById(long? Id)
     {
-        var Receive = DB.Receives.Where(i => i.Id == Id).Select(x => new
+        var Receive = DB.Receive.Where(i => i.Id == Id).Select(x => new
         {
             x.Id,
             x.TotalAmmount,
@@ -151,7 +152,7 @@ public class ReceiveController : Controller
     [HttpGet]
     public IActionResult GetReceiveByStatus(int Limit, string Sort, int Page, int? Status)
     {
-        var Receives = DB.Receives.Where(i => i.Status == Status).Select(x => new
+        var Receives = DB.Receive.Where(i => i.Status == Status).Select(x => new
         {
             x.Id,
             x.TotalAmmount,
@@ -188,7 +189,7 @@ public class ReceiveController : Controller
     public IActionResult GetReceiveByListId(string listid)
     {
         List<long> list = listid.Split(',').Select(long.Parse).ToList();
-        var Receives = DB.Receives.Where(s => list.Contains(s.Id)).Select(x => new
+        var Receives = DB.Receive.Where(s => list.Contains(s.Id)).Select(x => new
         {
             x.Id,
             x.TotalAmmount,
@@ -226,7 +227,7 @@ public class ReceiveController : Controller
             try
             {
                 // TODO: Add insert logic here
-                DB.Receives.Add(collection);
+                DB.Receive.Add(collection);
                 DB.SaveChanges();
                 return Ok(collection.Id);
 
@@ -247,7 +248,7 @@ public class ReceiveController : Controller
         {
             try
             {
-                Receive Receive = DB.Receives.Where(x => x.Id == collection.Id).SingleOrDefault();
+                Receive Receive = DB.Receive.Where(x => x.Id == collection.Id).SingleOrDefault();
                 Receive.Name = collection.Name;
                 Receive.FakeDate = collection.FakeDate;
                 Receive.ReceiveMethod = collection.ReceiveMethod;
@@ -278,7 +279,7 @@ public class ReceiveController : Controller
         {
             try
             {
-                Receive Receive = DB.Receives.Where(x => x.Id == ID).SingleOrDefault();
+                Receive Receive = DB.Receive.Where(x => x.Id == ID).SingleOrDefault();
                 Receive.ReceiveMethod = ReceiveMethod;
                 DB.SaveChanges();
                 return Ok(true);

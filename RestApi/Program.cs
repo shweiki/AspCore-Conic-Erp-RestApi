@@ -1,64 +1,94 @@
-using Domain;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
+using Swashbuckle.AspNetCore.SwaggerUI;
+using System;
 
-namespace RestApi;
+  string ImagesPath = "C:\\ConicImages";
 
-public class Program
+var builder = WebApplication.CreateBuilder(args);
+ImagesPath = builder.Configuration.GetValue<string>("ImagesPath") ?? "C:\\ConicImages";
+if (!Directory.Exists(ImagesPath))
 {
+    Directory.CreateDirectory(ImagesPath);
+}
+// Add logging
+var logger = builder.CreateLogger(builder.Configuration);
 
-    public static void Main(string[] args)
-    {
-        CreateHostBuilder(args).Build().MigrateDatabase().Run();
-    }
+// Add services to the container.
+builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddIdentityServices();
+builder.Services.AddApplicationServices();
+// Add services to the container.
 
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup<Startup>();
-            }).UseWindowsService();
-    public static void OpenBrowser()
-    {
+builder.Services.AddApiServices();
+builder.Services.AddJWTAuthenticationServices(builder.Configuration);
 
-
-        string rootUrl = "http://localhost:5000";
-        //_httpContextAccessor.HttpContext.Request.Scheme.ToString();// host;
-        ProcessStartInfo psi = new ProcessStartInfo("chrome", "--app=\"" + rootUrl + "\"") { UseShellExecute = true };
-        try
-        {
-            Process.Start(psi);
-        }
-        catch
-        {
-            try
-            {
-                psi.FileName = "firefox";
-                psi.Arguments = rootUrl;
-                Process.Start(psi);
-            }
-            catch
-            {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    psi.FileName = "edge";
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    psi.FileName = "safari";
-                }
-                try
-                {
-                    Process.Start(psi);
-                }
-                catch
-                {
-                }
-            }
-        }
-    }
+builder.Services.AddMemoryCache();
 
 
+builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// TODO: Move this code to a better place
+try
+{
+    // var provider = builder.Services.BuildServiceProvider();
+
+    //  var mediator = provider.GetService<ISender>()!;
+    //  await mediator.Send(new AddDefaultRolesCommand());
+    //  await mediator.Send(new AddDefaultSystemConfigurationCommand());
+}
+catch (Exception ex)
+{
+    logger.Error(ex, "Error adding default roles.");
+}
+var app = builder.Build();
+// Configure the HTTP request pipeline.
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI(c =>
+//    {
+//        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
+//        c.DocExpansion(DocExpansion.List);
+//    });
+//}
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
+    c.DocExpansion(DocExpansion.List);
+});
+app.UseForwardedHeaders();
+
+//app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseCors(x => x
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(origin => true) // allow any origin
+    .AllowCredentials()
+    ); // allow credentials
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseStaticFiles(new StaticFileOptions()
+{
+    FileProvider = new PhysicalFileProvider(
+    Path.GetFullPath(ImagesPath)),
+    RequestPath = new PathString("/images"),
+    DefaultContentType = "application/octet-stream"
+});
+app.MapControllers();
+
+// Run app
+try
+{
+    app.Run();
+}
+finally
+{
+    logger.Dispose();
 }

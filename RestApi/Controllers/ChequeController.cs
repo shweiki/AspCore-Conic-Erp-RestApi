@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -9,8 +9,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class ChequeController : Controller
 {
-    private ConicErpContext DB;
-    public ChequeController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public ChequeController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -18,7 +18,7 @@ public class ChequeController : Controller
     [HttpGet]
     public IActionResult GetCheque()
     {
-        var Cheques = DB.Cheques.Select(x => new
+        var Cheques = DB.Cheque.Select(x => new
         {
             x.Id,
             x.BankAddress,
@@ -49,7 +49,7 @@ public class ChequeController : Controller
             try
             {
                 collection.Status = 0;
-                DB.Cheques.Add(collection);
+                DB.Cheque.Add(collection);
                 DB.SaveChanges();
 
             }

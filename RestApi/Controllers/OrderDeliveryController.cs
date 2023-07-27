@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,8 +11,8 @@ namespace RestApi.Controllers;
 
 public class OrderDeliveryController : Controller
 {
-    private ConicErpContext DB;
-    public OrderDeliveryController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public OrderDeliveryController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -29,7 +29,7 @@ public class OrderDeliveryController : Controller
             {
 
                 // TODO: Add insert logic here
-                DB.OrderDeliveries.Add(collection);
+                DB.OrderDelivery.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
             }
@@ -48,23 +48,23 @@ public class OrderDeliveryController : Controller
     public IActionResult CreateWithDriver(OrderDelivery collection)
     {
         List<long> OrderD = new List<long>();
-        var DriverList = DB.Drivers.Where(x => x.IsActive == 1)
+        var DriverList = DB.Driver.Where(x => x.IsActive == 1)
                   .Select(s => new { s.Id }).ToList();
         if (DriverList.Count > 0)
         {
             foreach (var d in DriverList)
             {
-                var LastDriverOrders = DB.OrderDeliveries.Where(x => x.DriverId == d.Id).ToList().LastOrDefault().OrderId;
+                var LastDriverOrders = DB.OrderDelivery.Where(x => x.DriverId == d.Id).ToList().LastOrDefault().OrderId;
                 OrderD.Add(LastDriverOrders);
             }
             OrderD.Sort();
             var smallest = OrderD[0];
             Console.WriteLine(OrderD);
 
-            var lastOrderDriverId = DB.OrderDeliveries.Where(x => x.OrderId == smallest).ToList().SingleOrDefault().DriverId;
+            var lastOrderDriverId = DB.OrderDelivery.Where(x => x.OrderId == smallest).ToList().SingleOrDefault().DriverId;
             collection.Status = 1;
             collection.DriverId = lastOrderDriverId;
-            DB.OrderDeliveries.Add(collection);
+            DB.OrderDelivery.Add(collection);
             DB.SaveChanges();
             return Ok(true);
 
@@ -80,9 +80,9 @@ public class OrderDeliveryController : Controller
     [Route("OrderDelivery/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var Deliveries = DB.OrderDeliveries.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
+        var Deliveries = DB.OrderDelivery.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
      && (DateTo == null || s.FakeDate <= DateTo) && (Status == null || s.Status == Status) &&
-     (User == null || DB.ActionLogs.Where(l => l.TableName == "OrderDelivery" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
+     (User == null || DB.ActionLog.Where(l => l.TableName == "OrderDelivery" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
      {
          x.Id,
          x.OrderId,
@@ -118,7 +118,7 @@ public class OrderDeliveryController : Controller
     public IActionResult GetOrderDelivery(int Limit, string Sort, int Page, int? Status, string Any)
 
     {
-        var Orders = DB.OrderDeliveries.Where(s => (s.Status != 4) && (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (Status == null || s.Status == Status)).Select(x => new
+        var Orders = DB.OrderDelivery.Where(s => (s.Status != 4) && (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (Status == null || s.Status == Status)).Select(x => new
         {
             x.Id,
             x.OrderId,
@@ -159,7 +159,7 @@ public class OrderDeliveryController : Controller
         {
             try
             {
-                OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == OrderId).SingleOrDefault();
+                OrderDelivery Order = DB.OrderDelivery.Where(x => x.Id == OrderId).SingleOrDefault();
                 Order.DriverId = DriverId;
                 Order.Status = 1;
 
@@ -182,8 +182,8 @@ public class OrderDeliveryController : Controller
     public IActionResult GetDriverOrder(string Id, string name, int Limit, string Sort, int Page, int? Status, string Any)
 
     {
-        var Orders = DB.OrderDeliveries.Where(x => (x.Driver.DriverUserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2 || x.Status == 3) && (Any == null || x.Id.ToString().Contains(Any) || x.Name.Contains(Any)) && (Status == null || x.Status == Status)).Select(x => new
-        // var Orders = DB.OrderDeliveries.Where(x => x.Driver.DriverUserId == Id || name == "Developer").Select(x => new
+        var Orders = DB.OrderDelivery.Where(x => (x.Driver.DriverUserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2 || x.Status == 3) && (Any == null || x.Id.ToString().Contains(Any) || x.Name.Contains(Any)) && (Status == null || x.Status == Status)).Select(x => new
+        // var Orders = DB.OrderDelivery.Where(x => x.Driver.DriverUserId == Id || name == "Developer").Select(x => new
         {
             x.Id,
             x.OrderId,
@@ -229,7 +229,7 @@ public class OrderDeliveryController : Controller
         {
             try
             {
-                OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == id).SingleOrDefault();
+                OrderDelivery Order = DB.OrderDelivery.Where(x => x.Id == id).SingleOrDefault();
                 int Status = 2;
                 string Description = "Received";
                 if (ChangeStatus(Order, Description, Status))
@@ -255,7 +255,7 @@ public class OrderDeliveryController : Controller
         {
             try
             {
-                OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == id).SingleOrDefault();
+                OrderDelivery Order = DB.OrderDelivery.Where(x => x.Id == id).SingleOrDefault();
                 int Status = 3;
                 string Description = "Delivered";
                 if (ChangeStatus(Order, Description, Status))
@@ -282,7 +282,7 @@ public class OrderDeliveryController : Controller
         {
             try
             {
-                OrderDelivery Order = DB.OrderDeliveries.Where(x => x.Id == id).SingleOrDefault();
+                OrderDelivery Order = DB.OrderDelivery.Where(x => x.Id == id).SingleOrDefault();
                 int Status = 4;
                 string Description = "Done";
                 if (ChangeStatus(Order, Description, Status))
@@ -305,9 +305,9 @@ public class OrderDeliveryController : Controller
     [Route("OrderDelivery/GetByListQByDriver")]
     public IActionResult GetByListQByDriver(string Id, string name, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var Deliveries = DB.OrderDeliveries.Where(s => (s.Driver.DriverUserId == Id || name == "Developer") && (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
+        var Deliveries = DB.OrderDelivery.Where(s => (s.Driver.DriverUserId == Id || name == "Developer") && (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
         && (DateTo == null || s.FakeDate <= DateTo) && (Status == null || s.Status == Status) &&
-        (User == null || DB.ActionLogs.Where(l => l.TableName == "OrderDelivery" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
+        (User == null || DB.ActionLog.Where(l => l.TableName == "OrderDelivery" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
         {
             x.Id,
             x.OrderId,
@@ -340,11 +340,11 @@ public class OrderDeliveryController : Controller
         log.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
         log.Description = Description;
         log.TableName = "OrderDelivery";
-        DB.OrderDeliveries.Where(x => x.Id == Order.DriverId).SingleOrDefault().Status = Status;
+        DB.OrderDelivery.Where(x => x.Id == Order.DriverId).SingleOrDefault().Status = Status;
 
 
-        // ActionLogController logCon = new ActionLogController(ConicErpContext Db);
-        DB.ActionLogs.Add(log);
+        // ActionLogController logCon = new ActionLogController(IApplicationDbContext Db);
+        DB.ActionLog.Add(log);
 
         DB.SaveChanges();
         return true;

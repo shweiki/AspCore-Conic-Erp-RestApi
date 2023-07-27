@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -10,8 +10,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class InventoryItemController : Controller
 {
-    private ConicErpContext DB;
-    public InventoryItemController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public InventoryItemController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -24,7 +24,7 @@ public class InventoryItemController : Controller
         {
             try
             {
-                DB.InventoryItems.Add(collection);
+                DB.InventoryItem.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
 
@@ -44,7 +44,7 @@ public class InventoryItemController : Controller
     {
         if (ModelState.IsValid)
         {
-            InventoryItem InventoryItem = DB.InventoryItems.Where(x => x.Id == collection.Id).SingleOrDefault();
+            InventoryItem InventoryItem = DB.InventoryItem.Where(x => x.Id == collection.Id).SingleOrDefault();
             InventoryItem.Name = collection.Name;
             InventoryItem.Description = collection.Description;
             try
@@ -65,7 +65,7 @@ public class InventoryItemController : Controller
     [HttpGet]
     public IActionResult GetInventoryItem()
     {
-        var InventoryItems = DB.InventoryItems.Select(x => new
+        var InventoryItems = DB.InventoryItem.Select(x => new
         {
             x.Id,
             x.Name,
@@ -81,7 +81,7 @@ public class InventoryItemController : Controller
     [HttpGet]
     public IActionResult GetActiveInventory()
     {
-        var InventoryItems = DB.InventoryItems.Where(x => x.Status == 0).Select(x => new { value = x.Id, label = x.Name }).ToList();
+        var InventoryItems = DB.InventoryItem.Where(x => x.Status == 0).Select(x => new { value = x.Id, label = x.Name }).ToList();
         return Ok(InventoryItems);
 
     }
@@ -90,12 +90,12 @@ public class InventoryItemController : Controller
     [HttpPost]
     public IActionResult InventoryQty(long Id)
     {
-        var InventoryQty = (from i in DB.InventoryMovements.Where(o => o.InventoryItemId == Id).ToList()
+        var InventoryQty = (from i in DB.InventoryMovement.Where(o => o.InventoryItemId == Id).ToList()
                             group i by i.ItemsId into g
                             select new
                             {
 
-                                Item = DB.Items.Where(x => x.Id == g.Key).Select(x => new
+                                Item = DB.Item.Where(x => x.Id == g.Key).Select(x => new
                                 {
                                     x.Id,
                                     x.CostPrice,

@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,8 +11,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class WorkShopController : Controller
 {
-    private ConicErpContext DB;
-    public WorkShopController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public WorkShopController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -19,8 +20,8 @@ public class WorkShopController : Controller
     [Route("WorkShop/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var Invoices = DB.WorkShops.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any)) && (DateFrom == null || s.DeliveryDate >= DateFrom)
-        && (DateTo == null || s.DeliveryDate <= DateTo) && (Status == null || s.Status == Status) && (User == null || DB.ActionLogs.Where(l => l.TableName == "WorkShop" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
+        var Invoices = DB.WorkShop.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any)) && (DateFrom == null || s.DeliveryDate >= DateFrom)
+        && (DateTo == null || s.DeliveryDate <= DateTo) && (Status == null || s.Status == Status) && (User == null || DB.ActionLog.Where(l => l.TableName == "WorkShop" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
         {
             x.Id,
             x.Discount,
@@ -67,7 +68,7 @@ public class WorkShopController : Controller
     [HttpGet]
     public IActionResult GetWorkShop(DateTime DateFrom, DateTime DateTo)
     {
-        var Invoices = DB.WorkShops.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new
+        var Invoices = DB.WorkShop.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new
         {
 
             x.Id,
@@ -80,7 +81,7 @@ public class WorkShopController : Controller
             x.DeliveryDate,
             x.LowCost,
             x.Description,
-            InventoryMovements = DB.InventoryMovements.Where(i => i.WorkShopId == x.Id && i.TypeMove == "In").Select(m => new
+            InventoryMovements = DB.InventoryMovement.Where(i => i.WorkShopId == x.Id && i.TypeMove == "In").Select(m => new
             {
                 m.Id,
                 m.Items.Name,
@@ -99,15 +100,15 @@ public class WorkShopController : Controller
     [HttpGet]
     public IActionResult GetByItem(long ItemId, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
     {
-        var Invoices = DB.InventoryMovements.Where(s => s.WorkShopId != null && s.ItemsId == ItemId && (Any == null || s.Id.ToString().Contains(Any) || s.WorkShop.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.WorkShop.Description.Contains(Any) || s.WorkShop.Name.Contains(Any)) && (DateFrom == null || s.WorkShop.FakeDate >= DateFrom)
+        var Invoices = DB.InventoryMovement.Where(s => s.WorkShopId != null && s.ItemsId == ItemId && (Any == null || s.Id.ToString().Contains(Any) || s.WorkShop.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.WorkShop.Description.Contains(Any) || s.WorkShop.Name.Contains(Any)) && (DateFrom == null || s.WorkShop.FakeDate >= DateFrom)
           && (DateTo == null || s.WorkShop.FakeDate <= DateTo) && (Status == null || s.Status == Status)
-          && (User == null || DB.ActionLogs.Where(l => l.TableName == "InventoryMovement" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
+          && (User == null || DB.ActionLog.Where(l => l.TableName == "InventoryMovement" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
           {
               x.Id,
               x.WorkShopId,
               x.WorkShop.Discount,
               x.Tax,
-              Name = x.WorkShop.Name, //+ DB.Vendors.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Members.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
+              Name = x.WorkShop.Name, //+ DB.Vendor.Where(v => v.Id == x.VendorId).SingleOrDefault().Name + DB.Member.Where(v => v.Id == x.MemberId).SingleOrDefault().Name,
               x.WorkShop.FakeDate,
               x.WorkShop.DeliveryDate,
               x.WorkShop.PaymentMethod,
@@ -116,8 +117,8 @@ public class WorkShopController : Controller
               x.WorkShop.VendorId,
               x.WorkShop.Vendor,
               Total = x.SellingPrice * x.Qty,
-              //     ActionLogs = DB.ActionLogs.Where(l=>l.WorkShopId == x.Id).ToList(),
-              AccountId = DB.Vendors.Where(v => v.Id == x.WorkShop.VendorId).SingleOrDefault().AccountId.ToString(),
+              //     ActionLogs = DB.ActionLog.Where(l=>l.WorkShopId == x.Id).ToList(),
+              AccountId = DB.Vendor.Where(v => v.Id == x.WorkShop.VendorId).SingleOrDefault().AccountId.ToString(),
               InventoryMovements = x.WorkShop.InventoryMovements.Select(imx => new
               {
                   imx.Id,
@@ -159,8 +160,8 @@ public class WorkShopController : Controller
             try
             {
                 // TODO: Add insert logic here
-                collection.InventoryMovements.ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
-                DB.WorkShops.Add(collection);
+                collection.InventoryMovements.ToList().ForEach(s => DB.Item.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
+                DB.WorkShop.Add(collection);
                 DB.SaveChanges();
                 return Ok(collection.Id);
 
@@ -181,7 +182,7 @@ public class WorkShopController : Controller
         {
             try
             {
-                WorkShop Invoice = DB.WorkShops.Where(x => x.Id == collection.Id).SingleOrDefault();
+                WorkShop Invoice = DB.WorkShop.Where(x => x.Id == collection.Id).SingleOrDefault();
 
                 Invoice.Name = collection.Name;
                 Invoice.Tax = collection.Tax;
@@ -194,9 +195,9 @@ public class WorkShopController : Controller
                 Invoice.DeliveryDate = collection.DeliveryDate;
                 Invoice.LowCost = collection.LowCost;
                 Invoice.PaymentMethod = collection.PaymentMethod;
-                DB.InventoryMovements.RemoveRange(DB.InventoryMovements.Where(x => x.WorkShopId == Invoice.Id).ToList());
+                DB.InventoryMovement.RemoveRange(DB.InventoryMovement.Where(x => x.WorkShopId == Invoice.Id).ToList());
                 Invoice.InventoryMovements = collection.InventoryMovements;
-                Invoice.InventoryMovements.ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
+                Invoice.InventoryMovements.ToList().ForEach(s => DB.Item.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
 
                 DB.SaveChanges();
 
@@ -215,7 +216,7 @@ public class WorkShopController : Controller
     [HttpGet]
     public IActionResult GetWorkShopById(long? Id)
     {
-        var Invoices = DB.WorkShops.Where(i => i.Id == Id).Select(x => new
+        var Invoices = DB.WorkShop.Where(i => i.Id == Id).Select(x => new
         {
             x.Id,
             x.Name,
@@ -229,7 +230,7 @@ public class WorkShopController : Controller
             x.PaymentMethod,
             x.Status,
             x.Description,
-            InventoryMovements = DB.InventoryMovements.Where(i => i.WorkShopId == x.Id).Select(m => new
+            InventoryMovements = DB.InventoryMovement.Where(i => i.WorkShopId == x.Id).Select(m => new
             {
                 m.Id,
                 m.ItemsId,

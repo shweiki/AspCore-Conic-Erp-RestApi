@@ -1,4 +1,6 @@
-﻿using Domain;
+﻿
+using Domain;
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -11,9 +13,9 @@ namespace RestApi.Controllers;
 [Authorize]
 public class BankController : Controller
 {
-    private ConicErpContext DB;
+    private readonly IApplicationDbContext DB;
 
-    public BankController(ConicErpContext dbcontext)
+    public BankController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
 
@@ -23,8 +25,8 @@ public class BankController : Controller
     [HttpGet]
     public IActionResult Get()
     {
-        // return Ok(UW.Banks.Get());
-        var Banks = DB.Banks.Select(x => new
+        // return Ok(UW.Bank.Get());
+        var Banks = DB.Bank.Select(x => new
         {
             x.Id,
             x.Iban,
@@ -44,7 +46,7 @@ public class BankController : Controller
     [HttpGet]
     public IActionResult GetActive()
     {
-        var Banks = DB.Banks.Select(x => new { value = x.AccountId, label = x.Name }).ToList();
+        var Banks = DB.Bank.Select(x => new { value = x.AccountId, label = x.Name }).ToList();
         return Ok(Banks);
     }
     // POST: Banks
@@ -67,9 +69,9 @@ public class BankController : Controller
                     Description = collection.Description,
                     Status = 0,
                     Code = "",
-                    ParentId = DB.TreeAccounts.Where(x => x.Type == "Banks-Main").SingleOrDefault().Code
+                    ParentId = DB.TreeAccount.Where(x => x.Type == "Banks-Main").SingleOrDefault().Code
                 };
-                DB.Banks.Add(collection);
+                DB.Bank.Add(collection);
                 await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
 
 
@@ -92,7 +94,7 @@ public class BankController : Controller
         {
             try
             {
-                Bank bank = DB.Banks.Where(x => x.Id == collection.Id).SingleOrDefault();
+                Bank bank = DB.Bank.Where(x => x.Id == collection.Id).SingleOrDefault();
                 bank.Name = collection.Name;
                 bank.Description = collection.Description;
                 bank.Iban = collection.Iban;

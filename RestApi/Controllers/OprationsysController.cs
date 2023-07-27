@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,9 +18,9 @@ public class OprationsysController : Controller
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly ILogger<UserController> _logger;
-    private ConicErpContext DB;
+    private readonly IApplicationDbContext DB;
 
-    public OprationsysController(ConicErpContext dbcontext, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
+    public OprationsysController(IApplicationDbContext dbcontext, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -32,7 +32,7 @@ public class OprationsysController : Controller
     public IActionResult GetOpration()
     {
 
-        var Oprations = DB.Oprationsys.Select(x => new
+        var Oprations = DB.Oprationsy.Select(x => new
         {
             x.Id,
             x.OprationName,
@@ -54,7 +54,7 @@ public class OprationsysController : Controller
     [HttpGet]
     public IActionResult GetOprationByTable(string Name)
     {
-        var Oprations = DB.Oprationsys.Where(f => f.TableName == Name).Select(x => new
+        var Oprations = DB.Oprationsy.Where(f => f.TableName == Name).Select(x => new
         {
             x.Id,
             x.OprationName,
@@ -77,7 +77,7 @@ public class OprationsysController : Controller
     [HttpGet]
     public IActionResult GetOprationByStatusTable(string TableName, int Status)
     {
-        var Oprations = DB.Oprationsys.Where(i => i.Status == Status && i.TableName == TableName).Select(x => new
+        var Oprations = DB.Oprationsy.Where(i => i.Status == Status && i.TableName == TableName).Select(x => new
         {
             x.Id,
             x.OprationName,
@@ -100,7 +100,7 @@ public class OprationsysController : Controller
     [HttpGet]
     public IActionResult GetNextOprationByStatusTable(string TableName, int Status)
     {
-        var NextOprations = DB.Oprationsys.Where(i => i.ReferenceStatus == Status && i.TableName == TableName).Select(x => new
+        var NextOprations = DB.Oprationsy.Where(i => i.ReferenceStatus == Status && i.TableName == TableName).Select(x => new
         {
             x.Id,
             x.OprationName,
@@ -123,7 +123,7 @@ public class OprationsysController : Controller
     [HttpPost]
     public IActionResult ChangeObjStatusByTableName(long ObjId, string TableName, int Status, string Description)
     {
-        Oprationsy Op = DB.Oprationsys.Where(x => x.TableName == TableName && x.Status == Status).SingleOrDefault();
+        Oprationsy Op = DB.Oprationsy.Where(x => x.TableName == TableName && x.Status == Status).SingleOrDefault();
         if (ChangeStatus(ObjId, Op, Description))
         {
             return Ok(true);
@@ -134,7 +134,7 @@ public class OprationsysController : Controller
     [HttpPost]
     public IActionResult ChangeObjStatus(long ObjId, long OprationId, string Description)
     {
-        Oprationsy Op = DB.Oprationsys.Where(x => x.Id == OprationId).SingleOrDefault();
+        Oprationsy Op = DB.Oprationsy.Where(x => x.Id == OprationId).SingleOrDefault();
 
         if (ChangeStatus(ObjId, Op, Description))
         {
@@ -147,7 +147,7 @@ public class OprationsysController : Controller
     [HttpPost]
     public IActionResult ChangeArrObjStatus(List<int> ObjsId, string TableName, int Status, string Description)
     {
-        Oprationsy Op = DB.Oprationsys.Where(x => x.TableName == TableName && x.Status == Status).SingleOrDefault();
+        Oprationsy Op = DB.Oprationsy.Where(x => x.TableName == TableName && x.Status == Status).SingleOrDefault();
 
         foreach (long O in ObjsId)
         {
@@ -165,7 +165,7 @@ public class OprationsysController : Controller
             try
             {
                 // TODO: Add insert logic here
-                DB.Oprationsys.Add(collection);
+                DB.Oprationsy.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
             }
@@ -184,7 +184,7 @@ public class OprationsysController : Controller
     {
         if (ModelState.IsValid)
         {
-            Oprationsy Opration = DB.Oprationsys.Where(x => x.Id == collection.Id).SingleOrDefault();
+            Oprationsy Opration = DB.Oprationsy.Where(x => x.Id == collection.Id).SingleOrDefault();
             Opration.OprationName = collection.OprationName;
             Opration.Status = collection.Status;
             Opration.ReferenceStatus = collection.ReferenceStatus;
@@ -230,97 +230,97 @@ public class OprationsysController : Controller
         switch (Oprationsys.TableName)
         {
             case "InventoryItem":
-                DB.InventoryItems.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.InventoryItem.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "OrderInventory":
-                DB.OrderInventories.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
-                DB.InventoryMovements.Where(x => x.OrderInventoryId == ObjId).ToList().ForEach(b => b.Status = Oprationsys.Status);
+                DB.OrderInventory.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.InventoryMovement.Where(x => x.OrderInventoryId == ObjId).ToList().ForEach(b => b.Status = Oprationsys.Status);
                 break;
             case "StocktakingInventory":
-                DB.StocktakingInventories.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.StocktakingInventory.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "UnitItem":
-                DB.UnitItems.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.UnitItem.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "MenuItem":
-                DB.MenuItems.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.MenuItem.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "OriginItem":
-                DB.OriginItems.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.OriginItem.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Item":
-                DB.Items.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Item.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Vendor":
-                DB.Vendors.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Vendor.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "InventoryMovement":
-                DB.InventoryMovements.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.InventoryMovement.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "StockMovement":
-                DB.StockMovements.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.StockMovement.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "SalesInvoice":
-                DB.SalesInvoices.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
-                DB.InventoryMovements.Where(x => x.SalesInvoiceId == ObjId).ToList().ForEach(b => b.Status = Oprationsys.Status);
+                DB.SalesInvoice.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.InventoryMovement.Where(x => x.SalesInvoiceId == ObjId).ToList().ForEach(b => b.Status = Oprationsys.Status);
                 break;
             case "PurchaseInvoice":
-                DB.PurchaseInvoices.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
-                DB.InventoryMovements.Where(x => x.PurchaseInvoiceId == ObjId).ToList().ForEach(b => b.Status = Oprationsys.Status);
+                DB.PurchaseInvoice.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.InventoryMovement.Where(x => x.PurchaseInvoiceId == ObjId).ToList().ForEach(b => b.Status = Oprationsys.Status);
                 break;
             case "Account":
-                DB.TreeAccounts.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.TreeAccount.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "EntryAccounting":
-                DB.EntryAccountings.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.EntryAccounting.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Payment":
-                DB.Payments.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Payment.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Member":
-                DB.Members.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Member.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Membership":
-                DB.Memberships.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Membership.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "MembershipMovement":
-                DB.MembershipMovements.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.MembershipMovement.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "MembershipMovementOrder":
-                DB.MembershipMovementOrders.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.MembershipMovementOrder.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Bank":
-                DB.Banks.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Bank.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Cheque":
-                DB.Cheques.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Cheque.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Cash":
-                DB.Cashes.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Cash.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Discount":
-                DB.Discounts.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Discount.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Service":
-                DB.Services.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Service.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Area":
-                DB.Areas.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Area.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Driver":
-                DB.Drivers.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Driver.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "OrderDelivery":
-                DB.OrderDeliveries.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.OrderDelivery.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Visit":
-                DB.Visits.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Visit.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "OrderRestaurant":
-                DB.OrderRestaurants.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.OrderRestaurant.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             case "Employee":
-                DB.Employees.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
+                DB.Employee.Where(x => x.Id == ObjId).SingleOrDefault().Status = Oprationsys.Status;
                 break;
             default:
                 log.Fktable = ObjId.ToString();
@@ -328,7 +328,7 @@ public class OprationsysController : Controller
 
         }
         log.Fktable = ObjId.ToString();
-        DB.ActionLogs.Add(log);
+        DB.ActionLog.Add(log);
         DB.SaveChanges();
         return true;
 

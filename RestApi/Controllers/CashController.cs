@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -9,9 +10,9 @@ namespace RestApi.Controllers;
 [Authorize]
 public class CashesController : Controller
 {
-    private ConicErpContext DB;
+    private readonly IApplicationDbContext DB;
 
-    public CashesController(ConicErpContext dbcontext)
+    public CashesController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
 
@@ -21,13 +22,13 @@ public class CashesController : Controller
     [HttpGet]
     public IActionResult GetCashes()
     {
-        return Ok(DB.Cashes.ToList());
+        return Ok(DB.Cash.ToList());
     }
     [Route("Cash/GetActive")]
     [HttpGet]
     public IActionResult GetActive()
     {
-        var Cash = DB.Cashes.Where(
+        var Cash = DB.Cash.Where(
             x => x.Status != -1).Select(x => new { value = x.AccountId, label = x.Name }).ToList();
         return Ok(Cash);
     }
@@ -39,7 +40,7 @@ public class CashesController : Controller
     {
         if (ModelState.IsValid)
         {
-            Cash cash = DB.Cashes.Where(x => x.Id == collection.Id).SingleOrDefault();
+            Cash cash = DB.Cash.Where(x => x.Id == collection.Id).SingleOrDefault();
             cash.Pcip = collection.Pcip;
             cash.Btcash = collection.Btcash;
             cash.Description = collection.Description;
@@ -75,15 +76,15 @@ public class CashesController : Controller
                     Description = collection.Description,
                     Status = 0,
                     Code = "",
-                    ParentId = DB.TreeAccounts.Where(x => x.Type == "Cashes-Main").SingleOrDefault().Code
+                    ParentId = DB.TreeAccount.Where(x => x.Type == "Cashes-Main").SingleOrDefault().Code
 
                 };
-                DB.TreeAccounts.Add(NewAccount);
+                DB.TreeAccount.Add(NewAccount);
                 DB.SaveChanges();
                 // TODO: Add insert logic here
                 collection.Status = 0;
                 collection.AccountId = NewAccount.Id;
-                DB.Cashes.Add(collection);
+                DB.Cash.Add(collection);
                 DB.SaveChanges();
             }
             catch

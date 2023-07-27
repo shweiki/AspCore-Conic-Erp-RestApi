@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -8,8 +9,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class AdjustmentController : Controller
 {
-    private ConicErpContext DB;
-    public AdjustmentController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public AdjustmentController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -23,7 +24,7 @@ public class AdjustmentController : Controller
             try
             {
 
-                DB.Adjustments.Add(collection);
+                DB.Adjustment.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
             }
@@ -43,7 +44,7 @@ public class AdjustmentController : Controller
     {
         try
         {
-            var Adjustments = DB.Adjustments
+            var Adjustments = DB.Adjustment
                 .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsStaticAdjustment }).ToList();
 
             return Ok(Adjustments);
@@ -61,7 +62,7 @@ public class AdjustmentController : Controller
     {
         try
         {
-            var Adjustments = DB.Adjustments
+            var Adjustments = DB.Adjustment
                 .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsStaticAdjustment }).ToList();
 
             return Ok(Adjustments);
@@ -78,7 +79,7 @@ public class AdjustmentController : Controller
     {
         try
         {
-            var Adjustments = DB.Adjustments.Where(x => x.IsStaticAdjustment == true)
+            var Adjustments = DB.Adjustment.Where(x => x.IsStaticAdjustment == true)
                 .Select(x => new { x.Id, x.Name, x.AdjustmentAmount, x.Type, x.IsStaticAdjustment }).ToList();
 
             return Ok(Adjustments);
@@ -97,7 +98,7 @@ public class AdjustmentController : Controller
     {
         try
         {
-            var Adjustments = DB.Adjustments.Select(x => new
+            var Adjustments = DB.Adjustment.Select(x => new
             {
                 value = x.Id,
                 label = x.Name,

@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -9,8 +9,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class ServiceController : Controller
 {
-    private ConicErpContext DB;
-    public ServiceController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public ServiceController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -18,14 +18,14 @@ public class ServiceController : Controller
     [HttpGet]
     public IActionResult GetService()
     {
-        var Services = DB.Services.Select(x => new
+        var Services = DB.Service.Select(x => new
         {
             x.Id,
             x.Name,
             x.Qty,
             x.SellingPrice,
             x.ItemId,
-            ItemName = DB.Items.Where(i => i.Id == x.ItemId).SingleOrDefault().Name,
+            ItemName = DB.Item.Where(i => i.Id == x.ItemId).SingleOrDefault().Name,
             x.Type,
             x.Status,
             x.Description,
@@ -37,7 +37,7 @@ public class ServiceController : Controller
     [HttpGet]
     public IActionResult GetActiveService()
     {
-        var Services = DB.Services.Where(i => i.Status == 0).Select(x => new
+        var Services = DB.Service.Where(i => i.Status == 0).Select(x => new
         {
 
             x.Id,
@@ -45,7 +45,7 @@ public class ServiceController : Controller
             x.Qty,
             x.SellingPrice,
             x.ItemId,
-            ItemName = DB.Items.Where(i => i.Id == x.ItemId).SingleOrDefault().Name,
+            ItemName = DB.Item.Where(i => i.Id == x.ItemId).SingleOrDefault().Name,
             x.Type,
             x.Status,
             x.Description,
@@ -62,7 +62,7 @@ public class ServiceController : Controller
         {
             try
             {
-                DB.Services.Add(collection);
+                DB.Service.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
 
@@ -81,7 +81,7 @@ public class ServiceController : Controller
     {
         if (ModelState.IsValid)
         {
-            Service Service = DB.Services.Where(x => x.Id == collection.Id).SingleOrDefault();
+            Service Service = DB.Service.Where(x => x.Id == collection.Id).SingleOrDefault();
             Service.Name = collection.Name;
             Service.Qty = collection.Qty;
             Service.SellingPrice = collection.SellingPrice;

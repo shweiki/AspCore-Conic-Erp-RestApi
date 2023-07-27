@@ -1,17 +1,17 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NinjaNye.SearchExtensions;
 using System.Data;
-using System.Linq;
 
 namespace RestApi.Controllers;
 
 [Authorize]
 public class TreeAccountController : Controller
 {
-    private readonly ConicErpContext DB;
-    public TreeAccountController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public TreeAccountController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -21,7 +21,7 @@ public class TreeAccountController : Controller
     {
         var Accounts = new
         {
-            Accounts = DB.TreeAccounts.Where(i => i.Status == 0).Select(x => new
+            Accounts = DB.TreeAccount.Where(i => i.Status == 0).Select(x => new
             {
                 x.Id,
                 x.Description,
@@ -29,8 +29,8 @@ public class TreeAccountController : Controller
                 x.Code,
                 x.Name,
                 x.ParentId,
-                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
-                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
+                TotalDebit = DB.EntryMovement.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
+                TotalCredit = DB.EntryMovement.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
                 x.Type,
             }).ToList()
 
@@ -43,7 +43,7 @@ public class TreeAccountController : Controller
     [Route("Account/CheckIsExist")]
     public IActionResult CheckIsExist(string Name, string Type)
     {
-        var Account = DB.TreeAccounts.Where(m => m.Name == Name && m.Type == Type).ToList();
+        var Account = DB.TreeAccount.Where(m => m.Name == Name && m.Type == Type).ToList();
 
         return Ok(Account.Count() > 0 ? true : false);
     }
@@ -53,7 +53,7 @@ public class TreeAccountController : Controller
     public IActionResult GetTreeAccount()
     {
 
-        var Accounts = DB.TreeAccounts.Select(x => new
+        var Accounts = DB.TreeAccount.Select(x => new
         {
             x.Id,
             x.Description,
@@ -61,8 +61,8 @@ public class TreeAccountController : Controller
             Code = x.Code == null ? "" : x.Code,
             x.Name,
             x.ParentId,
-            TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
-            TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
+            TotalDebit = DB.EntryMovement.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
+            TotalCredit = DB.EntryMovement.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
             x.Type,
             children = new { }
         }).ToList();
@@ -74,7 +74,7 @@ public class TreeAccountController : Controller
     [HttpGet]
     public IActionResult GetActiveAccounts()
     {
-        var ActiveAccounts = DB.TreeAccounts.Where(x => x.Status == 0).Select(x => new
+        var ActiveAccounts = DB.TreeAccount.Where(x => x.Status == 0).Select(x => new
         {
             value = x.Id,
             label = (x.Members.Where(m => m.AccountId == x.Id).FirstOrDefault().Name != null ? x.Members.Where(m => m.AccountId == x.Id).FirstOrDefault().Name : x.Vendors.Where(m => m.AccountId == x.Id).FirstOrDefault().Name) + " - " + x.Name,
@@ -89,7 +89,7 @@ public class TreeAccountController : Controller
         {
             try
             {
-                TreeAccount account = DB.TreeAccounts.Where(x => x.Id == ID).SingleOrDefault();
+                TreeAccount account = DB.TreeAccount.Where(x => x.Id == ID).SingleOrDefault();
 
                 account.ParentId = ParentId;
                 DB.SaveChanges();
@@ -109,7 +109,7 @@ public class TreeAccountController : Controller
     {
         if (Any == null) return NotFound();
         Any = Any.ToLower();
-        var Accounts = DB.TreeAccounts.Where(a => !a.Type.Contains("Main")).Search(x => x.Name, x => x.Code, x => x.Id.ToString(), x => x.Type, x => x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name, x => x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name).Containing(Any)
+        var Accounts = DB.TreeAccount.Where(a => !a.Type.Contains("Main")).Search(x => x.Name, x => x.Code, x => x.Id.ToString(), x => x.Type, x => x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name, x => x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name).Containing(Any)
             .Select(x => new
             {
                 x.Id,
@@ -135,7 +135,7 @@ public class TreeAccountController : Controller
     [Route("Account/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
     {
-        var Accounts = DB.TreeAccounts.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Code.Contains(Any) || s.Type.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+        var Accounts = DB.TreeAccount.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Code.Contains(Any) || s.Type.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
         {
             x.Id,
             x.Name,
@@ -165,7 +165,7 @@ public class TreeAccountController : Controller
     [Route("Account/GetInComeAccounts")]
     public IActionResult GetInComeAccounts()
     {
-        var InComeAccounts = DB.TreeAccounts.Where(i => i.Type == "InCome").Select(x => new
+        var InComeAccounts = DB.TreeAccount.Where(i => i.Type == "InCome").Select(x => new
         {
             value = x.Id,
             Code = x.Code,
@@ -179,7 +179,7 @@ public class TreeAccountController : Controller
     [Route("Account/GetMainAccount")]
     public IActionResult GetMainAccount()
     {
-        var InComeAccounts = DB.TreeAccounts.Where(i => i.Type.Contains("Main")).Select(x => new
+        var InComeAccounts = DB.TreeAccount.Where(i => i.Type.Contains("Main")).Select(x => new
         {
             value = x.Id,
             Code = x.Code,
@@ -192,7 +192,7 @@ public class TreeAccountController : Controller
     [Route("Account/GetPayables")]
     public IActionResult GetPayables(int Limit, string Sort, int Page, bool WithZero, string Any)
     {
-        var Accounts = DB.TreeAccounts.Where(f => (Any != null ? f.Id.ToString().Contains(Any) : true) && (f.EntryMovements.Select(d => d.Credit).Sum() - f.EntryMovements.Select(d => d.Debit).Sum()) < 0).Select(x => new
+        var Accounts = DB.TreeAccount.Where(f => (Any != null ? f.Id.ToString().Contains(Any) : true) && (f.EntryMovements.Select(d => d.Credit).Sum() - f.EntryMovements.Select(d => d.Debit).Sum()) < 0).Select(x => new
         {
             x.Id,
             x.Description,
@@ -200,8 +200,8 @@ public class TreeAccountController : Controller
             x.Code,
             Name = x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? x.Name : x.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : x.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
             x.ParentId,
-            TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
-            TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
+            TotalDebit = DB.EntryMovement.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
+            TotalCredit = DB.EntryMovement.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
             x.Type,
         }).ToList();
         Accounts = (Sort == "+id" ? Accounts.OrderBy(s => s.Id).ToList() : Accounts.OrderByDescending(s => s.Id).ToList());
@@ -222,7 +222,7 @@ public class TreeAccountController : Controller
     [Route("Account/GetReceivables")]
     public IActionResult GetReceivables(int Limit, string Sort, int Page, bool WithZero, string Any)
     {
-        var Accounts = DB.TreeAccounts.Where(f => (Any != null ? f.Id.ToString().Contains(Any) : true) && (f.EntryMovements.Select(d => d.Credit).Sum() - f.EntryMovements.Select(d => d.Debit).Sum()) > 0).Select(x => new
+        var Accounts = DB.TreeAccount.Where(f => (Any != null ? f.Id.ToString().Contains(Any) : true) && (f.EntryMovements.Select(d => d.Credit).Sum() - f.EntryMovements.Select(d => d.Debit).Sum()) > 0).Select(x => new
         {
             x.Id,
             x.Description,
@@ -230,8 +230,8 @@ public class TreeAccountController : Controller
             x.Code,
             x.Name,
             x.ParentId,
-            TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
-            TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
+            TotalDebit = DB.EntryMovement.Where(l => l.AccountId == x.Id).Select(d => d.Debit).Sum(),
+            TotalCredit = DB.EntryMovement.Where(l => l.AccountId == x.Id).Select(c => c.Credit).Sum(),
             x.Type,
         }).ToList();
         Accounts = (Sort == "+id" ? Accounts.OrderBy(s => s.Id).ToList() : Accounts.OrderByDescending(s => s.Id).ToList());
@@ -252,7 +252,7 @@ public class TreeAccountController : Controller
     [Route("Account/GetById")]
     public IActionResult GetById(long Id)
     {
-        var Account = DB.TreeAccounts.Where(i => i.Id == Id).Select(x => new
+        var Account = DB.TreeAccount.Where(i => i.Id == Id).Select(x => new
         {
             x.Id,
             x.Name,
@@ -274,7 +274,7 @@ public class TreeAccountController : Controller
             try
             {
                 // TODO: Add insert logic here
-                DB.TreeAccounts.Add(collection);
+                DB.TreeAccount.Add(collection);
                 DB.SaveChanges();
 
                 return Ok(true);
@@ -295,7 +295,7 @@ public class TreeAccountController : Controller
         {
             try
             {
-                TreeAccount account = DB.TreeAccounts.Where(x => x.Id == collection.Id).SingleOrDefault();
+                TreeAccount account = DB.TreeAccount.Where(x => x.Id == collection.Id).SingleOrDefault();
                 account.Name = collection.Name;
                 account.Code = collection.Code;
                 account.Type = collection.Type;
@@ -321,13 +321,13 @@ public class TreeAccountController : Controller
         {
             try
             {
-                TreeAccount collection = DB.TreeAccounts.Where(x => x.Id == Id).SingleOrDefault();
-                if (DB.EntryMovements.Where(x => x.AccountId == collection.Id).SingleOrDefault() != null)
+                TreeAccount collection = DB.TreeAccount.Where(x => x.Id == Id).SingleOrDefault();
+                if (DB.EntryMovement.Where(x => x.AccountId == collection.Id).SingleOrDefault() != null)
                     return Ok(false);
 
                 else
                 {
-                    DB.TreeAccounts.Remove(collection);
+                    DB.TreeAccount.Remove(collection);
                     DB.SaveChanges();
                     return Ok(true);
                 }

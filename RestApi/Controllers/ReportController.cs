@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -9,8 +10,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class ReportController : Controller
 {
-    private ConicErpContext DB;
-    public ReportController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public ReportController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -19,7 +20,7 @@ public class ReportController : Controller
     [Route("Report/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string Any)
     {
-        var Reports = DB.Reports.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Type.Contains(Any) : true)).Select(x => new
+        var Reports = DB.Report.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Type.Contains(Any) : true)).Select(x => new
         {
             x.Id,
             x.Name,
@@ -44,7 +45,7 @@ public class ReportController : Controller
     [HttpGet]
     public IActionResult GetReportByType(string Type)
     {
-        var Reports = DB.Reports.Where(i => i.Type == Type).Select(x => new
+        var Reports = DB.Report.Where(i => i.Type == Type).Select(x => new
         {
             x.Id,
             x.Name,
@@ -60,7 +61,7 @@ public class ReportController : Controller
     [HttpGet]
     public IActionResult GetReport(int Id)
     {
-        var Reports = DB.Reports.Where(i => i.Id == Id).Select(x => new
+        var Reports = DB.Report.Where(i => i.Id == Id).Select(x => new
         {
             x.Id,
             x.Name,
@@ -77,7 +78,7 @@ public class ReportController : Controller
     public IActionResult GetTotal()
     {
 
-        return Ok(DB.Reports.Count());
+        return Ok(DB.Report.Count());
     }
 
     [Route("Report/Create")]
@@ -89,7 +90,7 @@ public class ReportController : Controller
             try
             {
                 // TODO: Add insert logic here
-                DB.Reports.Add(collection);
+                DB.Report.Add(collection);
                 DB.SaveChanges();
                 return Ok(collection.Id);
 
@@ -111,7 +112,7 @@ public class ReportController : Controller
         {
             try
             {
-                Report Report = DB.Reports.Where(x => x.Id == collection.Id).SingleOrDefault();
+                Report Report = DB.Report.Where(x => x.Id == collection.Id).SingleOrDefault();
 
                 Report.Name = collection.Name;
                 Report.Type = collection.Type;
@@ -138,7 +139,7 @@ public class ReportController : Controller
     [HttpGet]
     public IActionResult GetReportById(long? Id)
     {
-        var Report = DB.Reports.Where(i => i.Id == Id).Select(x => new
+        var Report = DB.Report.Where(i => i.Id == Id).Select(x => new
         {
             x.Id,
             x.Name,

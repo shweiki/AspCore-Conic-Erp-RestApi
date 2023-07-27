@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,8 +11,8 @@ namespace RestApi.Controllers;
 
 public class OrderInventoryController : Controller
 {
-    private ConicErpContext DB;
-    public OrderInventoryController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public OrderInventoryController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -21,8 +21,8 @@ public class OrderInventoryController : Controller
     [Route("OrderInventory/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var OrderInventory = DB.OrderInventories.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.OrderType.Contains(Any) || s.Description.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
-        && (DateTo == null || s.FakeDate <= DateTo) && (Status == null || s.Status == Status) && (User == null || DB.ActionLogs.Where(l => l.TableName == "OrderInventory" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
+        var OrderInventory = DB.OrderInventory.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.OrderType.Contains(Any) || s.Description.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
+        && (DateTo == null || s.FakeDate <= DateTo) && (Status == null || s.Status == Status) && (User == null || DB.ActionLog.Where(l => l.TableName == "OrderInventory" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
         {
             x.Id,
             x.FakeDate,
@@ -59,9 +59,9 @@ public class OrderInventoryController : Controller
     [HttpGet]
     public IActionResult GetByItem(long ItemId, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
     {
-        var Invoices = DB.InventoryMovements.Where(s => s.OrderInventoryId != null && s.ItemsId == ItemId && (Any == null || s.Id.ToString().Contains(Any) || s.Description.Contains(Any) || s.OrderInventory.Description.Contains(Any) || s.OrderInventory.OrderType.Contains(Any)) && (DateFrom == null || s.OrderInventory.FakeDate >= DateFrom)
+        var Invoices = DB.InventoryMovement.Where(s => s.OrderInventoryId != null && s.ItemsId == ItemId && (Any == null || s.Id.ToString().Contains(Any) || s.Description.Contains(Any) || s.OrderInventory.Description.Contains(Any) || s.OrderInventory.OrderType.Contains(Any)) && (DateFrom == null || s.OrderInventory.FakeDate >= DateFrom)
           && (DateTo == null || s.OrderInventory.FakeDate <= DateTo) && (Status == null || s.Status == Status) && (Type == null || s.OrderInventory.OrderType == Type)
-          && (User == null || DB.ActionLogs.Where(l => l.TableName == "OrderInventory" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
+          && (User == null || DB.ActionLog.Where(l => l.TableName == "OrderInventory" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
           {
               x.Id,
               x.OrderInventoryId,
@@ -108,7 +108,7 @@ public class OrderInventoryController : Controller
             try
             {
                 // TODO: Add insert logic here
-                DB.OrderInventories.Add(collection);
+                DB.OrderInventory.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
 
@@ -129,13 +129,13 @@ public class OrderInventoryController : Controller
         {
             try
             {
-                OrderInventory Order = DB.OrderInventories.Where(x => x.Id == collection.Id).SingleOrDefault();
+                OrderInventory Order = DB.OrderInventory.Where(x => x.Id == collection.Id).SingleOrDefault();
 
                 Order.OrderType = collection.OrderType;
                 Order.Description = collection.Description;
                 Order.Status = collection.Status;
                 Order.FakeDate = collection.FakeDate;
-                DB.InventoryMovements.RemoveRange(DB.InventoryMovements.Where(x => x.OrderInventoryId == Order.Id).ToList());
+                DB.InventoryMovement.RemoveRange(DB.InventoryMovement.Where(x => x.OrderInventoryId == Order.Id).ToList());
                 Order.InventoryMovements = collection.InventoryMovements;
 
                 DB.SaveChanges();
@@ -155,7 +155,7 @@ public class OrderInventoryController : Controller
     [HttpGet]
     public IActionResult GetOrderInventoryById(long? Id)
     {
-        var Orders = DB.OrderInventories.Where(i => i.Id == Id).Select(x => new
+        var Orders = DB.OrderInventory.Where(i => i.Id == Id).Select(x => new
         {
 
             x.Id,
@@ -163,7 +163,7 @@ public class OrderInventoryController : Controller
             x.OrderType,
             x.Status,
             x.Description,
-            InventoryMovements = DB.InventoryMovements.Where(i => i.OrderInventoryId == x.Id).Select(m => new
+            InventoryMovements = DB.InventoryMovement.Where(i => i.OrderInventoryId == x.Id).Select(m => new
             {
                 m.Id,
                 m.Qty,

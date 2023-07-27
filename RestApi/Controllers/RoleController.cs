@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +14,10 @@ public class RoleController : Controller
 {
 
     private RoleManager<IdentityRole> _roleManager;
-    private ConicErpContext DB;
+    private readonly IApplicationDbContext DB;
 
 
-    public RoleController(ConicErpContext dbcontext, RoleManager<IdentityRole> roleManager)
+    public RoleController(IApplicationDbContext dbcontext, RoleManager<IdentityRole> roleManager)
     {
 
         _roleManager = roleManager;
@@ -28,15 +29,17 @@ public class RoleController : Controller
     [Route("Role/GetRoles")]
     public IActionResult GetRoles()
     {
-        var Roles = DB.Roles.Select(x => new
-        {
-            x.Id,
-            x.Name,
-            x.NormalizedName,
-            x.ConcurrencyStamp,
-        }).ToList();
+        var Roles = _roleManager.Roles.ToList();
 
-        return Ok(DB.Roles.ToList());
+        //var Roles = DB.Roles.Select(x => new
+        //{
+        //    x.Id,
+        //    x.Name,
+        //    x.NormalizedName,
+        //    x.ConcurrencyStamp,
+        //}).ToList();
+
+        return Ok(Roles);
     }
 
     [HttpPost]
@@ -72,13 +75,15 @@ public class RoleController : Controller
     }
     [HttpPost]
     [Route("Role/Edit")]
-    public IActionResult Edit(IdentityRole Role)
+    public async Task<IActionResult> Edit(IdentityRole Role)
     {
-        var role = DB.Roles.Where(x => x.Id == Role.Id).SingleOrDefault();
-        role.Name = Role.Name;
-        role.ConcurrencyStamp = Role.ConcurrencyStamp;
-        role.NormalizedName = Role.NormalizedName;
-        DB.SaveChanges();
+        await _roleManager.UpdateAsync(Role);
+
+        //var role = DB.Roles.Where(x => x.Id == Role.Id).SingleOrDefault();
+        //role.Name = Role.Name;
+        //role.ConcurrencyStamp = Role.ConcurrencyStamp;
+        //role.NormalizedName = Role.NormalizedName;
+        //DB.SaveChanges();
         return Ok(true);
 
     }

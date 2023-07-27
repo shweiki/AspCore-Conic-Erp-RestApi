@@ -1,5 +1,6 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,8 +12,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class VisitController : Controller
 {
-    private ConicErpContext DB;
-    public VisitController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public VisitController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -20,8 +21,8 @@ public class VisitController : Controller
     [Route("Visit/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
     {
-        var visits = DB.Visits.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.PaymentMethod.Contains(Any) || s.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
-        && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (Type != null ? s.Type == Type : true) && (User != null ? DB.ActionLogs.Where(l => l.TableName == "Visit" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        var visits = DB.Visit.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.PaymentMethod.Contains(Any) || s.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+        && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (Type != null ? s.Type == Type : true) && (User != null ? DB.ActionLog.Where(l => l.TableName == "Visit" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
         {
             x.Id,
             x.Name,
@@ -57,7 +58,7 @@ public class VisitController : Controller
     public IActionResult GetByAny(string Any, int Status)
     {
         if (Any == null || Any == "") return Ok();
-        var Visits = DB.Visits.Where(s => s.Status == Status && (s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any))
+        var Visits = DB.Visit.Where(s => s.Status == Status && (s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any))
         ).Select(x => new
         {
             x.Id,
@@ -82,7 +83,7 @@ public class VisitController : Controller
     [HttpGet]
     public IActionResult GetByStatus(DateTime? DateFrom, DateTime? DateTo, int? Status)
     {
-        var visits = DB.Visits.Where(s => (DateFrom != null ? s.FakeDate >= DateFrom : true)
+        var visits = DB.Visit.Where(s => (DateFrom != null ? s.FakeDate >= DateFrom : true)
         && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true)).Select(x => new
         {
             x.Id,
@@ -122,7 +123,7 @@ public class VisitController : Controller
             {
                 // TODO: Add insert logic here
                 // collection.FakeDate = collection.FakeDate.ToLocalTime();
-                DB.Visits.Add(collection);
+                DB.Visit.Add(collection);
                 DB.SaveChanges();
                 return Ok(collection.Id);
 
@@ -143,7 +144,7 @@ public class VisitController : Controller
         {
             try
             {
-                Visit visit = DB.Visits.Where(x => x.Id == collection.Id).SingleOrDefault();
+                Visit visit = DB.Visit.Where(x => x.Id == collection.Id).SingleOrDefault();
 
                 visit.Type = collection.Type;
                 visit.Tax = collection.Tax;
@@ -179,7 +180,7 @@ public class VisitController : Controller
         {
             try
             {
-                Visit visit = DB.Visits.Where(x => x.Id == ID).SingleOrDefault();
+                Visit visit = DB.Visit.Where(x => x.Id == ID).SingleOrDefault();
                 visit.PaymentMethod = PaymentMethod;
                 DB.SaveChanges();
                 return Ok(true);
@@ -197,7 +198,7 @@ public class VisitController : Controller
     public IActionResult GetByListId(string listid)
     {
         List<long> list = listid.Split(',').Select(long.Parse).ToList();
-        var visits = DB.Visits.Where(s => list.Contains(s.Id)).Select(x => new
+        var visits = DB.Visit.Where(s => list.Contains(s.Id)).Select(x => new
         {
             x.Id,
             x.Name,
@@ -233,7 +234,7 @@ public class VisitController : Controller
     [HttpGet]
     public IActionResult GetById(long? Id)
     {
-        var visit = DB.Visits.Where(x => x.Id == Id).Select(x => new
+        var visit = DB.Visit.Where(x => x.Id == Id).Select(x => new
         {
             x.Id,
             x.Name,

@@ -1,5 +1,6 @@
-﻿using RestApi.Enums;
-using Domain;
+﻿using Application.Common.Enums;
+
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -9,8 +10,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class MembershipController : Controller
 {
-    private readonly ConicErpContext DB;
-    public MembershipController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public MembershipController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -19,7 +20,7 @@ public class MembershipController : Controller
     [HttpGet]
     public IActionResult GetMembership()
     {
-        return Ok(DB.Memberships.Select(x => new
+        return Ok(DB.Membership.Select(x => new
         {
             x.Id,
             x.Name,
@@ -33,7 +34,7 @@ public class MembershipController : Controller
             x.Description,
             x.Status,
             x.NumberClass,
-            TotalMembers = DB.MembershipMovements.Where(l => l.MembershipId == x.Id && l.Status > 0).Count(),
+            TotalMembers = DB.MembershipMovement.Where(l => l.MembershipId == x.Id && l.Status > 0).Count(),
         }).ToList());
     }
 
@@ -41,7 +42,7 @@ public class MembershipController : Controller
     [HttpGet]
     public IActionResult GetActiveMembership()
     {
-        var Memberships = DB.Memberships.Where(x => x.Status == (int)MembershipStatus.Active).Select(
+        var Memberships = DB.Membership.Where(x => x.Status == (int)MembershipStatus.Active).Select(
             x => new
             {
                 x.Id,
@@ -56,7 +57,7 @@ public class MembershipController : Controller
                 x.Tax,
                 x.Rate,
                 x.NumberClass,
-                TotalMembers = DB.MembershipMovements.Where(l => l.MembershipId == x.Id).Count(),
+                TotalMembers = DB.MembershipMovement.Where(l => l.MembershipId == x.Id).Count(),
 
             }).ToList();
         return Ok(Memberships);
@@ -69,7 +70,7 @@ public class MembershipController : Controller
         {
             try
             {
-                DB.Memberships.Add(collection);
+                DB.Membership.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
 
@@ -89,7 +90,7 @@ public class MembershipController : Controller
     {
         if (ModelState.IsValid)
         {
-            Membership Membership = DB.Memberships.Where(x => x.Id == collection.Id).SingleOrDefault();
+            Membership Membership = DB.Membership.Where(x => x.Id == collection.Id).SingleOrDefault();
             Membership.Name = collection.Name;
             Membership.NumberDays = collection.NumberDays;
             Membership.MinFreezeLimitDays = collection.MinFreezeLimitDays;

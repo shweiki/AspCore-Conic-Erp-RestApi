@@ -1,6 +1,7 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,8 @@ namespace RestApi.Controllers;
 
 public class MembershipMovementOrderController : Controller
 {
-    private ConicErpContext DB;
-    public MembershipMovementOrderController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public MembershipMovementOrderController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -21,7 +22,7 @@ public class MembershipMovementOrderController : Controller
     [HttpGet]
     public IActionResult GetById(long? Id)
     {
-        var MembershipMovementOrder = DB.MembershipMovementOrders.Where(i => i.Id == Id).Select(x => new
+        var MembershipMovementOrder = DB.MembershipMovementOrder.Where(i => i.Id == Id).Select(x => new
         {
             x.Id,
             x.EditorName,
@@ -39,7 +40,7 @@ public class MembershipMovementOrderController : Controller
     [HttpGet]
     public IActionResult GetMembershipMovementOrderByMemberShipId(long? MemberShipId)
     {
-        var MembershipMovementOrder = DB.MembershipMovementOrders.Where(i => i.MemberShipMovementId == MemberShipId).Select(x => new
+        var MembershipMovementOrder = DB.MembershipMovementOrder.Where(i => i.MemberShipMovementId == MemberShipId).Select(x => new
         {
             x.Id,
             x.EditorName,
@@ -58,7 +59,7 @@ public class MembershipMovementOrderController : Controller
     [HttpGet]
     public IActionResult GetMembershipMovementOrderByStatus(int? Status)
     {
-        var MembershipMovementOrders = DB.MembershipMovementOrders.Where(i => i.Status == Status).Select(x => new
+        var MembershipMovementOrders = DB.MembershipMovementOrder.Where(i => i.Status == Status).Select(x => new
         {
             x.Id,
             x.Type,
@@ -68,9 +69,9 @@ public class MembershipMovementOrderController : Controller
             x.EditorName,
             x.MemberShipMovementId,
             x.Description,
-            MembershipMovementType = DB.MembershipMovements.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().Type,
-            MemberId = DB.MembershipMovements.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId,
-            Name = DB.Members.Where(m => m.Id == DB.MembershipMovements.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId).SingleOrDefault().Name,
+            MembershipMovementType = DB.MembershipMovement.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().Type,
+            MemberId = DB.MembershipMovement.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId,
+            Name = DB.Member.Where(m => m.Id == DB.MembershipMovement.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId).SingleOrDefault().Name,
         }).ToList();
 
 
@@ -86,7 +87,7 @@ public class MembershipMovementOrderController : Controller
             try
             {
 
-                DB.MembershipMovementOrders.Add(collection);
+                DB.MembershipMovementOrder.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
 
@@ -107,7 +108,7 @@ public class MembershipMovementOrderController : Controller
         {
             try
             {
-                MembershipMovementOrder membershipmovementorder = DB.MembershipMovementOrders.Where(x => x.Id == collection.Id).SingleOrDefault();
+                MembershipMovementOrder membershipmovementorder = DB.MembershipMovementOrder.Where(x => x.Id == collection.Id).SingleOrDefault();
                 membershipmovementorder.Type = collection.Type;
                 membershipmovementorder.StartDate = collection.StartDate;
                 membershipmovementorder.EndDate = collection.EndDate;
@@ -134,8 +135,8 @@ public class MembershipMovementOrderController : Controller
 
         try
         {
-            MembershipMovementOrder membershipmovementorder = await DB.MembershipMovementOrders.FindAsync(Id);
-            DB.MembershipMovementOrders.Remove(membershipmovementorder);
+            MembershipMovementOrder membershipmovementorder = await DB.MembershipMovementOrder.FindAsync(Id);
+            DB.MembershipMovementOrder.Remove(membershipmovementorder);
 
             await DB.SaveChangesAsync();
             return Ok(true);
@@ -155,7 +156,7 @@ public class MembershipMovementOrderController : Controller
             try
             {
 
-                DB.MembershipMovementOrders.AddRange(collection);
+                DB.MembershipMovementOrder.AddRange(collection);
                 DB.SaveChanges();
                 return Ok(true);
 

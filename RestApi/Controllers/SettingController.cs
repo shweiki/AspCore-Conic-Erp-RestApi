@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,17 +11,17 @@ namespace RestApi.Controllers;
 
 public class SettingController : Controller
 {
-    private ConicErpContext DB;
-    public SettingController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public SettingController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
-
+    [AllowAnonymous]
     [Route("Setting/GetSetting")]
     [HttpGet]
     public IActionResult GetSetting()
     {
-        var Settings = DB.Settings.Select(x => new
+        var Settings = DB.Setting.Select(x => new
         {
             x.Id,
             x.Name,
@@ -37,7 +37,7 @@ public class SettingController : Controller
     [HttpGet]
     public IActionResult GetActiveSetting()
     {
-        var Settings = DB.Settings.Where(i => i.Status == 0).Select(x => new
+        var Settings = DB.Setting.Where(i => i.Status == 0).Select(x => new
         {
             x.Id,
             x.Name,
@@ -66,7 +66,7 @@ public class SettingController : Controller
         {
             try
             {
-                DB.Settings.Add(collection);
+                DB.Setting.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
 
@@ -106,7 +106,7 @@ public class SettingController : Controller
     {
         try
         {
-            DB.Settings.RemoveRange(DB.Settings.ToList());
+            DB.Setting.RemoveRange(DB.Setting.ToList());
             DB.SaveChanges();
             return Ok(true);
 
@@ -126,7 +126,7 @@ public class SettingController : Controller
         {
             try
             {
-                Setting Setting = DB.Settings.Where(x => x.Name == collection.Name).SingleOrDefault();
+                Setting Setting = DB.Setting.Where(x => x.Name == collection.Name).SingleOrDefault();
                 if (Setting != null)
                 {
                     Setting.Name = collection.Name;
@@ -137,7 +137,7 @@ public class SettingController : Controller
                 }
                 else
                 {
-                    DB.Settings.Add(collection);
+                    DB.Setting.Add(collection);
                 }
                 DB.SaveChanges();
                 return Ok(collection);

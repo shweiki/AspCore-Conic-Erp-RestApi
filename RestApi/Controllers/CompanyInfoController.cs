@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -9,8 +10,8 @@ namespace RestApi.Controllers;
 
 public class CompanyInfoController : Controller
 {
-    private ConicErpContext DB;
-    public CompanyInfoController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public CompanyInfoController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -20,9 +21,9 @@ public class CompanyInfoController : Controller
     {
         if (collection != null)
         {
-            CompanyInfo companyInfo = DB.CompanyInfos.Where(x => x.Id == 1).SingleOrDefault();
+            CompanyInfo companyInfo = DB.CompanyInfo.Where(x => x.Id == 1).SingleOrDefault();
             if (companyInfo == null)
-                DB.Add(collection);
+                DB.CompanyInfo.Add(collection);
             else
             {
                 companyInfo.Name = collection.Name;
@@ -53,7 +54,7 @@ public class CompanyInfoController : Controller
     [HttpGet]
     public IActionResult GetCompanyInfo()
     {
-        var companyInfo = DB.CompanyInfos.Where(x => x.Id == 1).SingleOrDefault();
+        var companyInfo = DB.CompanyInfo.Where(x => x.Id == 1).SingleOrDefault();
         if (companyInfo == null)
             return Ok();
         else

@@ -1,12 +1,10 @@
-using Application.Interfaces;
-using Domain;
-using Infrastructure.Services;
+using Application.Common.Interfaces;
+using Infrastructure.Common.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -37,6 +35,7 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddInfrastructureServices(Configuration);
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddMemoryCache();
         services.Configure<FormOptions>(o =>
@@ -46,21 +45,20 @@ public class Startup
             o.MemoryBufferThreshold = int.MaxValue;
         });
 
-        string ConnectionString = Configuration.GetConnectionString("Default");
-        services.AddDbContext<ConicErpContext>(options =>
-        {
-            options.UseSqlServer(ConnectionString, sqlServerOptionsAction: options =>
-            {
-                options.MigrationsAssembly("RestApi");
-            });
-         //   options.EnableSensitiveDataLogging(true);
-        });
-        // services.AddScoped<ConicErpContext>(provider => provider.GetRequiredService<ConicErpContext>());
-        services.AddScoped<ConicErpContext>();
+        //string ConnectionString = Configuration.GetConnectionString("Default");
+        //services.AddDbContext<ConicErpContext>(options =>
+        //{
+        //    options.UseSqlServer(ConnectionString, sqlServerOptionsAction: options =>
+        //    {
+        //        options.MigrationsAssembly("RestApi");
+        //    });
+        //    //   options.EnableSensitiveDataLogging(true);
+        //});
+        //// services.AddScoped<ConicErpContext>(provider => provider.GetRequiredService<ConicErpContext>());
+        //services.AddScoped<ConicErpContext>();
 
-        services.AddTransient<IUnitOfWork, UnitOfWork>();
         services.AddTransient<IEmailService, EmailService>();
-        services.AddDatabaseDeveloperPageExceptionFilter();
+        //services.AddDatabaseDeveloperPageExceptionFilter();
         services.Configure<IdentityOptions>(options =>
         {
             // Default Password settings.
@@ -71,18 +69,18 @@ public class Startup
             options.Password.RequiredLength = 6;
             options.Password.RequiredUniqueChars = 0;
         });
-        services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-            .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<ConicErpContext>()
-            .AddRoleManager<RoleManager<IdentityRole>>()
-            .AddUserManager<UserManager<IdentityUser>>();
-      //  services.AddAuthentication("esvlogin")
-      //.AddCookie("esvlogin", act =>
-      //{
-      //    act.LoginPath = "/home/login";
-      //    act.AccessDeniedPath = "/home/login";
-      //    act.SlidingExpiration = true;
-      //});
+        //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+        //    .AddRoles<IdentityRole>()
+        //    .AddEntityFrameworkStores<ConicErpContext>()
+        //    .AddRoleManager<RoleManager<IdentityRole>>()
+        //    .AddUserManager<UserManager<IdentityUser>>();
+        //  services.AddAuthentication("esvlogin")
+        //.AddCookie("esvlogin", act =>
+        //{
+        //    act.LoginPath = "/home/login";
+        //    act.AccessDeniedPath = "/home/login";
+        //    act.SlidingExpiration = true;
+        //});
         services.AddCors();
         services.AddHttpContextAccessor();
         services.AddControllers().AddNewtonsoftJson(options =>
@@ -101,7 +99,7 @@ public class Startup
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
-            app.UseMigrationsEndPoint();
+            //   app.UseMigrationsEndPoint();
         }
         if (!env.IsDevelopment())
         {

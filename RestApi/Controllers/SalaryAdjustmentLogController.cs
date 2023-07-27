@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -9,8 +9,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class SalaryAdjustmentLogController : Controller
 {
-    private ConicErpContext DB;
-    public SalaryAdjustmentLogController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public SalaryAdjustmentLogController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -23,7 +23,7 @@ public class SalaryAdjustmentLogController : Controller
         {
             try
             {
-                DB.SalaryAdjustmentLogs.Add(collection);
+                DB.SalaryAdjustmentLog.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
             }
@@ -44,7 +44,7 @@ public class SalaryAdjustmentLogController : Controller
         {
             try
             {
-                SalaryAdjustmentLog SalaryAdjustmentLog = DB.SalaryAdjustmentLogs.Where(x => x.Id == collection.Id).SingleOrDefault();
+                SalaryAdjustmentLog SalaryAdjustmentLog = DB.SalaryAdjustmentLog.Where(x => x.Id == collection.Id).SingleOrDefault();
                 SalaryAdjustmentLog.SalaryPaymentId = collection.SalaryPaymentId;
                 SalaryAdjustmentLog.Status = collection.Status;
                 SalaryAdjustmentLog.AdjustmentAmmount = collection.AdjustmentAmmount;
@@ -68,9 +68,9 @@ public class SalaryAdjustmentLogController : Controller
 
         try
         {
-            SalaryAdjustmentLog SalaryAdjustmentLog = DB.SalaryAdjustmentLogs.Where(x => x.Id == Id).SingleOrDefault();
+            SalaryAdjustmentLog SalaryAdjustmentLog = DB.SalaryAdjustmentLog.Where(x => x.Id == Id).SingleOrDefault();
 
-            DB.SalaryAdjustmentLogs.Remove(SalaryAdjustmentLog);
+            DB.SalaryAdjustmentLog.Remove(SalaryAdjustmentLog);
             DB.SaveChanges();
             return Ok(true);
         }
@@ -86,7 +86,7 @@ public class SalaryAdjustmentLogController : Controller
     {
         try
         {
-            var Adjustments = DB.SalaryAdjustmentLogs.Select(x => new
+            var Adjustments = DB.SalaryAdjustmentLog.Select(x => new
             {
                 x.Id,
                 x.AdjustmentAmmount,
@@ -106,7 +106,7 @@ public class SalaryAdjustmentLogController : Controller
     {
         try
         {
-            var Adjustments = DB.SalaryAdjustmentLogs.Where(m => m.Id == Id).Select(x => new
+            var Adjustments = DB.SalaryAdjustmentLog.Where(m => m.Id == Id).Select(x => new
             {
                 x.Id,
                 x.AdjustmentAmmount,
@@ -132,7 +132,7 @@ public class SalaryAdjustmentLogController : Controller
     {
         try
         {
-            var Adjustments = DB.SalaryAdjustmentLogs.Where(m => m.SalaryPaymentId == SalId && m.Status == 0).Select(
+            var Adjustments = DB.SalaryAdjustmentLog.Where(m => m.SalaryPaymentId == SalId && m.Status == 0).Select(
                 x => new
                 {
                     x.Id,
@@ -158,7 +158,7 @@ public class SalaryAdjustmentLogController : Controller
     [Route("SalaryAdjustmentLog/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, DateTime? DateFrom, DateTime? DateTo, int? Status)
     {
-        var Adjustments = DB.SalaryAdjustmentLogs.Where(s =>
+        var Adjustments = DB.SalaryAdjustmentLog.Where(s =>
         (s.Status == Status)).Select(x => new
         {
             x.Id,

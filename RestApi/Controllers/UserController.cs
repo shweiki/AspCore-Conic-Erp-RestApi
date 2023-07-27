@@ -1,29 +1,22 @@
-﻿using Domain;
-using Microsoft.AspNetCore.Authentication;
+﻿using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace RestApi.Controllers;
 
 public class UserController : Controller
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
     private readonly ILogger<UserController> _logger;
-    private readonly ConicErpContext DB;
+    private readonly IApplicationDbContext DB;
+    private readonly IIdentityService _identityService;
 
-
-    public UserController(ConicErpContext dbcontext, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<UserController> logger)
+    public UserController(IApplicationDbContext dbcontext, ILogger<UserController> logger, IIdentityService identityService)
     {
-        _userManager = userManager;
-        _signInManager = signInManager;
+
         _logger = logger;
         DB = dbcontext;
+        _identityService = identityService;
 
     }
 
@@ -41,33 +34,32 @@ public class UserController : Controller
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, 
             // set lockoutOnFailure: true
-            var result = await _signInManager.PasswordSignInAsync(model.Username,
-                               model.Password, model.RememberMe, lockoutOnFailure: true);
+            var result = await _identityService.PasswordSignInAsync(model.Username, model.Password);
             if (result.Succeeded)
             {
                 _logger.LogInformation("User logged in.");
 
-           
+
                 return Ok("User logged in.");
             }
-            if (result.RequiresTwoFactor)
-            {
-                return Ok("RequiresTwoFactor");
+            //if (result.RequiresTwoFactor)
+            //{
+            //    return BadRequest("RequiresTwoFactor");
 
-            }
-            if (result.IsLockedOut)
-            {
+            //}
+            //if (result.IsLockedOut)
+            //{
 
-                return Ok("User account locked out.");
+            //    return BadRequest("User account locked out.");
 
-            }
+            //}
             else
             {
                 //  ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 return Ok("User Name Or PassWord Is Not Correct");
             }
         }
-        else return Ok("Fack u");
+        else return BadRequest("null");
 
     }
 
@@ -77,19 +69,17 @@ public class UserController : Controller
     public async Task<IActionResult> Info()
     {
         UserResponse response = new UserResponse();
-        IdentityUser user = await _userManager.FindByNameAsync(User.Identity.Name);
-        var roles = await _userManager.GetRolesAsync(user);
+        var user = await _identityService.GetUserWithRolesAsync(User.Identity.Name);
+        var userInfo = await _identityService.GetUserInfoAsync(User.Identity.Name);
 
-        roles.Add("Gest");
-        response.Id = user.Id;
-        response.name = user.UserName;
-        response.phone = long.Parse(user.PhoneNumber);
+        response.name = user.User.FullName;
+        response.phone = long.Parse(user.User.PhoneNumber);
         response.introduction = "I am a super hero";
-        response.avatar = DB.FileData.Where(x => x.TableName == "User" && x.Fktable == long.Parse(user.PhoneNumber))?.ToList()?.LastOrDefault()?.File;
+        response.avatar = DB.FileData.Where(x => x.TableName == "User" && x.Fktable == long.Parse(user.User.PhoneNumber))?.ToList()?.LastOrDefault()?.File;
         // Url.Content("~/Images/User/" + long.Parse() + ".jpeg");
-        response.userrouter = DB.UserRouter.Where(x => x.UserId == user.Id)?.SingleOrDefault()?.Router;
-        response.defulateRedirect = DB.UserRouter.Where(x => x.UserId == user.Id)?.SingleOrDefault()?.DefulateRedirect;
-        response.roles = roles.ToArray();
+        response.userrouter = DB.UserRouter.Where(x => x.UserId == userInfo.Id)?.SingleOrDefault()?.Router;
+        response.defulateRedirect = DB.UserRouter.Where(x => x.UserId == userInfo.Id)?.SingleOrDefault()?.DefulateRedirect;
+        response.roles = user.Roles.ToArray();
         return Ok(response);
     }
 
@@ -98,13 +88,14 @@ public class UserController : Controller
     [Route("User/Logout")]
     public async Task<IActionResult> Logout()
     {
-        await _signInManager.SignOutAsync();
+        await _identityService.SignOutAsync();
         _logger.LogInformation("User logged out.");
         return Ok("User logged out.");
 
     }
 
     // POST User/Register
+    [HttpPost]
     [Route("User/Register")]
     public async Task<ActionResult> Register(UserRegister model)
     {
@@ -115,7 +106,7 @@ public class UserController : Controller
 
         var user = new IdentityUser() { UserName = model.UserName, Email = model.Email, PhoneNumber = model.PhoneNumber, PhoneNumberConfirmed = true, EmailConfirmed = true };
 
-        IdentityResult result = await _userManager.CreateAsync(user, model.Password);
+        (var result, _) = await _identityService.CreateUserAsync(user.UserName, model.Password, user.UserName, user.Email, user.PhoneNumber, user.UserName, "", "", true);
 
         if (!result.Succeeded)
         {
@@ -127,33 +118,36 @@ public class UserController : Controller
 
     [HttpPost]
     [Route("User/GetUsers")]
-    public IActionResult GetUsers()
+    public async Task<IActionResult> GetUsers()
     {
-        var Users = (from x in DB.Users.ToList()
-                     select new
-                     {
-                         x.Id,
-                         x.Email,
-                         x.UserName,
-                         x.PhoneNumber,
-                         avatar = Url.Content("~/Images/User/" + x.Id + ".jpeg"),
-                         router = DB.UserRouter.Where(ur => ur.UserId == x.Id)?.SingleOrDefault()?.Router,
-                         Redirect = DB.UserRouter.Where(ur => ur.UserId == x.Id)?.SingleOrDefault()?.DefulateRedirect,
-                         Roles = (from R in DB.UserRoles.Where(ur => ur.UserId == x.Id).ToList()
-                                  let p = new
-                                  {
-                                      Id = DB.Roles.Where(r => r.Id == R.RoleId).SingleOrDefault().Id,
-                                      Name = DB.Roles.Where(r => r.Id == R.RoleId).SingleOrDefault().Name
-                                  }
-                                  select p).ToList(),
-                     }).ToList();
+        var Users = await _identityService.GetUsersWithRolesAsync(0, 200, null, false, null);
+        //var Users = (from x in DB.Users.ToList()
+        //             select new
+        //             {
+        //                 x.Id,
+        //                 x.Email,
+        //                 x.UserName,
+        //                 x.PhoneNumber,
+        //                 avatar = Url.Content("~/Images/User/" + x.Id + ".jpeg"),
+        //                 router = DB.UserRouter.Where(ur => ur.UserId == x.Id)?.SingleOrDefault()?.Router,
+        //                 Redirect = DB.UserRouter.Where(ur => ur.UserId == x.Id)?.SingleOrDefault()?.DefulateRedirect,
+        //                 Roles = (from R in DB.UserRoles.Where(ur => ur.UserId == x.Id).ToList()
+        //                          let p = new
+        //                          {
+        //                              DB.Roles.Where(r => r.Id == R.RoleId).SingleOrDefault().Id,
+        //                              DB.Roles.Where(r => r.Id == R.RoleId).SingleOrDefault().Name
+        //                          }
+        //                          select p).ToList(),
+        //             }).ToList();
         return Ok(Users);
     }
     [HttpPost]
     [Route("User/GetUsersNames")]
-    public IActionResult GetUsersNames()
+    public async Task<IActionResult> GetUsersNames()
     {
-        var Users = DB.Users.Select(x => new { x.UserName }).ToList();
+        var Users = await _identityService.GetUsersWithRolesAsync(0, 200, null, false, null);
+
+        // var Users = DB.Users.Select(x => new { x.UserName }).ToList();
         return Ok(Users);
     }
     [HttpPost]
@@ -161,20 +155,19 @@ public class UserController : Controller
     public async Task<IActionResult> UnLockout(string UserId)
     {
 
-        IdentityUser user = await _userManager.FindByIdAsync(UserId);
-        var result = await _userManager.SetLockoutEnabledAsync(user, true);
-        if (result.Succeeded)
-            return Ok(true);
-        else return Ok(false);
+        //var user = await _identityService.GetUserInfoByIdAsync(UserId);
+        //var result = await _userManager.SetLockoutEnabledAsync(user, true);
+        //if (result.Succeeded)
+        //    return Ok(true);
+        //else return Ok(false);
+        return Ok(true);
     }
     [HttpPost]
     [Route("User/ChangePassword")]
     public async Task<IActionResult> ChangePassword(string OldPassword, string NewPassword)
     {
-        var UserName = _userManager.GetUserId(User); // Get user id:
-        IdentityUser user = await _userManager.FindByNameAsync(UserName);
-        IdentityResult result = await _userManager.ChangePasswordAsync(user, OldPassword, NewPassword);
-        if (result.Succeeded)
+        var result = _identityService.ChangePasswordAsync(User.Identity.Name, OldPassword, NewPassword); // Get user id:
+        if (result.IsCompleted)
             return Ok(true);
         else return Ok(false);
     }
@@ -183,27 +176,25 @@ public class UserController : Controller
     [Route("User/AddRoleForUser")]
     public async Task<IActionResult> AddRoleForUser(string UserName, string RoleName)
     {
-        IdentityUser user = await _userManager.FindByNameAsync(UserName);
+        var result = await _identityService.AddUserToRoleAsync(RoleName, UserName);
 
-        await _userManager.AddToRoleAsync(user, RoleName);
-
-        return Ok(true);
+        if (result.Succeeded)
+            return Ok(true);
+        else return Ok(false);
     }
     [HttpPost]
     [Route("User/DeleteRoleForUser")]
     public async Task<IActionResult> DeleteRoleForUser(string UserName, string RoleName)
     {
-        IdentityUser user = await _userManager.FindByNameAsync(UserName);
-        await _userManager.RemoveFromRoleAsync(user, RoleName);
-        return Ok(true);
+        var user = await _identityService.GetUserWithRolesAsync(UserName);
 
-    }
-    public string GetUserId()
-    {
-        var id = _userManager.GetUserId(User); // Get user id:
+        var result = await _identityService.AddUserToRolesAsync(user.Roles.ToArray(), UserName, true);
 
-        return id;
+        if (result.Succeeded)
+            return Ok(true);
+        else return Ok(false);
     }
+
     public class Userlogin
     {
         public string Username { get; set; }
@@ -231,6 +222,5 @@ public class UserController : Controller
         public string introduction { get; set; }
 
     }
-
 
 }

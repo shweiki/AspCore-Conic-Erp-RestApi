@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,8 +10,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class PurchaseInvoiceController : Controller
 {
-    private ConicErpContext DB;
-    public PurchaseInvoiceController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public PurchaseInvoiceController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -19,8 +19,8 @@ public class PurchaseInvoiceController : Controller
     [Route("PurchaseInvoice/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var Invoices = DB.PurchaseInvoices.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
-        && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (User != null ? DB.ActionLogs.Where(l => l.TableName == "PurchaseInvoice" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        var Invoices = DB.PurchaseInvoice.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Vendor.Name.Contains(Any) : true) && (DateFrom != null ? s.FakeDate >= DateFrom : true)
+        && (DateTo != null ? s.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true) && (User != null ? DB.ActionLog.Where(l => l.TableName == "PurchaseInvoice" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
         {
             x.Id,
             x.Discount,
@@ -33,7 +33,7 @@ public class PurchaseInvoiceController : Controller
             x.AccountInvoiceNumber,
             x.InvoicePurchaseDate,
             Total = x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
-            //  Logs = DB.ActionLogs.Where(l => l.PurchaseInvoiceId == x.Id).ToList(),
+            //  Logs = DB.ActionLog.Where(l => l.PurchaseInvoiceId == x.Id).ToList(),
             x.Vendor.AccountId,
             InventoryMovements = x.InventoryMovements.Select(imx => new
             {
@@ -67,7 +67,7 @@ public class PurchaseInvoiceController : Controller
     [HttpGet]
     public IActionResult GetPurchaseInvoice(DateTime DateFrom, DateTime DateTo)
     {
-        var Invoices = DB.PurchaseInvoices.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new
+        var Invoices = DB.PurchaseInvoice.Where(i => i.FakeDate >= DateFrom && i.FakeDate <= DateTo).Select(x => new
         {
 
             x.Id,
@@ -80,7 +80,7 @@ public class PurchaseInvoiceController : Controller
             x.InvoicePurchaseDate,
             x.AccountInvoiceNumber,
             x.Description,
-            InventoryMovements = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId == x.Id && i.TypeMove == "In").Select(m => new
+            InventoryMovements = DB.InventoryMovement.Where(i => i.PurchaseInvoiceId == x.Id && i.TypeMove == "In").Select(m => new
             {
                 m.Id,
                 m.Items.Name,
@@ -99,9 +99,9 @@ public class PurchaseInvoiceController : Controller
     [HttpGet]
     public IActionResult GetByItem(long ItemId, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
     {
-        var Invoices = DB.InventoryMovements.Where(s => s.PurchaseInvoiceId != null && s.ItemsId == ItemId && (Any != null ? s.Id.ToString().Contains(Any) || s.PurchaseInvoice.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PurchaseInvoice.Description.Contains(Any) || s.PurchaseInvoice.Name.Contains(Any) : true) && (DateFrom != null ? s.PurchaseInvoice.FakeDate >= DateFrom : true)
+        var Invoices = DB.InventoryMovement.Where(s => s.PurchaseInvoiceId != null && s.ItemsId == ItemId && (Any != null ? s.Id.ToString().Contains(Any) || s.PurchaseInvoice.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PurchaseInvoice.Description.Contains(Any) || s.PurchaseInvoice.Name.Contains(Any) : true) && (DateFrom != null ? s.PurchaseInvoice.FakeDate >= DateFrom : true)
           && (DateTo != null ? s.PurchaseInvoice.FakeDate <= DateTo : true) && (Status != null ? s.Status == Status : true)
-          && (User != null ? DB.ActionLogs.Where(l => l.TableName == "PurchaseInvoice" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+          && (User != null ? DB.ActionLog.Where(l => l.TableName == "PurchaseInvoice" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
           {
               x.Id,
               x.PurchaseInvoiceId,
@@ -116,8 +116,8 @@ public class PurchaseInvoiceController : Controller
               x.PurchaseInvoice.VendorId,
               x.PurchaseInvoice.Vendor,
               Total = x.SellingPrice * x.Qty,
-              //     ActionLogs = DB.ActionLogs.Where(l=>l.PurchaseInvoiceId == x.Id).ToList(),
-              AccountId = DB.Vendors.Where(v => v.Id == x.PurchaseInvoice.VendorId).SingleOrDefault().AccountId.ToString(),
+              //     ActionLogs = DB.ActionLog.Where(l=>l.PurchaseInvoiceId == x.Id).ToList(),
+              AccountId = DB.Vendor.Where(v => v.Id == x.PurchaseInvoice.VendorId).SingleOrDefault().AccountId.ToString(),
               InventoryMovements = x.PurchaseInvoice.InventoryMovements.Select(imx => new
               {
                   imx.Id,
@@ -160,8 +160,8 @@ public class PurchaseInvoiceController : Controller
             try
             {
                 // TODO: Add insert logic here
-                collection.InventoryMovements.ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
-                DB.PurchaseInvoices.Add(collection);
+                collection.InventoryMovements.ToList().ForEach(s => DB.Item.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
+                DB.PurchaseInvoice.Add(collection);
                 DB.SaveChanges();
                 return Ok(collection.Id);
             }
@@ -181,7 +181,7 @@ public class PurchaseInvoiceController : Controller
         {
             try
             {
-                PurchaseInvoice Invoice = DB.PurchaseInvoices.Where(x => x.Id == collection.Id).SingleOrDefault();
+                PurchaseInvoice Invoice = DB.PurchaseInvoice.Where(x => x.Id == collection.Id).SingleOrDefault();
 
                 Invoice.Name = collection.Name;
                 Invoice.AccountInvoiceNumber = collection.AccountInvoiceNumber;
@@ -193,9 +193,9 @@ public class PurchaseInvoiceController : Controller
                 Invoice.FakeDate = collection.FakeDate;
                 Invoice.InvoicePurchaseDate = collection.InvoicePurchaseDate;
                 Invoice.PaymentMethod = collection.PaymentMethod;
-                DB.InventoryMovements.RemoveRange(DB.InventoryMovements.Where(x => x.PurchaseInvoiceId == Invoice.Id).ToList());
+                DB.InventoryMovement.RemoveRange(DB.InventoryMovement.Where(x => x.PurchaseInvoiceId == Invoice.Id).ToList());
                 Invoice.InventoryMovements = collection.InventoryMovements;
-                Invoice.InventoryMovements.ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
+                Invoice.InventoryMovements.ToList().ForEach(s => DB.Item.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
 
                 DB.SaveChanges();
 
@@ -214,7 +214,7 @@ public class PurchaseInvoiceController : Controller
     [HttpGet]
     public IActionResult GetPurchaseInvoiceById(long? Id)
     {
-        var Invoices = DB.PurchaseInvoices.Where(i => i.Id == Id).Select(x => new
+        var Invoices = DB.PurchaseInvoice.Where(i => i.Id == Id).Select(x => new
         {
             x.Id,
             x.Name,
@@ -227,7 +227,7 @@ public class PurchaseInvoiceController : Controller
             x.PaymentMethod,
             x.Status,
             x.Description,
-            InventoryMovements = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId == x.Id && i.TypeMove == "In").Select(m => new
+            InventoryMovements = DB.InventoryMovement.Where(i => i.PurchaseInvoiceId == x.Id && i.TypeMove == "In").Select(m => new
             {
                 m.Id,
                 m.ItemsId,
@@ -251,7 +251,7 @@ public class PurchaseInvoiceController : Controller
     [HttpGet]
     public IActionResult GetPurchaseInvoiceByVendorId(long? Id)
     {
-        var Invoices = DB.PurchaseInvoices.Where(i => i.VendorId == Id).Select(x => new
+        var Invoices = DB.PurchaseInvoice.Where(i => i.VendorId == Id).Select(x => new
         {
             x.Id,
             Name = (x.Vendor.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
@@ -265,7 +265,7 @@ public class PurchaseInvoiceController : Controller
             x.Status,
             x.Description,
             Total = x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount),
-            InventoryMovements = DB.InventoryMovements.Where(i => i.PurchaseInvoiceId == x.Id).Select(m => new
+            InventoryMovements = DB.InventoryMovement.Where(i => i.PurchaseInvoiceId == x.Id).Select(m => new
             {
                 m.Id,
                 m.ItemsId,

@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,15 +11,15 @@ namespace RestApi.Controllers;
 [Authorize]
 public class EntryAccountingController : Controller
 {
-    private ConicErpContext DB;
-    public EntryAccountingController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public EntryAccountingController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
     [HttpGet]
     public IActionResult GetEntryAccounting(long AccountId, DateTime DateFrom, DateTime DateTo)
     {
-        var EntryMovements = DB.EntryMovements.Where(i => i.AccountId == AccountId && i.Entry.FakeDate >= DateFrom && i.Entry.FakeDate <= DateTo).Select(x => new
+        var EntryMovements = DB.EntryMovement.Where(i => i.AccountId == AccountId && i.Entry.FakeDate >= DateFrom && i.Entry.FakeDate <= DateTo).Select(x => new
         {
             x.Id,
             x.Debit,
@@ -33,9 +34,9 @@ public class EntryAccountingController : Controller
     [Route("EntryAccounting/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var EntryAccountings = DB.EntryAccountings.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Description.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
+        var EntryAccountings = DB.EntryAccounting.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Description.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
         && (DateTo == null || s.FakeDate <= DateTo) && (Status == null || s.Status == Status)
-      //  && (User == null || DB.ActionLogs.Where(l => l.TableName == "EntryAccounting" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)
+        //  && (User == null || DB.ActionLog.Where(l => l.TableName == "EntryAccounting" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)
         ).Select(x => new
         {
             x.Id,
@@ -74,7 +75,7 @@ public class EntryAccountingController : Controller
     [Route("EntryAccounting/GetAccountStatement")]
     public IActionResult GetAccountStatement(long? AccountId, long? MergeAccountId, DateTime DateFrom, DateTime DateTo)
     {
-        var EntryMovements = DB.EntryMovements.Where(s => (MergeAccountId != null ? s.AccountId == AccountId || s.AccountId == MergeAccountId : s.AccountId == AccountId) && (s.Entry.FakeDate >= DateFrom && s.Entry.FakeDate <= DateTo))
+        var EntryMovements = DB.EntryMovement.Where(s => (MergeAccountId != null ? s.AccountId == AccountId || s.AccountId == MergeAccountId : s.AccountId == AccountId) && (s.Entry.FakeDate >= DateFrom && s.Entry.FakeDate <= DateTo))
             .Select(x => new { x, x.Entry }).AsEnumerable()
                     .Select(x => new
                     {
@@ -91,7 +92,7 @@ public class EntryAccountingController : Controller
                         x.Entry.Type,
                         FkDescription = x.x.TableName != null ? GetFkDescription(x.x.TableName, x.x.Fktable) : ""
                     }).ToList();
-        double AllTotal = DB.EntryMovements.Where(s => (MergeAccountId != null ? s.AccountId == AccountId || s.AccountId == MergeAccountId : s.AccountId == AccountId)).Sum(s => s.Credit) - DB.EntryMovements.Where(s => (MergeAccountId != null ? s.AccountId == AccountId || s.AccountId == MergeAccountId : s.AccountId == AccountId)).Sum(s => s.Debit);
+        double AllTotal = DB.EntryMovement.Where(s => (MergeAccountId != null ? s.AccountId == AccountId || s.AccountId == MergeAccountId : s.AccountId == AccountId)).Sum(s => s.Credit) - DB.EntryMovement.Where(s => (MergeAccountId != null ? s.AccountId == AccountId || s.AccountId == MergeAccountId : s.AccountId == AccountId)).Sum(s => s.Debit);
         if (AllTotal != (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit)))
         {
             double Balancecarried = AllTotal - (EntryMovements.Sum(s => s.Credit) - EntryMovements.Sum(s => s.Debit));
@@ -135,7 +136,7 @@ public class EntryAccountingController : Controller
             try
             {
                 // TODO: Add insert logic here
-                DB.EntryAccountings.Add(collection);
+                DB.EntryAccounting.Add(collection);
                 DB.SaveChanges();
                 return Ok(collection.Id);
 
@@ -156,13 +157,13 @@ public class EntryAccountingController : Controller
         {
             try
             {
-                EntryAccounting Entry = DB.EntryAccountings.Where(x => x.Id == collection.Id).SingleOrDefault();
+                EntryAccounting Entry = DB.EntryAccounting.Where(x => x.Id == collection.Id).SingleOrDefault();
 
                 Entry.FakeDate = collection.FakeDate;
                 Entry.Description = collection.Description;
                 Entry.Status = collection.Status;
                 Entry.Type = collection.Type;
-                DB.EntryMovements.RemoveRange(DB.EntryMovements.Where(x => x.EntryId == Entry.Id).ToList());
+                DB.EntryMovement.RemoveRange(DB.EntryMovement.Where(x => x.EntryId == Entry.Id).ToList());
                 Entry.EntryMovements = collection.EntryMovements;
                 DB.SaveChanges();
                 return Ok(true);
@@ -183,19 +184,19 @@ public class EntryAccountingController : Controller
         {
             try
             {
-                var EntryMovements = DB.EntryMovements.Where(e => e.Fktable == Fktable && e.TableName == TableName).FirstOrDefault();
+                var EntryMovements = DB.EntryMovement.Where(e => e.Fktable == Fktable && e.TableName == TableName).FirstOrDefault();
                 if (EntryMovements == null)
                 {
-                    DB.EntryAccountings.Add(collection);
+                    DB.EntryAccounting.Add(collection);
                 }
                 else
                 {
-                    var Entry = DB.EntryAccountings.Where(e => e.Id == EntryMovements.EntryId).FirstOrDefault();
+                    var Entry = DB.EntryAccounting.Where(e => e.Id == EntryMovements.EntryId).FirstOrDefault();
                     Entry.FakeDate = collection.FakeDate;
                     Entry.Description = collection.Description;
                     Entry.Status = collection.Status;
                     Entry.Type = collection.Type;
-                    DB.EntryMovements.RemoveRange(DB.EntryMovements.Where(x => x.EntryId == Entry.Id).ToList());
+                    DB.EntryMovement.RemoveRange(DB.EntryMovement.Where(x => x.EntryId == Entry.Id).ToList());
                     Entry.EntryMovements = collection.EntryMovements;
                 }
 
@@ -214,14 +215,14 @@ public class EntryAccountingController : Controller
     [HttpGet]
     public IActionResult GetEntryById(long? Id)
     {
-        var Entrys = DB.EntryAccountings.Where(x => x.Id == Id).Select(x => new
+        var Entrys = DB.EntryAccounting.Where(x => x.Id == Id).Select(x => new
         {
             x.Id,
             x.FakeDate,
             x.Status,
             x.Description,
             x.Type,
-            EntryMovements = DB.EntryMovements.Where(Im => Im.EntryId == x.Id).Select(m => new
+            EntryMovements = DB.EntryMovement.Where(Im => Im.EntryId == x.Id).Select(m => new
             {
                 m.Id,
                 m.Debit,
@@ -241,28 +242,28 @@ public class EntryAccountingController : Controller
         switch (TableName)
         {
             case "CashPool":
-                Object = DB.CashPools.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                Object = DB.CashPool.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                 break;
             case "SaleInvoice":
-                Object = DB.SalesInvoices.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                Object = DB.SalesInvoice.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                 break;
             case "PurchaseInvoice":
-                Object = DB.PurchaseInvoices.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                Object = DB.PurchaseInvoice.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                 break;
             case "EntryAccounting":
-                Object = DB.EntryAccountings.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                Object = DB.EntryAccounting.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                 break;
             case "Payment":
-                Object = DB.Payments.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                Object = DB.Payment.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                 break;
             case "Receive":
-                Object = DB.Receives.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                Object = DB.Receive.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                 break;
             case "MembershipMovement":
-                Object = DB.MembershipMovements.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                Object = DB.MembershipMovement.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                 break;
             case "Cheque":
-                Object = DB.Cheques.Where(x => x.Id == Fktable).SingleOrDefault().Description;
+                Object = DB.Cheque.Where(x => x.Id == Fktable).SingleOrDefault().Description;
                 break;
         }
         return Object;

@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NinjaNye.SearchExtensions;
@@ -11,8 +12,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class ItemController : Controller
 {
-    private ConicErpContext DB;
-    public ItemController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public ItemController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -20,7 +21,7 @@ public class ItemController : Controller
     [Route("Item/GetItem")]
     public IActionResult GetItem()
     {
-        var Items = DB.Items.Select(x => new { x.Id, x.Name, x.Address, x.Model, x.Type, x.SN, x.Barcode, x.SellingPrice, x.OtherPrice, x.CostPrice, x.TakeBon }).ToList();
+        var Items = DB.Item.Select(x => new { x.Id, x.Name, x.Address, x.Model, x.Type, x.SN, x.Barcode, x.SellingPrice, x.OtherPrice, x.CostPrice, x.TakeBon }).ToList();
 
         return Ok(Items);
     }
@@ -28,7 +29,7 @@ public class ItemController : Controller
     [Route("Item/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
     {
-        var Items = DB.Items.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.MenuItem.Contains(Any) ||
+        var Items = DB.Item.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.MenuItem.Contains(Any) ||
         s.Barcode.Contains(Any) : true) && (Status == null || s.Status == Status))
           .Select(x => new
           {
@@ -52,8 +53,8 @@ public class ItemController : Controller
               x.Description,
               x.Ingredients,
               x.TakeBon,
-              TotalIn = Utility.toFixed(DB.InventoryMovements.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty), 2),
-              TotalOut = Utility.toFixed(DB.InventoryMovements.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty), 2),
+              TotalIn = Utility.toFixed(DB.InventoryMovement.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty), 2),
+              TotalOut = Utility.toFixed(DB.InventoryMovement.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty), 2),
           }).ToList();
         Items = (Sort == "+id" ? Items.OrderBy(s => s.Id).ToList() : Items.OrderByDescending(s => s.Id).ToList());
         return Ok(new
@@ -73,7 +74,7 @@ public class ItemController : Controller
     public IActionResult GetItemByAny(string Any, bool IsDisplay = false)
     {
         Any = Any.ToLower();
-        var Items = DB.Items.Search(x => x.Name.ToLower(), x => x.Barcode.ToLower(), x => x.Id.ToString(), x => x.MenuItem.ToLower(), x => x.Address.ToLower(), x => x.Model.ToLower(), x => x.SN.ToLower(), x => x.Type.ToLower()).Containing(Any)
+        var Items = DB.Item.Search(x => x.Name.ToLower(), x => x.Barcode.ToLower(), x => x.Id.ToString(), x => x.MenuItem.ToLower(), x => x.Address.ToLower(), x => x.Model.ToLower(), x => x.SN.ToLower(), x => x.Type.ToLower()).Containing(Any)
             .Select(x => new
             {
                 x.Id,
@@ -87,8 +88,8 @@ public class ItemController : Controller
                 x.OtherPrice,
                 x.CostPrice,
                 x.MenuItem,
-                TotalIn = DB.InventoryMovements.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty),
-                TotalOut = DB.InventoryMovements.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty)
+                TotalIn = DB.InventoryMovement.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty),
+                TotalOut = DB.InventoryMovement.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty)
             }).ToList();
 
         return Ok(Items);
@@ -97,7 +98,7 @@ public class ItemController : Controller
     [Route("Item/CheckItemIsExist")]
     public IActionResult CheckItemIsExist(string Name, string BarCode, string Sn)
     {
-        var Items = DB.Items.Where(m => (BarCode != null ? m.Barcode.ToLower() == BarCode.ToLower() : false)
+        var Items = DB.Item.Where(m => (BarCode != null ? m.Barcode.ToLower() == BarCode.ToLower() : false)
          || (Name != null ? m.Name.ToLower() == Name.ToLower() : false)
          || (Sn != null ? m.SN.ToLower() == Sn.ToLower() : false)).ToList();
 
@@ -107,7 +108,7 @@ public class ItemController : Controller
     [Route("Item/GetIsPrimeItem")]
     public IActionResult GetIsPrimeItem()
     {
-        var Items = DB.Items.Where(i => i.IsPrime == true).Select(x => new
+        var Items = DB.Item.Where(i => i.IsPrime == true).Select(x => new
         {
             x.Id,
             x.Name,
@@ -138,7 +139,7 @@ public class ItemController : Controller
     [Route("Item/GetLowOrder")]
     public IActionResult GetLowOrder(int Limit, string Sort, int Page, int? Status, string Any)
     {
-        var Items = DB.Items.Where(s => (s.InventoryMovements != null ?
+        var Items = DB.Item.Where(s => (s.InventoryMovements != null ?
         s.InventoryMovements.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty) - s.InventoryMovements.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty) < s.LowOrder
         : false) && (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) || s.MenuItem.Contains(Any) || s.Barcode.Contains(Any) : true) && (Status != null ? s.Status == Status : true))
          .Select(x => new
@@ -183,7 +184,7 @@ public class ItemController : Controller
     [HttpPost]
     public IActionResult GetEXP(DateTime? DateFrom, DateTime? DateTo, int Limit, string Sort, int Page, int? Status, string Any)
     {
-        var Items = DB.InventoryMovements.Where(s => (DateTo != null ? s.EXP <= DateTo : true) && (DateFrom != null ? s.EXP >= DateFrom : true))
+        var Items = DB.InventoryMovement.Where(s => (DateTo != null ? s.EXP <= DateTo : true) && (DateFrom != null ? s.EXP >= DateFrom : true))
         .Select(x => new
         {
             x.Items.Id,
@@ -224,7 +225,7 @@ public class ItemController : Controller
     [Route("Item/GetActiveItem")]
     public IActionResult GetActiveItem()
     {
-        var Items = DB.Items.Where(i => i.Status == 0).Select(x => new
+        var Items = DB.Item.Where(i => i.Status == 0).Select(x => new
         {
             x.Id,
             x.Name,
@@ -254,7 +255,7 @@ public class ItemController : Controller
     [Route("Item/GetItemMove")]
     public IActionResult GetItemMove(long? ItemId, long? MergeItemId, DateTime DateFrom, DateTime DateTo)
     {
-        var Movements = DB.InventoryMovements.Where(s => (MergeItemId != null ? s.ItemsId == ItemId || s.ItemsId == MergeItemId : s.ItemsId == ItemId)
+        var Movements = DB.InventoryMovement.Where(s => (MergeItemId != null ? s.ItemsId == ItemId || s.ItemsId == MergeItemId : s.ItemsId == ItemId)
              && ((s.SalesInvoice.FakeDate >= DateFrom && s.SalesInvoice.FakeDate <= DateTo)
              || (s.PurchaseInvoice.FakeDate >= DateFrom && s.PurchaseInvoice.FakeDate <= DateTo)
              || (s.OrderInventory.FakeDate >= DateFrom && s.OrderInventory.FakeDate <= DateTo)
@@ -275,8 +276,8 @@ public class ItemController : Controller
                             TotalRow = (x.x.TypeMove == "In" ? x.x.Qty : 0) - (x.x.TypeMove == "Out" ? x.x.Qty : 0),
                             FkObject = GetFkObject(x.x)
                         }).ToList();
-        double AllTotal = DB.InventoryMovements.Where(s => (MergeItemId != null ? s.ItemsId == ItemId || s.ItemsId == MergeItemId : s.ItemsId == ItemId)).Where(x => x.TypeMove == "In").Sum(s => s.Qty) -
-        DB.InventoryMovements.Where(s => (MergeItemId != null ? s.ItemsId == ItemId || s.ItemsId == MergeItemId : s.ItemsId == ItemId)).Where(x => x.TypeMove == "Out").Sum(s => s.Qty);
+        double AllTotal = DB.InventoryMovement.Where(s => (MergeItemId != null ? s.ItemsId == ItemId || s.ItemsId == MergeItemId : s.ItemsId == ItemId)).Where(x => x.TypeMove == "In").Sum(s => s.Qty) -
+        DB.InventoryMovement.Where(s => (MergeItemId != null ? s.ItemsId == ItemId || s.ItemsId == MergeItemId : s.ItemsId == ItemId)).Where(x => x.TypeMove == "Out").Sum(s => s.Qty);
         if (AllTotal != (Movements.Sum(s => s.In) - Movements.Sum(s => s.Out)))
         {
             double Balancecarried = AllTotal - (Movements.Sum(s => s.In) - Movements.Sum(s => s.Out));
@@ -313,7 +314,7 @@ public class ItemController : Controller
     [Route("Item/GetItemById")]
     public IActionResult GetItemById(long Id)
     {
-        var Item = DB.Items.Where(x => x.Id == Id).Select(x => new
+        var Item = DB.Item.Where(x => x.Id == Id).Select(x => new
         {
             x.Id,
             x.Name,
@@ -343,7 +344,7 @@ public class ItemController : Controller
     [Route("Item/GetItemByBarcode")]
     public IActionResult GetItemByBarcode(string BarCode)
     {
-        var Item = DB.Items.Where(x => x.Barcode == BarCode).Select(x => new
+        var Item = DB.Item.Where(x => x.Barcode == BarCode).Select(x => new
         {
             x.Id,
             x.Name,
@@ -361,8 +362,8 @@ public class ItemController : Controller
             x.UnitItem,
             x.Ingredients,
             x.TakeBon,
-            TotalIn = DB.InventoryMovements.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty),
-            TotalOut = DB.InventoryMovements.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty)
+            TotalIn = DB.InventoryMovement.Where(i => i.TypeMove == "In" && i.ItemsId == x.Id).Sum(s => s.Qty),
+            TotalOut = DB.InventoryMovement.Where(i => i.TypeMove == "Out" && i.ItemsId == x.Id).Sum(s => s.Qty)
             //  InventoryQty = CalculateInventoryItemQty(x.Id)
         }).FirstOrDefault();
         if (Item != null)
@@ -377,7 +378,7 @@ public class ItemController : Controller
         {
             try
             {
-                DB.Items.Add(collection);
+                DB.Item.Add(collection);
                 DB.SaveChanges();
                 return Ok(collection);
             }
@@ -398,7 +399,7 @@ public class ItemController : Controller
         {
             try
             {
-                Item item = DB.Items.Where(x => x.Id == collection.Id).SingleOrDefault();
+                Item item = DB.Item.Where(x => x.Id == collection.Id).SingleOrDefault();
                 item.Name = collection.Name;
                 item.CostPrice = collection.CostPrice;
                 item.SellingPrice = collection.SellingPrice;
@@ -434,8 +435,8 @@ public class ItemController : Controller
 
         try
         {
-            var item = DB.Items.Where(x => x.Id == ItemId).SingleOrDefault();
-            DB.Items.Remove(item);
+            var item = DB.Item.Where(x => x.Id == ItemId).SingleOrDefault();
+            DB.Item.Remove(item);
             DB.SaveChanges();
             return Ok(true);
         }
@@ -453,7 +454,7 @@ public class ItemController : Controller
         {
             try
             {
-                Item item = DB.Items.Where(x => x.Id == ItemId).SingleOrDefault();
+                Item item = DB.Item.Where(x => x.Id == ItemId).SingleOrDefault();
                 item.Ingredients = Ingredient;
                 DB.SaveChanges();
                 return Ok(true);
@@ -474,7 +475,7 @@ public class ItemController : Controller
         {
             try
             {
-                Item item = DB.Items.Where(x => x.Id == ItemId).SingleOrDefault();
+                Item item = DB.Item.Where(x => x.Id == ItemId).SingleOrDefault();
                 item.TakeBon = TakeBon;
                 DB.SaveChanges();
                 return Ok(true);
@@ -492,12 +493,12 @@ public class ItemController : Controller
     [HttpPost]
     public IActionResult CalculateInventoryItemQty(long Id)
     {
-        var InventoryItemsQty = from x in DB.InventoryMovements.Where(i => i.ItemsId == Id && i.Status >= 0).ToList()
+        var InventoryItemsQty = from x in DB.InventoryMovement.Where(i => i.ItemsId == Id && i.Status >= 0).ToList()
                                 group x by x.InventoryItemId into g
                                 select new
                                 {
                                     InventoryItemId = g.Key,
-                                    InventoryName = DB.InventoryItems.Where(a => a.Id == g.Key).Select(c => c.Name).FirstOrDefault(),
+                                    InventoryName = DB.InventoryItem.Where(a => a.Id == g.Key).Select(c => c.Name).FirstOrDefault(),
                                     QtyIn = g.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty),
                                     QtyOut = g.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty)
                                 };
@@ -506,12 +507,12 @@ public class ItemController : Controller
     }
     public object CalculateInventoryItemQtyById(long Id)
     {
-        var InventoryItemsQty = from x in DB.InventoryMovements.Where(i => i.ItemsId == Id && i.Status >= 0).ToList()
+        var InventoryItemsQty = from x in DB.InventoryMovement.Where(i => i.ItemsId == Id && i.Status >= 0).ToList()
                                 group x by x.InventoryItemId into g
                                 select new
                                 {
                                     InventoryItemId = g.Key,
-                                    InventoryName = DB.InventoryItems.Where(a => a.Id == g.Key).Select(c => c.Name).FirstOrDefault(),
+                                    InventoryName = DB.InventoryItem.Where(a => a.Id == g.Key).Select(c => c.Name).FirstOrDefault(),
                                     QtyIn = g.Where(d => d.TypeMove == "In").Sum(qc => qc.Qty),
                                     QtyOut = g.Where(d => d.TypeMove == "Out").Sum(qc => qc.Qty)
                                 };
@@ -522,7 +523,7 @@ public class ItemController : Controller
     [HttpPost]
     public IActionResult GetInventoryItemEXP(long Id)
     {
-        var InventoryItemsExp = from x in DB.InventoryMovements.Where(i => i.ItemsId == Id && i.Status == 0).ToList()
+        var InventoryItemsExp = from x in DB.InventoryMovement.Where(i => i.ItemsId == Id && i.Status == 0).ToList()
                                 group x by x.EXP into g
                                 select new
                                 {
@@ -535,7 +536,7 @@ public class ItemController : Controller
     [Route("Item/CalculateCostPrice")]
     public IActionResult CalculateCostPrice()
     {
-        DB.InventoryMovements.Where(i => i.PurchaseInvoiceId != null).ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
+        DB.InventoryMovement.Where(i => i.PurchaseInvoiceId != null).ToList().ForEach(s => DB.Item.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
         DB.SaveChanges();
         return Ok(true);
     }
@@ -546,19 +547,19 @@ public class ItemController : Controller
 
         if (OX.SalesInvoiceId != null)
 
-            Object = DB.SalesInvoices.Where(x => x.Id == OX.SalesInvoiceId).Select(s => new { s.Id, s.FakeDate, s.Description, Type = "SalesInvoice" }).SingleOrDefault();
+            Object = DB.SalesInvoice.Where(x => x.Id == OX.SalesInvoiceId).Select(s => new { s.Id, s.FakeDate, s.Description, Type = "SalesInvoice" }).SingleOrDefault();
 
         if (OX.PurchaseInvoiceId != null)
 
-            Object = DB.PurchaseInvoices.Where(x => x.Id == OX.PurchaseInvoiceId).Select(s => new { s.Id, s.FakeDate, s.Description, Type = "PurchaseInvoice" }).SingleOrDefault();
+            Object = DB.PurchaseInvoice.Where(x => x.Id == OX.PurchaseInvoiceId).Select(s => new { s.Id, s.FakeDate, s.Description, Type = "PurchaseInvoice" }).SingleOrDefault();
 
         if (OX.OrderInventoryId != null)
 
-            Object = DB.OrderInventories.Where(x => x.Id == OX.OrderInventoryId).Select(s => new { s.Id, s.FakeDate, s.Description, Type = "OrderInventory" }).SingleOrDefault();
+            Object = DB.OrderInventory.Where(x => x.Id == OX.OrderInventoryId).Select(s => new { s.Id, s.FakeDate, s.Description, Type = "OrderInventory" }).SingleOrDefault();
 
         if (OX.WorkShopId != null)
 
-            Object = DB.WorkShops.Where(x => x.Id == OX.WorkShopId).Select(s => new { s.Id, s.FakeDate, s.Description, Type = "WorkShop" }).SingleOrDefault();
+            Object = DB.WorkShop.Where(x => x.Id == OX.WorkShopId).Select(s => new { s.Id, s.FakeDate, s.Description, Type = "WorkShop" }).SingleOrDefault();
         if (Object is null)
         {
             Object = new { Id = 0, FakeDate = DateTime.Now.Year };

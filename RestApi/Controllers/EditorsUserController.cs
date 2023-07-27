@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -9,8 +10,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class EditorsUserController : Controller
 {
-    private ConicErpContext DB;
-    public EditorsUserController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public EditorsUserController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -19,7 +20,7 @@ public class EditorsUserController : Controller
     [HttpGet]
     public IActionResult Get()
     {
-        var EditorsUsers = DB.EditorsUsers.Select(x => new
+        var EditorsUsers = DB.EditorsUser.Select(x => new
         {
             x.Id,
             x.Name
@@ -38,7 +39,7 @@ public class EditorsUserController : Controller
     {
         if (ModelState.IsValid)
         {
-            EditorsUser Editor = DB.EditorsUsers.Where(x => x.Id == collection.Id).SingleOrDefault();
+            EditorsUser Editor = DB.EditorsUser.Where(x => x.Id == collection.Id).SingleOrDefault();
             Editor.Name = collection.Name;
             try
             {
@@ -64,7 +65,7 @@ public class EditorsUserController : Controller
             try
             {
                 // TODO: Add insert logic here
-                DB.EditorsUsers.Add(collection);
+                DB.EditorsUser.Add(collection);
                 DB.SaveChanges();
 
                 return Ok(true);

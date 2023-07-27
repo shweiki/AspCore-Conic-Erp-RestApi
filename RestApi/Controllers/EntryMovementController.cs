@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -10,8 +11,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class EntryMovementController : Controller
 {
-    private ConicErpContext DB;
-    public EntryMovementController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public EntryMovementController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -30,7 +31,7 @@ public class EntryMovementController : Controller
                                      Credit = field.Credit,
                                      EntryId = field.EntryId,
                                  };
-            DB.EntryMovements.AddRange(EntryMovements);
+            DB.EntryMovement.AddRange(EntryMovements);
             DB.SaveChanges();
             return Ok(true);
         }
@@ -45,7 +46,7 @@ public class EntryMovementController : Controller
     [HttpGet]
     public IActionResult GetEntryMovementsByAccountId(long? AccountId)
     {
-        var EntryMovements = DB.EntryMovements.Where(l => l.AccountId == AccountId).Select(x => new
+        var EntryMovements = DB.EntryMovement.Where(l => l.AccountId == AccountId).Select(x => new
         {
             x.Id,
             x.Credit,

@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,8 +10,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class CashPoolController : Controller
 {
-    private ConicErpContext DB;
-    public CashPoolController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public CashPoolController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -19,8 +19,8 @@ public class CashPoolController : Controller
     [Route("CashPool/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
     {
-        var List = DB.CashPools.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Description.Contains(Any) : true) && (DateFrom != null ? s.DateTime >= DateFrom : true)
-        && (DateTo != null ? s.DateTime <= DateTo : true) && (Status != null ? s.Status == Status : true) && (Type != null ? s.Type == Type : true) && (User != null ? DB.ActionLogs.Where(l => l.TableName == "CashPool" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
+        var List = DB.CashPool.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Description.Contains(Any) : true) && (DateFrom != null ? s.DateTime >= DateFrom : true)
+        && (DateTo != null ? s.DateTime <= DateTo : true) && (Status != null ? s.Status == Status : true) && (Type != null ? s.Type == Type : true) && (User != null ? DB.ActionLog.Where(l => l.TableName == "CashPool" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null : true)).Select(x => new
         {
             x.Id,
             x.Type,
@@ -66,7 +66,7 @@ public class CashPoolController : Controller
             {
                 // TODO: Add insert logic here
                 collection.DateTime = DateTime.Now;
-                DB.CashPools.Add(collection);
+                DB.CashPool.Add(collection);
                 DB.SaveChanges();
                 return Ok(collection.Id);
 
@@ -87,7 +87,7 @@ public class CashPoolController : Controller
         {
             try
             {
-                CashPool Invoice = DB.CashPools.Where(x => x.Id == collection.Id).SingleOrDefault();
+                CashPool Invoice = DB.CashPool.Where(x => x.Id == collection.Id).SingleOrDefault();
 
                 Invoice.Type = collection.Type;
                 Invoice.TotalCash = collection.TotalCash;
@@ -120,7 +120,7 @@ public class CashPoolController : Controller
     [HttpGet]
     public IActionResult GetCashPoolById(long? Id)
     {
-        var List = DB.CashPools.Where(x => x.Id == Id).Select(x => new
+        var List = DB.CashPool.Where(x => x.Id == Id).Select(x => new
         {
             x.Id,
             x.Type,

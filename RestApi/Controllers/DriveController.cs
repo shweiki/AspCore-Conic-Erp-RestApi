@@ -1,19 +1,20 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
-using Driver = Domain.Driver;
+using Driver = Domain.Entities.Driver;
 
 namespace RestApi.Controllers;
 
 [Authorize]
 public class DriverController : Controller
 {
-    private ConicErpContext DB;
+    private readonly IApplicationDbContext DB;
     private readonly UserManager<IdentityUser> _userManager;
-    public DriverController(ConicErpContext dbcontext, UserManager<IdentityUser> userManager)
+    public DriverController(IApplicationDbContext dbcontext, UserManager<IdentityUser> userManager)
 
     {
         _userManager = userManager;
@@ -25,7 +26,7 @@ public class DriverController : Controller
     [HttpGet]
     public IActionResult GetDriver()
     {
-        var Drivers = DB.Drivers.Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1, x.Tag, x.Company }).ToList();
+        var Drivers = DB.Driver.Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1, x.Tag, x.Company }).ToList();
 
         return Ok(Drivers);
     }
@@ -33,7 +34,7 @@ public class DriverController : Controller
     [HttpGet]
     public IActionResult GetActiveDriver()
     {
-        var Drivers = DB.Drivers.Where(x => x.Status == 0).Select(x => new
+        var Drivers = DB.Driver.Where(x => x.Status == 0).Select(x => new
         {
             value = x.Id,
             label = x.Name,
@@ -47,7 +48,7 @@ public class DriverController : Controller
     public IActionResult GetDriverByAny(string Any)
     {
         Any.ToLower();
-        var Drivers = DB.Drivers.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.Tag.Contains(Any))
+        var Drivers = DB.Driver.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.Tag.Contains(Any))
             .Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1, x.Tag }).ToList();
 
         return Ok(Drivers);
@@ -56,7 +57,7 @@ public class DriverController : Controller
     [Route("Driver/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
     {
-        var Drivers = DB.Drivers.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
+        var Drivers = DB.Driver.Where(s => (Any != null ? s.Id.ToString().Contains(Any) || s.Name.Contains(Any) : true) && (Status != null ? s.Status == Status : true)).Select(x => new
         {
             x.Id,
             x.Name,
@@ -85,7 +86,7 @@ public class DriverController : Controller
     [HttpGet]
     public IActionResult CheckDriverIsExist(string Ssn, string PhoneNumber)
     {
-        var Drivers = DB.Drivers.Where(m => m.Ssn == Ssn || m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", "")).ToList();
+        var Drivers = DB.Driver.Where(m => m.Ssn == Ssn || m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", "")).ToList();
 
         return Ok(Drivers.Count() > 0 ? true : false);
     }
@@ -95,7 +96,7 @@ public class DriverController : Controller
     [HttpGet]
     public IActionResult GetDriverByStatus(int Status)
     {
-        var Drivers = DB.Drivers.Where(f => f.Status == Status).Select(x => new
+        var Drivers = DB.Driver.Where(f => f.Status == Status).Select(x => new
         {
             x.Id,
             x.Name,
@@ -141,7 +142,7 @@ public class DriverController : Controller
             }
             collection.Pass = NewUser.PasswordHash;
             collection.DriverUserId = NewUser.Id;
-            DB.Drivers.Add(collection);
+            DB.Driver.Add(collection);
             DB.SaveChanges();
 
             UserRouter NewRole = new UserRouter()
@@ -167,7 +168,7 @@ public class DriverController : Controller
     {
         if (ModelState.IsValid)
         {
-            Driver Driver = DB.Drivers.Where(x => x.Id == collection.Id).SingleOrDefault();
+            Driver Driver = DB.Driver.Where(x => x.Id == collection.Id).SingleOrDefault();
             Driver.Name = collection.Name;
             Driver.Ssn = collection.Ssn;
             Driver.Email = collection.Email;
@@ -194,7 +195,7 @@ public class DriverController : Controller
     [HttpGet]
     public IActionResult GetDriverById(long? Id)
     {
-        var Drivers = DB.Drivers.Where(m => m.Id == Id).Select(
+        var Drivers = DB.Driver.Where(m => m.Id == Id).Select(
             x => new
             {
                 x.Id,
@@ -219,7 +220,7 @@ public class DriverController : Controller
     {
         if (name != "Developer")
         {
-            var Drivers = DB.Drivers.Where(m => m.DriverUserId == UserId).Select(
+            var Drivers = DB.Driver.Where(m => m.DriverUserId == UserId).Select(
                 x => new
                 {
                     x.Id,
@@ -249,7 +250,7 @@ public class DriverController : Controller
     [HttpGet]
     public IActionResult FixPhoneNumber()
     {
-        DB.Drivers.Where(i => i.PhoneNumber1 != null).ToList().ForEach(s =>
+        DB.Driver.Where(i => i.PhoneNumber1 != null).ToList().ForEach(s =>
         {
             s.PhoneNumber1 = s.PhoneNumber1.Replace(" ", "");
             s.PhoneNumber1 = s.PhoneNumber1.Length == 10 ? s.PhoneNumber1.Substring(1) : s.PhoneNumber1;
@@ -265,7 +266,7 @@ public class DriverController : Controller
     [HttpGet]
     public IActionResult GetDriversLabel()
     {
-        var Drivers = DB.Drivers.Where(x => x.Status == 0).Select(x => new
+        var Drivers = DB.Driver.Where(x => x.Status == 0).Select(x => new
         {
 
             value = x.Id,
@@ -279,7 +280,7 @@ public class DriverController : Controller
     [HttpGet]
     public IActionResult DriverActivation(long Id)
     {
-        var Drivers = DB.Drivers.Where(x => x.Id == Id).SingleOrDefault();
+        var Drivers = DB.Driver.Where(x => x.Id == Id).SingleOrDefault();
         Drivers.IsActive = 1;
 
         try
@@ -298,7 +299,7 @@ public class DriverController : Controller
     [HttpGet]
     public IActionResult DriverDeActivation(long Id)
     {
-        var Drivers = DB.Drivers.Where(x => x.Id == Id).SingleOrDefault();
+        var Drivers = DB.Driver.Where(x => x.Id == Id).SingleOrDefault();
         Drivers.IsActive = 0;
 
         try

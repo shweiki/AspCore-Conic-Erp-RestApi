@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿
+using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ public class EmailController : Controller
     [HttpPost]
     public async Task<IActionResult> SendTo(string to, string subject, string body)
     {
-       
+
         return Ok(await _emailService.SendMail(to, subject, body, true));
     }
 

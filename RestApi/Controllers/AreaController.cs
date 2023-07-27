@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -9,8 +10,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class AreaController : Controller
 {
-    private ConicErpContext DB;
-    public AreaController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public AreaController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -20,7 +21,7 @@ public class AreaController : Controller
     public IActionResult GetAreas()
 
     {
-        var Areas = DB.Areas.Select(x => new
+        var Areas = DB.Area.Select(x => new
         {
             x.Id,
             x.Adress1,
@@ -38,7 +39,7 @@ public class AreaController : Controller
     [HttpGet]
     public IActionResult GetAreasLabel()
     {
-        var Areas = DB.Areas.Where(x => x.Status == 0).Select(x => new
+        var Areas = DB.Area.Where(x => x.Status == 0).Select(x => new
         {
 
             value = x.Id,
@@ -59,7 +60,7 @@ public class AreaController : Controller
             {
                 // TODO: Add insert logic here
                 collection.Status = 0;
-                DB.Areas.Add(collection);
+                DB.Area.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
 
@@ -80,7 +81,7 @@ public class AreaController : Controller
     {
         if (ModelState.IsValid)
         {
-            Area area = DB.Areas.Where(x => x.Id == collection.Id).SingleOrDefault();
+            Area area = DB.Area.Where(x => x.Id == collection.Id).SingleOrDefault();
             area.Adress1 = collection.Adress1;
             area.Adress2 = collection.Adress2;
             area.Adress3 = collection.Adress3;

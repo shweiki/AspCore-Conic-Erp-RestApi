@@ -1,33 +1,31 @@
 {
   "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "sqlDebugging": false,
-      "nativeDebugging": false
-    },
     "RestApi": {
       "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "dotnetRunMessages": "true",
-      "applicationUrl": "https://localhost:5001;http://localhost:5000",
-      "jsWebView2Debugging": false
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:8095;http://localhost:8090"
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   },
+  "$schema": "https://json.schemastore.org/launchsettings.json",
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
-    "iis": {
-      "applicationUrl": "http://localhost/RestApi",
-      "sslPort": 0
-    },
     "iisExpress": {
-      "applicationUrl": "http://localhost:8090/api",
-      "sslPort": 0
+      "applicationUrl": "http://localhost:21264",
+      "sslPort": 44385
     }
   }
 }

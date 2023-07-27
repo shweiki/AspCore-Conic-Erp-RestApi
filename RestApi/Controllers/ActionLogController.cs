@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,20 +13,21 @@ namespace RestApi.Controllers;
 [Authorize]
 public class ActionLogController : Controller
 {
-    private ConicErpContext DB;
-    public ActionLogController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+
+    public ActionLogController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
-    public Boolean Create(ActionLog LogOpratio)
+    public async Task<Boolean> Create(ActionLog LogOpratio)
     {
         try
         {
             LogOpratio.PostingDateTime = DateTime.Now;
 
             // TODO: Add insert logic here
-            DB.ActionLogs.Add(LogOpratio);
-            DB.SaveChanges();
+            DB.ActionLog.Add(LogOpratio);
+            await DB.SaveChangesAsync();
             //  Console.WriteLine(collection);
             //return Json(collection);
             return (true);
@@ -40,7 +42,7 @@ public class ActionLogController : Controller
     [HttpGet]
     public async Task<IActionResult> GetLogByObjTable(string TableName, int Id)
     {
-        List<ActionLog> ActionLogs = await DB.ActionLogs.Where(l => l.TableName == TableName && l.Fktable == Id.ToString()).ToListAsync();
+        List<ActionLog> ActionLogs = await DB.ActionLog.Where(l => l.TableName == TableName && l.Fktable == Id.ToString()).ToListAsync();
 
         return Ok(ActionLogs);
     }

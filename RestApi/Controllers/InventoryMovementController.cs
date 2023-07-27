@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -12,8 +12,8 @@ namespace RestApi.Controllers;
 
 public class InventoryMovementController : Controller
 {
-    private ConicErpContext DB;
-    public InventoryMovementController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public InventoryMovementController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -30,7 +30,7 @@ public class InventoryMovementController : Controller
                            SellingPrice = field.SellingPrice,
                            InventoryItemId = field.InventoryItemId
                        };
-            DB.InventoryMovements.AddRange(fadd);
+            DB.InventoryMovement.AddRange(fadd);
             DB.SaveChanges();
             return true;
         }
@@ -43,7 +43,7 @@ public class InventoryMovementController : Controller
     [HttpGet]
     public IActionResult GetInventoryMovementsBySalesInvoiceId(long? SalesInvoiceId)
     {
-        var InventoryMovements = DB.InventoryMovements.Where(im => im.SalesInvoiceId == SalesInvoiceId).Select(imx => new
+        var InventoryMovements = DB.InventoryMovement.Where(im => im.SalesInvoiceId == SalesInvoiceId).Select(imx => new
         {
             imx.Id,
             imx.ItemsId,

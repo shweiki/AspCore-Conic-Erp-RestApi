@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,8 +10,8 @@ namespace RestApi.Controllers;
 
 public class OrderResaurantController : Controller
 {
-    private ConicErpContext DB;
-    public OrderResaurantController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public OrderResaurantController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -29,7 +29,7 @@ public class OrderResaurantController : Controller
             try
             {
                 // TODO: Add insert logic here
-                DB.OrderRestaurants.Add(collection);
+                DB.OrderRestaurant.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
             }
@@ -47,9 +47,9 @@ public class OrderResaurantController : Controller
     [Route("OrderRestaurant/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var Deliveries = DB.OrderRestaurants.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
+        var Deliveries = DB.OrderRestaurant.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
      && (DateTo == null || s.FakeDate <= DateTo) && (Status == null || s.Status == Status) &&
-     (User == null || DB.ActionLogs.Where(l => l.TableName == "OrderRestaurant" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
+     (User == null || DB.ActionLog.Where(l => l.TableName == "OrderRestaurant" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
      {
          x.Id,
          x.OrderId,
@@ -83,7 +83,7 @@ public class OrderResaurantController : Controller
     public IActionResult GetOrderRestaurant(int Limit, string Sort, int Page, int? Status, string Any)
 
     {
-        var Orders = DB.OrderRestaurants.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (Status == null || s.Status == Status)).Select(x => new
+        var Orders = DB.OrderRestaurant.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (Status == null || s.Status == Status)).Select(x => new
         {
             x.Id,
             x.OrderId,
@@ -122,7 +122,7 @@ public class OrderResaurantController : Controller
         {
             try
             {
-                OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == OrderId).SingleOrDefault();
+                OrderRestaurant Order = DB.OrderRestaurant.Where(x => x.Id == OrderId).SingleOrDefault();
                 int Status = 1;
                 string Description = "Delivered";
                 if (ChangeStatus(Order, Description, Status))
@@ -146,8 +146,8 @@ public class OrderResaurantController : Controller
     public IActionResult GetCustomerOrder(string Id, string name, int Limit, string Sort, int Page, int? Status, string Any)
 
     {
-        var Orders = DB.OrderRestaurants.Where(x => (x.Vendor.UserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2 || x.Status == 3 || x.Status == 4) && (Any == null || x.Id.ToString().Contains(Any) || x.Name.Contains(Any)) && (Status == null || x.Status == Status)).Select(x => new
-        // var Orders = DB.OrderRestaurants.Where(x => x.Driver.DriverUserId == Id || name == "Developer").Select(x => new
+        var Orders = DB.OrderRestaurant.Where(x => (x.Vendor.UserId == Id || name == "Developer") && (x.Status == 1 || x.Status == 2 || x.Status == 3 || x.Status == 4) && (Any == null || x.Id.ToString().Contains(Any) || x.Name.Contains(Any)) && (Status == null || x.Status == Status)).Select(x => new
+        // var Orders = DB.OrderRestaurant.Where(x => x.Driver.DriverUserId == Id || name == "Developer").Select(x => new
         {
             x.Id,
             x.OrderId,
@@ -191,7 +191,7 @@ public class OrderResaurantController : Controller
         {
             try
             {
-                OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == id).SingleOrDefault();
+                OrderRestaurant Order = DB.OrderRestaurant.Where(x => x.Id == id).SingleOrDefault();
                 int Status = 2;
                 string Description = "Received";
                 if (ChangeStatus(Order, Description, Status))
@@ -217,7 +217,7 @@ public class OrderResaurantController : Controller
         {
             try
             {
-                OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == id).SingleOrDefault();
+                OrderRestaurant Order = DB.OrderRestaurant.Where(x => x.Id == id).SingleOrDefault();
                 int Status = 3;
                 string Description = "Checkout";
                 if (ChangeStatus(Order, Description, Status))
@@ -244,7 +244,7 @@ public class OrderResaurantController : Controller
         {
             try
             {
-                OrderRestaurant Order = DB.OrderRestaurants.Where(x => x.Id == id).SingleOrDefault();
+                OrderRestaurant Order = DB.OrderRestaurant.Where(x => x.Id == id).SingleOrDefault();
                 int Status = 4;
                 string Description = "Done";
                 if (ChangeStatus(Order, Description, Status))
@@ -267,9 +267,9 @@ public class OrderResaurantController : Controller
     [Route("OrderRestaurant/GetByListQByVendor")]
     public IActionResult GetByListQByDriver(string Id, string name, int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any)
     {
-        var Deliveries = DB.OrderRestaurants.Where(s => (s.Vendor.UserId == Id || name == "Developer") && (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
+        var Deliveries = DB.OrderRestaurant.Where(s => (s.Vendor.UserId == Id || name == "Developer") && (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
         && (DateTo == null || s.FakeDate <= DateTo) && (Status == null || s.Status == Status) &&
-        (User == null || DB.ActionLogs.Where(l => l.TableName == "OrderRestaurant" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
+        (User == null || DB.ActionLog.Where(l => l.TableName == "OrderRestaurant" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).Select(x => new
         {
             x.Id,
             x.OrderId,
@@ -303,11 +303,11 @@ public class OrderResaurantController : Controller
         log.Description = Description;
         log.Fktable = Order.Id.ToString();
         log.TableName = "OrederRestaurant";
-        DB.OrderRestaurants.Where(x => x.Id == Order.Id).SingleOrDefault().Status = Status;
+        DB.OrderRestaurant.Where(x => x.Id == Order.Id).SingleOrDefault().Status = Status;
 
 
-        // ActionLogController logCon = new ActionLogController(ConicErpContext Db);
-        DB.ActionLogs.Add(log);
+        // ActionLogController logCon = new ActionLogController(IApplicationDbContext Db);
+        DB.ActionLog.Add(log);
 
         DB.SaveChanges();
         return true;

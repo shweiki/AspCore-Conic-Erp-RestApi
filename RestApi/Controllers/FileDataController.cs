@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,10 +19,10 @@ namespace RestApi.Controllers;
 [Authorize]
 public class FileDataController : Controller
 {
-    private ConicErpContext DB;
+    private readonly IApplicationDbContext DB;
     public IConfiguration _configuration { get; }
 
-    public FileDataController(ConicErpContext dbcontext, IConfiguration configuration)
+    public FileDataController(IApplicationDbContext dbcontext, IConfiguration configuration)
     {
         DB = dbcontext;
         _configuration = configuration;
@@ -139,9 +140,8 @@ public class FileDataController : Controller
     {
         try
         {
-            using (ConicErpContext _db = new ConicErpContext(_configuration))
-            {
-                var files = await _db.FileData.Where(x => x.FileType == "image" && x.File != null && x.File != "")
+             
+                var files = await DB.FileData.Where(x => x.FileType == "image" && x.File != null && x.File != "")
                 .Select(x => new
                 {
                     x.Id,
@@ -154,7 +154,7 @@ public class FileDataController : Controller
                 foreach (var file in files)
                 {
 
-                    var fileData = await _db.FileData.SingleOrDefaultAsync(i => i.Id == file.Id);
+                    var fileData = await DB.FileData.SingleOrDefaultAsync(i => i.Id == file.Id);
 
                     if (string.IsNullOrWhiteSpace(fileData.Type))
                     {
@@ -168,12 +168,12 @@ public class FileDataController : Controller
                     {
                         fileData.FilePath = path;
                         fileData.File = "";
-                        await _db.SaveChangesAsync();
+                        await DB.SaveChangesAsync();
                     }
 
                 }
                 return Ok(true);
-            }
+            
         }
         catch (Exception ex)
         {

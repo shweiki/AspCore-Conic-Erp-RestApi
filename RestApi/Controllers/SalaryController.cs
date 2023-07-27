@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -8,8 +8,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class SalaryController : Controller
 {
-    private ConicErpContext DB;
-    public SalaryController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public SalaryController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -21,7 +21,7 @@ public class SalaryController : Controller
         {
             try
             {
-                SalaryPayment SalaryPayment = DB.SalaryPayments.Where(x => x.Id == collection.Id).SingleOrDefault();
+                SalaryPayment SalaryPayment = DB.SalaryPayment.Where(x => x.Id == collection.Id).SingleOrDefault();
                 SalaryPayment.SalaryFrom = collection.SalaryFrom;
                 SalaryPayment.SalaryTo = collection.SalaryTo;
                 SalaryPayment.WorkingHours = collection.WorkingHours;
@@ -45,7 +45,7 @@ public class SalaryController : Controller
         {
             try
             {
-                DB.SalaryPayments.Add(collection);
+                DB.SalaryPayment.Add(collection);
                 DB.SaveChanges();
                 return Ok(true);
 
@@ -58,7 +58,7 @@ public class SalaryController : Controller
     [HttpGet]
     public IActionResult GetSalaryByEmployeeId(long? EmployeeId)
     {
-        var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == EmployeeId).Select(
+        var Salaries = DB.SalaryPayment.Where(m => m.EmployeeId == EmployeeId).Select(
             x => new
             {
                 x.Id,
@@ -88,7 +88,7 @@ public class SalaryController : Controller
     [HttpGet]
     public IActionResult GetById(long? Id)
     {
-        var Salaries = DB.SalaryPayments.Where(m => m.Id == Id).Select(
+        var Salaries = DB.SalaryPayment.Where(m => m.Id == Id).Select(
             x => new
             {
                 x.Id,
@@ -117,7 +117,7 @@ public class SalaryController : Controller
     [HttpGet]
     public IActionResult GetLastSalaryById(long? Id)
     {
-        var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == Id).Select(
+        var Salaries = DB.SalaryPayment.Where(m => m.EmployeeId == Id).Select(
             x => new
             {
                 x.Id,
@@ -139,7 +139,7 @@ public class SalaryController : Controller
     [HttpGet]
     public IActionResult GetSalaryId(long? EmployeeId)
     {
-        var Salaries = DB.SalaryPayments.Where(m => m.EmployeeId == EmployeeId && m.Status == 0).Select(
+        var Salaries = DB.SalaryPayment.Where(m => m.EmployeeId == EmployeeId && m.Status == 0).Select(
             x => new
             {
                 Id = x.Id,

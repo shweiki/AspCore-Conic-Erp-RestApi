@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,8 +14,8 @@ namespace RestApi.Controllers;
 
 public class MassageController : Controller
 {
-    private ConicErpContext DB;
-    public MassageController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public MassageController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -24,7 +24,7 @@ public class MassageController : Controller
     public IActionResult GetMassageObjId(string TableName, long ObjId)
     {
 
-        var Massage = DB.Massages.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new
+        var Massage = DB.Massage.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new
         {
             x.Id,
             x.SendDate,
@@ -45,7 +45,7 @@ public class MassageController : Controller
         {
 
             massage.SendDate = new DateTime();
-            DB.Massages.Add(massage);
+            DB.Massage.Add(massage);
 
             DB.SaveChanges();
             return Ok(true);
@@ -78,7 +78,7 @@ public class MassageController : Controller
     [HttpGet]
     public IActionResult CheckMassages()
     {
-        IList<Massage> Massages = DB.Massages?.Where(x => x.Status == 0).ToList();
+        IList<Massage> Massages = DB.Massage?.Where(x => x.Status == 0).ToList();
 
         Massages = Massages.GroupBy(a => a.Fktable)
          .Select(g => g.Last()).ToList();

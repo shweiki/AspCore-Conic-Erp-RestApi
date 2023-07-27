@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +11,9 @@ namespace RestApi.Controllers;
 [Authorize]
 public class EmployeeController : Controller
 {
-    private readonly ConicErpContext DB;
+    private readonly IApplicationDbContext DB;
     private readonly UserManager<IdentityUser> _userManager;
-    public EmployeeController(ConicErpContext dbcontext, UserManager<IdentityUser> userManager)
+    public EmployeeController(IApplicationDbContext dbcontext, UserManager<IdentityUser> userManager)
 
     {
         _userManager = userManager;
@@ -23,7 +24,7 @@ public class EmployeeController : Controller
     [HttpGet]
     public IActionResult GetReceivablesEmployee()
     {
-        var Employees = DB.Employees.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) > 0).Select(x => new
+        var Employees = DB.Employee.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) > 0).Select(x => new
         {
             x.Id,
             x.Name,
@@ -47,7 +48,7 @@ public class EmployeeController : Controller
     [HttpGet]
     public IActionResult GetPayablesEmployee()
     {
-        var Employees = DB.Employees.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) < 0).Select(x => new
+        var Employees = DB.Employee.Where(f => (f.Account.EntryMovements.Select(d => d.Credit).Sum() - f.Account.EntryMovements.Select(d => d.Debit).Sum()) < 0).Select(x => new
         {
             x.Id,
             x.Name,
@@ -71,7 +72,7 @@ public class EmployeeController : Controller
     [HttpGet]
     public IActionResult GetEmployee()
     {
-        var Employees = DB.Employees.Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1, x.Tag }).ToList();
+        var Employees = DB.Employee.Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1, x.Tag }).ToList();
 
         return Ok(Employees);
     }
@@ -81,7 +82,7 @@ public class EmployeeController : Controller
     public IActionResult GetEmployeeByAny(string Any)
     {
         _ = Any.ToLower();
-        var Employees = DB.Employees.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")))
+        var Employees = DB.Employee.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")))
             .Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1 }).ToList();
 
         return Ok(Employees);
@@ -90,7 +91,7 @@ public class EmployeeController : Controller
     [Route("Employee/GetByListQ")]
     public IActionResult GetByListQ(int Limit, string Sort, int Page, int? Status, string Any)
     {
-        var Employees = DB.Employees.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (Status == null || s.Status == Status)).Select(x => new
+        var Employees = DB.Employee.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.Name.Contains(Any)) && (Status == null || s.Status == Status)).Select(x => new
         {
             x.Id,
             x.Name,
@@ -125,7 +126,7 @@ public class EmployeeController : Controller
     [HttpGet]
     public IActionResult CheckEmployeeIsExist(string Ssn, string PhoneNumber)
     {
-        var Employees = DB.Employees.Where(m => m.Ssn == Ssn || m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", "")).ToList();
+        var Employees = DB.Employee.Where(m => m.Ssn == Ssn || m.PhoneNumber1.Replace("0", "") == PhoneNumber.Replace("0", "")).ToList();
 
         return Ok(Employees.Count > 0);
     }
@@ -136,7 +137,7 @@ public class EmployeeController : Controller
     {
         try
         {
-            var Employee = DB.Employees.Where(x => x.Status == 0).Select(x => new
+            var Employee = DB.Employee.Where(x => x.Status == 0).Select(x => new
             {
                 x.Id,
                 x.Name,
@@ -164,7 +165,7 @@ public class EmployeeController : Controller
     [HttpGet]
     public IActionResult GetEmployeeByStatus(int Status)
     {
-        var Employees = DB.Employees.Where(f => f.Status == Status).Select(x => new
+        var Employees = DB.Employee.Where(f => f.Status == Status).Select(x => new
         {
             x.Id,
             x.Name,
@@ -178,8 +179,8 @@ public class EmployeeController : Controller
             x.Tag,
             x.Vaccine,
             x.JobTitle,
-            TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
-            TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum()
+            TotalDebit = DB.EntryMovement.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
+            TotalCredit = DB.EntryMovement.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum()
             // Avatar = Url.Content("~/Images/Member/" + x.Id + ".jpeg").ToString(),
         }).ToList();
         return Ok(Employees);
@@ -199,7 +200,7 @@ public class EmployeeController : Controller
                 Description = collection.Description,
                 Status = 0,
                 Code = "",
-                ParentId = DB.TreeAccounts.Where(x => x.Type == "Employees-Main").SingleOrDefault().Code
+                ParentId = DB.TreeAccount.Where(x => x.Type == "Employees-Main").SingleOrDefault().Code
             };
 
             var NewUser = new IdentityUser()
@@ -218,10 +219,10 @@ public class EmployeeController : Controller
             Pass = NewUser.PasswordHash;
 
             collection.EmployeeUserId = NewUser.Id;
-            DB.TreeAccounts.Add(NewAccount);
+            DB.TreeAccount.Add(NewAccount);
             DB.SaveChanges();
             collection.AccountId = NewAccount.Id;
-            DB.Employees.Add(collection);
+            DB.Employee.Add(collection);
             DB.SaveChanges();
             return Ok(collection.Id);
         }
@@ -234,7 +235,7 @@ public class EmployeeController : Controller
     {
         if (ModelState.IsValid)
         {
-            Employee Employee = DB.Employees.Where(x => x.Id == collection.Id).SingleOrDefault();
+            Employee Employee = DB.Employee.Where(x => x.Id == collection.Id).SingleOrDefault();
             Employee.Name = collection.Name;
             Employee.LatinName = collection.LatinName;
             Employee.Ssn = collection.Ssn;
@@ -265,7 +266,7 @@ public class EmployeeController : Controller
     [HttpGet]
     public IActionResult GetEmployeeById(long? Id)
     {
-        var Employees = DB.Employees.Where(m => m.Id == Id).Select(
+        var Employees = DB.Employee.Where(m => m.Id == Id).Select(
             x => new
             {
                 x.Id,
@@ -283,9 +284,9 @@ public class EmployeeController : Controller
                 x.Tag,
                 x.Vaccine,
                 Avatar = Url.Content("~/Images/Employee/" + x.Id + ".jpeg"),
-                HaveFaceOnDevice = DB.FingerPrints.Where(f => f.Fk == x.Id.ToString() && f.TableName == "Employee").Any() ? true : false,
-                TotalDebit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
-                TotalCredit = DB.EntryMovements.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
+                HaveFaceOnDevice = DB.FingerPrint.Where(f => f.Fk == x.Id.ToString() && f.TableName == "Employee").Any() ? true : false,
+                TotalDebit = DB.EntryMovement.Where(l => l.AccountId == x.AccountId).Select(d => d.Debit).Sum(),
+                TotalCredit = DB.EntryMovement.Where(l => l.AccountId == x.AccountId).Select(c => c.Credit).Sum(),
                 x.AccountId,
             }).SingleOrDefault();
         return Ok(Employees);
@@ -294,7 +295,7 @@ public class EmployeeController : Controller
     [HttpGet]
     public IActionResult FixPhoneNumber()
     {
-        DB.Employees.Where(i => i.PhoneNumber1 != null).ToList().ForEach(s =>
+        DB.Employee.Where(i => i.PhoneNumber1 != null).ToList().ForEach(s =>
         {
             s.PhoneNumber1 = s.PhoneNumber1.Replace(" ", "");
             s.PhoneNumber1 = s.PhoneNumber1.Length == 10 ? s.PhoneNumber1.Substring(1) : s.PhoneNumber1;

@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿
+using Domain.Entities; using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,8 +15,8 @@ namespace RestApi.Controllers;
 [Authorize]
 public class BillOfEnteryController : Controller
 {
-    private ConicErpContext DB;
-    public BillOfEnteryController(ConicErpContext dbcontext)
+    private readonly IApplicationDbContext DB;
+    public BillOfEnteryController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
     }
@@ -28,7 +29,7 @@ public class BillOfEnteryController : Controller
         else
             await CheckBillOfEntery();
 
-        var Invoices = DB.BillOfEnterys.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.BonId.Contains(Any) || s.Description.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
+        var Invoices = DB.BillOfEntery.Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.BonId.Contains(Any) || s.Description.Contains(Any)) && (DateFrom == null || s.FakeDate >= DateFrom)
         && (DateTo == null || s.FakeDate <= DateTo) && (Status == null || s.Status == Status)).Select(x => new
         {
             x.Id,
@@ -39,8 +40,8 @@ public class BillOfEnteryController : Controller
             x.Status,
             x.PurchaseInvoiceId,
             x.ST9,
-            //  Logs = DB.ActionLogs.Where(l => l.BillOfEnteryId == x.Id).ToList(),
-            InventoryMovements = DB.InventoryMovements.Where(m => m.PurchaseInvoiceId == x.PurchaseInvoiceId && m.Items.TakeBon == true).Select(imx => new
+            //  Logs = DB.ActionLog.Where(l => l.BillOfEnteryId == x.Id).ToList(),
+            InventoryMovements = DB.InventoryMovement.Where(m => m.PurchaseInvoiceId == x.PurchaseInvoiceId && m.Items.TakeBon == true).Select(imx => new
             {
                 imx.Id,
                 imx.ItemsId,
@@ -49,12 +50,12 @@ public class BillOfEnteryController : Controller
                 imx.TypeMove,
                 imx.InventoryItemId,
                 imx.Qty,
-                Total = DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Sum(s => s.Qty),
+                Total = DB.InventoryMovement.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Sum(s => s.Qty),
                 imx.EXP,
                 imx.SellingPrice,
                 imx.Description,
-                Status = DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Sum(s => s.Qty) - imx.Qty == 0 ? 1 : 0,
-                BillOfEnteryItemMovements = DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Select(ibex => new
+                Status = DB.InventoryMovement.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Sum(s => s.Qty) - imx.Qty == 0 ? 1 : 0,
+                BillOfEnteryItemMovements = DB.InventoryMovement.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Select(ibex => new
                 {
                     ibex.Id,
                     ibex.ItemsId,
@@ -65,7 +66,7 @@ public class BillOfEnteryController : Controller
                     ibex.TypeMove,
                     ibex.InventoryItemId,
                     ibex.Qty,
-                    Total = Utility.toFixed(Math.Abs(DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null && m.Id <= ibex.Id).Sum(s => s.Qty) - imx.Qty), 2),
+                    Total = Utility.toFixed(Math.Abs(DB.InventoryMovement.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null && m.Id <= ibex.Id).Sum(s => s.Qty) - imx.Qty), 2),
                     ibex.EXP,
                     ibex.SellingPrice,
                     ibex.Description,
@@ -92,9 +93,9 @@ public class BillOfEnteryController : Controller
     {
         if (fromScratch)
         {
-            DB.InventoryMovements.ToList().ForEach(x => x.BillOfEnteryId = null);
+            DB.InventoryMovement.ToList().ForEach(x => x.BillOfEnteryId = null);
         }
-        var billOfEnterys = await DB.BillOfEnterys.ToListAsync();
+        var billOfEnterys = await DB.BillOfEntery.ToListAsync();
         billOfEnterys.ForEach(x => x.Status = 0);
         DB.SaveChanges();
 
@@ -107,8 +108,8 @@ public class BillOfEnteryController : Controller
             x.Description,
             x.Status,
             x.PurchaseInvoiceId,
-            //  Logs = DB.ActionLogs.Where(l => l.BillOfEnteryId == x.Id).ToList(),
-            InventoryMovements = DB.InventoryMovements.Where(m => m.PurchaseInvoiceId == x.PurchaseInvoiceId && m.Items.TakeBon == true).Select(imx => new
+            //  Logs = DB.ActionLog.Where(l => l.BillOfEnteryId == x.Id).ToList(),
+            InventoryMovements = DB.InventoryMovement.Where(m => m.PurchaseInvoiceId == x.PurchaseInvoiceId && m.Items.TakeBon == true).Select(imx => new
             {
                 imx.Id,
                 imx.ItemsId,
@@ -117,7 +118,7 @@ public class BillOfEnteryController : Controller
                 imx.TypeMove,
                 imx.InventoryItemId,
                 imx.Qty,
-                // Total = DB.InventoryMovements.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Sum(s=>s.Qty),
+                // Total = DB.InventoryMovement.Where(m => m.BillOfEnteryId == x.Id && m.ItemsId == imx.ItemsId && m.SalesInvoiceId != null).Sum(s=>s.Qty),
                 imx.EXP,
                 imx.SellingPrice,
                 imx.Description,
@@ -129,7 +130,7 @@ public class BillOfEnteryController : Controller
             foreach (var inventoryMovement in billOfEntery.InventoryMovements)
             {
                 double QtyBillEnteryItem = inventoryMovement.Qty;
-                var SaleItemMoves = DB.InventoryMovements.Where(x => x.SalesInvoice != null
+                var SaleItemMoves = DB.InventoryMovement.Where(x => x.SalesInvoice != null
                 && x.ItemsId == inventoryMovement.ItemsId
                 && x.BillOfEnteryId == null).OrderBy(o => o.SalesInvoice.FakeDate).ToList();
                 foreach (var saleItemMove in SaleItemMoves)
@@ -149,7 +150,7 @@ public class BillOfEnteryController : Controller
                         QtyBillEnteryItem -= QtyBillEnteryItem; // mean zero
                         saleItemMove.Qty -= ModQty;
                         saleItemMove.BillOfEnteryId = billOfEntery.Id;
-                        DB.InventoryMovements.Add(new InventoryMovement
+                        DB.InventoryMovement.Add(new InventoryMovement
                         {
                             ItemsId = saleItemMove.ItemsId,
                             TypeMove = saleItemMove.TypeMove,
@@ -170,11 +171,11 @@ public class BillOfEnteryController : Controller
                         break;
                     }
                 }
-                if (DB.InventoryMovements.Where(m => m.BillOfEnteryId == billOfEntery.Id && m.ItemsId == inventoryMovement.ItemsId && m.SalesInvoiceId != null).Sum(s => s.Qty) - inventoryMovement.Qty == 0)
+                if (DB.InventoryMovement.Where(m => m.BillOfEnteryId == billOfEntery.Id && m.ItemsId == inventoryMovement.ItemsId && m.SalesInvoiceId != null).Sum(s => s.Qty) - inventoryMovement.Qty == 0)
                     HowWillBeClose -= 1;
             }
             if (HowWillBeClose == 0)
-                DB.BillOfEnterys.Find(billOfEntery.Id).Status = 1; // Bill Of Entery Is Close
+                DB.BillOfEntery.Find(billOfEntery.Id).Status = 1; // Bill Of Entery Is Close
             DB.SaveChanges();
 
         }
@@ -183,7 +184,7 @@ public class BillOfEnteryController : Controller
     private async Task<bool> CheckBillOfEntery()
     {
 
-        var billOfEnterys = await DB.BillOfEnterys.ToListAsync();
+        var billOfEnterys = await DB.BillOfEntery.ToListAsync();
         billOfEnterys.ForEach(x => x.Status = 0);
         DB.SaveChanges();
 
@@ -196,7 +197,7 @@ public class BillOfEnteryController : Controller
             x.Description,
             x.Status,
             x.PurchaseInvoiceId,
-            InventoryMovements = DB.InventoryMovements.Where(m => m.PurchaseInvoiceId == x.PurchaseInvoiceId && m.Items.TakeBon == true).Select(imx => new
+            InventoryMovements = DB.InventoryMovement.Where(m => m.PurchaseInvoiceId == x.PurchaseInvoiceId && m.Items.TakeBon == true).Select(imx => new
             {
                 imx.Id,
                 imx.ItemsId,
@@ -208,7 +209,7 @@ public class BillOfEnteryController : Controller
             int HowWillBeClose = billOfEntery.InventoryMovements.Count(); // when be 0 mean all item is close 
             foreach (var inventoryMovement in billOfEntery.InventoryMovements)
             {
-                var SaleItemMoves = DB.InventoryMovements.Where(x => x.SalesInvoice != null
+                var SaleItemMoves = DB.InventoryMovement.Where(x => x.SalesInvoice != null
                              && x.ItemsId == inventoryMovement.ItemsId
                              && x.BillOfEnteryId == billOfEntery.Id).OrderBy(o => o.SalesInvoice.FakeDate).ToList();
 
@@ -216,7 +217,7 @@ public class BillOfEnteryController : Controller
                     HowWillBeClose -= 1;
             }
             if (HowWillBeClose == 0)
-                DB.BillOfEnterys.Find(billOfEntery.Id).Status = 1; // Bill Of Entery Is Close
+                DB.BillOfEntery.Find(billOfEntery.Id).Status = 1; // Bill Of Entery Is Close
             DB.SaveChanges();
         }
         return true;
@@ -232,8 +233,8 @@ public class BillOfEnteryController : Controller
             try
             {
                 // TODO: Add insert logic here
-                //  collection.InventoryMovements.ToList().ForEach(s => DB.Items.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
-                DB.BillOfEnterys.Add(collection);
+                //  collection.InventoryMovement.ToList().ForEach(s => DB.Item.Where(x => x.Id == s.ItemsId).SingleOrDefault().CostPrice = s.SellingPrice);
+                DB.BillOfEntery.Add(collection);
                 await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(collection.Id);
 
@@ -254,7 +255,7 @@ public class BillOfEnteryController : Controller
         {
             try
             {
-                BillOfEntery Invoice = DB.BillOfEnterys.Where(x => x.Id == collection.Id).SingleOrDefault();
+                BillOfEntery Invoice = DB.BillOfEntery.Where(x => x.Id == collection.Id).SingleOrDefault();
 
                 Invoice.BonId = collection.BonId;
                 Invoice.ItemsIds = collection.ItemsIds;
@@ -281,7 +282,7 @@ public class BillOfEnteryController : Controller
     [HttpGet]
     public IActionResult GetBillOfEnteryById(long? Id)
     {
-        var Invoices = DB.BillOfEnterys.Where(i => i.Id == Id).Select(x => new
+        var Invoices = DB.BillOfEntery.Where(i => i.Id == Id).Select(x => new
         {
             x.Id,
             x.BonId,
@@ -291,8 +292,8 @@ public class BillOfEnteryController : Controller
             x.Status,
             x.PurchaseInvoiceId,
             x.ST9,
-            //  Logs = DB.ActionLogs.Where(l => l.BillOfEnteryId == x.Id).ToList(),
-            InventoryMovements = DB.InventoryMovements.Where(m => m.PurchaseInvoiceId == x.PurchaseInvoiceId && m.Items.TakeBon == true).Select(imx => new
+            //  Logs = DB.ActionLog.Where(l => l.BillOfEnteryId == x.Id).ToList(),
+            InventoryMovements = DB.InventoryMovement.Where(m => m.PurchaseInvoiceId == x.PurchaseInvoiceId && m.Items.TakeBon == true).Select(imx => new
             {
                 imx.Id,
                 imx.ItemsId,
@@ -302,7 +303,7 @@ public class BillOfEnteryController : Controller
                 imx.Qty,
                 imx.EXP,
                 imx.SellingPrice,
-                SalesItemMovements = DB.InventoryMovements.Where(m => m.SalesInvoiceId != null && m.ItemsId == imx.ItemsId).Select(imx => new
+                SalesItemMovements = DB.InventoryMovement.Where(m => m.SalesInvoiceId != null && m.ItemsId == imx.ItemsId).Select(imx => new
                 {
                     imx.Id,
                     imx.ItemsId,
@@ -327,8 +328,8 @@ public class BillOfEnteryController : Controller
     [HttpGet]
     public IActionResult GetActiveBillOfEnteryForItemId(long ItemId)
     {
-        var Invoices = DB.BillOfEnterys.Where(i => i.Status == 0
-        && DB.InventoryMovements.Where(m => m.PurchaseInvoiceId == i.PurchaseInvoiceId && m.ItemsId == ItemId).Count() > 0).Select(x => new
+        var Invoices = DB.BillOfEntery.Where(i => i.Status == 0
+        && DB.InventoryMovement.Where(m => m.PurchaseInvoiceId == i.PurchaseInvoiceId && m.ItemsId == ItemId).Count() > 0).Select(x => new
         {
             x.Id,
             x.BonId,
@@ -345,7 +346,7 @@ public class BillOfEnteryController : Controller
     [HttpGet]
     public IActionResult GetBillOfEnteryByPurchaseId(long? Id)
     {
-        var Invoices = DB.BillOfEnterys.Where(i => i.PurchaseInvoiceId == Id).Select(x => new
+        var Invoices = DB.BillOfEntery.Where(i => i.PurchaseInvoiceId == Id).Select(x => new
         {
             x.Id,
             x.BonId,
@@ -366,7 +367,7 @@ public class BillOfEnteryController : Controller
         {
             try
             {
-                InventoryMovement Movement = DB.InventoryMovements.Where(x => x.Id == InventoryMovementsId).SingleOrDefault();
+                InventoryMovement Movement = DB.InventoryMovement.Where(x => x.Id == InventoryMovementsId).SingleOrDefault();
                 Movement.BillOfEnteryId = Pin == true ? BillOfEnteryId : null;
                 await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
@@ -387,7 +388,7 @@ public class BillOfEnteryController : Controller
         {
             try
             {
-                BillOfEntery Bill = DB.BillOfEnterys.Where(x => x.Id == BillOfEnteryId).SingleOrDefault();
+                BillOfEntery Bill = DB.BillOfEntery.Where(x => x.Id == BillOfEnteryId).SingleOrDefault();
                 Bill.ST9 = St9;
                 await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
