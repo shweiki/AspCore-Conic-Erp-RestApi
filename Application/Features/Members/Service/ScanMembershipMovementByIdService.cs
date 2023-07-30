@@ -8,8 +8,7 @@ namespace Application.Features.Members.Service;
 
 public class ScanMembershipMovementByIdService : IRequest<bool>
 {
-    public long Id { get; set; } 
-
+    public long Id { get; set; }
 }
 
 public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMembershipMovementByIdService, bool>
@@ -27,39 +26,36 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
         _context = context;
         _logger = logger;
         _mediator = sender;
-
     }
 
     public async Task<bool> Handle(ScanMembershipMovementByIdService request, CancellationToken cancellationToken)
     {
- 
-
         try
         {
-            MembershipMovement MS = await _context.MembershipMovement.Include(x => x.Member).Include(x => x.Membership).Include(x => x.MembershipMovementOrders).SingleOrDefaultAsync(x => x.Id == request.Id);
-            var member = MS.Member;
-            if (MS is null)
+            MembershipMovement membershipMovement = await _context.MembershipMovement.Include(x => x.Member).Include(x => x.Membership).Include(x => x.MembershipMovementOrders).SingleOrDefaultAsync(x => x.Id == request.Id);
+            var member = membershipMovement.Member;
+
+            if (membershipMovement is null)
             {
                 member.Status = -1;
                 return true;
-
             }
 
             int OStatus = member.Status;
-            double TotalMembershipMovementOrders = MS.MembershipMovementOrders.Where(x => x.Status == -2 || x.Status == -3).ToList().Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
-            int MembershipNumberDays = MS.Membership.NumberDays;// DB.Memberships.Where(m => m.Id == MS.MembershipId).FirstOrDefault().NumberDays;
-            MS.StartDate = MS.StartDate.Date;
-            MS.EndDate = MS.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders).Date.AddDays(1).AddSeconds(-1);
-            if (DateTime.Today >= MS.StartDate.Date && DateTime.Today <= MS.EndDate.Date.AddDays(1).AddSeconds(-1))
+            double TotalMembershipMovementOrders = membershipMovement.MembershipMovementOrders.Where(x => x.Status == -2 || x.Status == -3).ToList().Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
+            int MembershipNumberDays = membershipMovement.Membership.NumberDays;// DB.Memberships.Where(m => m.Id == MS.MembershipId).FirstOrDefault().NumberDays;
+            membershipMovement.StartDate = membershipMovement.StartDate.Date;
+            membershipMovement.EndDate = membershipMovement.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders).Date.AddDays(1).AddSeconds(-1);
+            if (DateTime.Today >= membershipMovement.StartDate.Date && DateTime.Today <= membershipMovement.EndDate.Date.AddDays(1).AddSeconds(-1))
             {
 
-                MS.Status = 1;
+                membershipMovement.Status = 1;
                 member.Status = 0;
-                var HowManyDaysLeft = (MS.EndDate - DateTime.Today).TotalDays;
+                var HowManyDaysLeft = (membershipMovement.EndDate - DateTime.Today).TotalDays;
                 if (HowManyDaysLeft == 3)
                 {
                     Massage msg = new();
-                    msg.Body = "عزيزي " + member.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + MS.EndDate + " وشكرا";
+                    msg.Body = "عزيزي " + member.Name + " يسعدنا ان تكون متواجد دائماَ معنا في High Fit , نود تذكيرك بان اشتراك الحالي سينتهي بعد 3 ايام وبتاريخ " + membershipMovement.EndDate + " وشكرا";
                     msg.Status = 0;
                     msg.TableName = "Member";
                     msg.Fktable = member.Id;
@@ -73,66 +69,66 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
             else
             {
 
-                if (MS.StartDate.Date > DateTime.Today)
+                if (membershipMovement.StartDate.Date > DateTime.Today)
                 {// معلق
-                    MS.Status = -2;
+                    membershipMovement.Status = -2;
                 }
                 else
                 {
-                    MS.Status = -1;
+                    membershipMovement.Status = -1;
                     member.Status = -1;
                 }
             }
 
-            foreach (var MSO in MS.MembershipMovementOrders.Where(x => x.Status == 1 || x.Status == 2).ToList())
+            foreach (var membershipMovementOrder in membershipMovement.MembershipMovementOrders.Where(x => x.Status == 1 || x.Status == 2).ToList())
             {
-                if (MSO.Status == 2)
+                if (membershipMovementOrder.Status == 2)
                 {
-                    MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
-                    MSO.Status = -2;
+                    membershipMovement.EndDate = membershipMovement.EndDate.AddDays((membershipMovementOrder.EndDate - membershipMovementOrder.StartDate).TotalDays);
+                    membershipMovementOrder.Status = -2;
                     continue;
                 }
-                if ((DateTime.Today >= MSO.StartDate.Date && DateTime.Today <= MSO.EndDate.Date.AddDays(1).AddSeconds(-1)))
+                if ((DateTime.Today >= membershipMovementOrder.StartDate.Date && DateTime.Today <= membershipMovementOrder.EndDate.Date.AddDays(1).AddSeconds(-1)))
                 {
-                    if (MSO.Type == "Freeze")
+                    if (membershipMovementOrder.Type == "Freeze")
                     {
-                        MS.Status = 2;
+                        membershipMovement.Status = 2;
                         member.Status = 1;
                     }
-                    if (MSO.Type == "Extra")
+                    if (membershipMovementOrder.Type == "Extra")
                     {
-                        MS.Status = 3;
+                        membershipMovement.Status = 3;
                         member.Status = 2;
 
                     }
                 }
                 else
                 {
-                    if (MSO.Type == "Extra")
+                    if (membershipMovementOrder.Type == "Extra")
                     {
-                        MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
-                        MSO.Status = -3;
+                        membershipMovement.EndDate = membershipMovement.EndDate.AddDays((membershipMovementOrder.EndDate - membershipMovementOrder.StartDate).TotalDays);
+                        membershipMovementOrder.Status = -3;
                     }
-                    if (DateTime.Today > MSO.EndDate)
+                    if (DateTime.Today > membershipMovementOrder.EndDate)
                     {
 
-                        MS.EndDate = MS.EndDate.AddDays((MSO.EndDate - MSO.StartDate).TotalDays);
-                        MSO.Status = -3;
+                        membershipMovement.EndDate = membershipMovement.EndDate.AddDays((membershipMovementOrder.EndDate - membershipMovementOrder.StartDate).TotalDays);
+                        membershipMovementOrder.Status = -3;
                     }
 
                 }
-                if ((MS.EndDate.Date.AddDays(1).AddSeconds(-1) > DateTime.Today))
+                if ((membershipMovement.EndDate.Date.AddDays(1).AddSeconds(-1) > DateTime.Today))
                 {
 
 
-                    MS.Status = 1;
+                    membershipMovement.Status = 1;
                     member.Status = 1;
-                    var DeviceLogs = await _context.DeviceLog.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && (x.DateTime.Date >= MS.StartDate.Date && x.DateTime.Date <= MS.EndDate.Date)).ToListAsync();
+                    var DeviceLogs = await _context.DeviceLog.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && (x.DateTime.Date >= membershipMovement.StartDate.Date && x.DateTime.Date <= membershipMovement.EndDate.Date)).ToListAsync();
                     if (DeviceLogs != null && DeviceLogs.Count > 0)
                     {
                         DeviceLogs = DeviceLogs.GroupBy(a => a.DateTime.Day).Select(g => g.Last()).ToList();
-                        MS.VisitsUsed = DeviceLogs.Count();
-                        int NumberClass = (int)(MS.Membership.NumberClass == null ? 0 : MS.Membership.NumberClass);
+                        membershipMovement.VisitsUsed = DeviceLogs.Count();
+                        int NumberClass = (int)(membershipMovement.Membership.NumberClass == null ? 0 : membershipMovement.Membership.NumberClass);
 
                         //var WhenFinishNumberOfClassUnActiveMemberShip = Configuration["GymConfiguration:WhenFinishNumberOfClassUnActiveMemberShip"];
                         //if (WhenFinishNumberOfClassUnActiveMemberShip == "True")
@@ -148,13 +144,12 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
                 }
 
 
-
-                  await _context.SaveChangesAsync(cancellationToken);
-
             }
 
             if (OStatus == -2) member.Status = -2;
-            //   await DB.SaveChangesAsync();
+
+
+            await _context.SaveChangesAsync(cancellationToken);
 
             return true;
 

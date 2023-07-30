@@ -24,29 +24,27 @@ public class ScanMemberStatueJobCommandHandler : IRequestHandler<ScanMemberStatu
     {
 
 
-        var Members = await _context.Member.Include(x => x.MembershipMovements).ToListAsync();
+        var members = await _context.Member.Include(x => x.MembershipMovements).ToListAsync();
 
-        foreach (var member in Members)
+        foreach (var member in members)
         {
             try
             {
-
-
                 int OStatus = member.Status;
 
-                var MembershipMovements = member.MembershipMovements.ToList();
+                var membershipMovements = member.MembershipMovements.ToList();
 
-                if (MembershipMovements.Count() <= 0)
+                if (membershipMovements.Count() <= 0)
                 {
                     member.Status = -1;
                 }
                 else
                 {
-                    foreach (var MS in MembershipMovements.OrderBy(o => o.Id))
+                    foreach (var membershipMovement in membershipMovements.OrderBy(o => o.Id))
                     {
                         var query = new ScanMembershipMovementByIdService
                         {
-                            Id = MS.Id
+                            Id = membershipMovement.Id
                         };
                         await _mediator.Send(query);
 
