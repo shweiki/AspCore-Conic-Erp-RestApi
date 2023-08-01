@@ -4,7 +4,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Features.Members.Service;
+namespace Application.Features.Members.Services;
 
 public class ScanMembershipMovementByIdService : IRequest<bool>
 {

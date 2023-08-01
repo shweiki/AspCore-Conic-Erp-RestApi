@@ -4,11 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RestApi.Controllers;
 
@@ -363,27 +358,27 @@ public class MemberController : Controller
         {
             try
             {
-         
-                    int OStatus = member.Status;
 
-                    var MembershipMovements = member.MembershipMovements.ToList();
+                int OStatus = member.Status;
 
-                    if (MembershipMovements.Count() <= 0)
+                var MembershipMovements = member.MembershipMovements.ToList();
+
+                if (MembershipMovements.Count() <= 0)
+                {
+                    member.Status = -1;
+                }
+                else
+                {
+                    foreach (var MS in MembershipMovements.OrderBy(o => o.Id))
                     {
-                        member.Status = -1;
+                        await MembershipMovementController.ScanMembershipMovementById(MS.Id, DB, _configuration);
                     }
-                    else
-                    {
-                        foreach (var MS in MembershipMovements.OrderBy(o => o.Id))
-                        {
-                            await MembershipMovementController.ScanMembershipMovementById(MS.Id, DB, _configuration);
-                        }
-                    }
-                    if (OStatus == -2) member.Status = -2;
+                }
+                if (OStatus == -2) member.Status = -2;
 
-                    await DB.SaveChangesAsync();
+                await DB.SaveChangesAsync();
 
-                 //CheckBlackListActionLogMembers();
+                //CheckBlackListActionLogMembers();
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
-﻿using Application.Features.SystemNotifications.Commands.ScanMemberStatueJob;
+﻿using Application.Features.SystemNotifications.Commands.FixBase64ToPathWithLoadedJob;
+using Application.Features.SystemNotifications.Commands.ScanMemberStatueJob;
 using MediatR;
 
 
@@ -16,6 +17,10 @@ public class MediatorHelper
     public async Task ScanMemberStatueJobCommand()
     {
         await _mediator.Send(new ScanMemberStatueJobCommand());
+    }   
+    public async Task FixBase64ToPathWithLoadedJobCommand()
+    {
+        await _mediator.Send(new FixBase64ToPathWithLoadedJobCommand());
     }
 
 }

@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces;
-using Application.Features.Members.Service;
+using Application.Features.Members.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

@@ -4,10 +4,9 @@ using MediatR;
 using Microsoft.Extensions.FileProviders;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
-string ImagesPath = "C:\\ConicImages";
 
 var builder = WebApplication.CreateBuilder(args);
-ImagesPath = builder.Configuration.GetValue<string>("ImagesPath") ?? "C:\\ConicImages";
+string ImagesPath = builder.Configuration.GetValue<string>("ImagesPath") ?? "C:\\ConicFiles";
 if (!Directory.Exists(ImagesPath))
 {
     Directory.CreateDirectory(ImagesPath);

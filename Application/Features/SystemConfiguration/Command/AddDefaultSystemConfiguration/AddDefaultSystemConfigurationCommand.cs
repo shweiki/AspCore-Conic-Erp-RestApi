@@ -22,13 +22,9 @@ public class AddDefaultSystemConfigurationCommandHandler : IRequestHandler<AddDe
                 new Domain.Entities.SystemConfiguration {  Key = "System.DefaultFilesPath",  Value = "C:/ConicFiles/" },
                 new Domain.Entities.SystemConfiguration {  Key = "System.EmailNotificationEnabled" ,  Value ="true" },
                 new Domain.Entities.SystemConfiguration {  Key = "System.LicenseExpiryNotificationPeriodInDays" ,  Value = "7" },
-                new Domain.Entities.SystemConfiguration {  Key = "System.DSSExpiryNotificationPeriodInDays" ,  Value = "7" },
-                new Domain.Entities.SystemConfiguration {  Key = "System.DigitalCertificateExpiryNotificationPeriodInDays" ,  Value = "7" },
-                new Domain.Entities.SystemConfiguration {  Key = "System.SignatureQuotaLimitNotificationPeriodInPercentage" ,  Value = "85" },
                 new Domain.Entities.SystemConfiguration {  Key = "System.OTPExpiryPeriodInMinute" ,  Value = "5" },
                 new Domain.Entities.SystemConfiguration {  Key = "System.OTPResendLimit" ,  Value = "3" },
                 new Domain.Entities.SystemConfiguration {  Key = "System.OTPSessionTimeOutInMinute" ,  Value = "30" },
-                new Domain.Entities.SystemConfiguration {  Key = "System.TerminatedSignedSignaturePeriodInDay" ,  Value = "7" },
                 new Domain.Entities.SystemConfiguration {  Key = "System.UsingWinAuth" ,  Value ="false" },
                 new Domain.Entities.SystemConfiguration {  Key = "System.HomePageUrl" ,  Value = "https://localhost:7041/" },
                 new Domain.Entities.SystemConfiguration {  Key = "System.LocationServiceUrl" ,  Value = "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={latitude}&longitude={longitude}" },
@@ -56,7 +52,7 @@ public class AddDefaultSystemConfigurationCommandHandler : IRequestHandler<AddDe
                 await _context.SystemConfiguration.AddAsync(systemConfiguration);
             }
         }
-        await _context.SaveChangesAsync(cancellationToken, "");
+        await _context.SaveChangesAsync(cancellationToken);
 
         return 0;
     }
