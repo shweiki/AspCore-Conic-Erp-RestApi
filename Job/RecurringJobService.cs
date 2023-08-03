@@ -23,6 +23,7 @@ public class RecurringJobService : BackgroundService
         try
         {
             string dailyIntervalCron = Cron.Daily(8);
+            string dailyIntervalCronActivated3AM = Cron.Daily(3);
             string hourIntervalCron = Cron.Hourly(6);
             string neverJustAdd = Cron.Never();
 
@@ -32,6 +33,7 @@ public class RecurringJobService : BackgroundService
             }
 
             _recurringJobManager.AddOrUpdate<MediatorHelper>("ScanMemberStatueJobCommand", x => x.ScanMemberStatueJobCommand(), dailyIntervalCron);
+            _recurringJobManager.AddOrUpdate<MediatorHelper>("BackupJobCommand", x => x.BackupJobCommand(), dailyIntervalCronActivated3AM);
             _recurringJobManager.AddOrUpdate<MediatorHelper>("FixBase64ToPathWithLoadedJobCommand", x => x.FixBase64ToPathWithLoadedJobCommand(), neverJustAdd);
         }
         catch (Exception ex)

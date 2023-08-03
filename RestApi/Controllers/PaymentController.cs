@@ -1,12 +1,9 @@
-﻿using Domain.Entities; using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RestApi.Controllers;
 
@@ -82,15 +79,17 @@ public class PaymentController : Controller
     }
     [Route("Payment/GetPaymentsByMemberId")]
     [HttpGet]
-    public IActionResult GetPaymentsByMemberId(long? MemberId)
+    public async Task<IActionResult> GetPaymentsByMemberId(long? MemberId)
     {
-        var Payments = DB.Payment.Where(i => i.MemberId == MemberId).Select(x => new
+        var itemsQuery = DB.Payment.Where(i => i.MemberId == MemberId).AsQueryable();
+       var items = await itemsQuery.ToListAsync();
+        items.Select(x => new
         {
             x.Id,
             x.TotalAmmount,
             x.Type,
             x.EditorName,
-            Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
+            Name = (x.Vendor?.Name ?? "") + (x.Member?.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
             ObjectId = x.VendorId == null ? x.MemberId : x.VendorId,
@@ -101,7 +100,7 @@ public class PaymentController : Controller
             x.Status
         }).ToList();
 
-        return Ok(Payments);
+        return Ok(items);
     }
     [Route("Payment/GetPaymentsByVendorId")]
     [HttpGet]

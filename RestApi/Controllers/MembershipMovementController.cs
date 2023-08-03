@@ -1,13 +1,8 @@
-﻿using Domain.Entities; using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace RestApi.Controllers;
 
@@ -25,7 +20,7 @@ public class MembershipMovementController : Controller
 
     [Route("MembershipMovement/Create")]
     [HttpPost]
-    public IActionResult Create(MembershipMovement collection)
+    public async Task<IActionResult> Create(MembershipMovement collection)
     {
         if (ModelState.IsValid)
         {
@@ -34,7 +29,7 @@ public class MembershipMovementController : Controller
                 collection.StartDate = collection.StartDate.Date;
                 collection.EndDate = collection.EndDate.Date.AddDays(1).AddSeconds(-1);
                 DB.MembershipMovement.Add(collection);
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Created("", collection);
 
             }
@@ -433,7 +428,7 @@ public class MembershipMovementController : Controller
 
             return Ok(true);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             return Ok(ex.Message);
         }

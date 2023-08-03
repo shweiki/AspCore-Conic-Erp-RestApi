@@ -89,6 +89,7 @@ public static class ConfigureServices
                 ValidateAudience = true,
                 ValidIssuer = bindJwtSettings.ValidIssuer,
                 ValidAudience = bindJwtSettings.ValidAudience,
+                RequireExpirationTime = bindJwtSettings.RequireExpirationTime,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(bindJwtSettings.IssuerSigningKey))
             };
         });

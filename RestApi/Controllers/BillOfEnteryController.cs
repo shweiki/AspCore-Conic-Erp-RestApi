@@ -1,14 +1,11 @@
 ﻿
-using Domain.Entities; using Application.Common.Interfaces;
+using Application.Common.Helper;
+using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RestApi.Helper;
-using System;
 using System.Data;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RestApi.Controllers;
 

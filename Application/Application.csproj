@@ -6,12 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Services\**" />
-    <EmbeddedResource Remove="Services\**" />
-    <None Remove="Services\**" />
-  </ItemGroup>
-
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.6.0" />
@@ -28,12 +22,20 @@
 		<PackageReference Include="Otp.NET" Version="1.3.0" />
 		<PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
 		<PackageReference Include="System.Drawing.Common" Version="7.0.0" />
-	</ItemGroup>
+    <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="170.18.0" />
+
+  </ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Features\MemberShips\Commands\" />
+	  <Folder Include="Features\MemberShips\Queries\" />
+	  <Folder Include="Features\Members\Commands\" />
 	  <Folder Include="Features\Members\Commands\" />
 	  <Folder Include="Features\Members\Queries\" />
+	  <Folder Include="Features\Members\Queries\" />
+	  <Folder Include="Features\Members\Services\" />
 	  <Folder Include="Features\SystemConfiguration\Command\UpdateSystemConfiguration\" />
+	  <Folder Include="Features\SystemNotifications\Commands\" />
 	  <Folder Include="Features\SystemNotifications\Queries\" />
 	</ItemGroup>
 

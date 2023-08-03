@@ -8,52 +8,56 @@ namespace RestApi.Helper;
 
 public static class JwtHelpers
 {
-    public static IEnumerable<Claim> GetClaims(this UserTokens userAccounts, Guid Id)
+    public static IEnumerable<Claim> GetClaims(this UserTokens userAccounts, Guid id)
     {
         IEnumerable<Claim> claims = new Claim[]
                 {
             new Claim(ClaimTypes.Name, userAccounts.UserName),
             new Claim(ClaimTypes.Email, userAccounts.EmailId),
-            new Claim(ClaimTypes.NameIdentifier,Id.ToString()),
-            new Claim(ClaimTypes.Expiration,DateTime.UtcNow.AddMinutes(10).ToString("MMM ddd dd yyyy HH:mm:ss tt") )
+            new Claim(ClaimTypes.NameIdentifier,id.ToString()),
+            new Claim(ClaimTypes.Expiration,userAccounts.ExpiredTime.ToString("MMM ddd dd yyyy HH:mm:ss tt") )
                 };
         return claims;
     }
-    public static IEnumerable<Claim> GetClaims(this UserTokens userAccounts, out Guid Id)
+    public static IEnumerable<Claim> GetClaims(this UserTokens userAccounts, out Guid id)
     {
-        Id = Guid.NewGuid();
-        return userAccounts.GetClaims(Id);
+        id = Guid.NewGuid();
+        return userAccounts.GetClaims(id);
     }
     public static UserTokens GenTokenkey(UserTokens model, JwtSettings jwtSettings)
     {
         try
         {
-            var UserToken = new UserTokens();
+            var userToken = new UserTokens();
             if (model == null) throw new ArgumentException(nameof(model));
+
+            var expirationTime = jwtSettings.ExpirationTime ?? 10;
+
+            DateTime expireTime = DateTime.Now.AddMinutes(expirationTime);
+            var idRefreshToken = Guid.NewGuid();
+            Guid Id = Guid.Empty;
 
             // Get secret key
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.IssuerSigningKey));
-            Guid Id = Guid.Empty;
-            DateTime expireTime = DateTime.Now.AddMinutes(10);
-            UserToken.Validaty = expireTime.TimeOfDay;
+
+            userToken.Validaty = expireTime.TimeOfDay;
             var JWToken = new JwtSecurityToken(
                 issuer: jwtSettings.ValidIssuer,
                 audience: jwtSettings.ValidAudience,
                 claims: model.GetClaims(out Id),
                 //   notBefore: new DateTimeOffset(DateTime.Now).DateTime,
-                expires: DateTime.Now.AddMinutes(10),
+                expires: DateTime.Now.AddMinutes(expirationTime),
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
 
             );
-            UserToken.Token = "Bearer " + new JwtSecurityTokenHandler().WriteToken(JWToken);
-            var idRefreshToken = Guid.NewGuid();
+            userToken.Token = "Bearer " + new JwtSecurityTokenHandler().WriteToken(JWToken);
 
-            UserToken.UserName = model.UserName;
-            UserToken.Id = model.Id;
-            UserToken.EmailId = model.EmailId;
-            UserToken.GuidId = Id;
-            UserToken.ExpiredTime = expireTime;
-            return UserToken;
+            userToken.UserName = model.UserName;
+            userToken.Id = model.Id;
+            userToken.EmailId = model.EmailId;
+            userToken.GuidId = Id;
+            userToken.ExpiredTime = expireTime;
+            return userToken;
         }
         catch (Exception)
         {

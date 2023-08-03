@@ -1,11 +1,10 @@
-﻿
-using Domain.Entities; using Application.Common.Interfaces;
+﻿using Application.Common.Helper;
+using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NinjaNye.SearchExtensions;
-using RestApi.Helper;
-using System;
-using System.Linq;
 
 namespace RestApi.Controllers;
 
@@ -182,10 +181,14 @@ public class ItemController : Controller
     }
     [Route("Item/GetEXP")]
     [HttpPost]
-    public IActionResult GetEXP(DateTime? DateFrom, DateTime? DateTo, int Limit, string Sort, int Page, int? Status, string Any)
+    public async Task<IActionResult> GetEXP(DateTime? DateFrom, DateTime? DateTo, int Limit, string Sort, int Page, int? Status, string Any)
     {
-        var Items = DB.InventoryMovement.Where(s => (DateTo != null ? s.EXP <= DateTo : true) && (DateFrom != null ? s.EXP >= DateFrom : true))
-        .Select(x => new
+        var itemsQuery = DB.InventoryMovement.Where(s => (DateTo != null ? s.EXP <= DateTo : true) && (DateFrom != null ? s.EXP >= DateFrom : true)).AsQueryable();
+        int totalCountBeforeFilter = await itemsQuery.CountAsync();
+
+        var itemsQueryList = await itemsQuery.ToListAsync();
+
+        var items = itemsQueryList.Select(x => new
         {
             x.Items.Id,
             x.Items.Name,
@@ -206,16 +209,20 @@ public class ItemController : Controller
             TotalIn = x.Items.InventoryMovements.Where(x => x.TypeMove == "In").Sum(s => s.Qty),
             TotalOut = x.Items.InventoryMovements.Where(x => x.TypeMove == "Out").Sum(s => s.Qty),
         }).ToList();
-        Items = (Sort == "+id" ? Items.OrderBy(s => s.Id).ToList() : Items.OrderByDescending(s => s.Id).ToList());
+
+        items = (Sort == "+id" ? items.OrderBy(s => s.Id).ToList() : items.OrderByDescending(s => s.Id).ToList());
+
+        var itemsTaken = items.Skip((Page - 1) * Limit).Take(Limit).ToList();
+
         return Ok(new
         {
-            items = Items.Skip((Page - 1) * Limit).Take(Limit).ToList(),
+            items = itemsTaken,
             Totals = new
             {
-                Rows = Items.Count(),
-                TotalIn = Items.Sum(s => s.TotalIn),
-                TotalOut = Items.Sum(s => s.TotalOut),
-                Totals = Items.Sum(s => s.TotalIn) - Items.Sum(s => s.TotalOut),
+                Rows = totalCountBeforeFilter,
+                TotalIn = items.Sum(s => s.TotalIn),
+                TotalOut = items.Sum(s => s.TotalOut),
+                Totals = items.Sum(s => s.TotalIn) - items.Sum(s => s.TotalOut),
 
             }
         });

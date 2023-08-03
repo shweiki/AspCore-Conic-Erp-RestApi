@@ -599,7 +599,7 @@ public class IdentityService : IIdentityService
         var users = await _userManager.FindByNameAsync(username);
         return users.Id;
     }
-    public async Task<UserInfoDto?> GetUserInfoAsync(string username)
+    public async Task<UserInfoDto> GetUserInfoAsync(string username)
     {
         var users = await _userManager.FindByNameAsync(username);
         var userResultDto = _mapper.Map<UserInfoDto>(users);

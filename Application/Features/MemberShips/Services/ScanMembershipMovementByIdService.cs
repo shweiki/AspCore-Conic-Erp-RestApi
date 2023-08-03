@@ -4,7 +4,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Features.Members.Services;
+namespace Application.Features.MemberShips.Services;
 
 public class ScanMembershipMovementByIdService : IRequest<bool>
 {
@@ -88,7 +88,7 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
                     membershipMovementOrder.Status = -2;
                     continue;
                 }
-                if ((DateTime.Today >= membershipMovementOrder.StartDate.Date && DateTime.Today <= membershipMovementOrder.EndDate.Date.AddDays(1).AddSeconds(-1)))
+                if (DateTime.Today >= membershipMovementOrder.StartDate.Date && DateTime.Today <= membershipMovementOrder.EndDate.Date.AddDays(1).AddSeconds(-1))
                 {
                     if (membershipMovementOrder.Type == "Freeze")
                     {
@@ -117,13 +117,13 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
                     }
 
                 }
-                if ((membershipMovement.EndDate.Date.AddDays(1).AddSeconds(-1) > DateTime.Today))
+                if (membershipMovement.EndDate.Date.AddDays(1).AddSeconds(-1) > DateTime.Today)
                 {
 
 
                     membershipMovement.Status = 1;
                     member.Status = 1;
-                    var DeviceLogs = await _context.DeviceLog.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && (x.DateTime.Date >= membershipMovement.StartDate.Date && x.DateTime.Date <= membershipMovement.EndDate.Date)).ToListAsync();
+                    var DeviceLogs = await _context.DeviceLog.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && x.DateTime.Date >= membershipMovement.StartDate.Date && x.DateTime.Date <= membershipMovement.EndDate.Date).ToListAsync();
                     if (DeviceLogs != null && DeviceLogs.Count > 0)
                     {
                         DeviceLogs = DeviceLogs.GroupBy(a => a.DateTime.Day).Select(g => g.Last()).ToList();

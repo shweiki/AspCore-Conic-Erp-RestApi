@@ -1,10 +1,9 @@
 ﻿
-using Domain.Entities; using Application.Common.Interfaces;
+using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Threading.Tasks;
 using Driver = Domain.Entities.Driver;
 
 namespace RestApi.Controllers;
@@ -13,11 +12,8 @@ namespace RestApi.Controllers;
 public class DriverController : Controller
 {
     private readonly IApplicationDbContext DB;
-    private readonly UserManager<IdentityUser> _userManager;
-    public DriverController(IApplicationDbContext dbcontext, UserManager<IdentityUser> userManager)
-
+    public DriverController(IApplicationDbContext dbcontext)
     {
-        _userManager = userManager;
         DB = dbcontext;
 
     }
@@ -133,13 +129,13 @@ public class DriverController : Controller
                 PhoneNumberConfirmed = true,
                 EmailConfirmed = true,
             };
-            IdentityResult result = await _userManager.CreateAsync(NewUser, collection.Pass);
+            //IdentityResult result = await _userManager.CreateAsync(NewUser, collection.Pass);
 
-            var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
-            if (!result.Succeeded)
-            {
-                return Ok(result);
-            }
+            //var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
+            //if (!result.Succeeded)
+            //{
+            //    return Ok(result);
+            //}
             collection.Pass = NewUser.PasswordHash;
             collection.DriverUserId = NewUser.Id;
             DB.Driver.Add(collection);

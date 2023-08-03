@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SignTEC.Application.Features.SystemConfiguration.Queries.GetSystemConfiguration;
 using System.Text.RegularExpressions;
 
-namespace Application.Features.SystemNotifications.Commands.FixBase64ToPathWithLoadedJob;
+namespace Application.Services.Systems.FixBase64ToPathWithLoadedJob;
 
 public class FixBase64ToPathWithLoadedJobCommand : IRequest<string>
 {

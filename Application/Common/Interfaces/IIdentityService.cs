@@ -36,7 +36,7 @@ public interface IIdentityService
     Task<UserWithRoleDto?> GetUserWithRolesAsync(string username);
     Task<UserWithRoleDto?> GetUserByEmailWithRolesAsync(string username);
     Task<string?> GetUserIdAsync(string username);
-    Task<UserInfoDto?> GetUserInfoAsync(string username);
+    Task<UserInfoDto> GetUserInfoAsync(string username);
     Task<UserInfoDto?> GetUserInfoByIdAsync(string userid);
     Task<UserInfoDto?> GetUserInfoByEmailAsync(string userid);
 

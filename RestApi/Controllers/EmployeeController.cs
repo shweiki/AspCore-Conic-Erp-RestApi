@@ -1,10 +1,9 @@
 ﻿
-using Domain.Entities; using Application.Common.Interfaces;
+using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace RestApi.Controllers;
 
@@ -12,11 +11,9 @@ namespace RestApi.Controllers;
 public class EmployeeController : Controller
 {
     private readonly IApplicationDbContext DB;
-    private readonly UserManager<IdentityUser> _userManager;
-    public EmployeeController(IApplicationDbContext dbcontext, UserManager<IdentityUser> userManager)
+    public EmployeeController(IApplicationDbContext dbcontext)
 
     {
-        _userManager = userManager;
         DB = dbcontext;
 
     }
@@ -212,9 +209,9 @@ public class EmployeeController : Controller
                 PhoneNumberConfirmed = true,
                 EmailConfirmed = true,
             };
-            IdentityResult result = await _userManager.CreateAsync(NewUser, Pass);
+            //IdentityResult result = await _userManager.CreateAsync(NewUser, Pass);
 
-            var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
+            //var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
 
             Pass = NewUser.PasswordHash;
 

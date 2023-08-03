@@ -1,16 +1,10 @@
 ﻿
-using Domain.Entities; using Application.Common.Interfaces;
+using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Claims;
 using System.Text.RegularExpressions;
 
 namespace RestApi.Controllers;
@@ -19,6 +13,7 @@ namespace RestApi.Controllers;
 public class BackupRestoreController : Controller
 {
     private readonly IApplicationDbContext DB;
+    private readonly IConfiguration Configuration;
 
     public BackupRestoreController(IConfiguration configuration, IApplicationDbContext dbcontext)
     {
@@ -27,8 +22,6 @@ public class BackupRestoreController : Controller
 
     }
 
-    public IConfiguration Configuration { get; }
-
     [Route("BackupRestore/GetBackup")]
     [HttpGet]
     public IActionResult GetBackup()
@@ -36,40 +29,6 @@ public class BackupRestoreController : Controller
         var BackUps = DB.BackUp.ToList();
         return Ok(BackUps);
     }
-    [Route("BackupRestore/Backup")]
-    [HttpGet]
-    public IActionResult Backup(string BackUpPath = "C:\\BackUp\\")
-    {
-        int lat = Environment.CurrentDirectory.LastIndexOf("\\") + 1;
-        string Name = Environment.CurrentDirectory[lat..];
-        Name = Name.Replace("-", "").ToUpper();
-        var ConnectionString = Configuration.GetConnectionString(Name);
-        if (ConnectionString == null)
-            Name = "DefaultConnection";
-        DateTime DateTime = DateTime.Now;
-        ServerConnection serverConnection = new(new SqlConnection(Configuration.GetConnectionString(Name)));
-        Server server = new(serverConnection);
-        Backup backup = new();
-        backup.Action = BackupActionType.Database;
-        backup.BackupSetDescription = "AdventureWorks - full backup";
-        backup.BackupSetName = "AdventureWorks backup";
-        backup.Database = serverConnection.DatabaseName;
-        if (!Directory.Exists(BackUpPath))
-        {
-            Directory.CreateDirectory(BackUpPath);
-        }
-        string name = BackUpPath + serverConnection.DatabaseName + "-" + DateTime.ToString("dd-MM-yyyy HH-mm-ss") + ".bak";
-        BackupDeviceItem deviceItem = new(name, DeviceType.File);
-        backup.Devices.Add(deviceItem);
-        backup.Incremental = false;
-        backup.LogTruncation = BackupTruncateLogType.Truncate;
-        backup.SqlBackup(server);
-        BackUp backup1 = new() { Name = name, BackUpPath = BackUpPath, DateTime = DateTime, UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value, DataBaseName = serverConnection.DatabaseName };
-        DB.BackUp.Add(backup1);
-        DB.SaveChanges();
-        return Ok(true);
-    }
-
 
     [Route("BackupRestore/Restore")]
     [HttpGet]
@@ -115,7 +74,6 @@ public class BackupRestoreController : Controller
 
     }
 
-
     // function to close any opend database connections
     private void CloseAllConnection(string commandSql)
     {
@@ -138,10 +96,6 @@ public class BackupRestoreController : Controller
         _connection.Close();
         _connection.Dispose();
     }
-
-
-
-
 
 
 }

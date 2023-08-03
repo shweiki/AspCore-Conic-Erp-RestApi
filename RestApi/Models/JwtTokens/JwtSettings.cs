@@ -10,5 +10,6 @@ public class JwtSettings
     public string ValidAudience { get; set; }
     public bool RequireExpirationTime { get; set; }
     public bool ValidateLifetime { get; set; } = true;
-    public double ExpirationTime { get; set; }
+    public double? ExpirationTime { get; set; }
+
 }

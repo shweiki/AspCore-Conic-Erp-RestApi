@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RestApi.Helper;
+namespace Application.Common.Helper;
 
 public static class Utility
 {

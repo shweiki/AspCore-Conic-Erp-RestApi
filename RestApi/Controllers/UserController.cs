@@ -78,7 +78,7 @@ public class UserController : Controller
         response.avatar = Url.Content("~/Images/User/" + user.User.UserName + ".jpeg");
         response.userrouter = DB.UserRouter.Where(x => x.UserId == userInfo.Id)?.SingleOrDefault()?.Router;
         response.defulateRedirect = DB.UserRouter.Where(x => x.UserId == userInfo.Id)?.SingleOrDefault()?.DefulateRedirect;
-        response.roles = user.Roles.ToArray();
+        response.roles = user.Roles.Select(s => s.ToLower()).ToArray();
         return Ok(response);
     }
 

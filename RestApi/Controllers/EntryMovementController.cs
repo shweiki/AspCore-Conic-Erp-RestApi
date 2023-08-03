@@ -1,10 +1,10 @@
 ﻿
-using Domain.Entities; using Application.Common.Interfaces;
+using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Linq;
 
 namespace RestApi.Controllers;
 
@@ -44,9 +44,12 @@ public class EntryMovementController : Controller
     }
     [Route("EntryMovement/GetEntryMovementsByAccountId")]
     [HttpGet]
-    public IActionResult GetEntryMovementsByAccountId(long? AccountId)
+    public async Task<IActionResult> GetEntryMovementsByAccountId(long? AccountId)
     {
-        var EntryMovements = DB.EntryMovement.Where(l => l.AccountId == AccountId).Select(x => new
+        var itemsQuery = DB.EntryMovement.Where(l => l.AccountId == AccountId).AsQueryable();
+
+        var items = await itemsQuery.ToListAsync();
+        items.Select(x => new
         {
             x.Id,
             x.Credit,
@@ -60,6 +63,6 @@ public class EntryMovementController : Controller
 
 
 
-        return Ok(EntryMovements);
+        return Ok(items);
     }
 }

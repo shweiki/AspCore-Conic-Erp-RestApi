@@ -1,23 +1,19 @@
-﻿using Domain.Entities; using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 namespace RestApi.Controllers;
 
 [Authorize]
 public class VendorController : Controller
 {
     private readonly IApplicationDbContext DB;
-    private readonly UserManager<IdentityUser> _userManager;
-    public VendorController(IApplicationDbContext dbcontext, UserManager<IdentityUser> userManager)
+    public VendorController(IApplicationDbContext dbcontext)
     {
         DB = dbcontext;
-        _userManager = userManager;
 
     }
     [Route("Vendor/GetVendor")]
@@ -202,105 +198,6 @@ public class VendorController : Controller
         return Ok(Vendor);
     }
 
-    [Route("Vendor/CreateWithUser")]
-    [HttpPost]
-    public async Task<ActionResult> CreateWithUser(Vendor collection)
-    {
-        if (ModelState.IsValid)
-        {
-
-            var NewUser = new IdentityUser()
-            {
-
-                Email = collection.Email,
-                UserName = collection.Name,
-                PhoneNumber = collection.PhoneNumber1,
-                PhoneNumberConfirmed = true,
-                EmailConfirmed = true,
-            };
-            IdentityResult result = await _userManager.CreateAsync(NewUser, collection.Pass);
-
-            var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
-            if (!result.Succeeded)
-            {
-                return Ok(result);
-            }
-            collection.Pass = NewUser.PasswordHash;
-            collection.UserId = NewUser.Id;
-            DB.Vendor.Add(collection);
-            DB.SaveChanges();
-
-            UserRouter NewRole = new UserRouter()
-            {
-                UserId = NewUser.Id,
-                Router = "[\"/OrderDelivery/DriverPage\",\"/OrderDelivery/DriverDeliveryList\"]",
-                DefulateRedirect = "/",
-            };
-            DB.UserRouter.Add(NewRole);
-            DB.SaveChanges();
-
-
-            return Ok(collection);
-
-        }
-        return Ok(false);
-    }
-
-
-    [Route("Vendor/CreateCustomer")]
-    [HttpPost]
-    public async Task<ActionResult> CreateCustomer(Vendor collection)
-    {
-        if (ModelState.IsValid)
-        {
-
-            TreeAccount NewAccount = new TreeAccount
-            {
-                Type = "Vendor",
-                Description = collection.Description,
-                Status = 0,
-                Code = "",
-                ParentId = DB.TreeAccount.Where(x => x.Type == "Customers-Main").SingleOrDefault().Code
-            };
-            DB.TreeAccount.Add(NewAccount);
-            DB.SaveChanges();
-            var NewUser = new IdentityUser()
-            {
-
-                Email = collection.Email,
-                UserName = collection.Name,
-                PhoneNumber = collection.PhoneNumber1,
-                PhoneNumberConfirmed = true,
-                EmailConfirmed = true,
-            };
-            IdentityResult result = await _userManager.CreateAsync(NewUser, collection.Pass);
-
-            var unlock = await _userManager.SetLockoutEnabledAsync(NewUser, false);
-            if (!result.Succeeded)
-            {
-                return Ok(result);
-            }
-            collection.Pass = NewUser.PasswordHash;
-            collection.UserId = NewUser.Id;
-            collection.AccountId = NewAccount.Id;
-            DB.Vendor.Add(collection);
-            DB.SaveChanges();
-
-            UserRouter NewRole = new UserRouter()
-            {
-                UserId = NewUser.Id,
-                Router = "[\"/OrderRestaurant/CustomerPage\",\"/OrderRestaurant/CustomerOrderList\",\"/Sales/CustomerPOS\"]",
-                DefulateRedirect = "/",
-            };
-            DB.UserRouter.Add(NewRole);
-            DB.SaveChanges();
-
-
-            return Ok(collection);
-
-        }
-        return Ok(false);
-    }
     [Route("Vendor/GetVendorByUserId")]
     [HttpGet]
     public IActionResult GetVendorByUserId(String Id)

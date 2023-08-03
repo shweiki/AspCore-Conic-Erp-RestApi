@@ -1,9 +1,9 @@
 ﻿using Application.Common.Interfaces;
-using Application.Features.Members.Services;
+using Application.Features.MemberShips.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Features.SystemNotifications.Commands.ScanMemberStatueJob;
+namespace Application.Services.Jobs.ScanMemberStatueJob;
 
 public class ScanMemberStatueJobCommand : IRequest<string>
 {
