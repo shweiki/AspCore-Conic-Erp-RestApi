@@ -80,16 +80,22 @@ public class FileDataController : Controller
     [HttpGet]
     public IActionResult GetFilesByObjId(string TableName, long ObjId)
     {
-
-        var files = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new
+        try
         {
-            x.Id,
-            x.Type,
-            FileUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/{TableName}/{x.Type}/{Path.GetFileName(x.FilePath)}",
-            x.FileType
-        }).ToList();
+            var files = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new
+             
+            {
+                x.Id,
+                x.Type,
+                FileUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/{TableName}/{x.Type}/{Path.GetFileName(x.FilePath)}",
+                x.FileType
+            }).ToList();
 
-        return Ok(files);
+            return Ok(files);
+        }
+        catch (Exception ex) {
+        return NotFound(ex.Message);
+        }
 
     }
     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
