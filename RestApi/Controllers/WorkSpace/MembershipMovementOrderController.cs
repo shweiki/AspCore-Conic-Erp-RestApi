@@ -1,4 +1,5 @@
-﻿using Domain.Entities; using Application.Common.Interfaces;
+﻿using Domain.Entities;
+using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RestApi.Controllers;
+namespace RestApi.Controllers.WorkSpace;
 
 [Authorize]
 
@@ -70,8 +71,8 @@ public class MembershipMovementOrderController : Controller
             x.MemberShipMovementId,
             x.Description,
             MembershipMovementType = DB.MembershipMovement.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().Type,
-            MemberId = DB.MembershipMovement.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId,
-            Name = DB.Member.Where(m => m.Id == DB.MembershipMovement.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId).SingleOrDefault().Name,
+            DB.MembershipMovement.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId,
+            DB.Member.Where(m => m.Id == DB.MembershipMovement.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().MemberId).SingleOrDefault().Name,
         }).ToList();
 
 

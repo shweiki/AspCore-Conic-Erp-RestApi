@@ -2,10 +2,7 @@
 ///    Experimented By : Ozesh Thapa
 ///    Email: dablackscarlet@gmail.com
 ///
-using System;
 using System.Drawing;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;

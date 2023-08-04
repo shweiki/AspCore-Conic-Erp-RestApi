@@ -81,26 +81,24 @@ public class PaymentController : Controller
     [HttpGet]
     public async Task<IActionResult> GetPaymentsByMemberId(long? MemberId)
     {
-        var itemsQuery = DB.Payment.Where(i => i.MemberId == MemberId).AsQueryable();
-       var items = await itemsQuery.ToListAsync();
-        items.Select(x => new
+        var itemsQuery = await DB.Payment.Include(x => x.Member).Where(i => i.MemberId == MemberId).ToListAsync();
+        var result = itemsQuery.Select(x => new
         {
             x.Id,
             x.TotalAmmount,
             x.Type,
             x.EditorName,
-            Name = (x.Vendor?.Name ?? "") + (x.Member?.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
+            Name = (x.Member?.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
-            ObjectId = x.VendorId == null ? x.MemberId : x.VendorId,
+            ObjectId = x.MemberId,
             x.Description,
-            x.VendorId,
             x.MemberId,
-            AccountId = (x.Vendor == null) ? x.Member.AccountId : x.Vendor.AccountId,
+            x.Member?.AccountId,
             x.Status
         }).ToList();
 
-        return Ok(items);
+        return Ok(result);
     }
     [Route("Payment/GetPaymentsByVendorId")]
     [HttpGet]

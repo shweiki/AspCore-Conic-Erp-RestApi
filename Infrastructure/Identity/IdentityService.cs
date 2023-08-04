@@ -509,9 +509,9 @@ public class IdentityService : IIdentityService
         }
 
 
-        sortBy = sortBy.ToLower();
+        sortBy = sortBy ?? "username";
 
-        var usersOrdered = isDesc ? sortBy switch
+        var usersOrdered = isDesc ? sortBy.ToLower() switch
         {
             "username" => users.OrderByDescending(x => x.User.UserName),
             "fullname" => users.OrderByDescending(x => x.User.FullName),

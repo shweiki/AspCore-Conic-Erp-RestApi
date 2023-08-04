@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace RestApi.Controllers;
+namespace RestApi.Controllers.WorkSpace;
 
 [Authorize]
 public class MemberController : Controller
@@ -26,7 +26,7 @@ public class MemberController : Controller
     [HttpGet]
     public IActionResult GetReceivablesMember()
     {
-        var Members = DB.Member.Where(f => (f.Account.EntryMovements.Sum(s => s.Credit) - f.Account.EntryMovements.Sum(s => s.Debit)) > 0)
+        var Members = DB.Member.Where(f => f.Account.EntryMovements.Sum(s => s.Credit) - f.Account.EntryMovements.Sum(s => s.Debit) > 0)
         .Select(x => new
         {
             x.Id,
@@ -51,7 +51,7 @@ public class MemberController : Controller
     [HttpGet]
     public IActionResult GetPayablesMember()
     {
-        var Members = DB.Member.Where(f => (f.Account.EntryMovements.Sum(s => s.Credit) - f.Account.EntryMovements.Sum(s => s.Debit)) < 0).Select(x => new
+        var Members = DB.Member.Where(f => f.Account.EntryMovements.Sum(s => s.Credit) - f.Account.EntryMovements.Sum(s => s.Debit) < 0).Select(x => new
         {
             x.Id,
             x.Name,
@@ -110,7 +110,7 @@ public class MemberController : Controller
         TotalDebit = x.Account.EntryMovements.Sum(d => d.Debit),
         TotalCredit = x.Account.EntryMovements.Sum(c => c.Credit),
     }).ToListAsync();
-        Members = (Sort == "+id" ? Members.OrderBy(s => s.Id).ToList() : Members.OrderByDescending(s => s.Id).ToList());
+        Members = Sort == "+id" ? Members.OrderBy(s => s.Id).ToList() : Members.OrderByDescending(s => s.Id).ToList();
         return Ok(new
         {
             items = Members.Skip((Page - 1) * Limit).Take(Limit).ToList(),

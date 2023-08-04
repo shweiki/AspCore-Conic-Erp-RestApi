@@ -29,7 +29,7 @@ public class GetSystemConfigurationQueryHandler : IRequestHandler<GetSystemConfi
             }
             return new SystemConfiguration
             {
-                DefaultFilesPath = systemConfiguration.SingleOrDefault(x => x.Key == "System.DefaultFilesPath")?.Value ?? "C:/SignTecFiles/",
+                DefaultFilesPath = systemConfiguration.SingleOrDefault(x => x.Key == "System.DefaultFilesPath")?.Value ?? "C:/ConicFiles/",
                 EmailNotificationEnabled = bool.Parse(systemConfiguration.SingleOrDefault(x => x.Key == "System.EmailNotificationEnabled")?.Value ?? "true"),
                 LicenseExpiryNotificationPeriodInDays = int.Parse(systemConfiguration.SingleOrDefault(x => x.Key == "System.LicenseExpiryNotificationPeriodInDays")?.Value ?? "7"),
                 OTPExpiryPeriodInMinute = int.Parse(systemConfiguration.SingleOrDefault(x => x.Key == "System.OTPExpiryPeriodInMinute")?.Value ?? "5"),

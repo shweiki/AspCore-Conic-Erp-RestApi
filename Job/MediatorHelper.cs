@@ -1,7 +1,9 @@
-﻿using Application.Services.Jobs.ScanMemberStatueJob;
+﻿using Application.Services.Jobs.CheckDeviceLogJob;
+using Application.Services.Jobs.GetMemberLogFromZktDataBaseJob;
+using Application.Services.Jobs.ScanMemberStatueJob;
 using Application.Services.Systems.FixBase64ToPathWithLoadedJob;
+using Application.Services.Systems.Jobs.BackupJob;
 using MediatR;
-
 
 namespace Jobs;
 
@@ -25,6 +27,14 @@ public class MediatorHelper
     public async Task BackupJobCommand()
     {
         await _mediator.Send(new BackupJobCommand());
+    }
+    public async Task GetMemberLogFromZktDataBaseJobCommand()
+    {
+        await _mediator.Send(new GetMemberLogFromZktDataBaseJobCommand());
+    }   
+    public async Task CheckDeviceLogJobCommand()
+    {
+        await _mediator.Send(new CheckDeviceLogJobCommand());
     }
 
 }

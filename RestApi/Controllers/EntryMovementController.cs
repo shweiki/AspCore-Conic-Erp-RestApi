@@ -49,7 +49,8 @@ public class EntryMovementController : Controller
         var itemsQuery = DB.EntryMovement.Where(l => l.AccountId == AccountId).AsQueryable();
 
         var items = await itemsQuery.ToListAsync();
-        items.Select(x => new
+       
+        return Ok(items.Select(x => new
         {
             x.Id,
             x.Credit,
@@ -59,10 +60,6 @@ public class EntryMovementController : Controller
             x.Entry.FakeDate,
             x.Description,
             TotalRow = 0,
-        }).ToList();
-
-
-
-        return Ok(items);
+        }).ToList());
     }
 }

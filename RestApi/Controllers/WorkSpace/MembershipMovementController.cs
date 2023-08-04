@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace RestApi.Controllers;
+namespace RestApi.Controllers.WorkSpace;
 
 [Authorize]
 public class MembershipMovementController : Controller
@@ -162,7 +162,7 @@ public class MembershipMovementController : Controller
                 MSO.Status = -2;
                 continue;
             }
-            if ((DateTime.Today >= MSO.StartDate.Date && DateTime.Today <= MSO.EndDate.Date.AddDays(1).AddSeconds(-1)))
+            if (DateTime.Today >= MSO.StartDate.Date && DateTime.Today <= MSO.EndDate.Date.AddDays(1).AddSeconds(-1))
             {
                 if (MSO.Type == "Freeze")
                 {
@@ -191,13 +191,13 @@ public class MembershipMovementController : Controller
                 }
 
             }
-            if ((MS.EndDate.Date.AddDays(1).AddSeconds(-1) > DateTime.Today))
+            if (MS.EndDate.Date.AddDays(1).AddSeconds(-1) > DateTime.Today)
             {
 
 
                 MS.Status = 1;
                 member.Status = 1;
-                var DeviceLogs = await DB.DeviceLog.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && (x.DateTime.Date >= MS.StartDate.Date && x.DateTime.Date <= MS.EndDate.Date)).ToListAsync();
+                var DeviceLogs = await DB.DeviceLog.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && x.DateTime.Date >= MS.StartDate.Date && x.DateTime.Date <= MS.EndDate.Date).ToListAsync();
                 if (DeviceLogs != null && DeviceLogs.Count > 0)
                 {
                     DeviceLogs = DeviceLogs.GroupBy(a => a.DateTime.Day).Select(g => g.Last()).ToList();

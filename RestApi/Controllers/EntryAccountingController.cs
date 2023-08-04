@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Data;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace RestApi.Controllers;
 
@@ -213,28 +214,29 @@ public class EntryAccountingController : Controller
     }
     [Route("EntryAccounting/GetEntryById")]
     [HttpGet]
-    public IActionResult GetEntryById(long? Id)
+    public async Task<IActionResult> GetEntryById(long? Id)
     {
-        var Entrys = DB.EntryAccounting.Where(x => x.Id == Id).Select(x => new
+        var item =await DB.EntryAccounting.Include(x => x.EntryMovements).SingleOrDefaultAsync(x => x.Id == Id);
+        var result = new
         {
-            x.Id,
-            x.FakeDate,
-            x.Status,
-            x.Description,
-            x.Type,
-            EntryMovements = DB.EntryMovement.Where(Im => Im.EntryId == x.Id).Select(m => new
+            item.Id,
+            item.FakeDate,
+            item.Status,
+            item.Description,
+            item.Type,
+            EntryMovements = item.EntryMovements.Select(m => new
             {
                 m.Id,
                 m.Debit,
                 m.Credit,
                 m.EntryId,
                 m.AccountId,
-                Name = m.Account.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? m.Account.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name == null ? m.Account.Name : m.Account.Members.Where(v => v.AccountId == x.Id).SingleOrDefault().Name : m.Account.Vendors.Where(v => v.AccountId == x.Id).SingleOrDefault().Name,
+                m.Account.Name,
                 m.Description
             }).ToList()
-        }).SingleOrDefault();
+        };
 
-        return Ok(Entrys);
+        return Ok(result);
     }
     public string GetFkDescription(string TableName, long Fktable)
     {

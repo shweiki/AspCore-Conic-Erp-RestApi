@@ -9,7 +9,7 @@
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.6.0" />
-		<PackageReference Include="libphonenumber-csharp" Version="8.13.17" />
+		<PackageReference Include="libphonenumber-csharp" Version="8.13.18" />
 		<PackageReference Include="MediatR" Version="12.1.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
@@ -31,8 +31,6 @@
 	  <Folder Include="Features\MemberShips\Queries\" />
 	  <Folder Include="Features\Members\Commands\" />
 	  <Folder Include="Features\Members\Commands\" />
-	  <Folder Include="Features\Members\Queries\" />
-	  <Folder Include="Features\Members\Queries\" />
 	  <Folder Include="Features\Members\Services\" />
 	  <Folder Include="Features\SystemConfiguration\Command\UpdateSystemConfiguration\" />
 	  <Folder Include="Features\SystemNotifications\Commands\" />
