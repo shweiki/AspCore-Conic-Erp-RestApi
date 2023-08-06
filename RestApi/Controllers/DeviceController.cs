@@ -1,12 +1,11 @@
-﻿
-using Domain.Entities; using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Domain.Entities;
 using ESC_POS_USB_NET.Printer;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
+using RestApi.Zkt;
 using System.IO.Ports;
-using System.Linq;
 using System.Text;
 
 namespace RestApi.Controllers;
@@ -15,13 +14,15 @@ namespace RestApi.Controllers;
 public class DeviceController : Controller
 {
     DeviceManipulator manipulator = new DeviceManipulator();
+    private readonly ISender _mediator;
 
     private ZkemClient objZkeeper;
 
     private readonly IApplicationDbContext DB;
-    public DeviceController(IApplicationDbContext dbcontext)
+    public DeviceController(IApplicationDbContext dbcontext, ISender mediator)
     {
         DB = dbcontext;
+        _mediator = mediator;
     }
     [Route("Device/GetById")]
     [HttpGet]
@@ -327,7 +328,7 @@ public class DeviceController : Controller
             Device.Description = "The device at " + Device.Ip + ":" + Device.Port + " did not respond!!";
         if (isValidIpA)
         {
-            objZkeeper = new ZkemClient(RaiseDeviceEvent);
+            objZkeeper = ZkemClient.ZkemClientServiceInstance(RaiseDeviceEvent);
             Device.Description = "Is Device Connected : ";
             IsDeviceConnected = objZkeeper.Connect_Net(Device.Ip, Device.Port);
             //  objZkeeper.SetDeviceTime2(1, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
@@ -347,7 +348,7 @@ public class DeviceController : Controller
             Device.Description = "The device at " + Device.Ip + ":" + Device.Port + " did not respond!!";
         if (isValidIpA)
         {
-            objZkeeper = new ZkemClient(RaiseDeviceEvent);
+            objZkeeper = ZkemClient.ZkemClientServiceInstance(RaiseDeviceEvent);
             Device.Description = "Device Is Not Connected";
             objZkeeper.Disconnect();
         }

@@ -1,7 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.SqlServer.Management.Smo;
 
 
 namespace Application.Features.Members.Queries.GetMemberById;
@@ -22,8 +21,8 @@ public class GetMemberByIdQueryHandler : IRequestHandler<GetMemberByIdQuery, obj
 
     public async Task<object?> Handle(GetMemberByIdQuery request, CancellationToken cancellationToken)
     {
-       var member = await _context.Member.Include(x => x.MembershipMovements).Include(x => x.Account.EntryMovements).SingleOrDefaultAsync(x => x.Id == request.Id);
-             
+        var member = await _context.Member.Include(x => x.MembershipMovements).Include(x => x.Account.EntryMovements).SingleOrDefaultAsync(x => x.Id == request.Id);
+
         if (member == null) { return null; }
         return new
         {

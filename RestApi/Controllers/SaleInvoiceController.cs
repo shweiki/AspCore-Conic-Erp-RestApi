@@ -1,15 +1,10 @@
-﻿using Domain.Entities; using Application.Common.Interfaces;
+﻿using Application.Common.Helper;
+using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RestApi.Helper;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Application.Common.Helper;
 
 namespace RestApi.Controllers;
 
@@ -26,12 +21,21 @@ public class SaleInvoiceController : Controller
     public async Task<IActionResult> GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
     {
 
-        var itemsQuery = DB.SalesInvoice.Include(x => x.Vendor).Include(x => x.Member).Include(x => x.InventoryMovements).Select(x => new
+        var itemsQuery = DB.SalesInvoice.Include(x => x.InventoryMovements).Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.PaymentMethod.Contains(Any) || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any)) &&
+        (DateFrom == null || s.FakeDate >= DateFrom) && (DateTo == null || s.FakeDate <= DateTo) &&
+        (Status == null || s.Status == Status) && (Type == null || s.Type == Type)).AsQueryable();
+
+        itemsQuery = (Sort == "+id" ? itemsQuery.OrderBy(s => s.Id) : itemsQuery.OrderByDescending(s => s.Id));
+        var items = await itemsQuery.ToListAsync();
+
+
+        var itemsTaken = await itemsQuery.Skip((Page - 1) * Limit).Take(Limit).ToListAsync();
+        var itemsTakenSelected = itemsTaken.Select(x => new
         {
             x.Id,
             x.Discount,
             x.Tax,
-            Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
+            x.Name,// Name = (x.Vendor?.Name ?? "") + (x.Member?.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
             x.Status,
@@ -39,11 +43,11 @@ public class SaleInvoiceController : Controller
             x.DeliveryPrice,
             x.Type,
             x.Description,
-            AccountId = (x.Vendor.AccountId.ToString() ?? "") + (x.Member.AccountId.ToString() ?? ""),
+            // AccountId = (x.Vendor?.AccountId.ToString() ?? "") + (x.Member?.AccountId.ToString() ?? ""),
             x.VendorId,
-            x.Vendor,
+            //  x.Vendor,
             x.MemberId,
-            x.Member,
+            //  x.Member,
             x.PhoneNumber,
             //  x.Vendor,
             TotalCost = x.InventoryMovements.Sum(s => s.Items.CostPrice * s.Qty),
@@ -66,31 +70,20 @@ public class SaleInvoiceController : Controller
                 imx.BillOfEnteryId
 
             }).ToList(),
-        }).Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.PaymentMethod.Contains(Any) || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any)) &&
-        (DateFrom == null || s.FakeDate >= DateFrom) && (DateTo == null || s.FakeDate <= DateTo) &&
-        (Status == null || s.Status == Status) && (Type == null || s.Type == Type) &&
-        (User == null || DB.ActionLog.Where(l => l.TableName == "SaleInvoice" && l.Fktable == s.Id.ToString() && l.UserId == User).SingleOrDefault() != null)).AsQueryable()
-;
-
-        itemsQuery = (Sort == "+id" ? itemsQuery.OrderBy(s => s.Id) : itemsQuery.OrderByDescending(s => s.Id));
-
-        var items = await itemsQuery.ToListAsync();
-        var itemsTaken = items.Skip((Page - 1) * Limit).Take(Limit).ToList();
-
-
+        }).ToList();
         int Rows = items.Count();
-        double Totals = items.Sum(x => x.Total) ?? 0;
-        double TotalCost = items.Sum(x => x.TotalCost) ?? 0;
-        double Profit = 0;//  itemsQuery.Sum(s => s.Total) - Invoices.Sum(s => s.TotalCost),
-        double Cash = items.Where(i => i.PaymentMethod == "Cash").Sum(x => x.Total) ?? 0;
-        double Receivables = items.Where(i => i.PaymentMethod == "Receivables").Sum(x => x.Total) ?? 0;
-        double Visa = items.Where(i => i.PaymentMethod == "Visa").Sum(x => x.Total) ?? 0;
+        double Totals = items.Sum(x => x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount)) ?? 0;
+        double TotalCost = items.Sum(x => x.InventoryMovements.Sum(s => s.Items.CostPrice * s.Qty)) ?? 0;
+        double Profit = Totals - TotalCost;
+        double Cash = items.Where(i => i.PaymentMethod == "Cash").Sum(x => x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount)) ?? 0;
+        double Receivables = items.Where(i => i.PaymentMethod == "Receivables").Sum(x => x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount)) ?? 0;
+        double Visa = items.Where(i => i.PaymentMethod == "Visa").Sum(x => x.Tax + (x.InventoryMovements.Sum(s => s.SellingPrice * s.Qty) - x.Discount)) ?? 0;
         double Discount = items.Sum(s => s.Discount);
         double Tax = items.Sum(s => s.Tax) ?? 0;
 
         return Ok(new
         {
-            items = itemsTaken,
+            items = itemsTakenSelected,
             Totals = new
             {
                 Rows,

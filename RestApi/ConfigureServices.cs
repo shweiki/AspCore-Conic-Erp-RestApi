@@ -14,6 +14,7 @@ using Serilog.Core;
 using System;
 using System.Text;
 using Newtonsoft.Json.Serialization;
+using RestApi.Zkt;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -32,7 +33,6 @@ public static class ConfigureServices
 
         // Authorization Handler with Custom
         services.AddSingleton<IAuthorizationHandler, CustomAuthorizationHandler>();
-
 
         services.Configure<ForwardedHeadersOptions>(options => { options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto; });
 

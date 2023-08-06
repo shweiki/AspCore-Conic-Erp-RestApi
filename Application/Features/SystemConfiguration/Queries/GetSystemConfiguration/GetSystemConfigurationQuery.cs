@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace SignTEC.Application.Features.SystemConfiguration.Queries.GetSystemConfiguration;
+namespace Application.Features.SystemConfiguration.Queries.GetSystemConfiguration;
 
 public class GetSystemConfigurationQuery : IRequest<SystemConfiguration>
 {

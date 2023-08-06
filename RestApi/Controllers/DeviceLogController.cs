@@ -1,11 +1,12 @@
 ﻿using Application.Common.Interfaces;
 using Application.Features.Members.Queries.GetMemberById;
 using Domain.Entities;
+using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
+using RestApi.Helper;
 
 namespace RestApi.Controllers;
 
@@ -13,15 +14,11 @@ namespace RestApi.Controllers;
 public class DeviceLogController : ControllerBase
 {
     private readonly IApplicationDbContext DB;
-    public readonly IConfiguration _configuration;
-    private readonly IMemoryCache _memoryCache;
     private readonly ISender _mediator;
 
-    public DeviceLogController(IApplicationDbContext dbcontext, IConfiguration configuration, IMemoryCache memoryCache, ISender mediator)
+    public DeviceLogController(IApplicationDbContext dbcontext, ISender mediator)
     {
         DB = dbcontext;
-        _configuration = configuration;
-        _memoryCache = memoryCache;
         _mediator = mediator;
     }
     [Route("DeviceLog/GetDeviceLog")]
@@ -56,6 +53,7 @@ public class DeviceLogController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetByStatus(int Status, string TableName, int Limit, string Sort, int Page, string Any)
     {
+        //  await _mediator.Send(new GetMemberLogFromZktDataBaseJobCommand());
 
         var deviceLogs = DB.DeviceLog.Where(x => x.Status == Status && x.TableName == TableName && (Any == null || x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any))).AsQueryable();
 
@@ -157,6 +155,42 @@ public class DeviceLogController : ControllerBase
         }).ToListAsync();
 
         return Ok(DeviceLogs);
+    }
+    public static void RegisterLog(string Id, DateTime datetime, string Ip)
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+        optionsBuilder.UseSqlServer(AppConfig.GetDefaultConnection());
+        using (var dbcontext = new ApplicationDbContext(optionsBuilder.Options))
+        {
+            long ID = Convert.ToInt32(Id);
+            string TableName = "";
+            var member = dbcontext.Member.Where(m => m.Id == ID).SingleOrDefault();
+            var Employee = dbcontext.Employee.Where(m => m.Id == ID).SingleOrDefault();
+            if (member != null) TableName = "Member";
+            if (Employee != null) TableName = "Employee";
+
+            var isLogSaveIt = dbcontext.DeviceLog.Where(l => l.Fk == Id && l.TableName == TableName).ToList();
+            isLogSaveIt = dbcontext.DeviceLog.Where(Ld => Ld.DateTime == datetime).ToList();
+            var Device = dbcontext.Device.Where(x => x.Ip == Ip).SingleOrDefault();
+            if (isLogSaveIt.Count <= 0 && Device != null)
+            {
+                var Log = new DeviceLog
+                {
+                    Type = "In",
+                    DateTime = datetime,
+                    DeviceId = Device.Id,
+                    Status = 0,
+                    Description = "Event Log",
+                    TableName = TableName,
+                    Fk = Id.ToString(),
+                };
+                dbcontext.DeviceLog.Add(Log);
+                dbcontext.SaveChanges();
+
+
+            }
+        }
+
     }
 
 }

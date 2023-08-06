@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace Application.Common.Helper;
+namespace Application.Common.Helpers;
 
 public class ImageHelper
 {

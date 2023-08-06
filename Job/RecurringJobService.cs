@@ -33,12 +33,12 @@ public class RecurringJobService : BackgroundService
                 return Task.CompletedTask;
             }
 
-            _recurringJobManager.AddOrUpdate<MediatorHelper>("ScanMemberStatueJobCommand", x => x.ScanMemberStatueJobCommand(), dailyIntervalCron);
+            _recurringJobManager.AddOrUpdate<MediatorHelper>("ScanMemberStatueJobCommand", x => x.ScanMemberStatueJobCommand(), dailyIntervalCronActivated3AM);
             _recurringJobManager.AddOrUpdate<MediatorHelper>("BackupJobCommand", x => x.BackupJobCommand(), dailyIntervalCronActivated3AM);
             _recurringJobManager.AddOrUpdate<MediatorHelper>("CheckDeviceLogJobCommand", x => x.CheckDeviceLogJobCommand(), dailyIntervalCronActivated3AM);
 
             _recurringJobManager.AddOrUpdate<MediatorHelper>("FixBase64ToPathWithLoadedJobCommand", x => x.FixBase64ToPathWithLoadedJobCommand(), neverJustAdd);
-            _recurringJobManager.AddOrUpdate<MediatorHelper>("GetMemberLogFromZktDataBaseJobCommand", x => x.GetMemberLogFromZktDataBaseJobCommand(), "*/20 * * * * *");
+            _recurringJobManager.AddOrUpdate<MediatorHelper>("GetMemberLogFromZktDataBaseJobCommand", x => x.GetMemberLogFromZktDataBaseJobCommand(), minuteIntervalCron);
         }
         catch (Exception ex)
         {

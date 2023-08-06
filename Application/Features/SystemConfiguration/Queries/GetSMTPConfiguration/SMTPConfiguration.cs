@@ -1,4 +1,4 @@
-﻿namespace SignTEC.Application.Features.SystemConfiguration.Queries.GetSMTPConfiguration;
+﻿namespace Application.Features.SystemConfiguration.Queries.GetSMTPConfiguration;
 
 public class SMTPConfiguration
 {

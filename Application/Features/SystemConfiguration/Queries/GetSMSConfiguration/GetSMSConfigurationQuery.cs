@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Application.Common.Interfaces;
 
 
-namespace SignTEC.Application.Features.SystemConfiguration.Queries.GetSMSConfiguration;
+namespace Application.Features.SystemConfiguration.Queries.GetSMSConfiguration;
 
 public class GetSMSConfigurationQuery : IRequest<SMSConfiguration>
 {

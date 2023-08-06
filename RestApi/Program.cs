@@ -2,6 +2,7 @@ using Application.Features.Role.Commands.AddDefaultRoles;
 using Application.Features.SystemConfiguration.Command.AddDefaultSystemConfiguration;
 using MediatR;
 using Microsoft.Extensions.FileProviders;
+using RestApi.Helper;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
 
@@ -19,6 +20,7 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddIdentityServices();
 builder.Services.AddApplicationServices();
 // Add services to the container.
+AppConfig.Initialize(builder.Configuration);
 
 builder.Services.AddApiServices();
 builder.Services.AddJWTAuthenticationServices(builder.Configuration);
@@ -45,26 +47,21 @@ catch (Exception ex)
     logger.Error(ex, "Error adding default roles.");
 }
 var app = builder.Build();
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI(c =>
-//    {
-//        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
-//        c.DocExpansion(DocExpansion.List);
-//    });
-//}
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+//Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
-    c.DocExpansion(DocExpansion.None);
-});
-app.UseForwardedHeaders();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
+        c.DocExpansion(DocExpansion.None);
+    });
+}
 
+app.UseForwardedHeaders();
+app.UseRouting();
+app.MapControllers();
 //app.UseHttpsRedirection();
-app.UseStaticFiles();
 app.UseCors(x => x
     .AllowAnyMethod()
     .AllowAnyHeader()
@@ -73,6 +70,8 @@ app.UseCors(x => x
     ); // allow credentials
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseStaticFiles(new StaticFileOptions()
 {
     FileProvider = new PhysicalFileProvider(
@@ -80,7 +79,7 @@ app.UseStaticFiles(new StaticFileOptions()
     RequestPath = new PathString("/images"),
     DefaultContentType = "application/octet-stream"
 });
-app.MapControllers();
+
 
 // Run app
 try

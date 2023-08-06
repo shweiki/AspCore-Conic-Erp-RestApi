@@ -1,122 +1,196 @@
-﻿///    Experimented By : Ozesh Thapa
-///    Email: dablackscarlet@gmail.com
-///
+﻿using Application.Features.DeviceLog.Commands.AddDeviceLog;
+using RestApi.Controllers;
 using zkemkeeper;
 
-namespace RestApi;
+namespace RestApi.Zkt;
 
 public class ZkemClient
 {
-    Action<object, string> RaiseDeviceEvent;
+    private readonly Action<object, string> _raiseDeviceEvent;
+    private readonly CZKEM _objCZKEM;
+    public static ZkemClient _service;
 
-    public ZkemClient(Action<object, string> RaiseDeviceEvent)
+    public ZkemClient(Action<object, string> raiseDeviceEvent)
     {
-        this.RaiseDeviceEvent = RaiseDeviceEvent;
+        _objCZKEM = new CZKEM();
+        _raiseDeviceEvent = raiseDeviceEvent;
     }
 
-    CZKEM objCZKEM = new CZKEM();
+    public static ZkemClient ZkemClientServiceInstance(Action<object, string> raiseDeviceEvent)
+    {
 
+        if (_service is null)
+        {
+            if (raiseDeviceEvent is null)
+            {
+                return null;
+            }
+
+            _service = new ZkemClient(raiseDeviceEvent);
+        }
+
+        return _service;
+
+    }
     #region 'What we will be using'
 
     public bool BatchUpdate(int dwMachineNumber)
     {
-        return objCZKEM.BatchUpdate(dwMachineNumber);
+        return _objCZKEM.BatchUpdate(dwMachineNumber);
     }
 
     public bool Beep(int DelayMS)
     {
-        return objCZKEM.Beep(DelayMS);
+        return _objCZKEM.Beep(DelayMS);
     }
 
     public bool BeginBatchUpdate(int dwMachineNumber, int UpdateFlag)
     {
-        return objCZKEM.BeginBatchUpdate(dwMachineNumber, UpdateFlag);
+        return _objCZKEM.BeginBatchUpdate(dwMachineNumber, UpdateFlag);
     }
 
 
     public bool ClearData(int dwMachineNumber, int DataFlag)
     {
-        return objCZKEM.ClearData(dwMachineNumber, DataFlag);
+        return _objCZKEM.ClearData(dwMachineNumber, DataFlag);
     }
 
 
     public bool ClearGLog(int dwMachineNumber)
     {
-        return objCZKEM.ClearGLog(dwMachineNumber);
+        return _objCZKEM.ClearGLog(dwMachineNumber);
     }
     public void Disconnect()
     {
         // [ Unregister events
-        objCZKEM.OnConnected -= ObjCZKEM_OnConnected;
-        objCZKEM.OnDisConnected -= objCZKEM_OnDisConnected;
-        objCZKEM.OnEnrollFinger -= ObjCZKEM_OnEnrollFinger;
-        objCZKEM.OnFinger -= ObjCZKEM_OnFinger;
+        _objCZKEM.OnConnected -= ObjCZKEM_OnConnected;
+        _objCZKEM.OnDisConnected -= objCZKEM_OnDisConnected;
+        _objCZKEM.OnEnrollFinger -= ObjCZKEM_OnEnrollFinger;
+        _objCZKEM.OnFinger -= ObjCZKEM_OnFinger;
 
 
-        objCZKEM.OnFingerFeature -= new _IZKEMEvents_OnFingerFeatureEventHandler(zkemClient_OnFingerFeature);
-        objCZKEM.OnEnrollFingerEx -= new _IZKEMEvents_OnEnrollFingerExEventHandler(zkemClient_OnEnrollFingerEx);
+        _objCZKEM.OnFingerFeature -= new _IZKEMEvents_OnFingerFeatureEventHandler(zkemClient_OnFingerFeature);
+        _objCZKEM.OnEnrollFingerEx -= new _IZKEMEvents_OnEnrollFingerExEventHandler(zkemClient_OnEnrollFingerEx);
 
-        objCZKEM.OnDeleteTemplate -= new _IZKEMEvents_OnDeleteTemplateEventHandler(zkemClient_OnDeleteTemplate);
-        objCZKEM.OnNewUser -= new _IZKEMEvents_OnNewUserEventHandler(zkemClient_OnNewUser);
-        objCZKEM.OnHIDNum -= new _IZKEMEvents_OnHIDNumEventHandler(zkemClient_OnHIDNum);
-        objCZKEM.OnAlarm -= new _IZKEMEvents_OnAlarmEventHandler(zkemClient_OnAlarm);
-        objCZKEM.OnDoor -= new _IZKEMEvents_OnDoorEventHandler(zkemClient_OnDoor);
-        objCZKEM.OnWriteCard -= new _IZKEMEvents_OnWriteCardEventHandler(zkemClient_OnWriteCard);
-        objCZKEM.OnEmptyCard -= new _IZKEMEvents_OnEmptyCardEventHandler(zkemClient_OnEmptyCard);
-
-
-        objCZKEM.OnVerify -= new _IZKEMEvents_OnVerifyEventHandler(zkemClient_OnVerifyEventHandler);
-        objCZKEM.OnAttTransactionEx -= new _IZKEMEvents_OnAttTransactionExEventHandler(zkemClient_OnAttTransactionEx);
-        // objCZKEM.OnAttTransaction -= new _IZKEMEvents_OnAttTransactionEventHandler(zkemClient_OnAttTransaction);
-        //  objCZKEM.OnAttTransactionEx_New -= new _IZKEMEvents_OnAttTransactionEx_NewEventHandler(zkemClient_OnAttTransactionEx_New);
-        // objCZKEM.OnGeneralEvent -= new _IZKEMEvents_OnGeneralEventEventHandler(zkemClient_OnGeneralEvent);
-        objCZKEM.OnKeyPress -= new _IZKEMEvents_OnKeyPressEventHandler(zkemClient_OnKeyPress);
-        objCZKEM.OnEMData -= new _IZKEMEvents_OnEMDataEventHandler(zkemClient_OnEMData);
+        _objCZKEM.OnDeleteTemplate -= new _IZKEMEvents_OnDeleteTemplateEventHandler(zkemClient_OnDeleteTemplate);
+        _objCZKEM.OnNewUser -= new _IZKEMEvents_OnNewUserEventHandler(zkemClient_OnNewUser);
+        _objCZKEM.OnHIDNum -= new _IZKEMEvents_OnHIDNumEventHandler(zkemClient_OnHIDNum);
+        _objCZKEM.OnAlarm -= new _IZKEMEvents_OnAlarmEventHandler(zkemClient_OnAlarm);
+        _objCZKEM.OnDoor -= new _IZKEMEvents_OnDoorEventHandler(zkemClient_OnDoor);
+        _objCZKEM.OnWriteCard -= new _IZKEMEvents_OnWriteCardEventHandler(zkemClient_OnWriteCard);
+        _objCZKEM.OnEmptyCard -= new _IZKEMEvents_OnEmptyCardEventHandler(zkemClient_OnEmptyCard);
 
 
-        objCZKEM.Disconnect();
+        _objCZKEM.OnVerify -= new _IZKEMEvents_OnVerifyEventHandler(zkemClient_OnVerifyEventHandler);
+        _objCZKEM.OnAttTransactionEx -= new _IZKEMEvents_OnAttTransactionExEventHandler(zkemClient_OnAttTransactionEx);
+        // _objCZKEM.OnAttTransaction -= new _IZKEMEvents_OnAttTransactionEventHandler(zkemClient_OnAttTransaction);
+        //  _objCZKEM.OnAttTransactionEx_New -= new _IZKEMEvents_OnAttTransactionEx_NewEventHandler(zkemClient_OnAttTransactionEx_New);
+        // _objCZKEM.OnGeneralEvent -= new _IZKEMEvents_OnGeneralEventEventHandler(zkemClient_OnGeneralEvent);
+        _objCZKEM.OnKeyPress -= new _IZKEMEvents_OnKeyPressEventHandler(zkemClient_OnKeyPress);
+        _objCZKEM.OnEMData -= new _IZKEMEvents_OnEMDataEventHandler(zkemClient_OnEMData);
+
+
+        _objCZKEM.Disconnect();
     }
 
     public bool Connect_Net(string IPAdd, int Port)
     {
-        if (objCZKEM.Connect_Net(IPAdd, Port))
+        if (_objCZKEM.Connect_Net(IPAdd, Port))
         {
             //65535, 32767
-            if (objCZKEM.RegEvent(1, 65535))
+            if (_objCZKEM.RegEvent(1, 65535))
             {
                 // [ Register your events here ]
                 // [ Go through the _IZKEMEvents_Event class for a complete list of events
-                objCZKEM.OnConnected += ObjCZKEM_OnConnected;
-                objCZKEM.OnDisConnected += objCZKEM_OnDisConnected;
-                objCZKEM.OnEnrollFinger += ObjCZKEM_OnEnrollFinger;
-                objCZKEM.OnFinger += ObjCZKEM_OnFinger;
+                _objCZKEM.OnConnected += ObjCZKEM_OnConnected;
+                _objCZKEM.OnDisConnected += objCZKEM_OnDisConnected;
+                _objCZKEM.OnEnrollFinger += ObjCZKEM_OnEnrollFinger;
+                _objCZKEM.OnFinger += ObjCZKEM_OnFinger;
 
 
-                objCZKEM.OnFingerFeature += new _IZKEMEvents_OnFingerFeatureEventHandler(zkemClient_OnFingerFeature);
-                objCZKEM.OnEnrollFingerEx += new _IZKEMEvents_OnEnrollFingerExEventHandler(zkemClient_OnEnrollFingerEx);
+                _objCZKEM.OnFingerFeature += new _IZKEMEvents_OnFingerFeatureEventHandler(zkemClient_OnFingerFeature);
+                _objCZKEM.OnEnrollFingerEx += new _IZKEMEvents_OnEnrollFingerExEventHandler(zkemClient_OnEnrollFingerEx);
 
-                objCZKEM.OnDeleteTemplate += new _IZKEMEvents_OnDeleteTemplateEventHandler(zkemClient_OnDeleteTemplate);
-                objCZKEM.OnNewUser += new _IZKEMEvents_OnNewUserEventHandler(zkemClient_OnNewUser);
-                objCZKEM.OnHIDNum += new _IZKEMEvents_OnHIDNumEventHandler(zkemClient_OnHIDNum);
-                objCZKEM.OnAlarm += new _IZKEMEvents_OnAlarmEventHandler(zkemClient_OnAlarm);
-                objCZKEM.OnDoor += new _IZKEMEvents_OnDoorEventHandler(zkemClient_OnDoor);
-                objCZKEM.OnWriteCard += new _IZKEMEvents_OnWriteCardEventHandler(zkemClient_OnWriteCard);
-                objCZKEM.OnEmptyCard += new _IZKEMEvents_OnEmptyCardEventHandler(zkemClient_OnEmptyCard);
+                _objCZKEM.OnDeleteTemplate += new _IZKEMEvents_OnDeleteTemplateEventHandler(zkemClient_OnDeleteTemplate);
+                _objCZKEM.OnNewUser += new _IZKEMEvents_OnNewUserEventHandler(zkemClient_OnNewUser);
+                _objCZKEM.OnHIDNum += new _IZKEMEvents_OnHIDNumEventHandler(zkemClient_OnHIDNum);
+                _objCZKEM.OnAlarm += new _IZKEMEvents_OnAlarmEventHandler(zkemClient_OnAlarm);
+                _objCZKEM.OnDoor += new _IZKEMEvents_OnDoorEventHandler(zkemClient_OnDoor);
+                _objCZKEM.OnWriteCard += new _IZKEMEvents_OnWriteCardEventHandler(zkemClient_OnWriteCard);
+                _objCZKEM.OnEmptyCard += new _IZKEMEvents_OnEmptyCardEventHandler(zkemClient_OnEmptyCard);
 
 
-                objCZKEM.OnVerify += new _IZKEMEvents_OnVerifyEventHandler(zkemClient_OnVerifyEventHandler);
-                objCZKEM.OnAttTransactionEx += new _IZKEMEvents_OnAttTransactionExEventHandler(zkemClient_OnAttTransactionEx);
-                objCZKEM.OnAttTransaction += new _IZKEMEvents_OnAttTransactionEventHandler(zkemClient_OnAttTransaction);
-                ///objCZKEM.OnAttTransactionEx_New += new _IZKEMEvents_OnAttTransactionEx_NewEventHandler(zkemClient_OnAttTransactionEx_New);
-                ///objCZKEM.OnGeneralEvent += new _IZKEMEvents_OnGeneralEventEventHandler(zkemClient_OnGeneralEvent);
-                objCZKEM.OnKeyPress += new _IZKEMEvents_OnKeyPressEventHandler(zkemClient_OnKeyPress);
-                objCZKEM.OnEMData += new _IZKEMEvents_OnEMDataEventHandler(zkemClient_OnEMData);
+                _objCZKEM.OnVerify += new _IZKEMEvents_OnVerifyEventHandler(zkemClient_OnVerifyEventHandler);
+                _objCZKEM.OnAttTransactionEx += new _IZKEMEvents_OnAttTransactionExEventHandler(zkemClient_OnAttTransactionEx);
+                _objCZKEM.OnAttTransaction += new _IZKEMEvents_OnAttTransactionEventHandler(zkemClient_OnAttTransaction);
+                ///_objCZKEM.OnAttTransactionEx_New += new _IZKEMEvents_OnAttTransactionEx_NewEventHandler(zkemClient_OnAttTransactionEx_New);
+                ///_objCZKEM.OnGeneralEvent += new _IZKEMEvents_OnGeneralEventEventHandler(zkemClient_OnGeneralEvent);
+                _objCZKEM.OnKeyPress += new _IZKEMEvents_OnKeyPressEventHandler(zkemClient_OnKeyPress);
+                _objCZKEM.OnEMData += new _IZKEMEvents_OnEMDataEventHandler(zkemClient_OnEMData);
 
             }
             return true;
         }
         return false;
     }
+    private void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
+    {
+        string Ip = "";
+        _objCZKEM.GetDeviceIP(1, ref Ip);
+
+        if (Year != 2000)
+        {
+
+            DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
+            var command = new AddDeviceLogCommand
+            {
+                Id = EnrollNumber,
+                Datetime = datetime,
+                Ip = Ip
+            };
+
+
+            DeviceLogController.RegisterLog(EnrollNumber, datetime, Ip);
+            //if (_service._mediator.Send(command).Result)
+            //{
+
+            //};
+        }
+        else
+        {
+            int machineNumber = 1;
+            string dwEnrollNumber1 = "";
+            int dwVerifyMode = 0;
+            int dwInOutMode = 0;
+            int dwYear = 0;
+            int dwMonth = 0;
+            int dwDay = 0;
+            int dwHour = 0;
+            int dwMinute = 0;
+            int dwSecond = 0;
+            int dwWorkCode = 0;
+
+            _objCZKEM.ReadAllGLogData(machineNumber);
+
+            while (_objCZKEM.SSR_GetGeneralLogData(machineNumber, out dwEnrollNumber1, out dwVerifyMode, out dwInOutMode, out dwYear, out dwMonth, out dwDay, out dwHour, out dwMinute, out dwSecond, ref dwWorkCode))
+            {
+                long ID = Convert.ToInt32(dwEnrollNumber1);
+
+                //   var member = OnGet(ID);
+
+                DateTime datetime = new DateTime(dwYear, dwMonth, dwDay, dwHour, dwMinute, 0);
+
+                //   _ = RLog(dwEnrollNumber1, datetime, Ip);
+            }
+            _objCZKEM.ClearGLog(0);
+
+            //objZkeeper.Disconnect();
+        }
+
+        //device.GetAllLogMembers(3);
+
+    }
+
     private void zkemClient_OnEMData(int DataType, int DataLen, ref sbyte DataBuffer)
     {
     }
@@ -163,14 +237,14 @@ public class ZkemClient
 
     private void ObjCZKEM_OnConnected()
     {
-        RaiseDeviceEvent(this, UniversalStatic.acx_Connect);
+        _raiseDeviceEvent(this, UniversalStatic.acx_Connect);
     }
 
 
     void objCZKEM_OnDisConnected()
     {
         // Implementing the Event
-        RaiseDeviceEvent(this, UniversalStatic.acx_Disconnect);
+        _raiseDeviceEvent(this, UniversalStatic.acx_Disconnect);
     }
 
 
@@ -181,7 +255,7 @@ public class ZkemClient
 
     public bool DisableDeviceWithTimeOut(int dwMachineNumber, int TimeOutSec)
     {
-        return objCZKEM.DisableDeviceWithTimeOut(dwMachineNumber, TimeOutSec);
+        return _objCZKEM.DisableDeviceWithTimeOut(dwMachineNumber, TimeOutSec);
     }
 
     private void zkemClient_OnVerifyEventHandler(int UserId)
@@ -195,64 +269,7 @@ public class ZkemClient
 
     }
 
-    private void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
-    {/*
-        string Ip = "";
-        objCZKEM.GetDeviceIP(1, ref Ip);
 
-        if (Year != 2000)
-        {
-
-            DateTime datetime = new DateTime(Year, Month, Day, Hour, Minute, 0);
-          //  DeviceLogController DeviceLog = new DeviceLogController();
-           // _ =  DeviceLog.RegisterLog(EnrollNumber, datetime, Ip);
-        }
-        else
-        {
-            int machineNumber = 1;
-            string dwEnrollNumber1 = "";
-            int dwVerifyMode = 0;
-            int dwInOutMode = 0;
-            int dwYear = 0;
-            int dwMonth = 0;
-            int dwDay = 0;
-            int dwHour = 0;
-            int dwMinute = 0;
-            int dwSecond = 0;
-            int dwWorkCode = 0;
-
-            objCZKEM.ReadAllGLogData(machineNumber);
-
-            while (objCZKEM.SSR_GetGeneralLogData(machineNumber, out dwEnrollNumber1, out dwVerifyMode, out dwInOutMode, out dwYear, out dwMonth, out dwDay, out dwHour, out dwMinute, out dwSecond, ref dwWorkCode))
-            {
-                long ID = Convert.ToInt32(dwEnrollNumber1);
-
-                var member = OnGet(ID);
-
-                DateTime datetime = new DateTime(dwYear, dwMonth, dwDay, dwHour, dwMinute, 0);
-
-                _ = RLog(dwEnrollNumber1, datetime, Ip);
-            }
-            objCZKEM.ClearGLog(0);
-
-            //objZkeeper.Disconnect();
-        }
-
-        //device.GetAllLogMembers(3);
-
-    }
-    public async Task<bool> OnGet(long id)
-    {
-       await Task.Run(() => { // or ThreadPool.QueueUserWorkItem(async _ => {
-            using (ConicErpContext DB = new ConicErpContext())
-            {
-                Member Book = DB.Members.Where(m => m.Id == id).SingleOrDefault();
-                return true;
-            }
-        });
-        return true;
-        */
-    }
     private void zkemClient_OnAttTransaction(int EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second)
     {
     }
@@ -261,13 +278,13 @@ public class ZkemClient
 
     public bool EnableDevice(int dwMachineNumber, bool bFlag)
     {
-        return objCZKEM.EnableDevice(dwMachineNumber, bFlag);
+        return _objCZKEM.EnableDevice(dwMachineNumber, bFlag);
     }
 
 
     public bool GetDeviceTime(int dwMachineNumber, ref int dwYear, ref int dwMonth, ref int dwDay, ref int dwHour, ref int dwMinute, ref int dwSecond)
     {
-        return objCZKEM.GetDeviceTime(dwMachineNumber, ref dwYear, ref dwMonth, ref dwDay, ref dwHour, ref dwMinute, ref dwSecond);
+        return _objCZKEM.GetDeviceTime(dwMachineNumber, ref dwYear, ref dwMonth, ref dwDay, ref dwHour, ref dwMinute, ref dwSecond);
     }
 
 
@@ -277,88 +294,88 @@ public class ZkemClient
     }
     public bool GetUserInfoEx(int dwMachineNumber, int dwEnrollNumber, out int VerifyStyle, out byte Reserved)
     {
-        return objCZKEM.GetUserInfoEx(dwMachineNumber, dwEnrollNumber, out VerifyStyle, out Reserved);
+        return _objCZKEM.GetUserInfoEx(dwMachineNumber, dwEnrollNumber, out VerifyStyle, out Reserved);
     }
 
     public bool GetUserTmp(int dwMachineNumber, int dwEnrollNumber, int dwFingerIndex, ref byte TmpData, ref int TmpLength)
     {
-        return objCZKEM.GetUserTmp(dwMachineNumber, dwEnrollNumber, dwFingerIndex, ref TmpData, ref TmpLength);
+        return _objCZKEM.GetUserTmp(dwMachineNumber, dwEnrollNumber, dwFingerIndex, ref TmpData, ref TmpLength);
     }
 
     public bool GetUserTmpEx(int dwMachineNumber, string dwEnrollNumber, int dwFingerIndex, out int Flag, out byte TmpData, out int TmpLength)
     {
-        return objCZKEM.GetUserTmpEx(dwMachineNumber, dwEnrollNumber, dwFingerIndex, out Flag, out TmpData, out TmpLength);
+        return _objCZKEM.GetUserTmpEx(dwMachineNumber, dwEnrollNumber, dwFingerIndex, out Flag, out TmpData, out TmpLength);
     }
 
     public bool GetUserTmpExStr(int dwMachineNumber, string dwEnrollNumber, int dwFingerIndex, out int Flag, out string TmpData, out int TmpLength)
     {
-        return objCZKEM.GetUserTmpExStr(dwMachineNumber, dwEnrollNumber, dwFingerIndex, out Flag, out TmpData, out TmpLength);
+        return _objCZKEM.GetUserTmpExStr(dwMachineNumber, dwEnrollNumber, dwFingerIndex, out Flag, out TmpData, out TmpLength);
     }
 
 
 
     public bool PowerOffDevice(int dwMachineNumber)
     {
-        return objCZKEM.PowerOffDevice(dwMachineNumber);
+        return _objCZKEM.PowerOffDevice(dwMachineNumber);
     }
 
 
     public bool QueryState(ref int State)
     {
-        return objCZKEM.QueryState(ref State);
+        return _objCZKEM.QueryState(ref State);
     }
 
     public bool ReadAllGLogData(int dwMachineNumber)
     {
-        return objCZKEM.ReadAllGLogData(dwMachineNumber);
+        return _objCZKEM.ReadAllGLogData(dwMachineNumber);
     }
 
 
     public bool ReadAllTemplate(int dwMachineNumber)
     {
-        return objCZKEM.ReadAllTemplate(dwMachineNumber);
+        return _objCZKEM.ReadAllTemplate(dwMachineNumber);
     }
 
     public bool ReadAllUserID(int dwMachineNumber)
     {
-        return objCZKEM.ReadAllUserID(dwMachineNumber);
+        return _objCZKEM.ReadAllUserID(dwMachineNumber);
     }
 
     public bool RefreshData(int dwMachineNumber)
     {
-        return objCZKEM.RefreshData(dwMachineNumber);
+        return _objCZKEM.RefreshData(dwMachineNumber);
     }
 
     public bool RegEvent(int dwMachineNumber, int EventMask)
     {
-        return objCZKEM.RegEvent(dwMachineNumber, EventMask);
+        return _objCZKEM.RegEvent(dwMachineNumber, EventMask);
     }
 
     public bool RestartDevice(int dwMachineNumber)
     {
-        return objCZKEM.RestartDevice(dwMachineNumber);
+        return _objCZKEM.RestartDevice(dwMachineNumber);
     }
 
 
     public bool SaveTheDataToFile(int dwMachineNumber, string TheFilePath, int FileFlag)
     {
-        return objCZKEM.SaveTheDataToFile(dwMachineNumber, TheFilePath, FileFlag);
+        return _objCZKEM.SaveTheDataToFile(dwMachineNumber, TheFilePath, FileFlag);
     }
 
 
     public bool SetUserTmpExStr(int dwMachineNumber, string dwEnrollNumber, int dwFingerIndex, int Flag, string TmpData)
     {
-        return objCZKEM.SetUserTmpExStr(dwMachineNumber, dwEnrollNumber, dwFingerIndex, Flag, TmpData);
+        return _objCZKEM.SetUserTmpExStr(dwMachineNumber, dwEnrollNumber, dwFingerIndex, Flag, TmpData);
     }
 
     public bool SSR_EnableUser(int dwMachineNumber, string dwEnrollNumber, bool bFlag)
     {
-        return objCZKEM.SSR_EnableUser(dwMachineNumber, dwEnrollNumber, bFlag);
+        return _objCZKEM.SSR_EnableUser(dwMachineNumber, dwEnrollNumber, bFlag);
     }
 
     public bool SSR_GetAllUserInfo(int dwMachineNumber, out string dwEnrollNumber, out string Name, out string Password, out int Privilege, out bool Enabled)
     {
-        return objCZKEM.SSR_GetAllUserInfo(dwMachineNumber, out dwEnrollNumber, out Name, out Password, out Privilege, out Enabled);
+        return _objCZKEM.SSR_GetAllUserInfo(dwMachineNumber, out dwEnrollNumber, out Name, out Password, out Privilege, out Enabled);
     }
     public bool GetAllGLogData(int dwMachineNumber, ref int dwTMachineNumber, ref int dwEnrollNumber, ref int dwEMachineNumber, ref int dwVerifyMode, ref int dwInOutMode, ref int dwYear, ref int dwMonth, ref int dwDay, ref int dwHour, ref int dwMinute)
     {
@@ -378,63 +395,63 @@ public class ZkemClient
 
     public bool SSR_GetGeneralLogData(int dwMachineNumber, out string dwEnrollNumber, out int dwVerifyMode, out int dwInOutMode, out int dwYear, out int dwMonth, out int dwDay, out int dwHour, out int dwMinute, out int dwSecond, ref int dwWorkCode)
     {
-        return objCZKEM.SSR_GetGeneralLogData(dwMachineNumber, out dwEnrollNumber, out dwVerifyMode, out dwInOutMode, out dwYear, out dwMonth, out dwDay, out dwHour, out dwMinute, out dwSecond, ref dwWorkCode);
+        return _objCZKEM.SSR_GetGeneralLogData(dwMachineNumber, out dwEnrollNumber, out dwVerifyMode, out dwInOutMode, out dwYear, out dwMonth, out dwDay, out dwHour, out dwMinute, out dwSecond, ref dwWorkCode);
     }
 
     public bool SSR_GetUserInfo(int dwMachineNumber, string dwEnrollNumber, out string Name, out string Password, out int Privilege, out bool Enabled)
     {
-        return objCZKEM.SSR_GetUserInfo(dwMachineNumber, dwEnrollNumber, out Name, out Password, out Privilege, out Enabled);
+        return _objCZKEM.SSR_GetUserInfo(dwMachineNumber, dwEnrollNumber, out Name, out Password, out Privilege, out Enabled);
     }
 
     public bool SSR_GetUserTmpStr(int dwMachineNumber, string dwEnrollNumber, int dwFingerIndex, out string TmpData, out int TmpLength)
     {
-        return objCZKEM.SSR_GetUserTmpStr(dwMachineNumber, dwEnrollNumber, dwFingerIndex, out TmpData, out TmpLength);
+        return _objCZKEM.SSR_GetUserTmpStr(dwMachineNumber, dwEnrollNumber, dwFingerIndex, out TmpData, out TmpLength);
     }
 
     public bool SSR_SetUserInfo(int dwMachineNumber, string dwEnrollNumber, string Name, string Password, int Privilege, bool Enabled)
     {
-        return objCZKEM.SSR_SetUserInfo(dwMachineNumber, dwEnrollNumber, Name, Password, Privilege, Enabled);
+        return _objCZKEM.SSR_SetUserInfo(dwMachineNumber, dwEnrollNumber, Name, Password, Privilege, Enabled);
     }
 
     public bool StartEnroll(int UserID, int FingerID)
     {
-        return objCZKEM.StartEnroll(UserID, FingerID);
+        return _objCZKEM.StartEnroll(UserID, FingerID);
     }
 
     public bool StartEnrollEx(string UserID, int FingerID, int Flag)
     {
-        return objCZKEM.StartEnrollEx(UserID, FingerID, Flag);
+        return _objCZKEM.StartEnrollEx(UserID, FingerID, Flag);
     }
 
     public bool StartIdentify()
-    { return objCZKEM.StartIdentify(); }
+    { return _objCZKEM.StartIdentify(); }
 
 
 
 
     public bool GetAllUserID(int dwMachineNumber, ref int dwEnrollNumber, ref int dwEMachineNumber, ref int dwBackupNumber, ref int dwMachinePrivilege, ref int dwEnable)
-    { return objCZKEM.GetAllUserID(dwMachineNumber, dwEnrollNumber, dwEMachineNumber, dwBackupNumber, dwMachinePrivilege, dwEnable); }
+    { return _objCZKEM.GetAllUserID(dwMachineNumber, dwEnrollNumber, dwEMachineNumber, dwBackupNumber, dwMachinePrivilege, dwEnable); }
 
     public bool GetFirmwareVersion(int dwMachineNumber, ref string strVersion)
-    { return objCZKEM.GetFirmwareVersion(dwMachineNumber, strVersion); }
+    { return _objCZKEM.GetFirmwareVersion(dwMachineNumber, strVersion); }
 
     public bool GetVendor(ref string strVendor)
-    { return objCZKEM.GetVendor(strVendor); }
+    { return _objCZKEM.GetVendor(strVendor); }
 
     public bool GetWiegandFmt(int dwMachineNumber, ref string sWiegandFmt)
-    { return objCZKEM.GetWiegandFmt(dwMachineNumber, sWiegandFmt); }
+    { return _objCZKEM.GetWiegandFmt(dwMachineNumber, sWiegandFmt); }
     public bool GetSDKVersion(ref string strVersion)
-    { return objCZKEM.GetSDKVersion(strVersion); }
+    { return _objCZKEM.GetSDKVersion(strVersion); }
 
     public bool GetSerialNumber(int dwMachineNumber, out string dwSerialNumber)
-    { return objCZKEM.GetSerialNumber(dwMachineNumber, out dwSerialNumber); }
+    { return _objCZKEM.GetSerialNumber(dwMachineNumber, out dwSerialNumber); }
 
     public bool GetDeviceMAC(int dwMachineNumber, ref string sMAC)
-    { return objCZKEM.GetDeviceMAC(dwMachineNumber, sMAC); }
+    { return _objCZKEM.GetDeviceMAC(dwMachineNumber, sMAC); }
 
     public void GetLastError(ref int dwErrorCode)
     {
-        objCZKEM.GetLastError(dwErrorCode);
+        _objCZKEM.GetLastError(dwErrorCode);
     }
     #endregion
 
@@ -463,7 +480,7 @@ public class ZkemClient
 
     public bool CancelOperation()
     {
-        return objCZKEM.CancelOperation();
+        return _objCZKEM.CancelOperation();
     }
 
     public bool CaptureImage(bool FullImage, ref int Width, ref int Height, ref byte Image, string ImageFile)
@@ -473,13 +490,13 @@ public class ZkemClient
 
     public bool ClearAdministrators(int dwMachineNumber)
     {
-        return objCZKEM.ClearAdministrators(dwMachineNumber);
+        return _objCZKEM.ClearAdministrators(dwMachineNumber);
     }
 
 
     public bool ClearKeeperData(int dwMachineNumber)
     {
-        return objCZKEM.ClearKeeperData(dwMachineNumber);
+        return _objCZKEM.ClearKeeperData(dwMachineNumber);
     }
 
     public bool ClearLCD()
@@ -494,7 +511,7 @@ public class ZkemClient
 
     public bool ClearSLog(int dwMachineNumber)
     {
-        return objCZKEM.ClearSLog(dwMachineNumber);
+        return _objCZKEM.ClearSLog(dwMachineNumber);
     }
 
     public bool ClearSMS(int dwMachineNumber)
@@ -627,14 +644,14 @@ public class ZkemClient
 
     public bool PlayVoice(int Position, int Length)
     {
-        return objCZKEM.PlayVoice(Position, Length);
+        return _objCZKEM.PlayVoice(Position, Length);
     }
 
 
 
     public bool GetUserFaceStr(int dwMachineNumber, string dwEnrollNumber, int dwFaceIndex, ref string TmpData, ref int TmpLength)
     {
-        return objCZKEM.GetUserFaceStr(dwMachineNumber, dwEnrollNumber, dwFaceIndex, ref TmpData, ref TmpLength);
+        return _objCZKEM.GetUserFaceStr(dwMachineNumber, dwEnrollNumber, dwFaceIndex, ref TmpData, ref TmpLength);
     }
 
     public bool GetUserGroup(int dwMachineNumber, int dwEnrollNumber, ref int UserGrp)
@@ -700,7 +717,7 @@ public class ZkemClient
 
     public bool GetDeviceIP(int dwMachineNumber, ref string IPAddr)
     {
-        return objCZKEM.GetDeviceIP(dwMachineNumber, ref IPAddr);
+        return _objCZKEM.GetDeviceIP(dwMachineNumber, ref IPAddr);
     }
 
 
@@ -986,7 +1003,7 @@ public class ZkemClient
 
     public bool SetDeviceTime2(int dwMachineNumber, int dwYear, int dwMonth, int dwDay, int dwHour, int dwMinute, int dwSecond)
     {
-        return objCZKEM.SetDeviceTime2(dwMachineNumber, dwYear, dwMonth, dwDay, dwHour, dwMinute, dwSecond);
+        return _objCZKEM.SetDeviceTime2(dwMachineNumber, dwYear, dwMonth, dwDay, dwHour, dwMinute, dwSecond);
     }
 
     public bool SetEnrollData(int dwMachineNumber, int dwEnrollNumber, int dwEMachineNumber, int dwBackupNumber, int dwMachinePrivilege, ref int dwEnrollData, int dwPassWord)
@@ -1056,14 +1073,14 @@ public class ZkemClient
 
     public bool SetUserFace(int dwMachineNumber, string dwEnrollNumber, int dwFaceIndex, ref byte TmpData, int TmpLength)
     {
-        return objCZKEM.SetUserFace(dwMachineNumber, dwEnrollNumber, dwFaceIndex, ref TmpData, TmpLength);
+        return _objCZKEM.SetUserFace(dwMachineNumber, dwEnrollNumber, dwFaceIndex, ref TmpData, TmpLength);
 
     }
 
     public bool SetUserFaceStr(int dwMachineNumber, string dwEnrollNumber, int dwFaceIndex, string TmpData, int TmpLength)
     {
 
-        return objCZKEM.SetUserFaceStr(dwMachineNumber, dwEnrollNumber, dwFaceIndex, TmpData, TmpLength);
+        return _objCZKEM.SetUserFaceStr(dwMachineNumber, dwEnrollNumber, dwFaceIndex, TmpData, TmpLength);
     }
 
     public bool SetUserGroup(int dwMachineNumber, int dwEnrollNumber, int UserGrp)
@@ -1073,7 +1090,7 @@ public class ZkemClient
 
     public bool SetUserInfo(int dwMachineNumber, int dwEnrollNumber, string Name, string Password, int Privilege, bool Enabled)
     {
-        return objCZKEM.SetUserInfo(dwMachineNumber, dwEnrollNumber, Name, Password, Privilege, Enabled);
+        return _objCZKEM.SetUserInfo(dwMachineNumber, dwEnrollNumber, Name, Password, Privilege, Enabled);
     }
 
     public bool SetUserInfoEx(int dwMachineNumber, int dwEnrollNumber, int VerifyStyle, ref byte Reserved)
@@ -1149,7 +1166,7 @@ public class ZkemClient
 
     public bool SSR_DeleteEnrollData(int dwMachineNumber, string dwEnrollNumber, int dwBackupNumber)
     {
-        return objCZKEM.SSR_DeleteEnrollData(dwMachineNumber, dwEnrollNumber, dwBackupNumber);
+        return _objCZKEM.SSR_DeleteEnrollData(dwMachineNumber, dwEnrollNumber, dwBackupNumber);
     }
 
     public bool SSR_DeleteEnrollDataExt(int dwMachineNumber, string dwEnrollNumber, int dwBackupNumber)
@@ -1272,7 +1289,7 @@ public class ZkemClient
 
     public bool SSR_SetUserTmpStr(int dwMachineNumber, string dwEnrollNumber, int dwFingerIndex, string TmpData)
     {
-        return objCZKEM.SSR_SetUserTmpStr(dwMachineNumber, dwEnrollNumber, dwFingerIndex, TmpData);
+        return _objCZKEM.SSR_SetUserTmpStr(dwMachineNumber, dwEnrollNumber, dwFingerIndex, TmpData);
     }
 
     public bool SSR_SetWorkCode(int AWorkCode, string Name)
