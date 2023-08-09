@@ -1,4 +1,4 @@
-﻿namespace SignTEC.Application.Features.SystemConfiguration.Queries.GetSMSConfiguration;
+﻿namespace Application.Features.SystemConfiguration.Queries.GetSMSConfiguration;
 
 public class StatisticsByWeekOfMonthDto
 {

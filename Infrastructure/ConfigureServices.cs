@@ -35,6 +35,8 @@ public static class ConfigureServices
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
+        services.TryAddScoped<ICurrentUserService, CurrentUserService>();
+        services.TryAddScoped<ISMSService, SMSService>();
         services.TryAddScoped<IEmailService, EmailService>();
 
         return services;

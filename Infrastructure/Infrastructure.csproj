@@ -11,13 +11,13 @@
 	  <PackageReference Include="Hangfire.Core" Version="1.8.4" />
 	  <PackageReference Include="Microsoft.AspNetCore.CookiePolicy" Version="2.2.8" />
 	  <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-	  <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.20" />
+	  <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.21" />
 	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.2.0" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.20" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.20" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.20" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.21" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.21" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.21" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="6.0.20" />
+	  <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="6.0.21" />
 	  <PackageReference Include="System.DirectoryServices" Version="7.0.1" />  </ItemGroup>
 
   <ItemGroup>

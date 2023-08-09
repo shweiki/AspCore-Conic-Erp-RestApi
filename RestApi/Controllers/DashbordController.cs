@@ -3,7 +3,7 @@ using Application.Features.Statistics.Queries.GetTotalCount;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SignTEC.Application.Features.SystemConfiguration.Queries.GetSMSConfiguration;
+using Application.Features.SystemConfiguration.Queries.GetSMSConfiguration;
 
 namespace RestApi.Controllers;
 

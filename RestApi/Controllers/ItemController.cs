@@ -1,4 +1,4 @@
-﻿using Application.Common.Helper;
+﻿using Application.Common.Helpers;
 using Application.Common.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;

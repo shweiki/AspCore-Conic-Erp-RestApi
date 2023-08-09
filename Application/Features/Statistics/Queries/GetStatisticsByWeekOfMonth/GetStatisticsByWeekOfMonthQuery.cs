@@ -1,9 +1,9 @@
-﻿using Application.Common.Helper;
+﻿using Application.Common.Helpers;
 using Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace SignTEC.Application.Features.SystemConfiguration.Queries.GetSMSConfiguration;
+namespace Application.Features.SystemConfiguration.Queries.GetSMSConfiguration;
 
 public class GetStatisticsByWeekOfMonthQuery : IRequest<StatisticsByWeekOfMonthDto>
 {

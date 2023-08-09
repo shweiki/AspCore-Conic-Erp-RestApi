@@ -1,11 +1,10 @@
-﻿
-using Application.Common.Helper;
+﻿using Application.Common.Helpers;
 using Application.Common.Interfaces;
+using Application.Features.SystemConfiguration.Queries.GetSystemConfiguration;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SignTEC.Application.Features.SystemConfiguration.Queries.GetSystemConfiguration;
 using System.Data;
 using System.Text.RegularExpressions;
 
@@ -30,8 +29,8 @@ public class FileDataController : Controller
     [HttpGet]
     public IActionResult GetProfilePictureByObjId(string TableName, long ObjId)
     {
-        try 
-        { 
+        try
+        {
             var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId && i.Type == "ProfilePicture").FirstOrDefault();
             if (file is not null)
             {
@@ -41,8 +40,8 @@ public class FileDataController : Controller
             //  return Ok(file);
             return Ok(false);
         }
-        catch (Exception ex) 
-        { 
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }
@@ -51,8 +50,8 @@ public class FileDataController : Controller
     [HttpPost]
     public async Task<IActionResult> SetTypeByObjId(long Id, string type)
     {
-        try 
-        { 
+        try
+        {
             var file = DB.FileData.Where(i => i.Id == Id).SingleOrDefault();
             if (file != null)
             {
@@ -62,8 +61,8 @@ public class FileDataController : Controller
             }
             return Ok(false);
         }
-        catch (Exception ex) 
-        { 
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }
@@ -72,19 +71,20 @@ public class FileDataController : Controller
     [HttpGet]
     public IActionResult GetFileByObjId(string TableName, long ObjId)
     {
-        try { 
-        var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new
+        try
         {
-            x.Id,
-            x.Type,
-            FileUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/{TableName}/{x.Type}/{Path.GetFileName(x.FilePath)}",
-            x.FilePath,
-            x.FileType
-        }).ToList().LastOrDefault();
-        if (file != null)
-            return Ok(file);
+            var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId).Select(x => new
+            {
+                x.Id,
+                x.Type,
+                FileUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/{TableName}/{x.Type}/{Path.GetFileName(x.FilePath)}",
+                x.FilePath,
+                x.FileType
+            }).ToList().LastOrDefault();
+            if (file != null)
+                return Ok(file);
 
-        return Ok(false);
+            return Ok(false);
         }
         catch (Exception ex) { return BadRequest(ex.Message); }
     }
@@ -105,8 +105,9 @@ public class FileDataController : Controller
 
             return Ok(files);
         }
-        catch (Exception ex) {
-        return NotFound(ex.Message);
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
         }
 
     }

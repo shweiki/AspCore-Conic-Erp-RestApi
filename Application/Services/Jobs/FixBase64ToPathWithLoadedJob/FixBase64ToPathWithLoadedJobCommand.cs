@@ -1,8 +1,8 @@
-﻿using Application.Common.Helper;
+﻿using Application.Common.Helpers;
 using Application.Common.Interfaces;
+using Application.Features.SystemConfiguration.Queries.GetSystemConfiguration;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using SignTEC.Application.Features.SystemConfiguration.Queries.GetSystemConfiguration;
 using System.Text.RegularExpressions;
 
 namespace Application.Services.Systems.FixBase64ToPathWithLoadedJob;
