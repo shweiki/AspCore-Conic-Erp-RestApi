@@ -1,10 +1,9 @@
-﻿using Domain.Entities; using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Data;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 
 namespace RestApi.Controllers;

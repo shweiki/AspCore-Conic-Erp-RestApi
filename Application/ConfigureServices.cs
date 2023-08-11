@@ -4,6 +4,7 @@ using MediatR.Pipeline;
 using Application.Common.Behaviors;
 using Application.Common.Interfaces;
 using System.Reflection;
+using Application.Services.SystemConfiguration;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -24,7 +25,7 @@ public static class ConfigureServices
         //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
 
         //services.AddScoped<ILicenseInfoService, LicenseInfoService>();
-        //services.AddScoped<ISystemConfigurationService, SystemConfigurationService>();
+        services.AddScoped<ISystemConfigurationService, SystemConfigurationService>();
         //services.AddScoped<IAddImportUserHandler, AddImportUserHandler>();
 
         return services;

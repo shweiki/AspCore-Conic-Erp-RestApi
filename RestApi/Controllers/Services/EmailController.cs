@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MailApp.Controllers;
+namespace RestApi.Controllers.Services;
 
 [Authorize]
 public class EmailController : Controller
@@ -18,7 +18,6 @@ public class EmailController : Controller
     [HttpPost]
     public async Task<IActionResult> SendTo(string to, string subject, string body)
     {
-
         return Ok(await _emailService.SendMail(to, subject, body, true));
     }
 

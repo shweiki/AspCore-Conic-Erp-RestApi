@@ -4,6 +4,6 @@ namespace Application.Common.Interfaces;
 
 public interface IEmailService
 {
-    Task<bool> SendMail(string recipientEmailAddress, string subject, string body, bool isBodyHtml);
-    Task<bool> SendMailWithAttachment(string recipientEmailAddress, string subject, string body, bool isBodyHtml, string pathAttachment, string fileName);
+    Task<bool> SendMail(string emailAddress, string subject, string body, bool isBodyHtml);
+    Task<bool> SendMailWithAttachment(string emailAddress, string subject, string body, bool isBodyHtml, string pathAttachment, string fileName);
 }

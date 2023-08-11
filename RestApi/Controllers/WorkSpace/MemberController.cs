@@ -1,9 +1,10 @@
 ﻿using Application.Common.Interfaces;
 using Domain.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
+using RestApi.Controllers.Services;
 
 namespace RestApi.Controllers.WorkSpace;
 
@@ -12,14 +13,14 @@ public class MemberController : Controller
 {
     private readonly IApplicationDbContext DB;
     private IConfiguration _configuration { get; }
-    private IMemoryCache _memoryCache;
+    private readonly ISender _mediator;
 
 
-    public MemberController(IApplicationDbContext dbcontext, IConfiguration configuration, IMemoryCache cache)
+    public MemberController(IApplicationDbContext dbcontext, IConfiguration configuration, ISender mediator)
     {
         DB = dbcontext;
         _configuration = configuration;
-        _memoryCache = cache;
+        _mediator = mediator;
 
     }
     [Route("Member/GetReceivablesMember")]
@@ -208,8 +209,16 @@ public class MemberController : Controller
                     Code = "",
                     ParentId = DB.TreeAccount.Where(x => x.Type == "Members-Main").SingleOrDefault().Code
                 };
-                DB.Member.Add(collection);
+                var result = await DB.Member.AddAsync(collection);
+
                 await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
+                DeviceController device = new DeviceController(DB, _mediator);
+                var devices = DB.Device.ToList();
+                foreach (var item in devices)
+                {
+                    device.SetUser(item.Id, result.Entity.Id.ToString(), collection.Name, "Member");
+                }
+
                 return Ok(collection.Id);
             }
             catch
@@ -334,66 +343,6 @@ public class MemberController : Controller
         }
     }
 
-    [Route("Member/CheckMembers")]
-    [HttpGet]
-    public async Task<IActionResult> CheckMembers()
-    {
-        bool IsWorkingCheckMembers = false;
-        if (_memoryCache.TryGetValue(IsWorkingCheckMembers, out IsWorkingCheckMembers))
-        {
-            if (IsWorkingCheckMembers)
-                return Ok("IsWorkingCheckMembers");
-        }
-
-        var cacheEntryOptions = new MemoryCacheEntryOptions()
-            .SetAbsoluteExpiration(TimeSpan.FromMinutes(60))
-                  //    .SetSlidingExpiration(TimeSpan.FromMinutes(60))
-                  .SetPriority(CacheItemPriority.High);
-
-        _memoryCache.Set(IsWorkingCheckMembers, true, cacheEntryOptions);
-
-        var Members = await DB.Member.Include(x => x.MembershipMovements).ToListAsync();
-
-        foreach (var member in Members)
-        {
-            try
-            {
-
-                int OStatus = member.Status;
-
-                var MembershipMovements = member.MembershipMovements.ToList();
-
-                if (MembershipMovements.Count() <= 0)
-                {
-                    member.Status = -1;
-                }
-                else
-                {
-                    foreach (var MS in MembershipMovements.OrderBy(o => o.Id))
-                    {
-                        await MembershipMovementController.ScanMembershipMovementById(MS.Id, DB, _configuration);
-                    }
-                }
-                if (OStatus == -2) member.Status = -2;
-
-                await DB.SaveChangesAsync();
-
-                //CheckBlackListActionLogMembers();
-            }
-            catch (Exception ex)
-            {
-                return Ok(ex.Message);
-            }
-            finally
-            {
-                _memoryCache.Remove(IsWorkingCheckMembers);
-
-            }
-        }
-
-
-        return Ok(true);
-    }
     [Route("Member/MergeTwoMembers")]
     [HttpPost]
     public async Task<IActionResult> MergeTwoMembers(long IntoId, long CurrentId)
@@ -443,21 +392,6 @@ public class MemberController : Controller
             return Forbid(ex.Message);
         }
 
-    }
-    [Route("Member/FixPhoneNumber")]
-    [HttpGet]
-    public async Task<IActionResult> FixPhoneNumber()
-    {
-        DB.Member.Where(i => i.PhoneNumber1 != null).ToList().ForEach(s =>
-        {
-            s.PhoneNumber1 = s.PhoneNumber1.Replace(" ", "");
-            s.PhoneNumber1 = s.PhoneNumber1.Length == 10 ? s.PhoneNumber1.Substring(1) : s.PhoneNumber1;
-        });
-
-        await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
-
-
-        return Ok(true);
     }
 
     [Route("Member/CheckBlackListActionLogMembers")]

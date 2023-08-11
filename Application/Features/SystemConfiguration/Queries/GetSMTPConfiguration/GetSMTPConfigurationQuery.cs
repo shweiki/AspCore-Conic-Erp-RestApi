@@ -1,7 +1,6 @@
-﻿using MediatR;
+﻿using Application.Common.Interfaces;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Application.Common.Interfaces;
-using Application.Common.Models;
 
 namespace Application.Features.SystemConfiguration.Queries.GetSMTPConfiguration;
 

@@ -1,4 +1,5 @@
 ﻿using Application.Services.Jobs.CheckDeviceLogJob;
+using Application.Services.Jobs.FixPhoneNumberJob;
 using Application.Services.Jobs.GetMemberLogFromZktDataBaseJob;
 using Application.Services.Jobs.ScanMemberStatueJob;
 using Application.Services.Systems.FixBase64ToPathWithLoadedJob;
@@ -35,6 +36,10 @@ public class MediatorHelper
     public async Task CheckDeviceLogJobCommand()
     {
         await _mediator.Send(new CheckDeviceLogJobCommand());
+    } 
+    public async Task FixPhoneNumberJobCommand()
+    {
+        await _mediator.Send(new FixPhoneNumberJobCommand());
     }
 
 }

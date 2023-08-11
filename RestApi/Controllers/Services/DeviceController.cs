@@ -8,7 +8,7 @@ using RestApi.Zkt;
 using System.IO.Ports;
 using System.Text;
 
-namespace RestApi.Controllers;
+namespace RestApi.Controllers.Services;
 
 [Authorize]
 public class DeviceController : Controller
