@@ -32,7 +32,7 @@ public static class ConfigureServices
 
         services.AddHangfire(x => x.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
         services.AddHangfireServer();
-
+        services.AddSignalR();
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
         services.TryAddScoped<ICurrentUserService, CurrentUserService>();

@@ -3,6 +3,7 @@ using Application.Features.SystemConfiguration.Command.AddDefaultSystemConfigura
 using MediatR;
 using Microsoft.Extensions.FileProviders;
 using RestApi.Helper;
+using RestApi.SignalR;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
 
@@ -80,7 +81,10 @@ app.UseStaticFiles(new StaticFileOptions()
     DefaultContentType = "application/octet-stream"
 });
 
-
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<SignalRHub>("/ApiHub");
+});
 // Run app
 try
 {
