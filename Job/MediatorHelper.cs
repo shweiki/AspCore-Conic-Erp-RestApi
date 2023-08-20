@@ -3,7 +3,7 @@ using Application.Services.Jobs.FixPhoneNumberJob;
 using Application.Services.Jobs.GetMemberLogFromZktDataBaseJob;
 using Application.Services.Jobs.ScanMemberStatueJob;
 using Application.Services.Systems.FixBase64ToPathWithLoadedJob;
-using Application.Services.Systems.Jobs.BackupJob;
+using Application.Services.Jobs.BackupJob;
 using MediatR;
 
 namespace Jobs;
