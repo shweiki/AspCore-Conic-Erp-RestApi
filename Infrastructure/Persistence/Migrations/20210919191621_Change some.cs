@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Infrastructure.Persistence.Migrations
 {
@@ -7,7 +6,7 @@ namespace Infrastructure.Persistence.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-         
+
             migrationBuilder.DropTable(
                 name: "MemberLog");
 
@@ -86,8 +85,8 @@ namespace Infrastructure.Persistence.Migrations
                 name: "FingerPrint");
 
 
-      
-        
+
+
             migrationBuilder.CreateTable(
                 name: "MemberLog",
                 columns: table => new

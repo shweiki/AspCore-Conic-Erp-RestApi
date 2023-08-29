@@ -15,7 +15,7 @@ public class OprationsysController : Controller
     private readonly ILogger<OprationsysController> _logger;
     private readonly IApplicationDbContext DB;
 
-    public OprationsysController(IApplicationDbContext dbcontext,  ILogger<OprationsysController> logger)
+    public OprationsysController(IApplicationDbContext dbcontext, ILogger<OprationsysController> logger)
     {
         _logger = logger;
         DB = dbcontext;

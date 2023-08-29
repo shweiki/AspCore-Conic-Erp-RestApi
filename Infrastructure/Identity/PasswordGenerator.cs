@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using System.Text;
 
 namespace Infrastructure.Identity;

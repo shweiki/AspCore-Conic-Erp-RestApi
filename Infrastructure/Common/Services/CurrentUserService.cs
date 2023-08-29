@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
 namespace Infrastructure.Common.Services;
@@ -14,7 +14,7 @@ public class CurrentUserService : ICurrentUserService
         _httpContextAccessor = httpContextAccessor;
     }
     public string Username => _httpContextAccessor.HttpContext?.User.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-    
+
     //public string Username
     //{
     //    get

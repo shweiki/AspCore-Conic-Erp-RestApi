@@ -1,8 +1,8 @@
-﻿using MediatR;
+﻿using Application.Common.Interfaces;
+using Application.Features.SystemConfiguration.Queries.GetSystemConfiguration;
+using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Application.Common.Interfaces;
-using Application.Features.SystemConfiguration.Queries.GetSystemConfiguration;
 
 namespace Application.Services.SystemConfiguration;
 

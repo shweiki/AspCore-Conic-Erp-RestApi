@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RestApi.Models;
+﻿namespace RestApi.Models;
 #nullable disable
 public class UserTokens
 {

@@ -27,7 +27,7 @@ public interface IApplicationDbContext
     DbSet<EntryAccounting> EntryAccounting { get; }
     DbSet<EntryMovement> EntryMovement { get; }
     DbSet<FileDatum> FileData { get; }
- 
+
     DbSet<InventoryItem> InventoryItem { get; }
     DbSet<InventoryMovement> InventoryMovement { get; }
     DbSet<Item> Item { get; }

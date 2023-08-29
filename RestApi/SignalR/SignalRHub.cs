@@ -37,7 +37,7 @@ public class SignalRHub : Hub
         return Context.ConnectionId;
     }
 }
- 
+
 public interface IUsersService
 {
     Dictionary<string, string> Users { get; set; }

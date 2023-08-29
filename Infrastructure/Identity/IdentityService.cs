@@ -620,7 +620,7 @@ public class IdentityService : IIdentityService
 
         return userResultDto;
     }
- 
+
     public async Task<bool> RestReadSignConsentAsync()
     {
         var users = await _userManager.Users.ToListAsync();

@@ -3,7 +3,6 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
-using System.Linq;
 
 namespace RestApi.Controllers;
 

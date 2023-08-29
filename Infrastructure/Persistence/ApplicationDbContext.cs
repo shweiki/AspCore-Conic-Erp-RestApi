@@ -179,8 +179,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
         return base.SaveChanges();
     }
-  
-        public async Task MigrateAsync()
+
+    public async Task MigrateAsync()
     {
         await Database.MigrateAsync();
     }

@@ -1,11 +1,10 @@
 ﻿
-using Domain.Entities; using Application.Common.Interfaces;
+using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Data;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace RestApi.Controllers;
 
@@ -216,7 +215,7 @@ public class EntryAccountingController : Controller
     [HttpGet]
     public async Task<IActionResult> GetEntryById(long? Id)
     {
-        var item =await DB.EntryAccounting.Include(x => x.EntryMovements).SingleOrDefaultAsync(x => x.Id == Id);
+        var item = await DB.EntryAccounting.Include(x => x.EntryMovements).SingleOrDefaultAsync(x => x.Id == Id);
         var result = new
         {
             item.Id,

@@ -1,10 +1,7 @@
-﻿using System;
+﻿namespace Application.Common.Models;
 
-namespace RestApi;
-
-public class MachineInfo
+public class ZktLogRecord
 {
-    public int MachineNumber { get; set; }
     public int IndRegID { get; set; }
     public string DateTimeRecord { get; set; }
 
@@ -16,5 +13,4 @@ public class MachineInfo
     {
         get { return DateTime.Parse(DateTime.Parse(DateTimeRecord).ToString("hh:mm:ss tt")); }
     }
-
 }

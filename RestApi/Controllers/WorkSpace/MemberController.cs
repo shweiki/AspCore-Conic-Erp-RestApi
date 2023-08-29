@@ -4,7 +4,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RestApi.Controllers.Services;
 
 namespace RestApi.Controllers.WorkSpace;
 
@@ -14,13 +13,15 @@ public class MemberController : Controller
     private readonly IApplicationDbContext DB;
     private IConfiguration _configuration { get; }
     private readonly ISender _mediator;
+    private readonly IZktServices _zktServices;
 
 
-    public MemberController(IApplicationDbContext dbcontext, IConfiguration configuration, ISender mediator)
+    public MemberController(IApplicationDbContext dbcontext, IConfiguration configuration, ISender mediator, IZktServices zktServices)
     {
         DB = dbcontext;
         _configuration = configuration;
         _mediator = mediator;
+        _zktServices = zktServices;
 
     }
     [Route("Member/GetReceivablesMember")]
@@ -212,11 +213,10 @@ public class MemberController : Controller
                 var result = await DB.Member.AddAsync(collection);
 
                 await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
-                DeviceController device = new DeviceController(DB, _mediator);
-                var devices = DB.Device.ToList();
-                foreach (var item in devices)
+
+                foreach (var item in DB.Device.ToList())
                 {
-                    device.SetUser(item.Id, result.Entity.Id.ToString(), collection.Name, "Member");
+                    _zktServices.PutUser(item.Ip, item.Port, result.Entity.Id.ToString(), collection.Name);
                 }
 
                 return Ok(collection.Id);

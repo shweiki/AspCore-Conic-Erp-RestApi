@@ -1,20 +1,15 @@
-﻿using RestApi.Filters;
-using RestApi.Models;
-using FluentValidation.AspNetCore;
+﻿using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using RestApi.Filters;
+using RestApi.Models;
 using Serilog;
 using Serilog.Core;
-using System;
 using System.Text;
-using Newtonsoft.Json.Serialization;
-using RestApi.Zkt;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -37,7 +32,7 @@ public static class ConfigureServices
         services.Configure<ForwardedHeadersOptions>(options => { options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto; });
 
         services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
-       
+
         services.AddControllers().AddNewtonsoftJson(options =>
         {
             options.SerializerSettings.ContractResolver = new DefaultContractResolver();

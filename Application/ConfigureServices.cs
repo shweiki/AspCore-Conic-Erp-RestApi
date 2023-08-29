@@ -1,10 +1,10 @@
-﻿using FluentValidation;
+﻿using Application.Common.Behaviors;
+using Application.Common.Interfaces;
+using Application.Services.SystemConfiguration;
+using FluentValidation;
 using MediatR;
 using MediatR.Pipeline;
-using Application.Common.Behaviors;
-using Application.Common.Interfaces;
 using System.Reflection;
-using Application.Services.SystemConfiguration;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

@@ -9,6 +9,7 @@ var logger = builder.CreateLogger(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddIdentityServices();
 builder.Services.AddApplicationServices();
+builder.Services.AddZktecoIntegrationServices();
 
 // Add services to the container.
 builder.Services.AddRazorPages();

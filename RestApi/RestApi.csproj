@@ -6,26 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>aspnet-RestApi-DAAF96C1-C6E8-4638-9DE4-F5E21222436E</UserSecretsId>
 	</PropertyGroup>
-	<ItemGroup>
-		<COMReference Include="zkemkeeper">
-			<WrapperTool>tlbimp</WrapperTool>
-			<VersionMinor>0</VersionMinor>
-			<VersionMajor>1</VersionMajor>
-			<Guid>fe9ded34-e159-408e-8490-b720a5e632c7</Guid>
-			<Lcid>0</Lcid>
-			<Isolated>True</Isolated>
-			<EmbedInteropTypes>False</EmbedInteropTypes>
-		</COMReference>
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Remove="Migrations\**" />
-		<Content Remove="Migrations\**" />
-		<EmbeddedResource Remove="Migrations\**" />
-		<None Remove="Migrations\**" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Compile Remove="Startup.cs" />
-	</ItemGroup>
+
 
 	<ItemGroup>
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
@@ -48,6 +29,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Application\Application.csproj" />
 		<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+		<ProjectReference Include="..\ZktecoIntegration\ZktecoIntegration.csproj" />
 	</ItemGroup>
 
 </Project>

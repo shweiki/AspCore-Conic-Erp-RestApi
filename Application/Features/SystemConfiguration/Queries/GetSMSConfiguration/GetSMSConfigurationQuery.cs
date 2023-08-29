@@ -1,6 +1,6 @@
-﻿using MediatR;
+﻿using Application.Common.Interfaces;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Application.Common.Interfaces;
 
 
 namespace Application.Features.SystemConfiguration.Queries.GetSMSConfiguration;

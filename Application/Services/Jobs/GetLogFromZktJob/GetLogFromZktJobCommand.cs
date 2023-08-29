@@ -1,67 +1,77 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Models;
 using Domain.Entities;
 using MediatR;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace Application.Services.Jobs.GetMemberLogFromZktDataBaseJob;
+namespace Application.Services.Jobs.GetLogFromZktJob;
 
-public class GetMemberLogFromZktDataBaseJobCommand : IRequest<string>
+public class GetLogFromZktJobCommand : IRequest<string>
 {
 }
 
-public class GetMemberLogFromZktDataBaseJobCommandHandler : IRequestHandler<GetMemberLogFromZktDataBaseJobCommand, string>
+public class GetLogFromZktJobCommandHandler : IRequestHandler<GetLogFromZktJobCommand, string>
 {
     private readonly ISender _mediator;
     private readonly IApplicationDbContext _context;
     private readonly IConfiguration _configuration;
+    private readonly IZktServices _zktServices;
 
-    public GetMemberLogFromZktDataBaseJobCommandHandler(ISender mediator, IApplicationDbContext context, IConfiguration configuration)
+    public GetLogFromZktJobCommandHandler(ISender mediator, IApplicationDbContext context, IConfiguration configuration, IZktServices zktServices)
     {
         _mediator = mediator;
         _context = context;
         _configuration = configuration;
+        _zktServices = zktServices;
     }
 
-    public async Task<string> Handle(GetMemberLogFromZktDataBaseJobCommand request, CancellationToken cancellationToken)
+    public async Task<string> Handle(GetLogFromZktJobCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var connectionString = _configuration.GetConnectionString("ZkbiotimeConnection");
-            if (string.IsNullOrWhiteSpace(connectionString)) { return ""; }
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            var devices = await _context.Device.ToListAsync();
+            foreach (var device in devices)
             {
-                connection.Open();
-
-                String sql = "SELECT  L.punch_time, L.emp_code , T.ip_address  ,L.id FROM zkbiotime.dbo.iclock_transaction as L" +
-                    " INNER JOIN  [zkbiotime].[dbo].[iclock_terminal] as T ON L.terminal_id= T.id" +
-                    " where L.reserved Is null";
-
-                using (SqlCommand command = new(sql, connection))
+                if (device is null) continue;
+                IList<ZktLogRecord> zktLogRecord = _zktServices.GetLogData(device.Ip, device.Port);
+                if (zktLogRecord is not null && zktLogRecord.Count > 0)
                 {
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    foreach (var record in zktLogRecord)
                     {
-                        if (reader.HasRows)
+                        var TableName = "";
+                        var member = _context.Member.Where(m => m.Id == record.IndRegID).SingleOrDefault();
+                        var Employee = _context.Employee.Where(m => m.Id == record.IndRegID).SingleOrDefault();
+                        if (member != null) TableName = "Member";
+                        if (Employee != null) TableName = "Employee";
+                        DateTime datetime = DateTime.Parse(record.DateTimeRecord);
+                        datetime = new DateTime(datetime.Year, datetime.Month, datetime.Day, datetime.Hour, datetime.Minute, 0);
+                        var isLogSaveIt = _context.DeviceLog.Where(l => l.Fk == record.IndRegID.ToString() && l.TableName == TableName && l.DateTime == datetime).Count();
+                        if (isLogSaveIt <= 0)
                         {
-                            while (reader.Read())
+                            DeviceLog Log = new DeviceLog
                             {
-                                if (reader[1].ToString() == "0") continue;
-
-                                DateTime action_time = DateTime.Parse(reader[0].ToString());
-                                action_time = new DateTime(action_time.Year, action_time.Month, action_time.Day, action_time.Hour, action_time.Minute, 0);
-
-                                string objectId = reader[1].ToString();
-                                string Ip = reader[2].ToString();
-                                await RegisterLog(objectId, action_time, Ip);
-
-                                UpdateFromZkBioReserved(reader[3].ToString());
-
-                            }
+                                Type = "In",
+                                DateTime = DateTime.Parse(record.DateTimeRecord),
+                                DeviceId = device.Id,
+                                Status = 0,
+                                TableName = TableName,
+                                Fk = record.IndRegID.ToString(),
+                                Description = ""
+                            };
+                            if (Log.DateTime < DateTime.Today)
+                                Log.Status = -1;
+                            _context.DeviceLog.Add(Log);
+                        }
+                        else
+                        {
+                            continue;
                         }
                     }
                 }
             }
+            _context.SaveChanges();
         }
         catch (SqlException e)
         {

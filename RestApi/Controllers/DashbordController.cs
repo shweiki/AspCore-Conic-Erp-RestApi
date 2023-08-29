@@ -1,9 +1,9 @@
 ﻿using Application.Common.Interfaces;
 using Application.Features.Statistics.Queries.GetTotalCount;
+using Application.Features.SystemConfiguration.Queries.GetSMSConfiguration;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Application.Features.SystemConfiguration.Queries.GetSMSConfiguration;
 
 namespace RestApi.Controllers;
 

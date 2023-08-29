@@ -1,6 +1,6 @@
-﻿using AutoMapper;
-using Application.Common.Enums;
+﻿using Application.Common.Enums;
 using Application.Common.Models;
+using AutoMapper;
 using Infrastructure.Identity;
 
 namespace Infrastructure.Common.Mappings;

@@ -5,7 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
-namespace Application.Services.Systems.FixBase64ToPathWithLoadedJob;
+namespace Application.Services.Jobs.FixBase64ToPathWithLoadedJob;
 
 public class FixBase64ToPathWithLoadedJobCommand : IRequest<string>
 {

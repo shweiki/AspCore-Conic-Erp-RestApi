@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Infrastructure.Identity;
+﻿namespace Infrastructure.Identity;
 
 public class Audit
 {

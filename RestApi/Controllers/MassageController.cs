@@ -1,12 +1,8 @@
-﻿using Domain.Entities; using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.IO;
-using System.Linq;
-using System.Net;
 
 namespace RestApi.Controllers;
 
@@ -57,20 +53,20 @@ public class MassageController : Controller
 
     public bool SendSms(string PhoneNumber, string Body)
     {
-//        WebRequest request = WebRequest.Create(
-//"http://josmsservice.com/smsonline/msgservicejo.cfm?numbers=962" + PhoneNumber + ",&senderid=High Fit&AccName=highfit&AccPass=D7!cT5!SgU0&msg=" + Body + "&requesttimeout=5000000");
-//        request.Credentials = CredentialCache.DefaultCredentials;
+        //        WebRequest request = WebRequest.Create(
+        //"http://josmsservice.com/smsonline/msgservicejo.cfm?numbers=962" + PhoneNumber + ",&senderid=High Fit&AccName=highfit&AccPass=D7!cT5!SgU0&msg=" + Body + "&requesttimeout=5000000");
+        //        request.Credentials = CredentialCache.DefaultCredentials;
 
-//        WebResponse response = request.GetResponse();
-//        string responseFromServer;
-//        using (Stream dataStream = response.GetResponseStream())
-//        {
-//            StreamReader reader = new StreamReader(dataStream);
-//            responseFromServer = reader.ReadToEnd();
-//        }
+        //        WebResponse response = request.GetResponse();
+        //        string responseFromServer;
+        //        using (Stream dataStream = response.GetResponseStream())
+        //        {
+        //            StreamReader reader = new StreamReader(dataStream);
+        //            responseFromServer = reader.ReadToEnd();
+        //        }
 
 
-//        response.Close();
+        //        response.Close();
         return true;
     }
 

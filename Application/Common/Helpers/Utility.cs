@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Application.Common.Helpers;
+﻿namespace Application.Common.Helpers;
 
 public static class Utility
 {

@@ -1,6 +1,5 @@
 ﻿#nullable disable
 
-using Domain;
 
 namespace Domain.Entities;
 

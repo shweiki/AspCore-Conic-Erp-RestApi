@@ -49,7 +49,7 @@ public class EntryMovementController : Controller
         var itemsQuery = DB.EntryMovement.Where(l => l.AccountId == AccountId).AsQueryable();
 
         var items = await itemsQuery.ToListAsync();
-       
+
         return Ok(items.Select(x => new
         {
             x.Id,

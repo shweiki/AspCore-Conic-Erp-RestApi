@@ -1,20 +1,13 @@
-﻿///
-///    Experimented By : Ozesh Thapa
-///    Email: dablackscarlet@gmail.com
-///
-using System.Drawing;
+﻿using System.Drawing;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace RestApi;
+namespace ZktecoIntegration.Models;
 
 public class UniversalStatic
 {
-
-    public const string acx_Disconnect = "Disconnected";
-    public const string acx_Connect = "Conncected";
 
     public static bool ValidateIP(string addrString)
     {
@@ -24,7 +17,6 @@ public class UniversalStatic
         else
             return false;
     }
-
 
     public static bool PingTheDevice(string ipAdd)
     {
@@ -62,7 +54,6 @@ public class UniversalStatic
         return result;
     }
 
-
     public static Image StringToImage(string imageString)
     {
         byte[] bArray1 = Convert.FromBase64String(imageString);
@@ -85,11 +76,5 @@ public class UniversalStatic
         }
         return actualString;
     }
-
-
-
-
-
-
 
 }

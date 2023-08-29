@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Application.Common.Interfaces;
+﻿namespace Application.Common.Interfaces;
 
 public interface IEmailService
 {

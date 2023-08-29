@@ -1,6 +1,6 @@
-﻿using MediatR;
-using Application.Common.Enums;
+﻿using Application.Common.Enums;
 using Application.Common.Interfaces;
+using MediatR;
 
 namespace Application.Features.Role.Commands.AddDefaultRoles;
 
