@@ -33,7 +33,7 @@ public class RecurringJobService : BackgroundService
             }
 
             _recurringJobManager.AddOrUpdate<MediatorHelper>("ScanMemberStatueJobCommand", x => x.ScanMemberStatueJobCommand(), dailyIntervalCronActivated3AM);
-            _recurringJobManager.AddOrUpdate<MediatorHelper>("BackupDataBaseJobCommand", x => x.BackupDataBaseJobCommand(), dailyIntervalCronActivated3AM);
+            _recurringJobManager.AddOrUpdate<MediatorHelper>("RecoveryDataBaseJobCommand", x => x.RecoveryDataBaseJobCommand(), dailyIntervalCronActivated3AM);
             _recurringJobManager.AddOrUpdate<MediatorHelper>("CheckDeviceLogJobCommand", x => x.CheckDeviceLogJobCommand(), dailyIntervalCronActivated3AM);
             _recurringJobManager.AddOrUpdate<MediatorHelper>("GetLogFromZktJobCommand", x => x.GetLogFromZktJobCommand(), dailyIntervalCronActivated3AM);
 

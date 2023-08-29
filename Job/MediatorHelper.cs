@@ -1,4 +1,4 @@
-﻿using Application.Services.Jobs.BackupDataBaseJobCommand;
+﻿using Application.Services.Jobs.RecoveryDataBaseJob;
 using Application.Services.Jobs.CheckDeviceLogJob;
 using Application.Services.Jobs.FixBase64ToPathWithLoadedJob;
 using Application.Services.Jobs.FixPhoneNumberJob;
@@ -25,9 +25,9 @@ public class MediatorHelper
     {
         await _mediator.Send(new FixBase64ToPathWithLoadedJobCommand());
     }
-    public async Task BackupDataBaseJobCommand()
+    public async Task RecoveryDataBaseJobCommand()
     {
-        await _mediator.Send(new BackupDataBaseJobCommand());
+        await _mediator.Send(new RecoveryDataBaseJobCommand());
     }
     public async Task GetLogFromZktJobCommand()
     {

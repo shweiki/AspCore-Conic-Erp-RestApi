@@ -22,9 +22,8 @@ public class ScanMemberStatueJobCommandHandler : IRequestHandler<ScanMemberStatu
 
     public async Task<string> Handle(ScanMemberStatueJobCommand request, CancellationToken cancellationToken)
     {
-
-
-        var members = await _context.Member.Include(x => x.MembershipMovements).ToListAsync();
+        var queryable = _context.Member.AsQueryable();
+        var members = await queryable.ToListAsync();
 
         foreach (var member in members)
         {
@@ -32,22 +31,20 @@ public class ScanMemberStatueJobCommandHandler : IRequestHandler<ScanMemberStatu
             {
                 int OStatus = member.Status;
 
-                var membershipMovements = member.MembershipMovements.ToList();
-
-                if (membershipMovements.Count() <= 0)
+                if (member.MembershipMovements.Count() <= 0)
                 {
                     member.Status = -1;
                 }
                 else
                 {
-                    foreach (var membershipMovement in membershipMovements.OrderBy(o => o.Id))
+
+                    foreach (var membershipMovement in member.MembershipMovements.Where(x => x.Status > 0).OrderBy(o => o.StartDate))
                     {
                         var query = new ScanMembershipMovementByIdService
                         {
                             Id = membershipMovement.Id
                         };
                         await _mediator.Send(query);
-
                     }
                 }
                 if (OStatus == -2) member.Status = -2;
