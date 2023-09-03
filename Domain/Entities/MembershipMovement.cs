@@ -1,8 +1,10 @@
 ﻿#nullable disable
 
+using Domain.Common;
+
 namespace Domain.Entities;
 
-public partial class MembershipMovement
+public partial class MembershipMovement : AuditEntity
 {
     public long Id { get; set; }
     public double TotalAmmount { get; set; }

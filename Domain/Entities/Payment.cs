@@ -1,8 +1,10 @@
 ﻿#nullable disable
 
+using Domain.Common;
+
 namespace Domain.Entities;
 
-public partial class Payment
+public partial class Payment : AuditEntity
 {
     public long Id { get; set; }
     public string Name { get; set; }

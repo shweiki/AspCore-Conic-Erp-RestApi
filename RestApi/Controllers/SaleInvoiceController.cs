@@ -12,20 +12,27 @@ namespace RestApi.Controllers;
 public class SaleInvoiceController : Controller
 {
     private readonly IApplicationDbContext DB;
-    public SaleInvoiceController(IApplicationDbContext dbcontext)
+    private readonly IIdentityService _identityService;
+
+    public SaleInvoiceController(IApplicationDbContext dbcontext, IIdentityService identityService)
     {
         DB = dbcontext;
+        _identityService = identityService;
     }
     [HttpPost]
     [Route("SaleInvoice/GetByListQ")]
     public async Task<IActionResult> GetByListQ(int Limit, string Sort, int Page, string User, DateTime? DateFrom, DateTime? DateTo, int? Status, string Any, string Type)
     {
-
         var itemsQuery = DB.SalesInvoice.Include(x => x.InventoryMovements).Where(s => (Any == null || s.Id.ToString().Contains(Any) || s.PaymentMethod.Contains(Any) || s.Vendor.Name.Contains(Any) || s.Description.Contains(Any) || s.PhoneNumber.Contains(Any) || s.Name.Contains(Any) || s.Region.Contains(Any)) &&
         (DateFrom == null || s.FakeDate >= DateFrom) && (DateTo == null || s.FakeDate <= DateTo) &&
         (Status == null || s.Status == Status) && (Type == null || s.Type == Type)).AsQueryable();
 
         itemsQuery = (Sort == "+id" ? itemsQuery.OrderBy(s => s.Id) : itemsQuery.OrderByDescending(s => s.Id));
+
+        if (!string.IsNullOrWhiteSpace(User))
+        {
+            itemsQuery = itemsQuery.Where(s => s.CreatedBy.ToString() == User).AsQueryable();
+        }
         var items = await itemsQuery.ToListAsync();
 
 

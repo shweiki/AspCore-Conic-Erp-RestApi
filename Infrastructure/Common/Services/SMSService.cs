@@ -21,6 +21,8 @@ public class SMSService : ISMSService
 
     public async Task<bool> SendSMSAsync(string tonumber, string message)
     {
+        if (string.IsNullOrWhiteSpace(tonumber)) return false;
+
         var validNumber = tonumber.Trim().Replace(" ", "");
         switch (validNumber.Length)
         {

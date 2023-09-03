@@ -28,16 +28,20 @@ public static class ConfigureServices
                 options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
                     builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
+
         }
 
-        services.AddHangfire(x => x.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
-        services.AddHangfireServer();
-        services.AddSignalR();
-        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+
+
+        services.TryAddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
         services.TryAddScoped<ICurrentUserService, CurrentUserService>();
         services.TryAddScoped<ISMSService, SMSService>();
         services.TryAddScoped<IEmailService, EmailService>();
+
+        services.AddHangfire(x => x.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
+        services.AddHangfireServer();
+        services.AddSignalR();
 
         return services;
     }
@@ -89,8 +93,8 @@ public static class ConfigureServices
         ///       services.TryAddScoped<IUserConfirmation<ApplicationUser>, DefaultUserConfirmation<ApplicationUser>>();
         //      services.TryAddScoped<ISystemClock, SystemClock>();
 
-        services.AddTransient<IIdentityService, IdentityService>();
-        services.AddTransient<IPasswordGenerator, PasswordGenerator>();
+        services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<IPasswordGenerator, PasswordGenerator>();
         services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, UserClaimsPrincipalFactory>();
 
 

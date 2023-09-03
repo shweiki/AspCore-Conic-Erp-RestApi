@@ -133,17 +133,19 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             AuditLog.Add(auditEntry.ToAudit());
         }
     }
-    private void PrepareSaveChanges()
+    private void PrepareSaveChanges(string userName = "System User")
     {
         foreach (var entry in ChangeTracker.Entries<AuditEntity>())
         {
             switch (entry.State)
             {
                 case EntityState.Added:
+                    entry.Entity.CreatedBy = userName;
                     entry.Entity.Created = DateTime.UtcNow;
                     break;
 
                 case EntityState.Modified:
+                    entry.Entity.LastModifiedBy = userName;
                     entry.Entity.LastModified = DateTime.UtcNow;
                     break;
             }
@@ -159,7 +161,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     }
     public virtual async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken(), string userName = null)
     {
-        PrepareSaveChanges();
+        PrepareSaveChanges(userName);
         OnBeforeSaveChanges(userName);
 
         var result = await base.SaveChangesAsync(cancellationToken);

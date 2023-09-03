@@ -1,11 +1,11 @@
 ﻿#nullable disable
 
+using Domain.Common;
+
 namespace Domain.Entities;
 
-public partial class SalesInvoice
+public partial class SalesInvoice : AuditEntity
 {
-
-
     public long Id { get; set; }
     public string Name { get; set; }
     public double? Tax { get; set; }
