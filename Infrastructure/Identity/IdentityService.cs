@@ -537,6 +537,7 @@ public class IdentityService : IIdentityService
         return userResultDto;
     }
 
+
     public async Task<UserWithRoleDto?> GetUserWithRolesAsync(string username)
     {
         var user = await _userManager.Users

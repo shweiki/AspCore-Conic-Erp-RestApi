@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Features.DeviceLog.Commands.AddDeviceLog;
 using Application.Features.Members.Queries.GetMemberById;
 using Domain.Entities;
 using MediatR;
@@ -8,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace RestApi.Controllers;
 
-[Authorize]
 public class DeviceLogController : ControllerBase
 {
     private readonly IApplicationDbContext DB;
@@ -19,6 +19,61 @@ public class DeviceLogController : ControllerBase
         DB = dbcontext;
         _mediator = mediator;
     }
+    [AllowAnonymous]
+    [Route("DeviceLog/CreateFromDeviceService")]
+    [HttpPost]
+    public async Task<IActionResult> CreateFromDeviceService([FromBody] AttTransactionLog attTransactionLog)
+    {
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                var command = new AddDeviceLogCommand
+                {
+                    Id = attTransactionLog.Id,
+                    Datetime = attTransactionLog.Datetime,
+                    Ip = attTransactionLog.Ip
+                };
+                var result = await _mediator.Send(command);
+                if (result)
+                {
+                    var query = new GetMemberByIdQuery
+                    {
+                        Id = Convert.ToInt32(attTransactionLog.Id)
+                    };
+                    var User = await _mediator.Send(query);
+
+                    return Ok(
+                    new
+                    {
+                        Id = 0,
+                        DateTime = attTransactionLog.Datetime,
+                        Description = "FromDeviceService",
+                        Fk = attTransactionLog.Id,
+                        TableName = "Member",
+                        User
+                    });
+                }
+                return BadRequest(false);
+            }
+            catch
+            {
+                //Console.WriteLine(collection);
+                return BadRequest(false);
+            }
+        }
+        return BadRequest(false);
+    }
+
+    public class AttTransactionLog
+    {
+        public string Id { get; set; }
+        public DateTime Datetime { get; set; }
+        public string Ip { get; set; }
+    }
+
+    [Authorize]
+
     [Route("DeviceLog/GetDeviceLog")]
     [HttpGet]
     public IActionResult GetDeviceLog()

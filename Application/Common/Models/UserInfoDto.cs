@@ -11,5 +11,4 @@ public class UserInfoDto
     public string? Country { get; set; }
     public string? State { get; set; }
     public bool Active { get; set; }
-    public bool IsReadSignConsent { get; set; }
 }

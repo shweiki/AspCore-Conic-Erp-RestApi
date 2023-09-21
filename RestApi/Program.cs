@@ -3,7 +3,6 @@ using Application.Features.SystemConfiguration.Command.AddDefaultSystemConfigura
 using MediatR;
 using Microsoft.Extensions.FileProviders;
 using RestApi.Helper;
-using RestApi.SignalR;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
 
@@ -20,7 +19,6 @@ var logger = builder.CreateLogger(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddIdentityServices();
 builder.Services.AddApplicationServices();
-builder.Services.AddZktecoIntegrationServices();
 // Add services to the container.
 AppConfig.Initialize(builder.Configuration);
 
@@ -82,10 +80,6 @@ app.UseStaticFiles(new StaticFileOptions()
     DefaultContentType = "application/octet-stream"
 });
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapHub<SignalRHub>("/ApiHub");
-});
 // Run app
 try
 {

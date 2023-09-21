@@ -1,27 +1,34 @@
-﻿using Application.Common.Interfaces;
-using Application.Common.Models;
-using Application.Features.DeviceLog.Commands.AddDeviceLog;
-using MediatR;
-using ZktecoIntegration.Models;
+﻿using Microsoft.AspNetCore.SignalR;
+using System.Text.Json;
+using ZktClientService.Hubs;
+using ZktClientService.Interfaces;
+using ZktClientService.Models;
 
-namespace ZktecoIntegration.Services;
+namespace ZktClientService.Services;
 
 internal class ZktServices : IZktServices
 {
-    public ZkemClient _service;
-    private int machineNumber = 1;
-    private readonly ISender _mediator;
+    private readonly IServerServices _serverServices;
+    private readonly IHubContext<ClientBrowserHub> _clientBrowserHub;
+    private readonly ILogger<ZktServices> _logger;
 
-    public ZktServices(ISender mediator)
+    public static ZkemClient _service;
+    private int machineNumber = 1;
+
+    public ZktServices(IServerServices serverServices, IHubContext<ClientBrowserHub> clientBrowserHub, ILogger<ZktServices> logger)
     {
+        _serverServices = serverServices;
+        _clientBrowserHub = clientBrowserHub;
+        _logger = logger;
         if (_service is null)
         {
             _service = new ZkemClient(RaiseDeviceEvent);
         }
-        _mediator = mediator;
-
     }
-
+    public bool IsConnect()
+    {
+        return _service.isConnected;
+    }
     public (bool, string) ConnectByIp(string IP, int Port)
     {
         bool isValidIpA = UniversalStatic.ValidateIP(IP);
@@ -178,11 +185,11 @@ internal class ZktServices : IZktServices
             if (!isDeviceConnected) return false;
         }
 
-        bool ClearKeeperData = _service.ClearKeeperData(machineNumber);
-        bool ClearGLog = _service.ClearGLog(machineNumber);
+        //  bool ClearKeeperData = _service.ClearKeeperData(machineNumber);
+        //  bool ClearGLog = _service.ClearGLog(machineNumber);
         bool ClearSLog = _service.ClearSLog(machineNumber);
 
-        return ClearGLog;
+        return ClearSLog;
     }
     public bool ClearAdministrators(string IP, int Port)
     {
@@ -242,16 +249,14 @@ internal class ZktServices : IZktServices
                 }
             case EventFlagEnum.OnAttTransactionExEvent:
                 {
-                    AttTransactionLog attTransactionLog = sender as AttTransactionLog ?? null;
+
+                    AttTransactionLog attTransactionLog = JsonSerializer.Deserialize<AttTransactionLog>(JsonSerializer.Serialize(sender));
+                    _logger.LogInformation($"On Att Transaction Ex Event :{JsonSerializer.Serialize(attTransactionLog)}  ");
 
                     if (attTransactionLog is null) break;
-                    var command = new AddDeviceLogCommand
-                    {
-                        Id = attTransactionLog.Id,
-                        Datetime = attTransactionLog.Datetime,
-                        Ip = attTransactionLog.Ip
-                    };
-                    _mediator.Send(command).Wait();
+                    var log = _serverServices.PostLogToServer(attTransactionLog);
+                    if (log is null) break;
+                    _clientBrowserHub.Clients.All.SendAsync("SendEventLog", log).Wait();
                     break;
                 }
 

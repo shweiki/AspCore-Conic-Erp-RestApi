@@ -4,7 +4,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ZktecoIntegration.Models;
+namespace ZktClientService.Models;
 
 public class UniversalStatic
 {
@@ -54,13 +54,13 @@ public class UniversalStatic
         return result;
     }
 
-    public static Image StringToImage(string imageString)
-    {
-        byte[] bArray1 = Convert.FromBase64String(imageString);
-        MemoryStream ms = new MemoryStream(bArray1);
-        Image logo = Image.FromStream(ms, true, true);
-        return logo;
-    }
+    //public static Image StringToImage(string imageString)
+    //{
+    //    byte[] bArray1 = Convert.FromBase64String(imageString);
+    //    MemoryStream ms = new MemoryStream(bArray1);
+    //    Image logo = Image.FromStream(ms, true, true);
+    //    return logo;
+    //}
     public static string IntegerValidation(char[] enteredString, string actualString)
     {
         foreach (char c in enteredString.AsEnumerable())

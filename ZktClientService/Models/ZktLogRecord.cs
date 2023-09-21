@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Models;
+﻿namespace ZktClientService.Models;
 
 public class ZktLogRecord
 {
@@ -12,5 +12,9 @@ public class ZktLogRecord
     public DateTime TimeOnlyRecord
     {
         get { return DateTime.Parse(DateTime.Parse(DateTimeRecord).ToString("hh:mm:ss tt")); }
+    }  
+    public DateTime DateTime 
+    {
+        get { return DateTime.Parse(DateTime.Parse(DateTimeRecord).ToString("yyyy-MM-dd hh:mm:ss tt")); }
     }
 }

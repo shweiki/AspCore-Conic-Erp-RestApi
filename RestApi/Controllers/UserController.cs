@@ -120,25 +120,17 @@ public class UserController : Controller
     public async Task<IActionResult> GetUsers()
     {
         var Users = await _identityService.GetUsersWithRolesAsync(0, 200, null, false, null);
-        //var Users = (from x in DB.Users.ToList()
-        //             select new
-        //             {
-        //                 x.Id,
-        //                 x.Email,
-        //                 x.UserName,
-        //                 x.PhoneNumber,
-        //                 avatar = Url.Content("~/Images/User/" + x.Id + ".jpeg"),
-        //                 router = DB.UserRouter.Where(ur => ur.UserId == x.Id)?.SingleOrDefault()?.Router,
-        //                 Redirect = DB.UserRouter.Where(ur => ur.UserId == x.Id)?.SingleOrDefault()?.DefulateRedirect,
-        //                 Roles = (from R in DB.UserRoles.Where(ur => ur.UserId == x.Id).ToList()
-        //                          let p = new
-        //                          {
-        //                              DB.Roles.Where(r => r.Id == R.RoleId).SingleOrDefault().Id,
-        //                              DB.Roles.Where(r => r.Id == R.RoleId).SingleOrDefault().Name
-        //                          }
-        //                          select p).ToList(),
-        //             }).ToList();
-        return Ok(Users);
+        return Ok(Users.Select(x => new
+        {
+            x.User.Id,
+            x.User.UserName,
+            x.User.Email,
+            x.User.PhoneNumber,
+            avatar = Url.Content("~/Images/User/" + x.User.UserName + ".jpeg"),
+            router = DB.UserRouter.Where(ur => ur.UserId == x.User.Id)?.SingleOrDefault()?.Router,
+            Redirect = DB.UserRouter.Where(ur => ur.UserId == x.User.Id)?.SingleOrDefault()?.DefulateRedirect,
+            x.Roles
+        }));
     }
     [HttpPost]
     [Route("User/GetUsersNames")]
@@ -186,7 +178,7 @@ public class UserController : Controller
     public async Task<IActionResult> DeleteRoleForUser(string UserName, string RoleName)
     {
         var user = await _identityService.GetUserWithRolesAsync(UserName);
-
+        user.Roles.Remove(RoleName);
         var result = await _identityService.AddUserToRolesAsync(user.Roles.ToArray(), UserName, true);
 
         if (result.Succeeded)

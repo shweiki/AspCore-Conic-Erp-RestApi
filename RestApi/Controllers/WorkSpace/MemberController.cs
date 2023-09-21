@@ -11,17 +11,15 @@ namespace RestApi.Controllers.WorkSpace;
 public class MemberController : Controller
 {
     private readonly IApplicationDbContext DB;
-    private IConfiguration _configuration { get; }
+    private IConfiguration _configuration;
     private readonly ISender _mediator;
-    private readonly IZktServices _zktServices;
 
 
-    public MemberController(IApplicationDbContext dbcontext, IConfiguration configuration, ISender mediator, IZktServices zktServices)
+    public MemberController(IApplicationDbContext dbcontext, IConfiguration configuration, ISender mediator)
     {
         DB = dbcontext;
         _configuration = configuration;
         _mediator = mediator;
-        _zktServices = zktServices;
 
     }
     [Route("Member/GetReceivablesMember")]
@@ -213,11 +211,6 @@ public class MemberController : Controller
                 var result = await DB.Member.AddAsync(collection);
 
                 await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
-
-                foreach (var item in DB.Device.ToList())
-                {
-                    _zktServices.PutUser(item.Ip, item.Port, result.Entity.Id.ToString(), collection.Name);
-                }
 
                 return Ok(collection.Id);
             }

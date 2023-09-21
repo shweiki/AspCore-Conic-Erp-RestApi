@@ -23,7 +23,6 @@ public class CheckDeviceLogJobCommandHandler : IRequestHandler<CheckDeviceLogJob
     {
         try
         {
-            await RemoveDuplicate();
 
             var deviceLogs = await _context.DeviceLog.Where(x => x.Status >= 0 && x.TableName == "Member").ToListAsync();
 
@@ -38,9 +37,11 @@ public class CheckDeviceLogJobCommandHandler : IRequestHandler<CheckDeviceLogJob
                 {
                     ML.Status = 0;
                 }
-                _context.SaveChanges();
 
             }
+            _context.SaveChanges();
+            await RemoveDuplicate();
+
             return "";
 
         }
@@ -63,8 +64,8 @@ public class CheckDeviceLogJobCommandHandler : IRequestHandler<CheckDeviceLogJob
                 if (!Dup.Any())
                     continue;
                 _context.DeviceLog.RemoveRange(Dup);
-                _context.SaveChanges();
             }
+            _context.SaveChanges();
         }
         catch
         {

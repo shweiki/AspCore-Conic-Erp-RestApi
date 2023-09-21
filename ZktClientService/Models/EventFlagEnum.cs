@@ -1,4 +1,4 @@
-﻿namespace ZktecoIntegration.Models;
+﻿namespace ZktClientService.Models;
 
 public enum EventFlagEnum
 {

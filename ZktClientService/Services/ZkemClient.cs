@@ -1,7 +1,7 @@
 ﻿using zkemkeeper;
-using ZktecoIntegration.Models;
+using ZktClientService.Models;
 
-namespace ZktecoIntegration.Services;
+namespace ZktClientService.Services;
 
 public class ZkemClient
 {

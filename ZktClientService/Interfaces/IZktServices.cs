@@ -1,9 +1,10 @@
-﻿using Application.Common.Models;
+﻿using ZktClientService.Models;
 
-namespace Application.Common.Interfaces;
+namespace ZktClientService.Interfaces;
 
 public interface IZktServices
 {
+    public bool IsConnect();
     (bool, string) ConnectByIp(string IPAdd, int Port);
     (bool, string) DisconnectByIp(string IPAdd, int Port);
     bool EnrollUser(string IP, int Port, string UserId);

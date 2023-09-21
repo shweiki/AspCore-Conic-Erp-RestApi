@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Job", "Job\Job.csproj", "{F02E3D67-DB54-4839-BEBD-570CBACD52B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZktecoIntegration", "ZktecoIntegration\ZktecoIntegration.csproj", "{75F89709-384F-4FE0-A5DA-E716B9D2DC37}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZktClientService", "ZktClientService\ZktClientService.csproj", "{66449BD6-9DAD-4F18-950D-109D5681BD20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +41,10 @@ Global
 		{F02E3D67-DB54-4839-BEBD-570CBACD52B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F02E3D67-DB54-4839-BEBD-570CBACD52B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F02E3D67-DB54-4839-BEBD-570CBACD52B3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{75F89709-384F-4FE0-A5DA-E716B9D2DC37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{75F89709-384F-4FE0-A5DA-E716B9D2DC37}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{75F89709-384F-4FE0-A5DA-E716B9D2DC37}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{75F89709-384F-4FE0-A5DA-E716B9D2DC37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66449BD6-9DAD-4F18-950D-109D5681BD20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66449BD6-9DAD-4F18-950D-109D5681BD20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66449BD6-9DAD-4F18-950D-109D5681BD20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66449BD6-9DAD-4F18-950D-109D5681BD20}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
