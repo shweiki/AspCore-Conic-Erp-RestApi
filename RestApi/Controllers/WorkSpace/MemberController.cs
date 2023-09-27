@@ -1,4 +1,7 @@
 ﻿using Application.Common.Interfaces;
+using Application.Features.Member.Queries.GetAllMembers;
+using Application.Features.MembershipMovement.Queries.GetAllMembershipMovement;
+using Application.Features.MembershipMovementOrder.Queries.GetAllMembershipMovementOrder;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -24,10 +27,11 @@ public class MemberController : Controller
     }
     [Route("Member/GetReceivablesMember")]
     [HttpGet]
-    public IActionResult GetReceivablesMember()
+    public async Task<IActionResult> GetReceivablesMember()
     {
-        var Members = DB.Member.Where(f => f.Account.EntryMovements.Sum(s => s.Credit) - f.Account.EntryMovements.Sum(s => s.Debit) > 0)
-        .Select(x => new
+        var Members = DB.Member.Include(x => x.Account).Include(x => x.Account.EntryMovements).Where(f => f.Account.EntryMovements.Sum(s => s.Credit) - f.Account.EntryMovements.Sum(s => s.Debit) > 0).AsQueryable();
+        var items = await Members.ToListAsync();
+        return Ok(items.Select(x => new
         {
             x.Id,
             x.Name,
@@ -43,15 +47,17 @@ public class MemberController : Controller
             TotalCredit = x.Account.EntryMovements.Sum(s => s.Credit)
             //   TotalDebit = DB.EntryMovement.Where(l => l.AccountId == x.AccountId).Sum(s => s.Debit),
             //  TotalCredit = DB.EntryMovement.Where(l => l.AccountId == x.AccountId).Sum(s => s.Credit)
-        }).ToList();
-
-        return Ok(Members);
+        }).ToList());
     }
     [Route("Member/GetPayablesMember")]
     [HttpGet]
-    public IActionResult GetPayablesMember()
+    public async Task<IActionResult> GetPayablesMember()
     {
-        var Members = DB.Member.Where(f => f.Account.EntryMovements.Sum(s => s.Credit) - f.Account.EntryMovements.Sum(s => s.Debit) < 0).Select(x => new
+        var Members = DB.Member.Include(x => x.Account).Include(x => x.Account.EntryMovements).Where(f => f.Account.EntryMovements.Sum(s => s.Credit) - f.Account.EntryMovements.Sum(s => s.Debit) < 0).AsQueryable();
+        var items = await Members.ToListAsync();
+
+
+        return Ok(items.Select(x => new
         {
             x.Id,
             x.Name,
@@ -65,9 +71,7 @@ public class MemberController : Controller
             x.Vaccine,
             TotalDebit = x.Account.EntryMovements.Sum(s => s.Debit),
             TotalCredit = x.Account.EntryMovements.Sum(s => s.Credit)
-        }).ToList();
-
-        return Ok(Members);
+        }).ToList());
     }
     [Route("Member/GetMember")]
     [HttpGet]
@@ -133,7 +137,21 @@ public class MemberController : Controller
 
         return Ok(Members.Count() > 0);
     }
+    [Route("Member/ExportDataOfMembers")]
+    [HttpGet]
+    public async Task<IActionResult> ExportDataOfMembers()
+    {
+        var resultMemebers = await _mediator.Send(new GetAllMemebersQuery());
+        var resultMembershipMovements = await _mediator.Send(new GetAllMembershipMovementQuery());
+        var resultMembershipMovementOrders = await _mediator.Send(new GetAllMembershipMovementOrderQuery());
 
+        return Ok(new
+        {
+            Memebers = resultMemebers,
+            MembershipMovements = resultMembershipMovements,
+            MembershipMovementOrders = resultMembershipMovementOrders
+        });
+    }
     [Route("Member/GetActiveMember")]
     [HttpGet]
     public IActionResult GetActiveMember()
@@ -387,23 +405,4 @@ public class MemberController : Controller
 
     }
 
-    [Route("Member/CheckBlackListActionLogMembers")]
-    [HttpGet]
-    public async Task<IActionResult> CheckBlackListActionLogMembers()
-    {
-        var Members = DB.Member?.ToList();
-
-        foreach (var M in Members)
-        {
-            int OStatus = M.Status;
-
-            var LastLog = DB.ActionLog.Where(x => x.TableName == "Member" && x.Fktable == M.Id.ToString())?.OrderBy(o => o.PostingDateTime).ToList().LastOrDefault();
-            if (LastLog != null)
-            {
-                M.Status = DB.Oprationsy.Where(x => x.Id == LastLog.OprationId).SingleOrDefault().Status;
-            }
-            await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
-        }
-        return Ok(true);
-    }
 }

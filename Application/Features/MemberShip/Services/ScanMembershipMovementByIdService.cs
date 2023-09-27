@@ -32,7 +32,7 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
     {
         try
         {
-            MembershipMovement membershipMovement = await _context.MembershipMovement.Include(x => x.Member).Include(x => x.Membership).Include(x => x.MembershipMovementOrders).SingleOrDefaultAsync(x => x.Id == request.Id);
+            var membershipMovement = await _context.MembershipMovement.Include(x => x.Member).Include(x => x.Membership).Include(x => x.MembershipMovementOrders).SingleOrDefaultAsync(x => x.Id == request.Id);
             var member = membershipMovement.Member;
 
             if (membershipMovement is null)
