@@ -41,7 +41,7 @@ public class MembershipController : Controller
     [HttpGet]
     public IActionResult GetActiveMembership()
     {
-        var Memberships = DB.Membership.Where(x => x.Status == (int)MembershipStatus.Active).Select(
+        var Memberships = DB.Membership.Where(x => x.Status == (int)MembershipEnum.Active).Select(
             x => new
             {
                 x.Id,

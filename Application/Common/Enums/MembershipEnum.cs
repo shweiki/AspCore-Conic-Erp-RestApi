@@ -1,6 +1,7 @@
 ﻿namespace Application.Common.Enums;
-public enum MembershipStatus
+public enum MembershipEnum
 {
     Active = 0,
-    Deactivate = -1
+    Deactivate = -1,
+
 }

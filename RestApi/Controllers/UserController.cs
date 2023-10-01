@@ -109,7 +109,7 @@ public class UserController : Controller
 
         if (!result.Succeeded)
         {
-            return Ok(result);
+            return BadRequest(result);
         }
 
         return Ok();

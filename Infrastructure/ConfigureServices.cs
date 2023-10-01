@@ -73,7 +73,16 @@ public static class ConfigureServices
          .AddDefaultTokenProviders();
         services.AddHttpContextAccessor();
 
-
+       services.Configure<IdentityOptions>(options =>
+        {
+            // Default Password settings.
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = false;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequiredLength = 6;
+            options.Password.RequiredUniqueChars = 0;
+        });
         // Identity services
         //   services.TryAddScoped<IUserValidator<ApplicationUser>, UserValidator<ApplicationUser>>();
         //     services.TryAddScoped<IPasswordValidator<ApplicationUser>, PasswordValidator<ApplicationUser>>();
