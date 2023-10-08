@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common.Enums;
+using Application.Common.Interfaces;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -6,12 +7,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Features.MemberShips.Services;
 
-public class ScanMembershipMovementByIdService : IRequest<bool>
+public class ScanMembershipMovementByIdService : IRequest<MemberStatus>
 {
     public long Id { get; set; }
 }
 
-public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMembershipMovementByIdService, bool>
+public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMembershipMovementByIdService, MemberStatus>
 {
     private readonly IApplicationDbContext _context;
     private readonly ILogger _logger;
@@ -28,7 +29,7 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
         _mediator = sender;
     }
 
-    public async Task<bool> Handle(ScanMembershipMovementByIdService request, CancellationToken cancellationToken)
+    public async Task<MemberStatus> Handle(ScanMembershipMovementByIdService request, CancellationToken cancellationToken)
     {
         try
         {
@@ -37,8 +38,8 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
 
             if (membershipMovement is null)
             {
-                member.Status = -1;
-                return true;
+                member.Status = (int)MemberStatus.Deactivate;
+                return MemberStatus.Deactivate;
             }
 
             int OStatus = member.Status;
@@ -49,8 +50,9 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
             if (DateTime.Today >= membershipMovement.StartDate.Date && DateTime.Today <= membershipMovement.EndDate.Date.AddDays(1).AddSeconds(-1))
             {
 
-                membershipMovement.Status = 1;
-                member.Status = 0;
+                membershipMovement.Status = (int)MembershipMovementStatus.InProgress;
+                member.Status = (int)MemberStatus.Active;
+
                 var HowManyDaysLeft = (membershipMovement.EndDate - DateTime.Today).TotalDays;
                 if (HowManyDaysLeft == 3)
                 {
@@ -71,58 +73,44 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
 
                 if (membershipMovement.StartDate.Date > DateTime.Today)
                 {// معلق
-                    membershipMovement.Status = -2;
+                    membershipMovement.Status = (int)MembershipMovementStatus.Suspense;
                 }
                 else
                 {
-                    membershipMovement.Status = -1;
-                    member.Status = -1;
+                    membershipMovement.Status = (int)MembershipMovementStatus.Terminated;
+                    member.Status = (int)MemberStatus.Deactivate;
                 }
             }
 
             foreach (var membershipMovementOrder in membershipMovement.MembershipMovementOrders.Where(x => x.Status == 1 || x.Status == 2).ToList())
             {
-                if (membershipMovementOrder.Status == 2)
+                if (membershipMovementOrder.Status == (int)MembershipMovementOrderStatus.Calculated)
                 {
                     membershipMovement.EndDate = membershipMovement.EndDate.AddDays((membershipMovementOrder.EndDate - membershipMovementOrder.StartDate).TotalDays);
-                    membershipMovementOrder.Status = -2;
                     continue;
                 }
                 if (DateTime.Today >= membershipMovementOrder.StartDate.Date && DateTime.Today <= membershipMovementOrder.EndDate.Date.AddDays(1).AddSeconds(-1))
                 {
-                    if (membershipMovementOrder.Type == "Freeze")
-                    {
-                        membershipMovement.Status = 2;
-                        member.Status = 1;
-                    }
-                    if (membershipMovementOrder.Type == "Extra")
-                    {
-                        membershipMovement.Status = 3;
-                        member.Status = 2;
 
-                    }
+                    membershipMovement.Status = (int)MembershipMovementStatus.InProgress;
+                    member.Status = (int)MemberStatus.Active;
+
                 }
                 else
                 {
-                    if (membershipMovementOrder.Type == "Extra")
-                    {
-                        membershipMovement.EndDate = membershipMovement.EndDate.AddDays((membershipMovementOrder.EndDate - membershipMovementOrder.StartDate).TotalDays);
-                        membershipMovementOrder.Status = -3;
-                    }
+
                     if (DateTime.Today > membershipMovementOrder.EndDate)
                     {
 
                         membershipMovement.EndDate = membershipMovement.EndDate.AddDays((membershipMovementOrder.EndDate - membershipMovementOrder.StartDate).TotalDays);
-                        membershipMovementOrder.Status = -3;
+                        membershipMovementOrder.Status = (int)MembershipMovementOrderStatus.Calculated;
                     }
 
                 }
                 if (membershipMovement.EndDate.Date.AddDays(1).AddSeconds(-1) > DateTime.Today)
                 {
-
-
-                    membershipMovement.Status = 1;
-                    member.Status = 1;
+                    membershipMovement.Status = (int)MembershipMovementStatus.InProgress;
+                    member.Status = (int)MemberStatus.Active;
                     var DeviceLogs = await _context.DeviceLog.Where(x => x.Fk == member.Id.ToString() && x.TableName == "Member" && x.DateTime.Date >= membershipMovement.StartDate.Date && x.DateTime.Date <= membershipMovement.EndDate.Date).ToListAsync();
                     if (DeviceLogs != null && DeviceLogs.Count > 0)
                     {
@@ -146,18 +134,18 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
 
             }
 
-            if (OStatus == -2) member.Status = -2;
+            if (OStatus == (int)MemberStatus.BlackList) member.Status = (int)MemberStatus.BlackList;
 
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            return true;
+            return (MemberStatus)member.Status;
 
         }
         catch (Exception ex)
         {
             _logger.LogError("Error create Sign Transaction : {Id}  Message : {Message}  StackTrace :{StackTrace} ", request.Id, ex.Message, ex.StackTrace);
-            return false;
+            return MemberStatus.Deactivate;
         }
 
     }

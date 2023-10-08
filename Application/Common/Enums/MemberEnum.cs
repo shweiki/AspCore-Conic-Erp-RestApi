@@ -1,9 +1,7 @@
 ﻿namespace Application.Common.Enums;
-public enum MemberEnum
+public enum MemberStatus
 {
     BlackList = -2,
     Deactivate = -1,
-    Active = 0,
-    Freeze = 1,
-    Free = 2
+    Active = 1,
 }

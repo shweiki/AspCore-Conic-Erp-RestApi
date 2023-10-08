@@ -1,7 +1,9 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common.Enums;
+using Application.Common.Interfaces;
 using Application.Features.Member.Queries.GetAllMembers;
 using Application.Features.MembershipMovement.Queries.GetAllMembershipMovement;
 using Application.Features.MembershipMovementOrder.Queries.GetAllMembershipMovementOrder;
+using Application.Features.MemberShips.Services;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -84,11 +86,11 @@ public class MemberController : Controller
 
     [Route("Member/GetMemberByAny")]
     [HttpGet]
-    public IActionResult GetMemberByAny(string Any)
+    public async Task<IActionResult> GetMemberByAny(string Any)
     {
         Any.ToLower();
-        var Members = DB.Member.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.Tag.Contains(Any))
-            .Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1, x.Tag }).ToList();
+        var Members = await DB.Member.Where(m => m.Id.ToString().Contains(Any) || m.Name.ToLower().Contains(Any) || m.Ssn.Contains(Any) || m.PhoneNumber1.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.PhoneNumber2.Replace("0", "").Replace(" ", "").Contains(Any.Replace("0", "").Replace(" ", "")) || m.Tag.Contains(Any))
+            .Select(x => new { x.Id, x.Name, x.Ssn, x.PhoneNumber1, x.Tag }).ToListAsync();
 
         return Ok(Members);
     }
@@ -279,19 +281,21 @@ public class MemberController : Controller
 
         var member = await DB.Member.Include(x => x.MembershipMovements).Include(x => x.Account.EntryMovements).SingleOrDefaultAsync(m => m.Id == Id);
         if (member is null) return BadRequest();
-        var membershipMovement = member.MembershipMovements.ToList();
-        if (membershipMovement.Count == 0)
+        if (member.MembershipMovements.Count() == 0)
         {
-            member.Status = -1;
+            member.Status = (int)MemberStatus.Deactivate;
         }
         else
         {
-            foreach (var MS in membershipMovement.OrderBy(o => o.Id))
+            foreach (var MS in member.MembershipMovements.ToList().OrderBy(o => o.Id))
             {
-                await MembershipMovementController.ScanMembershipMovementById(MS.Id, DB, _configuration);
+                var query = new ScanMembershipMovementByIdService
+                {
+                    Id = MS.Id
+                };
+                member.Status = (int)await _mediator.Send(query);
             }
         }
-        await DB.SaveChangesAsync();
 
         return Ok(
            new

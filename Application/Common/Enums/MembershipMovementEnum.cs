@@ -1,8 +1,8 @@
 ﻿namespace Application.Common.Enums;
-public enum MembershipMovementEnum
+public enum MembershipMovementStatus
 {
-    Active = 0,
-    Terminated = -1,
-    Pending = -2
- 
-}
+    Terminated = -1, // منتهي
+    Pending = 0,
+    InProgress = 1,
+    Suspense = 2 // معلق
+ }

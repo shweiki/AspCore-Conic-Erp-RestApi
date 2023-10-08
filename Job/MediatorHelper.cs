@@ -4,6 +4,7 @@ using Application.Services.Jobs.FixBase64ToPathWithLoadedJob;
 using Application.Services.Jobs.FixPhoneNumberJob;
 using Application.Services.Jobs.ScanMemberStatueJob;
 using MediatR;
+using Application.Services.Jobs.CheckEntryAccountForMembershipMovement;
 
 namespace Jobs;
 
@@ -35,6 +36,10 @@ public class MediatorHelper
     public async Task FixPhoneNumberJobCommand()
     {
         await _mediator.Send(new FixPhoneNumberJobCommand());
+    } 
+    public async Task CheckEntryAccountForMembershipMovementCommand()
+    {
+        await _mediator.Send(new CheckEntryAccountForMembershipMovementCommand());
     }
 
 }

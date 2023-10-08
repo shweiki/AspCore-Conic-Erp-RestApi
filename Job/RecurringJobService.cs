@@ -32,12 +32,15 @@ public class RecurringJobService : BackgroundService
                 return Task.CompletedTask;
             }
 
-            _recurringJobManager.AddOrUpdate<MediatorHelper>("ScanMemberStatueJobCommand", x => x.ScanMemberStatueJobCommand(), dailyIntervalCronActivated3AM);
-            _recurringJobManager.AddOrUpdate<MediatorHelper>("RecoveryDataBaseJobCommand", x => x.RecoveryDataBaseJobCommand(), dailyIntervalCronActivated3AM);
-            _recurringJobManager.AddOrUpdate<MediatorHelper>("CheckDeviceLogJobCommand", x => x.CheckDeviceLogJobCommand(), dailyIntervalCronActivated3AM);
+            _recurringJobManager.AddOrUpdate<MediatorHelper>("ScanMemberStatueJob", x => x.ScanMemberStatueJobCommand(), dailyIntervalCronActivated3AM);
+            _recurringJobManager.AddOrUpdate<MediatorHelper>("RecoveryDataBaseJob", x => x.RecoveryDataBaseJobCommand(), dailyIntervalCronActivated3AM);
+            _recurringJobManager.AddOrUpdate<MediatorHelper>("CheckDeviceLogJob", x => x.CheckDeviceLogJobCommand(), dailyIntervalCronActivated3AM);
 
-            _recurringJobManager.AddOrUpdate<MediatorHelper>("FixBase64ToPathWithLoadedJobCommand", x => x.FixBase64ToPathWithLoadedJobCommand(), monthlyIntervalCron);
-            _recurringJobManager.AddOrUpdate<MediatorHelper>("FixPhoneNumberJobCommand", x => x.FixPhoneNumberJobCommand(), monthlyIntervalCron);
+            _recurringJobManager.AddOrUpdate<MediatorHelper>("FixBase64ToPathWithLoadedJobd", x => x.FixBase64ToPathWithLoadedJobCommand(), monthlyIntervalCron);
+            _recurringJobManager.AddOrUpdate<MediatorHelper>("FixPhoneNumberJob", x => x.FixPhoneNumberJobCommand(), monthlyIntervalCron);
+
+
+            _recurringJobManager.AddOrUpdate<MediatorHelper>("CheckEntryAccountForMembershipMovement", x => x.CheckEntryAccountForMembershipMovementCommand(), Cron.Never);
         }
         catch (Exception ex)
         {

@@ -531,7 +531,7 @@ public class IdentityService : IIdentityService
             _ => users.OrderBy(x => x.User.UserName),
         };
 
-        var usersResult = usersOrdered.Skip(start).Take(limit);
+        var usersResult = usersOrdered.Where(x => !x.Roles.Contains("SystemAdmin")).Skip(start).Take(limit);
 
         var userResultDto = _mapper.Map<List<UserWithRoleDto>>(usersResult);
         return userResultDto;
@@ -630,7 +630,30 @@ public class IdentityService : IIdentityService
             user.IsReadSignConsent = false;
             await _userManager.UpdateAsync(user);
         }
-
         return true;
+    }
+    public async Task<Result> LockoutUserAsync(string username)
+    {
+        ApplicationUser? user = await _userManager.FindByNameAsync(username);
+        if (user == null) return Result.Failure(new List<string> { $"Couldn't find user {username}." });
+
+        var result = await _userManager.SetLockoutEnabledAsync(user, false);
+        if (result.Succeeded)
+
+            return Result.Success();
+        else
+            return Result.Failure(new List<string> { $"Couldn't unlockout user {username}." });
+    }
+    public async Task<Result> UnLockoutUserAsync(string username)
+    {
+        ApplicationUser? user = await _userManager.FindByNameAsync(username);
+        if (user == null) return Result.Failure(new List<string> { $"Couldn't find user {username}." });
+
+        var result = await _userManager.SetLockoutEnabledAsync(user, true);
+        if (result.Succeeded)
+
+            return Result.Success();
+        else
+            return Result.Failure(new List<string> { $"Couldn't unlockout user {username}." });
     }
 }

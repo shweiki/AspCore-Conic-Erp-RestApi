@@ -27,13 +27,9 @@ public static class ConfigureServices
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
                     builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
-
-
         }
 
-
-
-        services.TryAddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        services.TryAddTransient<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
         services.TryAddScoped<ICurrentUserService, CurrentUserService>();
         services.TryAddScoped<ISMSService, SMSService>();

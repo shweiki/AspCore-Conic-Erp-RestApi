@@ -10,17 +10,12 @@ public class UserController : Controller
     private readonly ILogger<UserController> _logger;
     private readonly IApplicationDbContext DB;
     private readonly IIdentityService _identityService;
-
     public UserController(IApplicationDbContext dbcontext, ILogger<UserController> logger, IIdentityService identityService)
     {
-
         _logger = logger;
         DB = dbcontext;
         _identityService = identityService;
-
     }
-
-
 
     // POST User/Login
     [AllowAnonymous]
@@ -129,6 +124,8 @@ public class UserController : Controller
             avatar = Url.Content("~/Images/User/" + x.User.UserName + ".jpeg"),
             router = DB.UserRouter.Where(ur => ur.UserId == x.User.Id)?.SingleOrDefault()?.Router,
             Redirect = DB.UserRouter.Where(ur => ur.UserId == x.User.Id)?.SingleOrDefault()?.DefulateRedirect,
+            x.User.Active,
+            x.User.LockoutEnabled,
             x.Roles
         }));
     }
@@ -138,20 +135,43 @@ public class UserController : Controller
     {
         var Users = await _identityService.GetUsersWithRolesAsync(0, 200, null, false, null);
 
-        // var Users = DB.Users.Select(x => new { x.UserName }).ToList();
         return Ok(Users);
     }
     [HttpPost]
-    [Route("User/UnLockout")]
-    public async Task<IActionResult> UnLockout(string UserId)
+    [Route("User/SetActive")]
+    public async Task<IActionResult> SetActive(string UserName, bool isActive)
     {
 
-        //var user = await _identityService.GetUserInfoByIdAsync(UserId);
-        //var result = await _userManager.SetLockoutEnabledAsync(user, true);
-        //if (result.Succeeded)
-        //    return Ok(true);
-        //else return Ok(false);
-        return Ok(true);
+        var result = await _identityService.UpdateUserStatusAsync(UserName , isActive);
+        if (!result.Succeeded)
+        {
+            return BadRequest(result);
+        }
+        return Ok();
+    }
+    [HttpPost]
+    [Route("User/UnLockout")]
+    public async Task<IActionResult> UnLockout(string UserName)
+    {
+
+        var result = await _identityService.UnLockoutUserAsync(UserName);
+        if (!result.Succeeded)
+        {
+            return BadRequest(result);
+        }
+        return Ok();
+    }
+    [HttpPost]
+    [Route("User/Lockout")]
+    public async Task<IActionResult> Lockout(string UserName)
+    {
+
+        var result = await _identityService.LockoutUserAsync(UserName);
+        if (!result.Succeeded)
+        {
+            return BadRequest(result);
+        }
+        return Ok();
     }
     [HttpPost]
     [Route("User/ChangePassword")]

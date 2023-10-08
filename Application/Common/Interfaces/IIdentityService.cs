@@ -39,6 +39,8 @@ public interface IIdentityService
     Task<UserInfoDto> GetUserInfoAsync(string username);
     Task<UserInfoDto?> GetUserInfoByIdAsync(string userid);
     Task<UserInfoDto?> GetUserInfoByEmailAsync(string userid);
+    Task<Result> UnLockoutUserAsync(string username);
+    Task<Result> LockoutUserAsync(string username);
 
 
     Task<int> GetTotalUsersCount();

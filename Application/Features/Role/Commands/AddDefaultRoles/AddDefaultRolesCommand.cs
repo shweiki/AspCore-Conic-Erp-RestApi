@@ -28,7 +28,7 @@ public class AddUserCommandHandler : IRequestHandler<AddDefaultRolesCommand, int
         string defaultAdminUsername = "Developer";
         string defaultAdminFullNname = "Developer";
         string defaultAdminTitle = "System Administrator";
-        string defaultAdminPassword = "Taha123456++"; // TODO: Should be removed from code, and the hash added by sql.
+        string defaultAdminPassword = "P@$$w0rd"; // TODO: Should be removed from code, and the hash added by sql.
 
         foreach (string roleName in roleNames)
         {
@@ -48,7 +48,9 @@ public class AddUserCommandHandler : IRequestHandler<AddDefaultRolesCommand, int
 
             if (result.Succeeded)  // TODO: Add error checking and handling.
             {
-                await _identityService.AddUserToRoleAsync("SystemAdmin", defaultAdminUsername);  // TODO: Add error checking and handling.
+                await _identityService.AddUserToRoleAsync(RolesEnum.SystemAdmin.Name, defaultAdminUsername);  // TODO: Add error checking and handling.
+                await _identityService.AddUserToRoleAsync(RolesEnum.Admin.Name, defaultAdminUsername);  // TODO: Add error checking and handling.
+                await _identityService.AddUserToRoleAsync(RolesEnum.User.Name, defaultAdminUsername);  // TODO: Add error checking and handling.
             }
         }
 

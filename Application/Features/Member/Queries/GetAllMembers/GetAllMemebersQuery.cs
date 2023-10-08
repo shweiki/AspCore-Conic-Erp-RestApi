@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common.Enums;
+using Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +31,7 @@ public class GetAllMemebersQueryHandler : IRequestHandler<GetAllMemebersQuery, L
             x.Ssn,
             x.PhoneNumber1,
             x.PhoneNumber2,
-            x.Status,
+            Status = MemberStatus.GetName(typeof(int), x.Status)?.ToString(),
             x.Type,
             x.AccountId,
             x.Tag,

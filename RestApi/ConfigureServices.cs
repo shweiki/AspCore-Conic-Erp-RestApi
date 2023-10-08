@@ -17,14 +17,6 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddApiServices(this IServiceCollection services)
     {
-        services.AddControllers().AddNewtonsoftJson(options =>
-        {
-            //  options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-            //   options.SerializerSettings.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
-            options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
-            options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-
-        });
 
         // Authorization Handler with Custom
         services.AddSingleton<IAuthorizationHandler, CustomAuthorizationHandler>();

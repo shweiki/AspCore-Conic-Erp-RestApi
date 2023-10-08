@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common.Enums;
+using Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +28,7 @@ public class GetAllMembershipMovementOrderQueryHandler : IRequestHandler<GetAllM
         {
             x.Id,
             x.Type,
-            x.Status,
+            Status = MembershipMovementOrderStatus.GetName(typeof(int), x.Status)?.ToString(),
             x.Description,
             x.EditorName,
             MemberName = x.MemberShipMovement.Member.Name,

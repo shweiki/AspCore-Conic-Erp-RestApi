@@ -177,6 +177,8 @@ internal class ZktServices : IZktServices
     }
     public bool ClearLog(string IP, int Port)
     {
+        bool ret = false;
+
         string currentIP = "";
         _service.GetDeviceIP(1, ref currentIP);
         if (!_service.isConnected || !string.Equals(currentIP, IP))
@@ -185,11 +187,19 @@ internal class ZktServices : IZktServices
             if (!isDeviceConnected) return false;
         }
 
-        //  bool ClearKeeperData = _service.ClearKeeperData(machineNumber);
-        //  bool ClearGLog = _service.ClearGLog(machineNumber);
-        bool ClearSLog = _service.ClearSLog(machineNumber);
+        _service.EnableDevice(machineNumber, false);//disable the device
 
-        return ClearSLog;
+        if (_service.ClearGLog(machineNumber))
+        {
+            _service.RefreshData(machineNumber);
+            ret = true;
+        }
+        _service.EnableDevice(machineNumber, true);//enable the device
+
+        //  bool ClearKeeperData = _service.ClearKeeperData(machineNumber);
+        //  bool ClearSLog = _service.ClearSLog(machineNumber);
+
+        return ret;
     }
     public bool ClearAdministrators(string IP, int Port)
     {

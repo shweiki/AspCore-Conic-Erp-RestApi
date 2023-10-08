@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common.Enums;
+using Application.Common.Interfaces;
 using Application.Features.MemberShips.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,7 @@ public class ScanMemberStatueJobCommandHandler : IRequestHandler<ScanMemberStatu
 
                 if (member.MembershipMovements.Count() <= 0)
                 {
-                    member.Status = -1;
+                    member.Status = (int)MemberStatus.Deactivate;
                 }
                 else
                 {
@@ -44,10 +45,10 @@ public class ScanMemberStatueJobCommandHandler : IRequestHandler<ScanMemberStatu
                         {
                             Id = membershipMovement.Id
                         };
-                        await _mediator.Send(query);
+                        member.Status = (int)await _mediator.Send(query);
                     }
                 }
-                if (OStatus == -2) member.Status = -2;
+                if (OStatus == (int)MemberStatus.BlackList) member.Status = (int)MemberStatus.BlackList;
 
                 await _context.SaveChangesAsync(cancellationToken);
 

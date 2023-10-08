@@ -3,6 +3,7 @@ using Application.Common.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace RestApi.Controllers.WorkSpace;
 
@@ -39,9 +40,9 @@ public class MembershipController : Controller
 
     [Route("Membership/GetActiveMembership")]
     [HttpGet]
-    public IActionResult GetActiveMembership()
+    public async Task<IActionResult> GetActiveMembership()
     {
-        var Memberships = DB.Membership.Where(x => x.Status == (int)MembershipEnum.Active).Select(
+        var Memberships = await DB.Membership.Where(x => x.Status == (int)MembershipStatus.Active).Select(
             x => new
             {
                 x.Id,
@@ -58,7 +59,7 @@ public class MembershipController : Controller
                 x.NumberClass,
                 TotalMembers = DB.MembershipMovement.Where(l => l.MembershipId == x.Id).Count(),
 
-            }).ToList();
+            }).ToListAsync();
         return Ok(Memberships);
     }
     [Route("Membership/Create")]

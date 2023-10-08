@@ -13,29 +13,17 @@ public class RoleController : Controller
     private RoleManager<IdentityRole> _roleManager;
     private readonly IApplicationDbContext DB;
 
-
     public RoleController(IApplicationDbContext dbcontext, RoleManager<IdentityRole> roleManager)
     {
-
         _roleManager = roleManager;
         DB = dbcontext;
-
     }
 
     [HttpGet]
     [Route("Role/GetRoles")]
     public IActionResult GetRoles()
     {
-        var Roles = _roleManager.Roles.ToList();
-
-        //var Roles = DB.Roles.Select(x => new
-        //{
-        //    x.Id,
-        //    x.Name,
-        //    x.NormalizedName,
-        //    x.ConcurrencyStamp,
-        //}).ToList();
-
+        var Roles = _roleManager.Roles.Where(x => x.Name != "SystemAdmin").ToList();
         return Ok(Roles);
     }
 

@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common.Enums;
+using Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,7 +42,7 @@ public class GetAllMembershipMovementQueryHandler : IRequestHandler<GetAllMember
             EndDate = x.EndDate.ToShortDateString(),
             x.Discount,
             x.EditorName,
-            x.Status,
+            Status = MembershipMovementStatus.GetName(typeof(int), x.Status)?.ToString(),
             x.Tax,
             TotalDays = Math.Ceiling((x.EndDate.Date - x.StartDate.Date).TotalDays),
            // Remaining = Math.Ceiling((x.EndDate.Date - DateTime.Today).TotalDays),
