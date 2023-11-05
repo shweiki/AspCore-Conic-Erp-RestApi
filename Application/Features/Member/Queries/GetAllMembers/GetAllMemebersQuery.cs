@@ -31,7 +31,7 @@ public class GetAllMemebersQueryHandler : IRequestHandler<GetAllMemebersQuery, L
             x.Ssn,
             x.PhoneNumber1,
             x.PhoneNumber2,
-            Status = MemberStatus.GetName(typeof(int), x.Status)?.ToString(),
+            Status = MemberStatus.GetName(typeof(MemberStatus), x.Status)?.ToString(),
             x.Type,
             x.AccountId,
             x.Tag,

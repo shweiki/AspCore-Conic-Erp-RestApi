@@ -42,7 +42,7 @@ public class GetAllMembershipMovementQueryHandler : IRequestHandler<GetAllMember
             EndDate = x.EndDate.ToShortDateString(),
             x.Discount,
             x.EditorName,
-            Status = MembershipMovementStatus.GetName(typeof(int), x.Status)?.ToString(),
+            Status = MembershipMovementStatus.GetName(typeof(MembershipMovementStatus), x.Status)?.ToString(),
             x.Tax,
             TotalDays = Math.Ceiling((x.EndDate.Date - x.StartDate.Date).TotalDays),
            // Remaining = Math.Ceiling((x.EndDate.Date - DateTime.Today).TotalDays),

@@ -28,7 +28,7 @@ public class GetAllMembershipMovementOrderQueryHandler : IRequestHandler<GetAllM
         {
             x.Id,
             x.Type,
-            Status = MembershipMovementOrderStatus.GetName(typeof(int), x.Status)?.ToString(),
+            Status = MembershipMovementOrderStatus.GetName(typeof(MembershipMovementOrderStatus), x.Status)?.ToString(),
             x.Description,
             x.EditorName,
             MemberName = x.MemberShipMovement.Member.Name,
