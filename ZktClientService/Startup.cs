@@ -38,7 +38,7 @@ public class Startup
 
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapHub<ClientBrowserHub>("/hubs/clientbrowser");
+            endpoints.MapHub<ConicDeviceHub>("/hubs/conicdevicehub");
             endpoints.MapControllers();
         });
     }

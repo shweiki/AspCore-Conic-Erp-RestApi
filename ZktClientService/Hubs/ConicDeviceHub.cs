@@ -5,13 +5,13 @@ using ZktClientService.Models;
 
 namespace ZktClientService.Hubs
 {
-    public class ClientBrowserHub : Hub
+    public class ConicDeviceHub : Hub
     {
         private readonly IZktServices _zktServices;
         private readonly IServerServices _serverServices;
         private readonly IConfiguration _configuration;
 
-        public ClientBrowserHub(IZktServices zktServices, IServerServices serverServices, IConfiguration configuration)
+        public ConicDeviceHub(IZktServices zktServices, IServerServices serverServices, IConfiguration configuration)
         {
             _zktServices = zktServices;
             _serverServices = serverServices;
@@ -27,6 +27,10 @@ namespace ZktClientService.Hubs
         public async Task SendEventLog(object log)
         {
             await Clients.Caller.SendAsync("SendEventLog", log);
+        } 
+        public async Task DeviceState(object msg)
+        {
+            await Clients.Caller.SendAsync("DeviceState", msg);
         }
 
         public async Task EnrollUser(string iP, string objectId, string name)
@@ -119,10 +123,10 @@ namespace ZktClientService.Hubs
                 {
                     (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.IP, device.Port);
 
-                    await Clients.Caller.SendAsync("SendMessage", $"The device is   connected {deviceIsConnect} reason : {result}");
+                    await Clients.Caller.SendAsync("SendMessage", $"The device is connected {deviceIsConnect} reason : {result}");
 
                 }
-                await Clients.Caller.SendAsync("SendMessage", $"The device is  connected {deviceIsConnect}");
+                await Clients.Caller.SendAsync("SendMessage", $"The device is connected {deviceIsConnect}");
 
                 return;
             }

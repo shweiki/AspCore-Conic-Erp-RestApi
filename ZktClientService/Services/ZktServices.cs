@@ -9,16 +9,16 @@ namespace ZktClientService.Services;
 internal class ZktServices : IZktServices
 {
     private readonly IServerServices _serverServices;
-    private readonly IHubContext<ClientBrowserHub> _clientBrowserHub;
+    private readonly IHubContext<ConicDeviceHub> _conicDeviceHub;
     private readonly ILogger<ZktServices> _logger;
 
     public static ZkemClient _service;
     private int machineNumber = 1;
 
-    public ZktServices(IServerServices serverServices, IHubContext<ClientBrowserHub> clientBrowserHub, ILogger<ZktServices> logger)
+    public ZktServices(IServerServices serverServices, IHubContext<ConicDeviceHub> conicDeviceHub, ILogger<ZktServices> logger)
     {
         _serverServices = serverServices;
-        _clientBrowserHub = clientBrowserHub;
+        _conicDeviceHub = conicDeviceHub;
         _logger = logger;
         if (_service is null)
         {
@@ -266,7 +266,7 @@ internal class ZktServices : IZktServices
                     if (attTransactionLog is null) break;
                     var log = _serverServices.PostLogToServer(attTransactionLog);
                     if (log is null) break;
-                    _clientBrowserHub.Clients.All.SendAsync("SendEventLog", log).Wait();
+                    _conicDeviceHub.Clients.All.SendAsync("SendEventLog", log).Wait();
                     break;
                 }
 
