@@ -31,7 +31,7 @@ public class FileDataController : Controller
     {
         try
         {
-            var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId && i.Type == "ProfilePicture").FirstOrDefault();
+            var file = DB.FileData.Where(i => i.TableName == TableName && i.Fktable == ObjId && i.Type == "ProfilePicture").OrderByDescending(o=>o.Id).FirstOrDefault();
             if (file is not null)
             {
                 string ImageUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/images/{TableName}/{file.Type}/{Path.GetFileName(file.FilePath)}";
