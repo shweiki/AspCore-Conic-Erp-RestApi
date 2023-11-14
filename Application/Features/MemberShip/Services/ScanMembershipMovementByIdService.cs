@@ -43,7 +43,7 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
             }
 
             int OStatus = member.Status;
-            double TotalMembershipMovementOrders = membershipMovement.MembershipMovementOrders.Where(x => x.Status == -2 || x.Status == -3).ToList().Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
+            double TotalMembershipMovementOrders = membershipMovement.MembershipMovementOrders.Where(x => x.Status == (int)MembershipMovementOrderStatus.InProgress || x.Status == (int)MembershipMovementOrderStatus.Calculated).ToList().Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
             int MembershipNumberDays = membershipMovement.Membership.NumberDays;// DB.Memberships.Where(m => m.Id == MS.MembershipId).FirstOrDefault().NumberDays;
             membershipMovement.StartDate = membershipMovement.StartDate.Date;
             membershipMovement.EndDate = membershipMovement.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders).Date.AddDays(1).AddSeconds(-1);
