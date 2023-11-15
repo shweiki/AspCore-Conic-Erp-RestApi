@@ -1,11 +1,10 @@
-﻿#nullable disable
+﻿using Domain.Entities;
 
-using Domain.Common;
+namespace Application.Features.MembershipMovement.Queries.GetMembershipMovementList;
 
-namespace Domain.Entities;
-
-public partial class MembershipMovement : AuditEntity
+public class MembershipMovementDto
 {
+
     public long Id { get; set; }
     public double TotalAmmount { get; set; }
     public double? Tax { get; set; }
@@ -20,7 +19,7 @@ public partial class MembershipMovement : AuditEntity
     public int MembershipId { get; set; }
     public string DiscountDescription { get; set; }
 
-    public virtual Member Member { get; set; }
+    public virtual Domain.Entities.Member Member { get; set; }
     public virtual Membership Membership { get; set; }
-    public virtual ICollection<MembershipMovementOrder> MembershipMovementOrders { get; set; }
+
 }

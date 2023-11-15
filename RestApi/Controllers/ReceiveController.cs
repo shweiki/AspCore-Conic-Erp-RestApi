@@ -26,7 +26,8 @@ public class ReceiveController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.ReceiveMethod,
@@ -61,7 +62,8 @@ public class ReceiveController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.ReceiveMethod,
@@ -85,7 +87,8 @@ public class ReceiveController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.ReceiveMethod,
@@ -108,7 +111,8 @@ public class ReceiveController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.ReceiveMethod,
@@ -131,7 +135,8 @@ public class ReceiveController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             x.Name,
             x.FakeDate,
             x.ReceiveMethod,
@@ -154,7 +159,8 @@ public class ReceiveController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.ReceiveMethod,
@@ -191,7 +197,8 @@ public class ReceiveController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.ReceiveMethod,
@@ -255,7 +262,6 @@ public class ReceiveController : Controller
                 Receive.IsPrime = collection.IsPrime;
                 Receive.MemberId = collection.MemberId;
                 Receive.Type = collection.Type;
-                Receive.EditorName = collection.EditorName;
 
                 DB.SaveChanges();
                 return Ok(true);

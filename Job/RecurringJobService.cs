@@ -23,7 +23,8 @@ public class RecurringJobService : BackgroundService
         try
         {
             string monthlyIntervalCron = Cron.Monthly(1);
-            string dailyIntervalCronActivated3AM = Cron.Daily(3);
+            string dailyIntervalCronActivated3AM = Cron.Daily(0); // UTC
+            string dailyIntervalCronActivated6AM = Cron.Daily(3); // UTC
             string hourIntervalCron = Cron.Hourly(6);
             string minuteIntervalCron = Cron.Minutely();
 
@@ -33,7 +34,7 @@ public class RecurringJobService : BackgroundService
             }
 
             _recurringJobManager.AddOrUpdate<MediatorHelper>("ScanMemberStatueJob", x => x.ScanMemberStatueJobCommand(), dailyIntervalCronActivated3AM);
-            _recurringJobManager.AddOrUpdate<MediatorHelper>("RecoveryDataBaseJob", x => x.RecoveryDataBaseJobCommand(), dailyIntervalCronActivated3AM);
+            _recurringJobManager.AddOrUpdate<MediatorHelper>("RecoveryDataBaseJob", x => x.RecoveryDataBaseJobCommand(), dailyIntervalCronActivated6AM);
             _recurringJobManager.AddOrUpdate<MediatorHelper>("CheckDeviceLogJob", x => x.CheckDeviceLogJobCommand(), dailyIntervalCronActivated3AM);
 
             _recurringJobManager.AddOrUpdate<MediatorHelper>("FixBase64ToPathWithLoadedJobd", x => x.FixBase64ToPathWithLoadedJobCommand(), monthlyIntervalCron);

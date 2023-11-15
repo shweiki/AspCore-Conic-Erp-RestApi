@@ -21,7 +21,8 @@ public class MembershipMovementOrderController : Controller
         var MembershipMovementOrder = DB.MembershipMovementOrder.Where(i => i.Id == Id).Select(x => new
         {
             x.Id,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             x.Type,
             x.StartDate,
             x.EndDate,
@@ -39,7 +40,8 @@ public class MembershipMovementOrderController : Controller
         var MembershipMovementOrder = DB.MembershipMovementOrder.Where(i => i.MemberShipMovementId == MemberShipId).Select(x => new
         {
             x.Id,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             x.Type,
             x.StartDate,
             x.EndDate,
@@ -62,7 +64,8 @@ public class MembershipMovementOrderController : Controller
             x.StartDate,
             x.EndDate,
             x.Status,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             x.MemberShipMovementId,
             x.Description,
             MembershipMovementType = DB.MembershipMovement.Where(m => m.Id == x.MemberShipMovementId).SingleOrDefault().Type,
@@ -110,7 +113,6 @@ public class MembershipMovementOrderController : Controller
                 membershipmovementorder.EndDate = collection.EndDate;
                 membershipmovementorder.Status = collection.Status;
                 membershipmovementorder.Description = collection.Description;
-                membershipmovementorder.EditorName = collection.EditorName;
 
 
                 DB.SaveChanges();

@@ -1,8 +1,11 @@
 ﻿using Application.Common.Interfaces;
+using Application.Features.MembershipMovement.Queries.GetMembershipMovementList;
 using Domain.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RestApi.Models;
 
 namespace RestApi.Controllers.WorkSpace;
 
@@ -11,102 +14,32 @@ public class MembershipMovementController : Controller
 {
     private readonly IApplicationDbContext DB;
     public IConfiguration _configuration { get; }
+    private readonly ISender _mediator;
 
-    public MembershipMovementController(IApplicationDbContext dbcontext, IConfiguration configuration)
+    public MembershipMovementController(IApplicationDbContext dbcontext, IConfiguration configuration, ISender mediator)
     {
         DB = dbcontext;
         _configuration = configuration;
+        _mediator = mediator;
     }
-
-    [Route("MembershipMovement/Create")]
-    [HttpPost]
-    public async Task<IActionResult> Create(MembershipMovement collection)
-    {
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                collection.StartDate = collection.StartDate.Date;
-                collection.EndDate = collection.EndDate.Date.AddDays(1).AddSeconds(-1);
-                DB.MembershipMovement.Add(collection);
-                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
-                return Created("", collection);
-
-            }
-            catch (Exception ex)
-            {
-                //Console.WriteLine(collection);
-                return Forbid(ex.Message);
-            }
-        }
-        return Forbid("False Valid");
-    }
-    [Route("MembershipMovement/Edit")]
-    [HttpPost]
-    public IActionResult Edit(MembershipMovement collection)
-    {
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                var MemberShipMovement = DB.MembershipMovement.Where(x => x.Id == collection.Id).SingleOrDefault();
-                MemberShipMovement.StartDate = collection.StartDate.Date;
-                MemberShipMovement.EndDate = collection.EndDate.Date.AddDays(1).AddSeconds(-1);
-                MemberShipMovement.Tax = collection.Tax;
-                MemberShipMovement.TotalAmmount = collection.TotalAmmount;
-                MemberShipMovement.Type = collection.Type;
-                MemberShipMovement.Discount = collection.Discount;
-                MemberShipMovement.Description = collection.Description;
-                MemberShipMovement.DiscountDescription = collection.DiscountDescription;
-                MemberShipMovement.MembershipId = collection.MembershipId;
-                MemberShipMovement.EditorName = collection.EditorName;
-
-                DB.SaveChanges();
-                return Ok(collection.Id);
-
-            }
-            catch (Exception ex)
-            {
-                //Console.WriteLine(collection);
-                return Forbid(ex.Message);
-            }
-        }
-        return Forbid("False Valid");
-    }
-    [Route("MembershipMovement/Delete")]
-    [HttpPost]
-    public async Task<IActionResult> Delete(long Id)
-    {
-        try
-        {
-            var entryAccount = await DB.EntryMovement.Where(x => x.TableName == "MembershipMovement" && x.Fktable == Id).FirstOrDefaultAsync();
-            if (entryAccount is not null)
-            {
-                var entryAccounting = await DB.EntryAccounting.Include(x => x.EntryMovements).SingleOrDefaultAsync(x => x.Id == entryAccount.EntryId);
-                DB.EntryMovement.RemoveRange(entryAccounting.EntryMovements);
-                DB.EntryAccounting.Remove(entryAccounting);
-            }
-            var membershipmovement = await DB.MembershipMovement.Include(x => x.MembershipMovementOrders).SingleOrDefaultAsync(x => x.Id == Id);
-            DB.MembershipMovementOrder.RemoveRange(membershipmovement.MembershipMovementOrders);
-            DB.MembershipMovement.Remove(membershipmovement);
-
-            await DB.SaveChangesAsync();
-            return Ok(true);
-
-            //   else return Forbid("Can't found entry account");
-
-        }
-        catch (Exception ex)
-        {
-            return Forbid(ex.Message);
-
-        }
-    }
-
-  
-    [Route("MembershipMovement/GetMembershipMovementByMemberId")]
+    [Route("MembershipMovement/GetMembershipMovementList")]
     [HttpGet]
-    public async Task<IActionResult> GetMembershipMovementByMemberId(long? MemberId)
+    public async Task<IActionResult> GetMembershipMovementList([FromQuery] SearchOptions options)
+    {
+        var query = new GetMembershipMovementListQuery
+        {
+            Start = options.Page,
+            Limit = options.Limit,
+            CreatedBy = options.Any,
+            SortBy = options.Sort,
+            IsDesc = options.Sort[0].Equals("+"),
+        };
+
+        var result = await _mediator.Send(query);
+        return Ok(result);
+
+    }
+    public async Task<IActionResult> GetMembershipMovementByMemberId(long MemberId)
     {
         var MembershipMovements = await DB.MembershipMovement.Where(z => z.MemberId == MemberId).Select(MS => new
         {
@@ -124,7 +57,8 @@ public class MembershipMovementController : Controller
             StartDate = DateOnly.Parse(MS.StartDate.ToShortDateString()),
             EndDate = DateOnly.Parse(MS.EndDate.ToShortDateString()),
             MS.Discount,
-            MS.EditorName,
+            MS.Created,
+            MS.CreatedBy,
             MS.Status,
             MS.Tax,
             TotalDays = Math.Ceiling((MS.EndDate.Date - MS.StartDate.Date).TotalDays),
@@ -137,8 +71,8 @@ public class MembershipMovementController : Controller
                 MSO.EndDate,
                 MSO.Status,
                 MSO.Description,
-                MSO.EditorName,
-
+                MSO.Created,
+                MSO.CreatedBy
             }).ToList(),
         }).ToListAsync();
 
@@ -148,7 +82,7 @@ public class MembershipMovementController : Controller
     }
     [Route("MembershipMovement/GetMembershipMovementById")]
     [HttpGet]
-    public IActionResult GetMembershipMovementById(long? Id)
+    public IActionResult GetMembershipMovementById(long Id)
     {
         var MembershipMovements = DB.MembershipMovement.Where(z => z.Id == Id).Select(x => new
         {
@@ -165,7 +99,8 @@ public class MembershipMovementController : Controller
             x.Discount,
             x.Tax,
             x.Status,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy
         }).SingleOrDefault();
 
 
@@ -188,7 +123,8 @@ public class MembershipMovementController : Controller
             x.DiscountDescription,
             x.Description,
             x.Status,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             x.MemberId,
             x.Member.AccountId,
             MemberName = x.Member.Name,
@@ -217,7 +153,8 @@ public class MembershipMovementController : Controller
              x.DiscountDescription,
              x.Description,
              x.Status,
-             x.EditorName,
+             x.Created,
+             x.CreatedBy,
              x.MemberId,
              x.Member.PhoneNumber1,
              x.Member.AccountId,
@@ -245,7 +182,8 @@ public class MembershipMovementController : Controller
             x.DiscountDescription,
             x.Description,
             x.Status,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             x.MemberId,
             x.Member.PhoneNumber1,
             x.Member.AccountId,
@@ -307,5 +245,88 @@ public class MembershipMovementController : Controller
             return Ok(ex.Message);
         }
 
+    }
+    [Route("MembershipMovement/Create")]
+    [HttpPost]
+    public async Task<IActionResult> Create(MembershipMovement collection)
+    {
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                collection.StartDate = collection.StartDate.Date;
+                collection.EndDate = collection.EndDate.Date.AddDays(1).AddSeconds(-1);
+                DB.MembershipMovement.Add(collection);
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
+                return Created("", collection);
+
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine(collection);
+                return Forbid(ex.Message);
+            }
+        }
+        return Forbid("False Valid");
+    }
+    [Route("MembershipMovement/Edit")]
+    [HttpPost]
+    public IActionResult Edit(MembershipMovement collection)
+    {
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                var MemberShipMovement = DB.MembershipMovement.Where(x => x.Id == collection.Id).SingleOrDefault();
+                MemberShipMovement.StartDate = collection.StartDate.Date;
+                MemberShipMovement.EndDate = collection.EndDate.Date.AddDays(1).AddSeconds(-1);
+                MemberShipMovement.Tax = collection.Tax;
+                MemberShipMovement.TotalAmmount = collection.TotalAmmount;
+                MemberShipMovement.Type = collection.Type;
+                MemberShipMovement.Discount = collection.Discount;
+                MemberShipMovement.Description = collection.Description;
+                MemberShipMovement.DiscountDescription = collection.DiscountDescription;
+                MemberShipMovement.MembershipId = collection.MembershipId;
+
+                DB.SaveChanges();
+                return Ok(collection.Id);
+
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine(collection);
+                return Forbid(ex.Message);
+            }
+        }
+        return Forbid("False Valid");
+    }
+    [Route("MembershipMovement/Delete")]
+    [HttpPost]
+    public async Task<IActionResult> Delete(long Id)
+    {
+        try
+        {
+            var entryAccount = await DB.EntryMovement.Where(x => x.TableName == "MembershipMovement" && x.Fktable == Id).FirstOrDefaultAsync();
+            if (entryAccount is not null)
+            {
+                var entryAccounting = await DB.EntryAccounting.Include(x => x.EntryMovements).SingleOrDefaultAsync(x => x.Id == entryAccount.EntryId);
+                DB.EntryMovement.RemoveRange(entryAccounting.EntryMovements);
+                DB.EntryAccounting.Remove(entryAccounting);
+            }
+            var membershipmovement = await DB.MembershipMovement.Include(x => x.MembershipMovementOrders).SingleOrDefaultAsync(x => x.Id == Id);
+            DB.MembershipMovementOrder.RemoveRange(membershipmovement.MembershipMovementOrders);
+            DB.MembershipMovement.Remove(membershipmovement);
+
+            await DB.SaveChangesAsync();
+            return Ok(true);
+
+            //   else return Forbid("Can't found entry account");
+
+        }
+        catch (Exception ex)
+        {
+            return Forbid(ex.Message);
+
+        }
     }
 }

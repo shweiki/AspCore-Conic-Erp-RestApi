@@ -1,8 +1,10 @@
 ﻿#nullable disable
 
+using Domain.Common;
+
 namespace Domain.Entities;
 
-public partial class CashPool
+public partial class CashPool : AuditEntity
 {
     public long Id { get; set; }
     public string Type { get; set; }
@@ -17,7 +19,6 @@ public partial class CashPool
     public DateTime DateTime { get; set; }
     public int Status { get; set; }
     public string Description { get; set; }
-    public string EditorName { get; set; }
     public string TableName { get; set; }
     public string Fktable { get; set; }
 }

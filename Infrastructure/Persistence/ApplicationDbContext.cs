@@ -27,7 +27,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public virtual DbSet<CompanyInfo> CompanyInfo => Set<CompanyInfo>();
     public virtual DbSet<Device> Device => Set<Device>();
     public virtual DbSet<Discount> Discount => Set<Discount>();
-    public virtual DbSet<EditorsUser> EditorsUser => Set<EditorsUser>();
     public virtual DbSet<Visit> Visit => Set<Visit>();
     public virtual DbSet<CashPool> CashPool => Set<CashPool>();
     public virtual DbSet<Driver> Driver => Set<Driver>();

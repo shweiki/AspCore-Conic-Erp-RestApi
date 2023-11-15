@@ -32,7 +32,8 @@ public class CashPoolController : Controller
             x.DateTime,
             x.Status,
             x.Description,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             x.TableName,
             x.Fktable,
             Totals = 0
@@ -86,21 +87,20 @@ public class CashPoolController : Controller
         {
             try
             {
-                CashPool Invoice = DB.CashPool.Where(x => x.Id == collection.Id).SingleOrDefault();
+                CashPool item = DB.CashPool.Where(x => x.Id == collection.Id).SingleOrDefault();
 
-                Invoice.Type = collection.Type;
-                Invoice.TotalCash = collection.TotalCash;
-                Invoice.TotalCoins = collection.TotalCoins;
-                Invoice.TotalVisa = collection.TotalVisa;
-                Invoice.TotalReject = collection.TotalReject;
-                Invoice.TotalOutlay = collection.TotalOutlay;
-                Invoice.TotalRestitution = collection.TotalRestitution;
-                Invoice.DateTime = collection.DateTime;
-                Invoice.Status = collection.Status;
-                Invoice.Description = collection.Description;
-                Invoice.EditorName = collection.EditorName;
-                Invoice.TableName = collection.TableName;
-                Invoice.Fktable = collection.Fktable;
+                item.Type = collection.Type;
+                item.TotalCash = collection.TotalCash;
+                item.TotalCoins = collection.TotalCoins;
+                item.TotalVisa = collection.TotalVisa;
+                item.TotalReject = collection.TotalReject;
+                item.TotalOutlay = collection.TotalOutlay;
+                item.TotalRestitution = collection.TotalRestitution;
+                item.DateTime = collection.DateTime;
+                item.Status = collection.Status;
+                item.Description = collection.Description;
+                item.TableName = collection.TableName;
+                item.Fktable = collection.Fktable;
 
                 DB.SaveChanges();
 
@@ -132,7 +132,8 @@ public class CashPoolController : Controller
             x.DateTime,
             x.Status,
             x.Description,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             x.TableName,
             x.Fktable,
         }).SingleOrDefault();

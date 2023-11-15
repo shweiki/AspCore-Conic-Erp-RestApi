@@ -20,7 +20,6 @@ public interface IApplicationDbContext
     DbSet<CompanyInfo> CompanyInfo { get; }
     DbSet<Device> Device { get; }
     DbSet<Discount> Discount { get; }
-    DbSet<EditorsUser> EditorsUser { get; }
     DbSet<Visit> Visit { get; }
     DbSet<CashPool> CashPool { get; }
     DbSet<Driver> Driver { get; }

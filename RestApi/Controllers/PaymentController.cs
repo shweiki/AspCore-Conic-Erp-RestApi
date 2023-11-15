@@ -27,7 +27,8 @@ public class PaymentController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
@@ -62,7 +63,8 @@ public class PaymentController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
@@ -87,7 +89,8 @@ public class PaymentController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             Name = (x.Member?.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
@@ -109,7 +112,8 @@ public class PaymentController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
@@ -132,7 +136,8 @@ public class PaymentController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
@@ -155,7 +160,8 @@ public class PaymentController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
@@ -192,7 +198,8 @@ public class PaymentController : Controller
             x.Id,
             x.TotalAmmount,
             x.Type,
-            x.EditorName,
+            x.Created,
+            x.CreatedBy,
             Name = (x.Vendor.Name ?? "") + (x.Member.Name ?? "") + (String.IsNullOrWhiteSpace(x.Name) ? "" : " - " + x.Name),
             x.FakeDate,
             x.PaymentMethod,
@@ -256,7 +263,6 @@ public class PaymentController : Controller
                 payment.IsPrime = collection.IsPrime;
                 payment.MemberId = collection.MemberId;
                 payment.Type = collection.Type;
-                payment.EditorName = collection.EditorName;
 
                 await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
@@ -277,7 +283,7 @@ public class PaymentController : Controller
         {
             try
             {
-                Payment payment = DB.Payment.Where(x => x.Id == ID).SingleOrDefault();
+                Payment payment = await DB.Payment.Where(x => x.Id == ID).SingleOrDefaultAsync();
                 payment.PaymentMethod = PaymentMethod;
                 await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);

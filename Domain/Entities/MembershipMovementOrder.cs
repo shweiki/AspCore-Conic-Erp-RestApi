@@ -1,8 +1,10 @@
 ﻿#nullable disable
 
+using Domain.Common;
+
 namespace Domain.Entities;
 
-public partial class MembershipMovementOrder
+public partial class MembershipMovementOrder : AuditEntity
 {
     public int Id { get; set; }
     public string Type { get; set; }
@@ -10,7 +12,6 @@ public partial class MembershipMovementOrder
     public DateTime EndDate { get; set; }
     public int Status { get; set; }
     public string Description { get; set; }
-    public string EditorName { get; set; }
     public long MemberShipMovementId { get; set; }
 
     public virtual MembershipMovement MemberShipMovement { get; set; }
