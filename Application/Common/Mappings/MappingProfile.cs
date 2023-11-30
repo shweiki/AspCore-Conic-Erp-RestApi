@@ -1,6 +1,9 @@
-﻿using Application.Features.MembershipMovement.Queries.GetMembershipMovementList;
+﻿using Application.Features.Member.Queries.GetAllMembers;
+using Application.Features.MembershipMovement.Queries.GetMembershipMovementList;
+using Application.Features.MemberShips.Queries.GetMemberShipList;
 using AutoMapper;
 using Domain.Entities;
+using System.Reflection;
 
 namespace Application.Common.Mappings;
 
@@ -8,8 +11,31 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-         CreateMap<MembershipMovement, MembershipMovementDto>().ReverseMap();
+
+        ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
+
+        CreateMap<Membership, MembershipDto>().ReverseMap();
+        CreateMap<Member, MemberDto>().ReverseMap();
+        CreateMap<MembershipMovement, MembershipMovementDto>().ReverseMap();
 
     }
 
+    private void ApplyMappingsFromAssembly(Assembly assembly)
+    {
+        var types = assembly.GetExportedTypes()
+            .Where(t => t.GetInterfaces().Any(i =>
+                i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMapFrom<>)))
+            .ToList();
+
+        foreach (var type in types)
+        {
+            var instance = Activator.CreateInstance(type);
+
+            var methodInfo = type.GetMethod("Mapping")
+                ?? type.GetInterface("IMapFrom`1")!.GetMethod("Mapping");
+
+            methodInfo?.Invoke(instance, new object[] { this });
+
+        }
+    }
 }

@@ -3,6 +3,7 @@ using Application.Common.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace RestApi.Controllers;
@@ -43,9 +44,9 @@ public class ReportController : Controller
     }
     [Route("Report/GetReportByType")]
     [HttpGet]
-    public IActionResult GetReportByType(string Type)
+    public async Task<IActionResult> GetReportByType(string Type)
     {
-        var Reports = DB.Report.Where(i => i.Type == Type).Select(x => new
+        var Reports = await DB.Report.Where(i => i.Type == Type).Select(x => new
         {
             x.Id,
             x.Name,
@@ -54,7 +55,7 @@ public class ReportController : Controller
             x.Html,
             x.Printer,
             x.Icon
-        }).ToList();
+        }).ToListAsync();
         return Ok(Reports);
     }
     [Route("Report/GetReport")]

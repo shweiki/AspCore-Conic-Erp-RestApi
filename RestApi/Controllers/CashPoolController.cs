@@ -2,6 +2,7 @@
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace RestApi.Controllers;
@@ -58,7 +59,7 @@ public class CashPoolController : Controller
     [HttpPost]
     [Route("CashPool/Create")]
 
-    public IActionResult Create(CashPool collection)
+    public async Task<IActionResult> Create(CashPool collection)
     {
         if (ModelState.IsValid)
         {
@@ -67,8 +68,9 @@ public class CashPoolController : Controller
                 // TODO: Add insert logic here
                 collection.DateTime = DateTime.Now;
                 DB.CashPool.Add(collection);
-                DB.SaveChanges();
-                return Ok(collection.Id);
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
+
+                return Ok(collection);
 
             }
             catch
@@ -81,13 +83,13 @@ public class CashPoolController : Controller
     }
     [Route("CashPool/Edit")]
     [HttpPost]
-    public IActionResult Edit(CashPool collection)
+    public async Task<IActionResult> Edit(CashPool collection)
     {
         if (ModelState.IsValid)
         {
             try
             {
-                CashPool item = DB.CashPool.Where(x => x.Id == collection.Id).SingleOrDefault();
+                CashPool item = await DB.CashPool.SingleOrDefaultAsync(x => x.Id == collection.Id);
 
                 item.Type = collection.Type;
                 item.TotalCash = collection.TotalCash;
@@ -102,7 +104,7 @@ public class CashPoolController : Controller
                 item.TableName = collection.TableName;
                 item.Fktable = collection.Fktable;
 
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
 
                 return Ok(true);
 

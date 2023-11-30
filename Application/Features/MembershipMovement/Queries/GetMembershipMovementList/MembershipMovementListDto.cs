@@ -8,7 +8,7 @@ public class MembershipMovementListDto
     }
 
     public IList<MembershipMovementDto> Items { get; set; }
-    public int TotalCount { get; set; }
-    public int TotalCountBeforeFilter { get; set; }
+    public int Rows { get; set; }
+    public int Totals { get; set; }
 
 }

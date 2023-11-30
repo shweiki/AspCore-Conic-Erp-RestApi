@@ -6,8 +6,10 @@ public class SearchOptions
     //public int Start { get; set; }
     //public int Length { get; set; }
     //public string SortBy { get; set; } = "";
-    //public bool IsDesc { get; set; }
-    //public string CreatedBy { get; set; } = "";
+    public int? MembershipId { get; set; }
+    public string CreatedBy { get; set; } = "";
+    public DateTime? DateFrom { get; set; }
+    public DateTime? DateTo { get; set; }
 
     public int Limit { get; set; }
     public string Sort { get; set; }

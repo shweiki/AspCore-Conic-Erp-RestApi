@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.Features.Member.Queries.GetAllMembers;
+using Application.Features.MemberShips.Queries.GetMemberShipList;
 
 namespace Application.Features.MembershipMovement.Queries.GetMembershipMovementList;
 
@@ -18,8 +19,12 @@ public class MembershipMovementDto
     public long MemberId { get; set; }
     public int MembershipId { get; set; }
     public string DiscountDescription { get; set; }
-
-    public virtual Domain.Entities.Member Member { get; set; }
-    public virtual Membership Membership { get; set; }
+    public DateTime Created { get; set; }
+    public string? CreatedBy { get; set; }
+    public DateTime? LastModified { get; set; }
+    public string? LastModifiedBy { get; set; }
+    public bool IsDeleted { get; set; }
+    public MemberDto Member { get; set; }
+    public MembershipDto Membership { get; set; }
 
 }

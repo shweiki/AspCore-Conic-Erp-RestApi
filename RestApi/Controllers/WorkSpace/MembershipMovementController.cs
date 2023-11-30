@@ -22,24 +22,36 @@ public class MembershipMovementController : Controller
         _configuration = configuration;
         _mediator = mediator;
     }
-    [Route("MembershipMovement/GetMembershipMovementList")]
+    [Route("MembershipMovement/GetByListQ")]
     [HttpGet]
-    public async Task<IActionResult> GetMembershipMovementList([FromQuery] SearchOptions options)
+    public async Task<IActionResult> GetByListQ([FromQuery] SearchOptions options)
     {
-        var query = new GetMembershipMovementListQuery
+        try
         {
-            Start = options.Page,
-            Limit = options.Limit,
-            CreatedBy = options.Any,
-            SortBy = options.Sort,
-            IsDesc = options.Sort[0].Equals("+"),
-        };
+            var query = new GetMembershipMovementListQuery
+            {
+                MembershipId = options.MembershipId,
+                DateFrom = options.DateFrom,
+                DateTo = options.DateTo,
+                Start = options.Page,
+                Limit = options.Limit,
+                CreatedBy = options.CreatedBy,
+                SortBy = options.Sort,
+                IsDesc = options.Sort[0].Equals("+"),
+            };
 
-        var result = await _mediator.Send(query);
-        return Ok(result);
-
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+        catch
+        {
+            return BadRequest();
+        }
     }
-    public async Task<IActionResult> GetMembershipMovementByMemberId(long MemberId)
+
+    [Route("MembershipMovement/GetMembershipMovementByMemberId")]
+    [HttpGet]
+    public async Task<IActionResult> GetMembershipMovementByMemberId(long? MemberId)
     {
         var MembershipMovements = await DB.MembershipMovement.Where(z => z.MemberId == MemberId).Select(MS => new
         {

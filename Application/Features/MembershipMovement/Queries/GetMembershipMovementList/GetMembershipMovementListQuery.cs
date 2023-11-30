@@ -10,6 +10,10 @@ namespace Application.Features.MembershipMovement.Queries.GetMembershipMovementL
 public class GetMembershipMovementListQuery : IRequest<MembershipMovementListDto>
 {
     public string? CreatedBy { get; set; }
+    public DateTime? DateFrom { get; set; }
+    public DateTime? DateTo { get; set; }
+    public int? MembershipId { get; set; }
+
     public int Start { get; set; }
     public int Limit { get; set; }
     public string SortBy { get; set; } = "";
@@ -41,13 +45,31 @@ public class GetMembershipMovementListQueryHandler : IRequestHandler<GetMembersh
 
 
         int totalCountBeforeFilter = await itemsQuery.CountAsync();
+        if (request.MembershipId is int)
+        {
+            itemsQuery = itemsQuery.Where(x => x.MembershipId == request.MembershipId);
+        }
+        if (request.DateFrom is not null)
+        {
+            itemsQuery = itemsQuery.Where(x => x.Created >= request.DateFrom.Value);
+        }
 
+        if (request.DateTo is not null)
+        {
+            //request.ToDate = request.ToDate.Value.Date.AddDays(1).AddMilliseconds(-1);
+            itemsQuery = itemsQuery.Where(x => x.Created <= request.DateTo.Value);
+        }
         if (!string.IsNullOrWhiteSpace(request.CreatedBy))
         {
             request.CreatedBy = request.CreatedBy.Trim().ToLower();
             itemsQuery = itemsQuery.Where(x => x.CreatedBy.ToLower().Contains(request.CreatedBy));
         }
         request.SortBy = request.SortBy?.ToLower();
+
+        if (!string.IsNullOrWhiteSpace(request.SortBy))
+        {
+            request.SortBy = "creationDate";
+        }
         var itemsOrdered = request.IsDesc ? request.SortBy switch
         {
             "status" => itemsQuery.OrderByDescending(x => x.Status),
@@ -62,11 +84,11 @@ public class GetMembershipMovementListQueryHandler : IRequestHandler<GetMembersh
             _ => itemsQuery.OrderBy(x => x.Created),
         };
 
-        var itemsTaken = itemsOrdered.Skip(request.Start).Take(request.Limit);
+        var itemsTaken = itemsOrdered.Skip(request.Start - 1).Take(request.Limit);
+
         var items = await itemsTaken
             .ProjectTo<MembershipMovementDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
-
         int totalCount = await itemsQuery
             .CountAsync(cancellationToken);
 
@@ -74,8 +96,8 @@ public class GetMembershipMovementListQueryHandler : IRequestHandler<GetMembersh
         return new MembershipMovementListDto
         {
             Items = items,
-            TotalCount = totalCount,
-            TotalCountBeforeFilter = totalCountBeforeFilter
+            Rows = totalCount,
+            Totals = totalCountBeforeFilter
         };
 
 
