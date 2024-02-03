@@ -43,10 +43,10 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
             }
 
             int OStatus = member.Status;
-            double TotalMembershipMovementOrders = membershipMovement.MembershipMovementOrders.Where(x => x.Status == (int)MembershipMovementOrderStatus.InProgress || x.Status == (int)MembershipMovementOrderStatus.Calculated).ToList().Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays);
+            double TotalMembershipMovementOrders = Math.Ceiling(membershipMovement.MembershipMovementOrders.Where(x => x.Status == (int)MembershipMovementOrderStatus.InProgress || x.Status == (int)MembershipMovementOrderStatus.Calculated).ToList().Aggregate(0.0, (acc, x) => acc + (x.EndDate - x.StartDate).TotalDays));
             int MembershipNumberDays = membershipMovement.Membership.NumberDays;// DB.Memberships.Where(m => m.Id == MS.MembershipId).FirstOrDefault().NumberDays;
             membershipMovement.StartDate = membershipMovement.StartDate.Date;
-            membershipMovement.EndDate = membershipMovement.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders).Date.AddDays(1).AddSeconds(-1);
+            membershipMovement.EndDate = membershipMovement.StartDate.AddDays(MembershipNumberDays + TotalMembershipMovementOrders);
             if (DateTime.Today >= membershipMovement.StartDate.Date && DateTime.Today <= membershipMovement.EndDate.Date.AddDays(1).AddSeconds(-1))
             {
 
@@ -86,7 +86,6 @@ public class ScanMembershipMovementByIdServiceHandler : IRequestHandler<ScanMemb
             {
                 if (membershipMovementOrder.Status == (int)MembershipMovementOrderStatus.Calculated)
                 {
-                    membershipMovement.EndDate = membershipMovement.EndDate.AddDays((membershipMovementOrder.EndDate - membershipMovementOrder.StartDate).TotalDays);
                     continue;
                 }
                 if (DateTime.Today >= membershipMovementOrder.StartDate.Date && DateTime.Today <= membershipMovementOrder.EndDate.Date.AddDays(1).AddSeconds(-1))

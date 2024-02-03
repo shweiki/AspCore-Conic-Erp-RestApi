@@ -236,11 +236,10 @@ public class MemberController : Controller
             }
             catch
             {
-                //Console.WriteLine(collection);
-                return Ok(false);
+                return BadRequest();
             }
         }
-        return Ok(false);
+        return BadRequest();
     }
 
     [Route("Member/Edit")]
@@ -249,30 +248,31 @@ public class MemberController : Controller
     {
         if (ModelState.IsValid)
         {
-            Member member = DB.Member.Where(x => x.Id == collection.Id).SingleOrDefault();
-            member.Name = collection.Name;
-            member.Ssn = collection.Ssn;
-            member.Email = collection.Email;
-            member.PhoneNumber1 = collection.PhoneNumber1;
-            member.PhoneNumber2 = collection.PhoneNumber2;
-            member.DateofBirth = collection.DateofBirth;
-            member.Description = collection.Description;
-            member.Status = collection.Status;
-            member.Type = collection.Type;
-            member.Tag = collection.Tag;
-            member.Vaccine = collection.Vaccine;
             try
             {
+                Member member = DB.Member.Where(x => x.Id == collection.Id).SingleOrDefault();
+                member.Name = collection.Name;
+                member.Ssn = collection.Ssn;
+                member.Email = collection.Email;
+                member.PhoneNumber1 = collection.PhoneNumber1;
+                member.PhoneNumber2 = collection.PhoneNumber2;
+                member.DateofBirth = collection.DateofBirth;
+                member.Description = collection.Description;
+                member.Status = collection.Status;
+                member.Type = collection.Type;
+                member.Tag = collection.Tag;
+                member.Vaccine = collection.Vaccine;
+
                 await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
             }
             catch
             {
                 //Console.WriteLine(collection);
-                return Ok(false);
+                return BadRequest();
             }
         }
-        return Ok(false);
+        return BadRequest();
     }
     [Route("Member/GetMemberById")]
     [HttpGet]

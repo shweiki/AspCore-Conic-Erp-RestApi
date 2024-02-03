@@ -283,7 +283,7 @@ public class MembershipMovementController : Controller
     }
     [Route("MembershipMovement/Edit")]
     [HttpPost]
-    public IActionResult Edit(MembershipMovement collection)
+    public async Task<IActionResult> Edit(MembershipMovement collection)
     {
         if (ModelState.IsValid)
         {
@@ -300,7 +300,7 @@ public class MembershipMovementController : Controller
                 MemberShipMovement.DiscountDescription = collection.DiscountDescription;
                 MemberShipMovement.MembershipId = collection.MembershipId;
 
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(collection.Id);
 
             }
@@ -329,7 +329,7 @@ public class MembershipMovementController : Controller
             DB.MembershipMovementOrder.RemoveRange(membershipmovement.MembershipMovementOrders);
             DB.MembershipMovement.Remove(membershipmovement);
 
-            await DB.SaveChangesAsync();
+            await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
             return Ok(true);
 
             //   else return Forbid("Can't found entry account");

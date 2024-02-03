@@ -79,7 +79,7 @@ public class MembershipMovementOrderController : Controller
 
     [Route("MembershipMovementOrder/Create")]
     [HttpPost]
-    public IActionResult Create(MembershipMovementOrder collection)
+    public async Task<IActionResult> Create(MembershipMovementOrder collection)
     {
         if (ModelState.IsValid)
         {
@@ -87,7 +87,7 @@ public class MembershipMovementOrderController : Controller
             {
 
                 DB.MembershipMovementOrder.Add(collection);
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
 
             }
@@ -101,7 +101,7 @@ public class MembershipMovementOrderController : Controller
     }
     [Route("MembershipMovementOrder/Edit")]
     [HttpPost]
-    public IActionResult Edit(MembershipMovementOrder collection)
+    public async Task<IActionResult> Edit(MembershipMovementOrder collection)
     {
         if (ModelState.IsValid)
         {
@@ -115,7 +115,7 @@ public class MembershipMovementOrderController : Controller
                 membershipmovementorder.Description = collection.Description;
 
 
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
             }
             catch
@@ -136,7 +136,7 @@ public class MembershipMovementOrderController : Controller
             MembershipMovementOrder membershipmovementorder = await DB.MembershipMovementOrder.FindAsync(Id);
             DB.MembershipMovementOrder.Remove(membershipmovementorder);
 
-            await DB.SaveChangesAsync();
+            await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
             return Ok(true);
         }
         catch (Exception ex)
@@ -147,7 +147,7 @@ public class MembershipMovementOrderController : Controller
     }
     [Route("MembershipMovementOrder/CreateMulti")]
     [HttpPost]
-    public IActionResult CreateMulti(List<MembershipMovementOrder> collection)
+    public async Task<IActionResult> CreateMulti(List<MembershipMovementOrder> collection)
     {
         if (ModelState.IsValid)
         {
@@ -155,7 +155,7 @@ public class MembershipMovementOrderController : Controller
             {
 
                 DB.MembershipMovementOrder.AddRange(collection);
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
 
             }
@@ -167,8 +167,4 @@ public class MembershipMovementOrderController : Controller
         }
         return Ok(false);
     }
-
-
-
-
 }

@@ -64,55 +64,55 @@ public class MembershipController : Controller
     }
     [Route("Membership/Create")]
     [HttpPost]
-    public IActionResult Create(Membership collection)
+    public async Task<IActionResult> Create(Membership collection)
     {
         if (ModelState.IsValid)
         {
             try
             {
                 DB.Membership.Add(collection);
-                DB.SaveChanges();
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
 
             }
             catch
             {
-                //Console.WriteLine(collection);
-                return Ok(false);
+                return BadRequest();
+
             }
         }
-        return Ok(false);
+        return BadRequest();
     }
 
     [Route("Membership/Edit")]
     [HttpPost]
-    public IActionResult Edit(Membership collection)
+    public async Task<IActionResult> Edit(Membership collection)
     {
         if (ModelState.IsValid)
         {
-            Membership Membership = DB.Membership.Where(x => x.Id == collection.Id).SingleOrDefault();
-            Membership.Name = collection.Name;
-            Membership.NumberDays = collection.NumberDays;
-            Membership.MinFreezeLimitDays = collection.MinFreezeLimitDays;
-            Membership.MaxFreezeLimitDays = collection.MaxFreezeLimitDays;
-            Membership.FullDayPrice = collection.FullDayPrice;
-            Membership.MorningPrice = collection.MorningPrice;
-            Membership.Tax = collection.Tax;
-            Membership.Rate = collection.Rate;
-            Membership.Description = collection.Description;
-            Membership.NumberClass = collection.NumberClass;
             try
             {
-                DB.SaveChanges();
+                Membership Membership = DB.Membership.Where(x => x.Id == collection.Id).SingleOrDefault();
+                Membership.Name = collection.Name;
+                Membership.NumberDays = collection.NumberDays;
+                Membership.MinFreezeLimitDays = collection.MinFreezeLimitDays;
+                Membership.MaxFreezeLimitDays = collection.MaxFreezeLimitDays;
+                Membership.FullDayPrice = collection.FullDayPrice;
+                Membership.MorningPrice = collection.MorningPrice;
+                Membership.Tax = collection.Tax;
+                Membership.Rate = collection.Rate;
+                Membership.Description = collection.Description;
+                Membership.NumberClass = collection.NumberClass;
+
+                await DB.SaveChangesAsync(new CancellationToken(), User.Identity.Name);
                 return Ok(true);
             }
             catch
             {
-                //Console.WriteLine(collection);
-                return Ok(false);
+                return BadRequest();
             }
         }
-        return Ok(false);
+        return BadRequest(false);
     }
 
 
