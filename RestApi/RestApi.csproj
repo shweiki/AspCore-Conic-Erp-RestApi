@@ -10,14 +10,14 @@
 
 	<ItemGroup>
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.25" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.25" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.25">
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.26" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.26" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.26">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
-		<PackageReference Include="Serilog.Sinks.MSSqlServer" Version="6.4.0" />
+		<PackageReference Include="Serilog.Sinks.MSSqlServer" Version="6.5.1" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 		<PackageReference Include="NinjaNye.SearchExtensions" Version="3.0.1" />
 		<PackageReference Include="System.IO.Ports" Version="7.0.0" />

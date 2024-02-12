@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Job", "Job\Job.csproj", "{F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZktClientService", "ZktClientService\ZktClientService.csproj", "{66449BD6-9DAD-4F18-950D-109D5681BD20}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WacomClientService", "WacomClientService\WacomClientService.csproj", "{13E2B1F7-8B9E-4A21-B14B-16790DC30637}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{66449BD6-9DAD-4F18-950D-109D5681BD20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66449BD6-9DAD-4F18-950D-109D5681BD20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66449BD6-9DAD-4F18-950D-109D5681BD20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13E2B1F7-8B9E-4A21-B14B-16790DC30637}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13E2B1F7-8B9E-4A21-B14B-16790DC30637}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13E2B1F7-8B9E-4A21-B14B-16790DC30637}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13E2B1F7-8B9E-4A21-B14B-16790DC30637}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
