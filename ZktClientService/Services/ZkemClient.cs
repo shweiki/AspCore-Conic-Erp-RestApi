@@ -117,7 +117,7 @@ public class ZkemClient
     private void zkemClient_OnAttTransactionEx(string EnrollNumber, int IsInValid, int AttState, int VerifyMethod, int Year, int Month, int Day, int Hour, int Minute, int Second, int WorkCode)
     {
         string Ip = "";
-        _objCZKEM.GetDeviceIP(1, ref Ip);
+        _objCZKEM.GetDeviceIP(2, ref Ip);
         _raiseDeviceEvent(new
         {
             Id = EnrollNumber,
