@@ -14,13 +14,13 @@ if (!Directory.Exists(ImagesPath))
 }
 // Add logging
 var logger = builder.CreateLogger(builder.Configuration);
+AppConfig.Initialize(builder.Configuration);
 
 // Add services to the container.
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddIdentityServices();
 builder.Services.AddApplicationServices();
 // Add services to the container.
-AppConfig.Initialize(builder.Configuration);
 
 builder.Services.AddApiServices();
 builder.Services.AddJWTAuthenticationServices(builder.Configuration);
