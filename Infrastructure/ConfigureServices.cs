@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Hangfire;
+using Infrastructure.Common.Mappings;
 using Infrastructure.Common.Services;
 using Infrastructure.Identity;
 using Infrastructure.Persistence;
@@ -17,6 +18,8 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddAutoMapper(typeof(Application.Common.Mappings.MappingProfile), typeof(MappingProfile));
+
         if (configuration.GetValue("UseInMemoryDatabase", false))
         {
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -69,16 +72,16 @@ public static class ConfigureServices
          .AddDefaultTokenProviders();
         services.AddHttpContextAccessor();
 
-       services.Configure<IdentityOptions>(options =>
-        {
-            // Default Password settings.
-            options.Password.RequireDigit = true;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequiredLength = 6;
-            options.Password.RequiredUniqueChars = 0;
-        });
+        services.Configure<IdentityOptions>(options =>
+         {
+             // Default Password settings.
+             options.Password.RequireDigit = true;
+             options.Password.RequireLowercase = false;
+             options.Password.RequireNonAlphanumeric = false;
+             options.Password.RequireUppercase = false;
+             options.Password.RequiredLength = 6;
+             options.Password.RequiredUniqueChars = 0;
+         });
         // Identity services
         //   services.TryAddScoped<IUserValidator<ApplicationUser>, UserValidator<ApplicationUser>>();
         //     services.TryAddScoped<IPasswordValidator<ApplicationUser>, PasswordValidator<ApplicationUser>>();

@@ -13,10 +13,7 @@ public class AccountController : ControllerBase
     private readonly JwtSettings _jwtSettings;
     private readonly IIdentityService _identityService;
 
-    public AccountController(
-    JwtSettings jwtSettings,
-    IIdentityService identityService
-    )
+    public AccountController(JwtSettings jwtSettings, IIdentityService identityService)
     {
         _jwtSettings = jwtSettings;
         _identityService = identityService;
