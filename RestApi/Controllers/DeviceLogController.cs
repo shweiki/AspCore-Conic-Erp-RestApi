@@ -82,6 +82,7 @@ public class DeviceLogController : ControllerBase
 
         return Ok(DeviceLogs);
     }
+    
     [Route("DeviceLog/GetById")]
     [HttpGet]
     public IActionResult GetById(long Id)
@@ -89,6 +90,7 @@ public class DeviceLogController : ControllerBase
 
         return Ok(DB.DeviceLog.Where(ml => ml.Id == Id).SingleOrDefault());
     }
+    
     [Route("DeviceLog/GetlastLogByUserId")]
     [HttpGet]
     public async Task<IActionResult> GetlastLogByUserId(string UserId, string TableName)
@@ -102,6 +104,7 @@ public class DeviceLogController : ControllerBase
         }
         return Ok(lastLog.DateTime);
     }
+    
     [Route("DeviceLog/GetByStatus")]
     [HttpGet]
     public async Task<IActionResult> GetByStatus(int Status, string TableName, int Limit, string Sort, int Page, string Any)
@@ -208,6 +211,82 @@ public class DeviceLogController : ControllerBase
         }).ToListAsync();
 
         return Ok(DeviceLogs);
+    }
+
+    [Route("DeviceLog/GetLogin")]
+    [HttpGet]
+    public async Task<IActionResult> GetLogin(int Status, string TableName, int Limit, string Sort, int Page, string Any)
+    {
+        //  await _mediator.Send(new GetMemberLogFromZktDataBaseJobCommand());
+
+        var deviceLogs = DB.DeviceLog.Where(x => x.Id % 2 == 0 && x.Status == Status && x.TableName == TableName && (Any == null || x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any))).AsQueryable();
+
+        deviceLogs = (Sort == "+id" ? deviceLogs.OrderBy(s => s.Id) : deviceLogs.OrderByDescending(s => s.Id));
+
+        var itemsQuery = await deviceLogs.Skip((Page - 1) * Limit).Take(Limit).ToListAsync();
+
+        var groupedQuery = itemsQuery.GroupBy(a => new { a.Fk, a.DateTime }).Select(g => g.Last());
+
+        var result = new List<dynamic>();
+
+        foreach (var deviceLog in groupedQuery)
+        {
+            var query = new GetMemberByIdQuery
+            {
+                Id = Convert.ToInt32(deviceLog.Fk)
+            };
+            var User = await _mediator.Send(query);
+
+            result.Add(new
+            {
+                deviceLog.Id,
+                deviceLog.DateTime,
+                deviceLog.Description,
+                deviceLog.Fk,
+                deviceLog.TableName,
+                User
+            });
+        }
+
+        return Ok(result);
+    }
+
+    [Route("DeviceLog/GetLogout")]
+    [HttpGet]
+    public async Task<IActionResult> GetLogout(int Status, string TableName, int Limit, string Sort, int Page, string Any)
+    {
+        //  await _mediator.Send(new GetMemberLogFromZktDataBaseJobCommand());
+
+        var deviceLogs = DB.DeviceLog.Where(x => x.Id % 2 == 1 && x.Status == Status && x.TableName == TableName && (Any == null || x.Fk.ToString().Contains(Any) || x.DateTime.ToString().Contains(Any))).AsQueryable();
+
+        deviceLogs = (Sort == "+id" ? deviceLogs.OrderBy(s => s.Id) : deviceLogs.OrderByDescending(s => s.Id));
+
+        var itemsQuery = await deviceLogs.Skip((Page - 1) * Limit).Take(Limit).ToListAsync();
+
+        var groupedQuery = itemsQuery.GroupBy(a => new { a.Fk, a.DateTime }).Select(g => g.Last());
+
+        var result = new List<dynamic>();
+
+        foreach (var deviceLog in groupedQuery)
+        {
+            var query = new GetMemberByIdQuery
+            {
+                Id = Convert.ToInt32(deviceLog.Fk)
+            };
+            var User = await _mediator.Send(query);
+
+            result.Add(new
+            {
+                deviceLog.Id,
+                deviceLog.DateTime,
+                deviceLog.Description,
+                deviceLog.Fk,
+                deviceLog.TableName,
+                User
+            });
+        }
+
+        return Ok(result);
     }
 
 }
