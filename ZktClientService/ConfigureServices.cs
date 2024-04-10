@@ -1,4 +1,4 @@
-﻿ using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using ZktClientService.Interfaces;
 using ZktClientService.Services;
 
@@ -9,7 +9,7 @@ public static class ConfigureServices
     public static IServiceCollection AddZktecoIntegrationServices(this IServiceCollection services)
     {
         services.TryAddSingleton<IServerServices, ServerServices>();
-        services.TryAddSingleton<IZktServices, ZktServices>();
+      //  services.TryAddSingleton<IZktServices, ZktServices>();
 
         return services;
     }

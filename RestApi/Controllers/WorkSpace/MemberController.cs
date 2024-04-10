@@ -1,9 +1,9 @@
-﻿using Application.Common.Enums;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Application.Features.Member.Queries.GetAllMembers;
 using Application.Features.MembershipMovement.Queries.GetAllMembershipMovement;
 using Application.Features.MembershipMovementOrder.Queries.GetAllMembershipMovementOrder;
 using Application.Features.MemberShips.Services;
+using Domain.Common.Enum;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

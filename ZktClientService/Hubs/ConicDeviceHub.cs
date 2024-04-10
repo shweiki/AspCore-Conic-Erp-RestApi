@@ -27,7 +27,7 @@ namespace ZktClientService.Hubs
         public async Task SendEventLog(object log)
         {
             await Clients.Caller.SendAsync("SendEventLog", log);
-        } 
+        }
         public async Task DeviceState(object msg)
         {
             await Clients.Caller.SendAsync("DeviceState", msg);
@@ -37,9 +37,7 @@ namespace ZktClientService.Hubs
         {
             try
             {
-                var devices = new List<DeviceInfo>();
-                _configuration.Bind("Device", devices);
-                var device = devices.Where(x => x.IP == iP).SingleOrDefault();
+                var device = _serverServices.Devices.Where(x => x.Ip == iP).SingleOrDefault();
                 if (device is null)
                 {
                     await Clients.Caller.SendAsync("SendMessage", "The device is not register");
@@ -50,12 +48,12 @@ namespace ZktClientService.Hubs
 
                 if (!deviceIsConnect)
                 {
-                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.IP, device.Port);
+                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.Ip, device.Port);
                     if (!deviceIsConnect)
                         await Clients.Caller.SendAsync("SendMessage", $"The device is not connect reason : {result}");
 
                 }
-                await Clients.Caller.SendAsync("SendMessage", $"Enroll User return {_zktServices.PutUser(device.IP, device.Port, objectId, name)} ");
+                await Clients.Caller.SendAsync("SendMessage", $"Enroll User return {_zktServices.PutUser(device.Ip, device.Port, objectId, name)} ");
                 return;
             }
             catch (Exception ex)
@@ -69,10 +67,7 @@ namespace ZktClientService.Hubs
         {
             try
             {
-
-                var devices = new List<DeviceInfo>();
-                _configuration.Bind("Device", devices);
-                var device = devices.Where(x => x.IP == iP).SingleOrDefault();
+                var device = _serverServices.Devices.Where(x => x.Ip == iP).SingleOrDefault();
                 if (device is null)
                 {
                     await Clients.Caller.SendAsync("SendMessage", "The device is not register");
@@ -83,15 +78,21 @@ namespace ZktClientService.Hubs
 
                 if (!deviceIsConnect)
                 {
-                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.IP, device.Port);
+                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.Ip, device.Port);
                     if (!deviceIsConnect)
                         await Clients.Caller.SendAsync("SendMessage", $"The device is not connect reason : {result}");
-
+                    return;
                 }
                 var users = _serverServices.GetUsers(accessToken);
+                if (users.Count == 0)
+                {
+                    await Clients.Caller.SendAsync("SendMessage", $"Users is Zero ");
+                    return;
+                }
+
                 foreach (var user in users)
                 {
-                    _zktServices.PutUser(device.IP, device.Port, user.Id, user.Name);
+                    _zktServices.PutUser(device.Ip, device.Port, user.Id, user.Name);
                 }
                 await Clients.Caller.SendAsync("SendMessage", $"Enroll Server Users is Done ");
 
@@ -108,9 +109,7 @@ namespace ZktClientService.Hubs
         {
             try
             {
-                var devices = new List<DeviceInfo>();
-                _configuration.Bind("Device", devices);
-                var device = devices.Where(x => x.IP == iP).SingleOrDefault();
+                var device = _serverServices.Devices.Where(x => x.Ip == iP).SingleOrDefault();
                 if (device is null)
                 {
                     await Clients.Caller.SendAsync("SendMessage", "The device is not register");
@@ -121,7 +120,7 @@ namespace ZktClientService.Hubs
 
                 if (!deviceIsConnect)
                 {
-                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.IP, device.Port);
+                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.Ip, device.Port);
 
                     await Clients.Caller.SendAsync("SendMessage", $"The device is connected {deviceIsConnect} reason : {result}");
 
@@ -141,9 +140,8 @@ namespace ZktClientService.Hubs
         {
             try
             {
-                var devices = new List<DeviceInfo>();
-                _configuration.Bind("Device", devices);
-                var device = devices.Where(x => x.IP == iP).SingleOrDefault();
+
+                var device = _serverServices.Devices.Where(x => x.Ip == iP).SingleOrDefault();
                 if (device is null)
                 {
                     await Clients.Caller.SendAsync("SendMessage", "The device is not register");
@@ -154,13 +152,13 @@ namespace ZktClientService.Hubs
 
                 if (!deviceIsConnect)
                 {
-                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.IP, device.Port);
+                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.Ip, device.Port);
                     if (!deviceIsConnect)
                         await Clients.Caller.SendAsync("SendMessage", $"The device is not connect reason : {result}");
 
                 }
 
-                await Clients.Caller.SendAsync("SendMessage", $"Clear Log device return {_zktServices.ClearLog(device.IP, device.Port)} ");
+                await Clients.Caller.SendAsync("SendMessage", $"Clear Log device return {_zktServices.ClearLog(device.Ip, device.Port)} ");
                 return;
             }
             catch (Exception ex)
@@ -174,9 +172,8 @@ namespace ZktClientService.Hubs
         {
             try
             {
-                var devices = new List<DeviceInfo>();
-                _configuration.Bind("Device", devices);
-                var device = devices.Where(x => x.IP == iP).SingleOrDefault();
+
+                var device = _serverServices.Devices.Where(x => x.Ip== iP).SingleOrDefault();
                 if (device is null)
                 {
                     await Clients.Caller.SendAsync("SendMessage", "The device is not register");
@@ -187,12 +184,12 @@ namespace ZktClientService.Hubs
 
                 if (!deviceIsConnect)
                 {
-                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.IP, device.Port);
+                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.Ip, device.Port);
                     if (!deviceIsConnect)
                         await Clients.Caller.SendAsync("SendMessage", $"The device is not connect reason : {result}");
 
                 }
-                IList<ZktLogRecord> zktLogRecord = _zktServices.GetLogData(device.IP, device.Port);
+                IList<ZktLogRecord> zktLogRecord = _zktServices.GetLogData(device.Ip, device.Port);
                 if (zktLogRecord is not null && zktLogRecord.Count > 0)
                 {
                     foreach (var record in zktLogRecord)
@@ -201,7 +198,7 @@ namespace ZktClientService.Hubs
                         {
                             Datetime = record.DateTime,
                             Id = record.IndRegID.ToString(),
-                            Ip = device.IP
+                            Ip = device.Ip
                         });
                     }
                 }
@@ -219,9 +216,7 @@ namespace ZktClientService.Hubs
         {
             try
             {
-                var devices = new List<DeviceInfo>();
-                _configuration.Bind("Device", devices);
-                var device = devices.Where(x => x.IP == iP).SingleOrDefault();
+                var device = _serverServices.Devices.Where(x => x.Ip == iP).SingleOrDefault();
                 if (device is null)
                 {
                     await Clients.Caller.SendAsync("SendMessage", "The device is not register");
@@ -232,13 +227,13 @@ namespace ZktClientService.Hubs
 
                 if (!deviceIsConnect)
                 {
-                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.IP, device.Port);
+                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.Ip, device.Port);
                     if (!deviceIsConnect)
                         await Clients.Caller.SendAsync("SendMessage", $"The device is not connect reason : {result}");
 
                 }
 
-                await Clients.Caller.SendAsync("SendMessage", $"Clear Administrators return {_zktServices.ClearAdministrators(device.IP, device.Port)} ");
+                await Clients.Caller.SendAsync("SendMessage", $"Clear Administrators return {_zktServices.ClearAdministrators(device.Ip, device.Port)} ");
                 return;
             }
             catch (Exception ex)
@@ -252,9 +247,7 @@ namespace ZktClientService.Hubs
         {
             try
             {
-                var devices = new List<DeviceInfo>();
-                _configuration.Bind("Device", devices);
-                var device = devices.Where(x => x.IP == iP).SingleOrDefault();
+                var device = _serverServices.Devices.Where(x => x.Ip== iP).SingleOrDefault();
                 if (device is null)
                 {
                     await Clients.Caller.SendAsync("SendMessage", "The device is not register");
@@ -265,13 +258,13 @@ namespace ZktClientService.Hubs
 
                 if (!deviceIsConnect)
                 {
-                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.IP, device.Port);
+                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.Ip, device.Port);
                     if (!deviceIsConnect)
                         await Clients.Caller.SendAsync("SendMessage", $"The device is not connect reason : {result}");
 
                 }
 
-                await Clients.Caller.SendAsync("SendMessage", $"Restart device return {_zktServices.ClearAdministrators(device.IP, device.Port)} ");
+                await Clients.Caller.SendAsync("SendMessage", $"Restart device return {_zktServices.ClearAdministrators(device.Ip, device.Port)} ");
                 return;
             }
             catch (Exception ex)
@@ -285,9 +278,7 @@ namespace ZktClientService.Hubs
         {
             try
             {
-                var devices = new List<DeviceInfo>();
-                _configuration.Bind("Device", devices);
-                var device = devices.Where(x => x.IP == iP).SingleOrDefault();
+                var device = _serverServices.Devices.Where(x => x.Ip == iP).SingleOrDefault();
                 if (device is null)
                 {
                     await Clients.Caller.SendAsync("SendMessage", "The device is not register");
@@ -298,13 +289,13 @@ namespace ZktClientService.Hubs
 
                 if (!deviceIsConnect)
                 {
-                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.IP, device.Port);
+                    (deviceIsConnect, string result) = _zktServices.ConnectByIp(device.Ip, device.Port);
                     if (!deviceIsConnect)
                         await Clients.Caller.SendAsync("SendMessage", $"The device is not connect reason : {result}");
 
                 }
 
-                await Clients.Caller.SendAsync("SendMessage", $"Turn Off device return {_zktServices.TurnOff(device.IP, device.Port)} ");
+                await Clients.Caller.SendAsync("SendMessage", $"Turn Off device return {_zktServices.TurnOff(device.Ip, device.Port)} ");
                 return;
             }
             catch (Exception ex)

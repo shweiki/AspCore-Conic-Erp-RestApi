@@ -1,6 +1,6 @@
-﻿using Application.Common.Enums;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Application.Features.MemberShips.Services;
+using Domain.Common.Enum;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

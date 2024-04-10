@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Net;
+﻿using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -31,7 +30,7 @@ public class UniversalStatic
             // Create a buffer of 32 bytes of data to be transmitted. 
             string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
             byte[] buffer = Encoding.ASCII.GetBytes(data);
-            int timeout = 120;
+            int timeout = 12000;
             PingReply reply = pingSender.Send(ipAddress, timeout, buffer, options);
 
             if (reply.Status == IPStatus.Success)

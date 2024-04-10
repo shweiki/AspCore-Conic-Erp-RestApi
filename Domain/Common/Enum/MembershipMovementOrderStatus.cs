@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Enums;
+﻿namespace Domain.Common.Enum;
 public enum MembershipMovementOrderStatus
 {
     Declined = -1,

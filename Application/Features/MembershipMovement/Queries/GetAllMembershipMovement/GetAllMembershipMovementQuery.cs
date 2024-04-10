@@ -1,5 +1,5 @@
-﻿using Application.Common.Enums;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Domain.Common.Enum;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -46,7 +46,7 @@ public class GetAllMembershipMovementQueryHandler : IRequestHandler<GetAllMember
             Status = MembershipMovementStatus.GetName(typeof(MembershipMovementStatus), x.Status)?.ToString(),
             x.Tax,
             TotalDays = Math.Ceiling((x.EndDate.Date - x.StartDate.Date).TotalDays),
-           // Remaining = Math.Ceiling((x.EndDate.Date - DateTime.Today).TotalDays),
+            // Remaining = Math.Ceiling((x.EndDate.Date - DateTime.Today).TotalDays),
         }).ToList<Object>();
 
     }

@@ -35,7 +35,7 @@ public class AddDeviceLogCommandHandler : IRequestHandler<AddDeviceLogCommand, b
 
         var Log = new Domain.Entities.DeviceLog
         {
-            Type = "In",
+            Type = Device.Type ?? "In",
             DateTime = request.Datetime,
             DeviceId = Device.Id,
             Status = 0,

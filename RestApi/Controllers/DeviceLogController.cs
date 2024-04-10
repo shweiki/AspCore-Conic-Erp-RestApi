@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RestApi.Models;
 
 namespace RestApi.Controllers;
 
@@ -65,12 +66,7 @@ public class DeviceLogController : ControllerBase
         return BadRequest(false);
     }
 
-    public class AttTransactionLog
-    {
-        public string Id { get; set; }
-        public DateTime Datetime { get; set; }
-        public string Ip { get; set; }
-    }
+
 
     [Authorize]
 
@@ -82,7 +78,7 @@ public class DeviceLogController : ControllerBase
 
         return Ok(DeviceLogs);
     }
-    
+
     [Route("DeviceLog/GetById")]
     [HttpGet]
     public IActionResult GetById(long Id)
@@ -90,7 +86,7 @@ public class DeviceLogController : ControllerBase
 
         return Ok(DB.DeviceLog.Where(ml => ml.Id == Id).SingleOrDefault());
     }
-    
+
     [Route("DeviceLog/GetlastLogByUserId")]
     [HttpGet]
     public async Task<IActionResult> GetlastLogByUserId(string UserId, string TableName)
@@ -104,7 +100,7 @@ public class DeviceLogController : ControllerBase
         }
         return Ok(lastLog.DateTime);
     }
-    
+
     [Route("DeviceLog/GetByStatus")]
     [HttpGet]
     public async Task<IActionResult> GetByStatus(int Status, string TableName, int Limit, string Sort, int Page, string Any)
@@ -197,7 +193,7 @@ public class DeviceLogController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetLogByUserId(string UserId, string TableName, DateTime? DateFrom, DateTime? DateTo)
     {
-        var DeviceLogs = await DB.DeviceLog.Where(x => x.Fk == UserId && x.TableName == TableName && x.DateTime >= DateFrom && x.DateTime <= DateTo).Select(x => new
+        var deviceLogs = DB.DeviceLog.Where(x => x.Fk == UserId && x.TableName == TableName && x.DateTime >= DateFrom && x.DateTime <= DateTo).Select(x => new
         {
             x.Status,
             x.Type,
@@ -208,9 +204,12 @@ public class DeviceLogController : ControllerBase
             x.Id,
             x.Fk,
             x.TableName
-        }).ToListAsync();
+        }).AsQueryable();
 
-        return Ok(DeviceLogs);
+
+        var itemsQuery = await deviceLogs.OrderBy(s => s.DateTime).ToListAsync();
+
+        return Ok(itemsQuery);
     }
 
     [Route("DeviceLog/GetLogin")]

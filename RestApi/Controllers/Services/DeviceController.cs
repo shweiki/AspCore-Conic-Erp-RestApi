@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Domain.Common.Enum;
 using Domain.Entities;
 using ESC_POS_USB_NET.Printer;
 using MediatR;
@@ -25,7 +26,7 @@ public class DeviceController : Controller
     [HttpGet]
     public IActionResult GetById(long? Id)
     {
-        var Device = DB.Device.Where(x => x.Id == Id).Select(x => new { x.Id, x.Name, x.Feel, x.Status, x.Port, x.MAC, x.Ip, x.Description }).SingleOrDefault();
+        var Device = DB.Device.Where(x => x.Id == Id).Select(x => new { x.Id, x.Name, x.AutoConnect, x.Status, x.Port, x.MAC, x.Ip, x.Description, x.Type }).SingleOrDefault();
 
         return Ok(Device);
     }
@@ -59,12 +60,13 @@ public class DeviceController : Controller
         {
             try
             {
-                var Device = DB.Device.Where(x => x.Id == collection.Id).SingleOrDefault();
+                var Device = DB.Device.SingleOrDefault(x => x.Id == collection.Id);
                 Device.Name = collection.Name;
+                Device.Type = collection.Type;
                 Device.Ip = collection.Ip;
                 Device.MAC = collection.MAC;
                 Device.Port = collection.Port;
-                Device.Feel = collection.Feel;
+                Device.AutoConnect = collection.AutoConnect;
                 Device.Status = collection.Status;
                 Device.LastSetDateTime = collection.LastSetDateTime;
                 Device.Description = collection.Description;
@@ -78,21 +80,6 @@ public class DeviceController : Controller
             }
         }
         return Ok(false);
-    }
-    [Route("Device/FeelDevice")]
-    [HttpGet]
-    public IActionResult FeelDevice()
-    {
-        try
-        {
-            var Devices = DB.Device.Where(x => x.Feel == true).ToList();
-            // Devices.ForEach(e => CheckDeviceHere((int)e.Id));
-            return Ok(true);
-        }
-        catch
-        {
-            return Ok(false);
-        }
     }
     [Route("Device/OpenCashDrawer")]
     [HttpGet]
@@ -133,18 +120,23 @@ public class DeviceController : Controller
         printer.PrintDocument();
         return Ok(true);
     }
+    [AllowAnonymous]
+
     [Route("Device/GetDevice")]
     [HttpGet]
     public IActionResult GetDevice()
     {
-        var Device = DB.Device.Select(d => new { d.Id, d.Name, d.Feel, d.Status, d.Port, d.Ip, d.Description }).ToList();
+        var Device = DB.Device.Select(d => new { d.Id, d.Name, d.AutoConnect, d.Status, d.Port, d.Ip, d.Type, d.Description }).ToList();
         return Ok(Device);
     }
+
+    [Authorize]
     [Route("Device/GetUsersForDevice")]
     [HttpGet]
+
     public async Task<IActionResult> GetUsersForDevice()
     {
-        var members = await DB.Member.Where(x => x.Status == 0).Select(x => new
+        var members = await DB.Member.Where(x => x.Status == (int)MemberStatus.Active).Select(x => new
         {
             Id = x.Id.ToString(),
             x.Name

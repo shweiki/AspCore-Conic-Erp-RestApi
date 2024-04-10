@@ -142,7 +142,7 @@ public class UserController : Controller
     public async Task<IActionResult> SetActive(string UserName, bool isActive)
     {
 
-        var result = await _identityService.UpdateUserStatusAsync(UserName , isActive);
+        var result = await _identityService.UpdateUserStatusAsync(UserName, isActive);
         if (!result.Succeeded)
         {
             return BadRequest(result);
