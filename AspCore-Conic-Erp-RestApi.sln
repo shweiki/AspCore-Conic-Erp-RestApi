@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Job", "Job\Job.csproj", "{F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZktClientService", "ZktClientService\ZktClientService.csproj", "{66449BD6-9DAD-4F18-950D-109D5681BD20}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientApp.Server", "ClientApp\ClientApp.Server\ClientApp.Server.csproj", "{A283B7C8-2B5D-4B88-BD9D-6D5A675A15CF}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{42B447A3-B694-47CF-A67B-BF224D9936AB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ztk-SDK-Ver6.3.1.37", "Ztk-SDK-Ver6.3.1.37", "{EA82FF75-1516-444C-9D0D-AD1BDC25F24C}"
@@ -93,10 +91,6 @@ Global
 		{66449BD6-9DAD-4F18-950D-109D5681BD20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66449BD6-9DAD-4F18-950D-109D5681BD20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66449BD6-9DAD-4F18-950D-109D5681BD20}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A283B7C8-2B5D-4B88-BD9D-6D5A675A15CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A283B7C8-2B5D-4B88-BD9D-6D5A675A15CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A283B7C8-2B5D-4B88-BD9D-6D5A675A15CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A283B7C8-2B5D-4B88-BD9D-6D5A675A15CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
